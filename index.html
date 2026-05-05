@@ -89,7 +89,7 @@ body{font-family:var(--sans);background:var(--paper2);color:var(--ink);min-heigh
 }
 .tab.active{color:var(--ink);font-weight:500;border-bottom-color:var(--ink)}
 .tab:hover:not(.active){color:var(--ink2);background:var(--paper2)}
-.tab.admin-only{display:none}
+.tab.admin-only{display:none}.tab.admin-visible{display:block!important}
 
 /* ── PANELS ── */
 .panel{display:none}.panel.active{display:block}
@@ -257,6 +257,7 @@ tr:hover td{background:var(--paper2);cursor:pointer}
       <button class="tab admin-only" data-tab="predict" onclick="switchTab('predict',this)">Win Probability</button>
       <button class="tab admin-only" data-tab="routes" onclick="switchTab('routes',this)">Routes</button>
       <button class="tab admin-only" data-tab="formulas" onclick="switchTab('formulas',this)">Formulas</button>
+      <button class="tab admin-only" data-tab="calendar" onclick="switchTab('calendar',this)">📅 Sig Calendar</button>
     </div>
   </div>
 
@@ -513,6 +514,51 @@ Red still more likely to achieve AWP (33.6% vs 25.2%)</div>
     </div>
   </div>
 
+  <!-- ── SIG CALENDAR (admin) ── -->
+  <div id="tab-calendar" class="panel">
+    <div class="page">
+
+      <!-- Add event form -->
+      <div class="card">
+        <p class="sec">Add Sig Event</p>
+        <div class="g3" style="margin-bottom:12px">
+          <div><label>Event name</label><input id="cal-name" placeholder="e.g. Mall of America Sig"></div>
+          <div><label>Start date</label><input type="date" id="cal-start"></div>
+          <div><label>End date</label><input type="date" id="cal-end"></div>
+        </div>
+        <div class="g2" style="margin-bottom:12px">
+          <div><label>Location (optional)</label><input id="cal-loc" placeholder="e.g. Minneapolis, MN"></div>
+          <div><label>Notes (optional)</label><input id="cal-notes" placeholder="e.g. Worlds qualifying event"></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-p" onclick="addCalEvent()">Add event</button>
+          <button class="btn" onclick="clearCalForm()">Clear</button>
+        </div>
+        <div id="cal-msg"></div>
+      </div>
+
+      <!-- Filter leaderboard by event period -->
+      <div class="card">
+        <p class="sec">Filter leaderboard by event period</p>
+        <p class="hint" style="margin-bottom:12px">Select a Sig event below to see the leaderboard using only entries from that time window.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
+          <select id="cal-filter-select" onchange="applyCalFilter()" style="max-width:320px">
+            <option value="">— Show all entries (no filter) —</option>
+          </select>
+          <button class="btn btn-sm" onclick="clearCalFilter()">Clear filter</button>
+        </div>
+        <div id="cal-filter-status" style="font-size:13px;color:var(--ink3);font-family:var(--mono)"></div>
+      </div>
+
+      <!-- Event list -->
+      <div class="card">
+        <p class="sec">Scheduled Sig events</p>
+        <div id="calList"><div class="empty" style="padding:1.5rem">No events added yet.</div></div>
+      </div>
+
+    </div>
+  </div>
+
 </div><!-- end appShell -->
 
 <!-- Detail overlay (shared) -->
@@ -567,7 +613,7 @@ function tryLogin() {
     sessionStorage.setItem('admin', '1');
     closeLoginModal();
     // Reveal admin tabs
-    document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+    document.querySelectorAll('.admin-only').forEach(el => el.classList.add('admin-visible'));
     document.getElementById('modeBadge').textContent = 'Admin';
     document.getElementById('modeBadge').className = 'mode-badge mode-admin';
     document.getElementById('logoutBtn').style.display = '';
@@ -583,7 +629,7 @@ function tryLogin() {
 function logout() {
   sessionStorage.removeItem('admin');
   isAdmin = false;
-  document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('admin-visible'));
   document.getElementById('modeBadge').textContent = 'Viewer';
   document.getElementById('modeBadge').className = 'mode-badge mode-pub';
   document.getElementById('logoutBtn').style.display = 'none';
@@ -598,7 +644,10 @@ function logout() {
 function launchApp(admin) {
   document.getElementById('appShell').style.display = 'block';
   // Admin tabs hidden by default for viewers
-  document.querySelectorAll('.admin-only').forEach(el => el.style.display = admin ? '' : 'none');
+  document.querySelectorAll('.admin-only').forEach(el => {
+    if(admin) el.classList.add('admin-visible');
+    else el.classList.remove('admin-visible');
+  });
   document.getElementById('modeBadge').textContent = admin ? 'Admin' : 'Viewer';
   document.getElementById('modeBadge').className = 'mode-badge ' + (admin ? 'mode-admin' : 'mode-pub');
   document.getElementById('logoutBtn').style.display = admin ? '' : 'none';
@@ -1087,6 +1136,158 @@ if(sessionStorage.getItem('admin') === '1') {
 } else {
   launchApp(false);
 }
+
+/* ═══════════════════════════════════════════════════════
+   SIG CALENDAR
+════════════════════════════════════════════════════════ */
+let calEvents = JSON.parse(localStorage.getItem('override_cal') || '[]');
+let activeCalFilter = null; // { start, end, name } or null
+
+function saveCalEvents() {
+  try { localStorage.setItem('override_cal', JSON.stringify(calEvents)); } catch(e){}
+}
+
+function addCalEvent() {
+  const name  = document.getElementById('cal-name').value.trim();
+  const start = document.getElementById('cal-start').value;
+  const end   = document.getElementById('cal-end').value;
+  const loc   = document.getElementById('cal-loc').value.trim();
+  const notes = document.getElementById('cal-notes').value.trim();
+  if(!name || !start || !end) { showMsg('cal-msg','Name, start and end date are required.','err'); return; }
+  if(start > end) { showMsg('cal-msg','Start date must be before end date.','err'); return; }
+  calEvents.push({ id: Date.now(), name, start, end, loc, notes });
+  calEvents.sort((a,b) => a.start.localeCompare(b.start));
+  saveCalEvents();
+  renderCalList();
+  updateCalSelect();
+  clearCalForm();
+  showMsg('cal-msg','Event added!','ok');
+}
+
+function clearCalForm() {
+  ['cal-name','cal-start','cal-end','cal-loc','cal-notes'].forEach(id => document.getElementById(id).value = '');
+}
+
+function deleteCalEvent(id) {
+  if(!confirm('Delete this event?')) return;
+  calEvents = calEvents.filter(e => e.id !== id);
+  saveCalEvents();
+  renderCalList();
+  updateCalSelect();
+  if(activeCalFilter && activeCalFilter.id === id) clearCalFilter();
+}
+
+function renderCalList() {
+  const el = document.getElementById('calList');
+  if(!calEvents.length) { el.innerHTML = '<div class="empty" style="padding:1.5rem">No events added yet.</div>'; return; }
+  const now = new Date().toISOString().slice(0,10);
+  el.innerHTML = calEvents.map(e => {
+    const isPast    = e.end < now;
+    const isCurrent = e.start <= now && e.end >= now;
+    const status    = isCurrent ? '<span class="badge b-awp">LIVE</span>' : isPast ? '<span class="badge b-no">Past</span>' : '<span class="badge b-sig">Upcoming</span>';
+    const entryCount = allEntries.filter(en => {
+      const d = (en.created_at||en.ts||'').slice(0,10);
+      return d >= e.start && d <= e.end;
+    }).length;
+    return `<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0;border-bottom:.5px solid var(--paper3);gap:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        <div style="font-weight:600;font-size:14px;margin-bottom:4px">${e.name} ${status}</div>
+        <div style="font-size:12px;font-family:var(--mono);color:var(--ink3)">${e.start} → ${e.end}${e.loc?' · '+e.loc:''}</div>
+        ${e.notes?`<div style="font-size:12px;color:var(--ink2);margin-top:3px">${e.notes}</div>`:''}
+        <div style="font-size:11px;font-family:var(--mono);color:var(--ink3);margin-top:4px">${entryCount} scouting entr${entryCount!==1?'ies':'y'} in this window</div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+        <button class="btn btn-sm" onclick="filterByEvent(${e.id})">Filter leaderboard</button>
+        <button class="btn btn-sm btn-d" onclick="deleteCalEvent(${e.id})">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateCalSelect() {
+  const sel = document.getElementById('cal-filter-select');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Show all entries (no filter) —</option>';
+  calEvents.forEach(e => {
+    const opt = document.createElement('option');
+    opt.value = e.id;
+    opt.textContent = e.name + ' (' + e.start + ' → ' + e.end + ')';
+    sel.appendChild(opt);
+  });
+  if(cur) sel.value = cur;
+}
+
+function filterByEvent(id) {
+  const ev = calEvents.find(e => e.id === id);
+  if(!ev) return;
+  activeCalFilter = ev;
+  applyCalFilterToLeaderboard(ev);
+}
+
+function applyCalFilter() {
+  const id = parseInt(document.getElementById('cal-filter-select').value);
+  if(!id) { clearCalFilter(); return; }
+  const ev = calEvents.find(e => e.id === id);
+  if(ev) { activeCalFilter = ev; applyCalFilterToLeaderboard(ev); }
+}
+
+function applyCalFilterToLeaderboard(ev) {
+  // Filter allEntries to only entries within this event window
+  const filtered = allEntries.filter(en => {
+    const d = (en.created_at||en.ts||'').slice(0,10);
+    return d >= ev.start && d <= ev.end;
+  });
+  const filteredTeams = buildStats(filtered);
+
+  // Update leaderboard with filtered data
+  lbFiltered = [...filteredTeams];
+  lbPg = 1;
+  lbSortRender();
+
+  // Update summary cards
+  const totP = filtered.reduce((s,e)=>s+pins(e),0);
+  const avgP = filtered.length ? (totP/filtered.length).toFixed(1) : '—';
+  const awpR = filtered.length ? Math.round(filtered.filter(e=>e.awp==='Y').length/filtered.length*100) : 0;
+  document.getElementById('lbT').textContent = filteredTeams.length;
+  document.getElementById('lbE').textContent = filtered.length;
+  document.getElementById('lbP').textContent = avgP;
+  document.getElementById('lbA').textContent = awpR + '%';
+
+  // Show status
+  document.getElementById('cal-filter-status').innerHTML =
+    '✓ Leaderboard filtered to <strong>' + ev.name + '</strong> (' + ev.start + ' → ' + ev.end + ') — ' +
+    filtered.length + ' entries, ' + filteredTeams.length + ' teams. <a href="#" onclick="clearCalFilter();return false;" style="color:var(--blue)">Clear filter</a>';
+
+  // Switch to leaderboard tab to show result
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelector('[data-tab="leaderboard"]').classList.add('active');
+  document.getElementById('tab-leaderboard').classList.add('active');
+
+  setSyncStatus('ok', 'Filtered: ' + ev.name);
+}
+
+function clearCalFilter() {
+  activeCalFilter = null;
+  document.getElementById('cal-filter-select').value = '';
+  document.getElementById('cal-filter-status').textContent = '';
+  lbFiltered = [...allTeams];
+  lbPg = 1;
+  lbSortRender();
+  // Restore full counts
+  const totP = allEntries.reduce((s,e)=>s+pins(e),0);
+  const avgP = allEntries.length ? (totP/allEntries.length).toFixed(1) : '—';
+  const awpR = allEntries.length ? Math.round(allEntries.filter(e=>e.awp==='Y').length/allEntries.length*100) : 0;
+  document.getElementById('lbT').textContent = allTeams.length;
+  document.getElementById('lbE').textContent = allEntries.length;
+  document.getElementById('lbP').textContent = avgP;
+  document.getElementById('lbA').textContent = awpR + '%';
+  setSyncStatus('ok', allTeams.length+' teams · '+allEntries.length+' entries');
+}
+
+// Init calendar UI
+updateCalSelect();
+renderCalList();
 </script>
 </body>
 </html>
