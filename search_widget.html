@@ -572,23 +572,54 @@ function clearConfig() {
   document.getElementById('cfg-msg').textContent = 'Cleared.';
 }
 
+/* ── Build team stats from raw entries (no view dependency) ── */
+function buildTeamStats(entries) {
+  const map = {};
+  entries.forEach(e => {
+    const t = (e.team || '').toUpperCase().trim();
+    if(!t) return;
+    if(!map[t]) map[t] = { team: t, matches: [], routes: new Set(), types: new Set(), last_seen: '' };
+    map[t].matches.push(e);
+    if(e.route && e.route !== 'Unknown route') map[t].routes.add(e.route);
+    if(e.type) map[t].types.add(e.type);
+    if(e.created_at > map[t].last_seen) map[t].last_seen = e.created_at;
+  });
+  return Object.values(map).map(g => {
+    const ms = g.matches;
+    const totalPins = ms.reduce((s, e) => {
+      return s + (e.pins||'0').split('+').map(n=>parseInt(n)||0).reduce((a,b)=>a+b,0);
+    }, 0);
+    const awpCount = ms.filter(e => e.awp === 'Y').length;
+    const sigCount = ms.filter(e => e.sig === 'yes').length;
+    const totalBon = ms.reduce((s,e) => s + (parseInt(e.bonuses)||0), 0);
+    return {
+      team: g.team,
+      match_count: ms.length,
+      avg_pins: ms.length ? (totalPins / ms.length).toFixed(2) : '0',
+      avg_bonuses: ms.length ? (totalBon / ms.length).toFixed(2) : '0',
+      awp_rate_pct: ms.length ? (awpCount / ms.length * 100).toFixed(1) : '0',
+      awp_count: awpCount,
+      sig_matches: sigCount,
+      known_routes: [...g.routes].join(' · ') || 'Unknown',
+      robot_types: [...g.types].join(', ') || '',
+      last_seen: g.last_seen,
+      raw_matches: ms
+    };
+  });
+}
+
 /* ── Init ── */
 async function init() {
-  if(!SUPABASE_URL || !SUPABASE_KEY) {
-    showConfig();
-    return;
-  }
   showEmpty('Connecting to database…');
   try {
-    [allTeams, allEntries] = await Promise.all([
-      apiFetch('team_stats?select=*&order=avg_pins.desc'),
-      apiFetch('entries?select=*&order=created_at.desc&limit=500')
-    ]);
-    setStatus('live', allTeams.length + ' teams in database');
+    // Fetch all entries directly — no view needed
+    allEntries = await apiFetch('entries?select=*&order=created_at.desc&limit=2000');
+    allTeams   = buildTeamStats(allEntries);
+    setStatus('live', allTeams.length + ' team' + (allTeams.length !== 1 ? 's' : '') + ' in database');
     applyFilter(activeFilter);
   } catch(e) {
     setStatus('err', 'Connection failed');
-    showEmpty('Could not connect. <a href="#" onclick="showConfig();return false;" style="color:var(--accent)">Click here to update your credentials</a>');
+    showEmpty('Could not connect to database. Check your Supabase URL and key.');
     console.error(e);
   }
 }
@@ -727,7 +758,7 @@ function changePage(dir) {
 /* ── Detail overlay ── */
 function openDetail(team) {
   const t = typeof team === 'string' ? JSON.parse(team) : team;
-  const teamEntries = allEntries.filter(e => e.team.toUpperCase() === t.team.toUpperCase());
+  const teamEntries = t.raw_matches || allEntries.filter(e => (e.team||'').toUpperCase() === t.team.toUpperCase());
   const awpPct = parseFloat(t.awp_rate_pct || 0);
 
   const routes = (t.known_routes || 'Unknown').split(' · ').map(r =>
