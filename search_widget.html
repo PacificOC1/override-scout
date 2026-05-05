@@ -423,12 +423,31 @@ body {
 <body>
 <div class="shell">
 
-  <!-- Config warning (shown if keys not set) -->
-  <div class="config-warn" id="configWarn">
-    ⚠️ <strong>Setup needed:</strong> Open this file and replace <code>YOUR_SUPABASE_URL</code> and
-    <code>YOUR_SUPABASE_ANON_KEY</code> near the bottom of the file with your real Supabase credentials.
-    See the setup guide for instructions.
+  <!-- Config panel (shown when no credentials saved) -->
+  <div id="configPanel" style="display:none;max-width:520px;margin:2rem auto;border:1.5px solid var(--ink);border-radius:12px;padding:1.5rem;background:var(--paper)">
+    <div style="font-size:20px;font-weight:700;margin-bottom:4px">Connect to Supabase</div>
+    <div style="font-size:12px;color:var(--ink3);font-family:var(--mono);margin-bottom:1.25rem;text-transform:uppercase;letter-spacing:.5px">One-time setup · saved in this browser</div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:12px;color:var(--ink2);display:block;margin-bottom:4px">Project URL</label>
+      <input id="cfg-url" type="text" placeholder="https://xxxxxxxxxxxxxx.supabase.co"
+        style="width:100%;padding:10px 12px;border:1.5px solid #ccc;border-radius:6px;font-size:14px;font-family:var(--mono)">
+      <div style="font-size:11px;color:var(--ink3);margin-top:4px">supabase.com → your project → Settings → API Keys → Project URL</div>
+    </div>
+    <div style="margin-bottom:16px">
+      <label style="font-size:12px;color:var(--ink2);display:block;margin-bottom:4px">Publishable / Anon Key</label>
+      <input id="cfg-key" type="text" placeholder="sb_publishable_... or eyJ..."
+        style="width:100%;padding:10px 12px;border:1.5px solid #ccc;border-radius:6px;font-size:14px;font-family:var(--mono)">
+      <div style="font-size:11px;color:var(--ink3);margin-top:4px">Settings → API Keys → Publishable key (NOT the secret key)</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <button onclick="saveConfig()" style="padding:10px 20px;background:#0f0f0d;color:#fff;border:none;border-radius:6px;font-size:14px;cursor:pointer;font-family:var(--sans)">Save &amp; Connect</button>
+      <button onclick="clearConfig()" style="padding:10px 16px;background:transparent;border:1px solid #ccc;border-radius:6px;font-size:14px;cursor:pointer;font-family:var(--sans)">Clear</button>
+    </div>
+    <div id="cfg-msg" style="font-size:13px;min-height:20px"></div>
   </div>
+
+  <!-- Main content (hidden while config panel is shown) -->
+  <div id="mainWrap">
 
   <!-- Header -->
   <div class="hd">
@@ -439,6 +458,7 @@ body {
     <div class="db-status">
       <div class="status-dot" id="statusDot"></div>
       <span id="statusLabel">Connecting…</span>
+      <button onclick="showConfig()" style="margin-left:8px;padding:3px 10px;border:1px solid #ccc;border-radius:4px;font-size:11px;cursor:pointer;background:transparent;font-family:var(--mono)">⚙ Configure</button>
     </div>
   </div>
 
@@ -474,6 +494,7 @@ body {
   </div>
 
 </div><!-- end shell -->
+</div><!-- end mainWrap -->
 
 <!-- Team detail overlay -->
 <div class="detail-overlay" id="detailOverlay" onclick="closeDetail(event)">
@@ -484,46 +505,80 @@ body {
 </div>
 
 <script>
-/* ══════════════════════════════════════════════════════
-   ▶  CONFIGURATION — replace these two values
-   ══════════════════════════════════════════════════════ */
-const SUPABASE_URL  = 'https://ajymmthxmdyhkiynwhuf.supabase.co';   // e.g. https://abcdefgh.supabase.co
-const SUPABASE_KEY  = 'sb_publishable_1r5xHNrNLbRHB_GcJMgsjg_fwEvgdqS';  // long string starting with eyJ…
-/* ══════════════════════════════════════════════════════ */
+/* ── Config — saved in browser localStorage, no file editing needed ── */
+let SUPABASE_URL = localStorage.getItem('sw_sb_url') || '';
+let SUPABASE_KEY = localStorage.getItem('sw_sb_key') || '';
 
 const PAGE_SIZE = 20;
 let allTeams   = [];
 let filtered   = [];
 let currentPage= 1;
 let sortCol    = 'avg_pins';
-let sortDir    = -1; // -1 = desc
+let sortDir    = -1;
 let activeFilter = 'all';
-let allEntries = []; // raw entries for match history
+let allEntries = [];
 
 /* ── API helpers ── */
-function apiUrl(table, params='') {
-  return `${SUPABASE_URL}/rest/v1/${table}${params}`;
+function getHeaders() {
+  return {
+    'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer ' + SUPABASE_KEY,
+    'Content-Type': 'application/json'
+  };
 }
-const HEADERS = {
-  'apikey': SUPABASE_KEY,
-  'Authorization': 'Bearer ' + SUPABASE_KEY,
-  'Content-Type': 'application/json'
-};
 
 async function apiFetch(path) {
-  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, { headers: HEADERS });
+  const base = SUPABASE_URL.replace(/\/+$/, '');
+  const res = await fetch(base + '/rest/v1/' + path, { headers: getHeaders() });
   if(!res.ok) throw new Error('HTTP ' + res.status);
   return res.json();
 }
 
+/* ── Config panel functions ── */
+function showConfig() {
+  document.getElementById('configPanel').style.display = 'block';
+  document.getElementById('mainWrap').style.display = 'none';
+}
+function hideConfig() {
+  document.getElementById('configPanel').style.display = 'none';
+  document.getElementById('mainWrap').style.display = 'block';
+}
+function saveConfig() {
+  const url = document.getElementById('cfg-url').value.trim().replace(/\/+$/, '');
+  const key = document.getElementById('cfg-key').value.trim();
+  const msg = document.getElementById('cfg-msg');
+  if(!url.startsWith('https://') || !url.includes('.supabase.co')) {
+    msg.textContent = '⚠ URL must look like: https://xxxxxx.supabase.co';
+    msg.style.color = '#c8410a'; return;
+  }
+  if(!key || key.length < 20) {
+    msg.textContent = '⚠ Key too short — copy the full publishable key';
+    msg.style.color = '#c8410a'; return;
+  }
+  SUPABASE_URL = url;
+  SUPABASE_KEY = key;
+  localStorage.setItem('sw_sb_url', url);
+  localStorage.setItem('sw_sb_key', key);
+  msg.textContent = '✓ Saved! Connecting...';
+  msg.style.color = '#2d6a2d';
+  setTimeout(() => { hideConfig(); init(); }, 700);
+}
+function clearConfig() {
+  localStorage.removeItem('sw_sb_url');
+  localStorage.removeItem('sw_sb_key');
+  SUPABASE_URL = ''; SUPABASE_KEY = '';
+  document.getElementById('cfg-url').value = '';
+  document.getElementById('cfg-key').value = '';
+  document.getElementById('cfg-msg').textContent = 'Cleared.';
+}
+
 /* ── Init ── */
 async function init() {
-  if(SUPABASE_URL === 'YOUR_SUPABASE_URL') {
-    document.getElementById('configWarn').style.display = 'block';
-    setStatus('err', 'Not configured');
-    showEmpty('Set your Supabase URL and anon key in the HTML file to connect.');
+  if(!SUPABASE_URL || !SUPABASE_KEY) {
+    showConfig();
     return;
   }
+  showEmpty('Connecting to database…');
   try {
     [allTeams, allEntries] = await Promise.all([
       apiFetch('team_stats?select=*&order=avg_pins.desc'),
@@ -533,7 +588,7 @@ async function init() {
     applyFilter(activeFilter);
   } catch(e) {
     setStatus('err', 'Connection failed');
-    showEmpty('Could not connect to database. Check your Supabase URL and key.');
+    showEmpty('Could not connect. <a href="#" onclick="showConfig();return false;" style="color:var(--accent)">Click here to update your credentials</a>');
     console.error(e);
   }
 }
@@ -768,6 +823,8 @@ function showEmpty(msg) {
 }
 
 /* ── Start ── */
+if(SUPABASE_URL) document.getElementById('cfg-url').value = SUPABASE_URL;
+if(SUPABASE_KEY) document.getElementById('cfg-key').value = SUPABASE_KEY;
 init();
 </script>
 </body>
