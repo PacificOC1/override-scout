@@ -122,6 +122,7 @@ tr:hover td{background:var(--bg2)}
   <button class="tab" data-tab="routes" onclick="switchTab('routes',this)">Routes</button>
   <button class="tab" data-tab="formulas" onclick="switchTab('formulas',this)">Formulas</button>
   <button class="tab" data-tab="sheets" onclick="switchTab('sheets',this)">Sheets Sync</button>
+  <button class="tab" data-tab="supabase" onclick="switchTab('supabase',this)">⚡ Supabase</button>
 </div>
 
 <!-- ═══════════════ LOG ═══════════════ -->
@@ -524,20 +525,80 @@ AWP:         Red 33.6%,  Blue 25.2%  (Red more likely to get AWP despite losing 
   </div>
 </div>
 
+<!-- ═══════════════ SUPABASE ═══════════════ -->
+<div id="tab-supabase" class="panel">
+  <div class="card" id="sb-cfg-panel">
+    <p class="sec">Connect to Supabase</p>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">
+      Your credentials are saved in this browser only — you never need to edit any files.
+      Get these from <strong>supabase.com → your project → Settings → API Keys</strong>.
+    </p>
+    <div style="margin-bottom:12px">
+      <label>Project URL</label>
+      <input type="text" id="sb-url-input" placeholder="https://xxxxxxxxxxxxxx.supabase.co">
+      <p class="hint">Must start with https:// and end with .supabase.co — nothing after that</p>
+    </div>
+    <div style="margin-bottom:12px">
+      <label>Publishable / Anon Key</label>
+      <input type="text" id="sb-key-input" placeholder="sb_publishable_... or eyJ...">
+      <p class="hint">The long key from Settings → API Keys. NOT the secret key.</p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+      <button class="btn btn-primary" onclick="saveSBConfig()">Save &amp; Connect</button>
+      <button class="btn" onclick="clearSBConfig()">Clear credentials</button>
+    </div>
+    <div id="sb-cfg-msg" style="font-size:13px;margin-top:4px"></div>
+  </div>
+  <div class="card" id="sb-status-card">
+    <p class="sec">Connection status</p>
+    <div style="font-size:13px;color:var(--text2);line-height:2">
+      <div>URL saved: <strong id="sb-url-display" style="color:var(--text)">—</strong></div>
+      <div>Key saved: <strong id="sb-key-display" style="color:var(--text)">—</strong></div>
+    </div>
+    <p class="hint" style="margin-top:8px">Every time you save a new entry in + Add Entry, it automatically pushes to Supabase. The sync dot in the top right turns green when it works.</p>
+  </div>
+</div>
+
 </div><!-- end .app -->
 
 <script>
-/* ─── SUPABASE CONFIG ─────────────────────────────────────
-   Paste your two values from Supabase → Settings → API Keys
-   Leave as-is if you don't want cloud sync yet.
-────────────────────────────────────────────────────────── */
-const SB_URL = 'https://ajymmthxmdyhkiynwhuf.supabase.co';        // e.g. https://abcxyz.supabase.co
-const SB_KEY = 'sb_publishable_1r5xHNrNLbRHB_GcJMgsjg_fwEvgdqS';   // starts with sb_publishable_ or eyJ...
+/* ─── SUPABASE CONFIG (stored in browser — no file editing needed) ─── */
+let SB_URL = localStorage.getItem('sb_url') || '';
+let SB_KEY = localStorage.getItem('sb_key') || '';
+
+function saveSBConfig() {
+  const url = document.getElementById('sb-url-input').value.trim().replace(/\/+$/, '');
+  const key = document.getElementById('sb-key-input').value.trim();
+  const msg = document.getElementById('sb-cfg-msg');
+  if(!url.startsWith('https://') || !url.includes('.supabase.co')) {
+    msg.textContent = '\u26a0 URL must look like: https://xxxxxx.supabase.co';
+    msg.style.color = 'var(--red-text)'; return;
+  }
+  if(!key || key.length < 20) {
+    msg.textContent = '\u26a0 Key looks too short — copy the full publishable key';
+    msg.style.color = 'var(--red-text)'; return;
+  }
+  SB_URL = url; SB_KEY = key;
+  localStorage.setItem('sb_url', url);
+  localStorage.setItem('sb_key', key);
+  msg.textContent = '\u2713 Saved! Supabase is now connected.';
+  msg.style.color = 'var(--green)';
+  setSyncStatus('ok', 'Connected to Supabase \u2713');
+}
+
+function clearSBConfig() {
+  localStorage.removeItem('sb_url'); localStorage.removeItem('sb_key');
+  SB_URL = ''; SB_KEY = '';
+  document.getElementById('sb-url-input').value = '';
+  document.getElementById('sb-key-input').value = '';
+  document.getElementById('sb-cfg-msg').textContent = 'Credentials cleared.';
+  setSyncStatus('', 'Not connected');
+}
 
 async function pushToSupabase(entry) {
-  if(SB_URL === 'YOUR_SUPABASE_URL') return; // not configured yet, skip silently
+  if(!SB_URL || !SB_KEY) return;
   try {
-    const res = await fetch(SB_URL + '/rest/v1/entries', {
+    const res = await fetch(SB_URL.replace(/\/+$/,'') + '/rest/v1/entries', {
       method: 'POST',
       headers: {
         'apikey': SB_KEY,
@@ -547,11 +608,10 @@ async function pushToSupabase(entry) {
       },
       body: JSON.stringify(entry)
     });
-    if(res.ok) setSyncStatus('ok', 'Synced to Supabase ✓');
-    else setSyncStatus('err', 'Supabase push failed (' + res.status + ')');
+    if(res.ok) setSyncStatus('ok', 'Synced to Supabase \u2713');
+    else setSyncStatus('err', 'Push failed (' + res.status + ')');
   } catch(e) {
     setSyncStatus('err', 'Supabase unreachable');
-    console.error('Supabase push error:', e);
   }
 }
 /* ─────────────────────────────────────────────────────── */
@@ -1070,6 +1130,15 @@ renderRoutes();
 if(sheetsUrl) {
   setSyncStatus('ok','Connected');
   document.getElementById('syncBtn').style.display = '';
+}
+// Pre-fill Supabase tab if credentials exist
+if(SB_URL) {
+  document.getElementById('sb-url-display').textContent = SB_URL;
+  document.getElementById('sb-key-display').textContent = SB_KEY.slice(0,20) + '...';
+  setSyncStatus('ok', 'Connected to Supabase \u2713');
+} else {
+  document.getElementById('sb-url-display').textContent = 'Not set';
+  document.getElementById('sb-key-display').textContent = 'Not set';
 }
 </script>
 </body>
