@@ -3,1142 +3,1089 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Override Auto Scout — V5RC 2026-27</title>
+<title>Override Scout — V5RC 2026-27</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#ffffff;--bg2:#f5f5f3;--bg3:#ebebea;
-  --text:#1a1a1a;--text2:#666;--text3:#aaa;
-  --border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.25);
-  --radius:8px;--radius-lg:12px;
-  --red:#D85A30;--red-bg:#FAECE7;--red-text:#993C1D;
-  --blue:#378ADD;--blue-bg:#E6F1FB;--blue-text:#185FA5;
-  --green:#3B6D11;--green-bg:#EAF3DE;
-  --amber-bg:#FAEEDA;--amber-text:#854F0B;
-  --font:'Segoe UI',system-ui,-apple-system,sans-serif;
-  --mono:'Cascadia Code','Fira Code',monospace;
+  --ink:#0f0f0d;--ink2:#4a4a46;--ink3:#9a9a94;
+  --paper:#fafaf7;--paper2:#f0f0eb;--paper3:#e4e4de;
+  --red:#c8410a;--red-bg:#faece7;--red-text:#7a2a10;
+  --blue:#1a5fb4;--blue-bg:#e6f1fb;
+  --green:#2d6a2d;--green-bg:#e8f5e8;
+  --amber-bg:#fef3cd;--amber:#7a5c00;
+  --mono:'DM Mono','Cascadia Code','Fira Code','Courier New',monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  --radius:7px;--radius-lg:12px;
 }
-@media(prefers-color-scheme:dark){:root{
-  --bg:#1c1c1a;--bg2:#252523;--bg3:#2e2e2c;
-  --text:#e8e8e6;--text2:#aaa;--text3:#666;
-  --border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.22);
-}}
-body{font-family:var(--font);background:var(--bg3);color:var(--text);min-height:100vh}
-.app{max-width:1120px;margin:0 auto;padding:1.5rem 1rem}
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:8px}
-.header-left h1{font-size:19px;font-weight:500}
-.header-left p{font-size:12px;color:var(--text2);margin-top:2px}
-.sync-status{display:flex;align-items:center;gap:8px;font-size:13px}
-.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--text3)}
-.sync-dot.ok{background:#3B6D11}.sync-dot.err{background:var(--red)}.sync-dot.syncing{background:#854F0B;animation:pulse 1s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:1.5rem;overflow-x:auto}
-.tab{padding:9px 18px;font-size:13px;cursor:pointer;border:none;background:transparent;color:var(--text2);white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:var(--font)}
-.tab.active{color:var(--text);font-weight:500;border-bottom-color:var(--text)}
-.tab:hover:not(.active){background:var(--bg2)}
+body{font-family:var(--sans);background:var(--paper2);color:var(--ink);min-height:100vh}
+
+/* ── LOGIN MODAL ── */
+.login-modal-bg{
+  display:none;position:fixed;inset:0;background:rgba(15,15,13,.55);z-index:500;
+  align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(3px);
+}
+.login-modal-bg.open{display:flex}
+.login-modal{
+  background:var(--paper);border:1.5px solid var(--ink);border-radius:var(--radius-lg);
+  padding:1.75rem;max-width:340px;width:100%;box-shadow:5px 5px 0 var(--ink);position:relative;
+}
+.login-modal-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--ink3)}
+.login-modal-close:hover{color:var(--red)}
+.login-logo{font-size:18px;font-weight:700;letter-spacing:-0.4px;margin-bottom:3px}
+.login-logo span{color:var(--red)}
+.login-sub{font-size:11px;font-family:var(--mono);color:var(--ink3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:1.25rem}
+.login-modal label{font-size:12px;color:var(--ink2);display:block;margin-bottom:4px}
+.login-modal input{
+  width:100%;padding:9px 11px;border:1px solid var(--paper3);border-radius:var(--radius);
+  font-size:13px;font-family:var(--mono);background:var(--paper);color:var(--ink);margin-bottom:10px;
+}
+.login-modal input:focus{outline:2px solid var(--blue);border-color:transparent}
+.btn-login{
+  width:100%;padding:10px;background:var(--ink);color:var(--paper);border:none;
+  border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans);
+}
+.btn-login:hover{background:var(--red)}
+.login-err{font-size:12px;color:var(--red);margin-top:6px;min-height:16px;font-family:var(--mono)}
+.btn-admin-trigger{
+  padding:5px 12px;border-radius:var(--radius);font-size:12px;cursor:pointer;
+  border:1px solid var(--paper3);background:var(--paper2);color:var(--ink3);
+  font-family:var(--sans);transition:all .15s;
+}
+.btn-admin-trigger:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+/* ── MAIN APP SHELL ── */
+#appShell{display:none}
+.topbar{
+  background:var(--paper);border-bottom:1.5px solid var(--ink);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.75rem 1.25rem;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:50;
+}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.site-title{font-size:17px;font-weight:700;letter-spacing:-0.4px}
+.site-title span{color:var(--red)}
+.mode-badge{
+  font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:99px;
+  font-weight:500;text-transform:uppercase;letter-spacing:.5px;
+}
+.mode-admin{background:var(--red-bg);color:var(--red-text);border:1px solid #f8c5b5}
+.mode-pub{background:var(--paper2);color:var(--ink3);border:1px solid var(--paper3)}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--ink3)}
+.sync-dot.ok{background:var(--green)}.sync-dot.err{background:var(--red)}
+.sync-txt{font-size:12px;color:var(--ink3);font-family:var(--mono)}
+.btn-sm{padding:5px 12px;border-radius:var(--radius);font-size:12px;cursor:pointer;border:1px solid var(--paper3);background:var(--paper2);color:var(--ink2);font-family:var(--sans)}
+.btn-sm:hover{background:var(--paper3)}
+.btn-sm.danger{color:var(--red-text);border-color:#f8c5b5}
+.btn-sm.danger:hover{background:var(--red-bg)}
+.btn-primary{background:var(--ink);color:var(--paper);border-color:transparent}
+.btn-primary:hover{background:var(--red)}
+
+/* ── TABS ── */
+.tabs-wrap{background:var(--paper);border-bottom:1px solid var(--paper3);padding:0 1.25rem;overflow-x:auto}
+.tabs{display:flex;gap:0;white-space:nowrap}
+.tab{
+  padding:10px 16px;font-size:13px;cursor:pointer;border:none;background:transparent;
+  color:var(--ink3);border-bottom:2px solid transparent;margin-bottom:-1px;font-family:var(--sans);
+}
+.tab.active{color:var(--ink);font-weight:500;border-bottom-color:var(--ink)}
+.tab:hover:not(.active){color:var(--ink2);background:var(--paper2)}
+.tab.admin-only{display:none}
+
+/* ── PANELS ── */
 .panel{display:none}.panel.active{display:block}
-.card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem}
+.page{max-width:1100px;margin:0 auto;padding:1.5rem 1.25rem}
+
+/* ── SHARED COMPONENTS ── */
+.card{background:var(--paper);border:.5px solid var(--paper3);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.sec{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--ink)}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-@media(max-width:640px){.g2,.g3,.g4{grid-template-columns:1fr}.tabs{flex-wrap:nowrap}}
-label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px}
-input,select,textarea{width:100%;padding:7px 10px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px}
-input:focus,select:focus,textarea:focus{outline:2px solid var(--blue);outline-offset:1px;border-color:transparent}
+@media(max-width:640px){.g2,.g3,.g4{grid-template-columns:1fr}}
+label{font-size:12px;color:var(--ink2);display:block;margin-bottom:4px}
+input,select,textarea{
+  width:100%;padding:7px 10px;border:.5px solid var(--paper3);border-radius:var(--radius);
+  background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:13px;
+}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--blue);border-color:transparent}
 textarea{resize:vertical}
-.btn{padding:7px 14px;border-radius:var(--radius);font-size:13px;cursor:pointer;border:0.5px solid var(--border2);background:transparent;color:var(--text);font-family:var(--font)}
-.btn:hover{background:var(--bg2)}.btn:active{transform:scale(.98)}
-.btn-primary{background:var(--text);color:var(--bg);border-color:transparent}
-.btn-primary:hover{opacity:.85}
-.btn-sm{padding:4px 10px;font-size:12px}
-.btn-del{color:var(--red-text);border-color:transparent}.btn-del:hover{background:var(--red-bg)}
-.mc{background:var(--bg2);border-radius:var(--radius);padding:.75rem 1rem}
-.mc-label{font-size:11px;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
-.mc-val{font-size:22px;font-weight:500}
+.btn{padding:7px 14px;border-radius:var(--radius);font-size:13px;cursor:pointer;border:.5px solid var(--paper3);background:transparent;color:var(--ink);font-family:var(--sans)}
+.btn:hover{background:var(--paper2)}.btn:active{transform:scale(.98)}
+.btn-p{background:var(--ink);color:var(--paper);border-color:transparent}
+.btn-p:hover{background:var(--red)}
+.btn-d{color:var(--red-text);border-color:transparent}.btn-d:hover{background:var(--red-bg)}
+.hint{font-size:12px;color:var(--ink3);margin-top:4px;line-height:1.5}
+code{font-family:var(--mono);font-size:11px;background:var(--paper2);padding:1px 5px;border-radius:3px}
+.row-bar{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
+.mc{background:var(--paper2);border:1px solid var(--paper3);border-radius:var(--radius);padding:.65rem 1rem}
+.mc-l{font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin-bottom:3px}
+.mc-v{font-size:22px;font-weight:600;font-family:var(--mono)}
 .badge{display:inline-block;padding:2px 7px;border-radius:99px;font-size:11px;font-weight:500}
-.b-awp{background:var(--green-bg);color:var(--green)}
-.b-no{background:var(--bg2);color:var(--text2)}
-.b-sig{background:var(--amber-bg);color:var(--amber-text)}
-.b-q{background:var(--blue-bg);color:var(--blue-text)}
-.sec{font-size:14px;font-weight:500;margin-bottom:12px}
-.hint{font-size:12px;color:var(--text2);margin-top:4px;line-height:1.5}
-code{font-family:var(--mono);font-size:11px;background:var(--bg2);padding:1px 5px;border-radius:3px}
+.b-awp{background:var(--green-bg);color:var(--green);border:1px solid #b8ddb8}
+.b-sig{background:var(--amber-bg);color:var(--amber);border:1px solid #f0d070}
+.b-q{background:var(--blue-bg);color:var(--blue)}
+.b-no{background:var(--paper2);color:var(--ink3);border:1px solid var(--paper3)}
 .tw{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{font-size:11px;color:var(--text2);font-weight:500;text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);white-space:nowrap}
-td{padding:7px 8px;border-bottom:0.5px solid var(--border);vertical-align:middle}
+th{background:var(--ink);color:var(--paper);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.6px;padding:8px 10px;text-align:left;white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{background:#2a2a26}th.sorted{color:#ffd700}
+td{padding:8px 10px;border-bottom:.5px solid var(--paper3);vertical-align:middle}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:var(--bg2)}
-.empty{text-align:center;padding:2.5rem;color:var(--text3);font-size:13px}
-.row-bar{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
-/* Probability UI */
-.alliance-panel{border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1rem}
+tr:hover td{background:var(--paper2);cursor:pointer}
+.tn{font-family:var(--mono);font-weight:600;font-size:13px;color:var(--blue)}
+.msg-ok{color:var(--green);font-size:13px;margin-top:6px}
+.msg-err{color:var(--red-text);font-size:13px;margin-top:6px}
+.empty{text-align:center;padding:2.5rem;color:var(--ink3);font-size:13px;font-family:var(--mono)}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--paper3);border-top-color:var(--ink);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ── FILTERS / CHIPS ── */
+.filters{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
+.fl{font-size:11px;font-family:var(--mono);color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-right:2px}
+.chip{padding:4px 12px;border:1px solid var(--paper3);border-radius:99px;font-size:12px;cursor:pointer;background:var(--paper2);color:var(--ink2);font-family:var(--mono)}
+.chip.on,.chip:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+/* ── SEARCH ── */
+.search-zone{display:flex;border:1.5px solid var(--ink);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem}
+.search-zone:focus-within{box-shadow:3px 3px 0 var(--ink)}
+.si{flex:1;border:none;outline:none;padding:10px 14px;font-size:14px;font-family:var(--mono);background:transparent;color:var(--ink);min-width:0}
+.si::placeholder{color:var(--ink3)}
+.sb{padding:10px 18px;background:var(--ink);color:var(--paper);border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:var(--sans);white-space:nowrap}
+.sb:hover{background:var(--red)}
+
+/* ── AWP BAR ── */
+.awp-wrap{display:flex;height:5px;border-radius:3px;background:var(--paper3);overflow:hidden;flex:1;min-width:40px}
+.awp-fill{background:var(--green);border-radius:3px}
+
+/* ── DETAIL OVERLAY ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(15,15,13,.5);z-index:200;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(3px)}
+.overlay.open{display:flex}
+.dcard{background:var(--paper);border:1.5px solid var(--ink);border-radius:var(--radius-lg);padding:1.5rem;max-width:600px;width:100%;max-height:88vh;overflow-y:auto;position:relative;box-shadow:5px 5px 0 var(--ink)}
+.dc-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink2)}
+.dc-close:hover{color:var(--red)}
+.dc-team{font-size:26px;font-weight:700;letter-spacing:-1px;font-family:var(--mono);color:var(--blue);margin-bottom:2px}
+.dc-sub{font-size:12px;color:var(--ink3);font-family:var(--mono);margin-bottom:1.25rem}
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.25rem}
+@media(max-width:440px){.sgrid{grid-template-columns:1fr 1fr}}
+.sbox{background:var(--paper2);border:1px solid var(--paper3);border-radius:var(--radius);padding:8px 10px}
+.sbox-l{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin-bottom:4px}
+.sbox-v{font-size:18px;font-weight:600;font-family:var(--mono)}
+.dr{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:.5px solid var(--paper3);font-size:13px;gap:12px}
+.dr:last-child{border-bottom:none}
+.dk{font-family:var(--mono);font-size:10px;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+.dv{font-size:13px;text-align:right;color:var(--ink);word-break:break-all}
+.mh-hd{font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin:1rem 0 6px}
+.mh-row{display:grid;grid-template-columns:1fr 70px 60px 36px 28px;gap:6px;padding:6px 0;border-bottom:.5px solid var(--paper3);font-size:12px;align-items:center}
+.mh-row:last-child{border-bottom:none}
+
+/* ── PAGER ── */
+.pager{display:flex;gap:6px;justify-content:center;align-items:center;margin-top:.75rem;font-size:12px;font-family:var(--mono)}
+.pb{padding:4px 12px;border:1px solid var(--paper3);border-radius:var(--radius);background:var(--paper2);cursor:pointer;color:var(--ink2);font-family:var(--mono);font-size:12px}
+.pb:hover:not(:disabled){background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.pb:disabled{opacity:.35;cursor:default}
+.pi{color:var(--ink3);padding:0 8px}
+
+/* ── PROBABILITY ── */
+.alliance-panel{border:.5px solid var(--paper3);border-radius:var(--radius-lg);padding:1rem;background:var(--paper)}
 .red-panel{border-left:3px solid var(--red)}.blue-panel{border-left:3px solid var(--blue)}
-.prob-title{font-size:13px;font-weight:500;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.prob-title{font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin-bottom:6px}
 .win-wrap{display:flex;height:26px;border-radius:var(--radius);overflow:hidden;margin:8px 0}
-.bar-red{background:var(--red);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:500;transition:width .5s;min-width:28px}
-.bar-blue{background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:500;transition:width .5s;min-width:28px}
-.bar-green{background:#3B6D11;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:500;transition:width .5s;min-width:28px}
-.bar-green2{background:#5a9e24;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:500;transition:width .5s;min-width:28px}
-.bk-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+.bar-red{background:var(--red);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600;transition:width .5s;min-width:28px}
+.bar-blue{background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600;transition:width .5s;min-width:28px}
+.bar-green{background:#3B6D11;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600;transition:width .5s;min-width:28px}
+.bar-green2{background:#5a9e24;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600;transition:width .5s;min-width:28px}
+.bk-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:.5px solid var(--paper3);font-size:13px}
 .bk-row:last-child{border-bottom:none}
-.dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:6px;flex-shrink:0}
-.dr{background:var(--red)}.db{background:var(--blue)}
-.formula-box{background:var(--bg2);border-radius:var(--radius);padding:1rem;font-family:var(--mono);font-size:12px;line-height:1.9;margin:8px 0;white-space:pre-wrap;overflow-x:auto}
-/* Sheets config */
-.config-box{background:var(--blue-bg);border:0.5px solid rgba(55,138,221,.3);border-radius:var(--radius-lg);padding:1rem;margin-bottom:1rem}
-.step-num{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:500;align-items:center;justify-content:center;margin-right:8px;flex-shrink:0}
-.step-row{display:flex;align-items:flex-start;margin-bottom:10px;font-size:13px;line-height:1.6}
-.msg-ok{color:var(--green);font-size:13px;margin-top:8px}
-.msg-err{color:var(--red-text);font-size:13px;margin-top:8px}
-.resource-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:0.5px solid var(--border);gap:12px}
+.pdot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:6px}
+.dr_{background:var(--red)}.db_{background:var(--blue)}
+
+/* ── RESOURCE ROWS ── */
+.resource-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:.5px solid var(--paper3);gap:12px}
 .resource-row:last-child{border-bottom:none}
-.pull-banner{background:var(--green-bg);border:0.5px solid rgba(59,109,17,.3);border-radius:var(--radius);padding:8px 12px;font-size:13px;color:var(--green);margin-bottom:8px;display:none}
+
+/* ── FORMULA BOX ── */
+.formula-box{background:var(--paper2);border-radius:var(--radius);padding:1rem;font-family:var(--mono);font-size:12px;line-height:1.9;margin:8px 0;white-space:pre-wrap;overflow-x:auto}
 </style>
 </head>
 <body>
-<div class="app">
 
-<div class="header">
-  <div class="header-left">
-    <h1>Override Autonomous Scout</h1>
-    <p>VEX V5RC 2026–27 · <span id="entryCount">0</span> entries</p>
+<!-- ═══════════════════════════════════════════
+     LOGIN MODAL
+════════════════════════════════════════════ -->
+<div class="login-modal-bg" id="loginModal" onclick="if(event.target===this)closeLoginModal()">
+  <div class="login-modal">
+    <button class="login-modal-close" onclick="closeLoginModal()">✕</button>
+    <div class="login-logo">Override <span>Scout</span></div>
+    <div class="login-sub">Admin login</div>
+    <label>Username</label>
+    <input type="text" id="unInput" placeholder="Username" autocomplete="username"
+      onkeydown="if(event.key==='Enter')document.getElementById('pwInput').focus()">
+    <label>Password</label>
+    <input type="password" id="pwInput" placeholder="Password" autocomplete="current-password"
+      onkeydown="if(event.key==='Enter')tryLogin()">
+    <button class="btn-login" onclick="tryLogin()">Login</button>
+    <div class="login-err" id="loginErr"></div>
   </div>
-  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-    <div class="sync-status">
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MAIN APP
+════════════════════════════════════════════ -->
+<div id="appShell">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="site-title">Override <span>Scout</span></div>
+      <span class="mode-badge" id="modeBadge">Viewer</span>
+    </div>
+    <div class="topbar-right">
       <div class="sync-dot" id="syncDot"></div>
-      <span id="syncLabel" style="color:var(--text2)">Not connected</span>
-    </div>
-    <button class="btn btn-sm" onclick="manualSync()" id="syncBtn" style="display:none">Sync now</button>
-    <button class="btn btn-sm" onclick="switchTab('sheets',document.querySelector('[data-tab=sheets]'))">⚙ Sheets</button>
-  </div>
-</div>
-
-<div class="tabs">
-  <button class="tab active" data-tab="log" onclick="switchTab('log',this)">Scout Log</button>
-  <button class="tab" data-tab="add" onclick="switchTab('add',this)">+ Add Entry</button>
-  <button class="tab" data-tab="predict" onclick="switchTab('predict',this)">Win Probability</button>
-  <button class="tab" data-tab="search" onclick="switchTab('search',this)">Search Teams</button>
-  <button class="tab" data-tab="routes" onclick="switchTab('routes',this)">Routes</button>
-  <button class="tab" data-tab="formulas" onclick="switchTab('formulas',this)">Formulas</button>
-  <button class="tab" data-tab="sheets" onclick="switchTab('sheets',this)">Sheets Sync</button>
-  <button class="tab" data-tab="supabase" onclick="switchTab('supabase',this)">⚡ Supabase</button>
-</div>
-
-<!-- ═══════════════ LOG ═══════════════ -->
-<div id="tab-log" class="panel active">
-  <div class="row-bar">
-    <input type="text" id="logQ" placeholder="Search team, event, route…" oninput="renderLog()" style="max-width:260px">
-    <select id="logFil" onchange="renderLog()" style="max-width:150px">
-      <option value="">All entries</option>
-      <option value="sig">Sig events only</option>
-      <option value="awp">AWP achieved</option>
-    </select>
-    <button class="btn btn-sm" onclick="exportCSV()">Export CSV</button>
-    <button class="btn btn-sm" onclick="importClick()">Import CSV</button>
-    <input type="file" id="importFile" accept=".csv" style="display:none" onchange="importCSV(event)">
-  </div>
-  <div id="pullBanner" class="pull-banner"></div>
-  <div class="g4" id="summaryCards" style="margin-bottom:1rem"></div>
-  <div class="card">
-    <div class="tw">
-      <table>
-        <thead><tr>
-          <th>Team</th><th>Event</th><th>Round</th><th>Side</th><th>Robot Type</th>
-          <th>Route</th><th>Pins</th><th>Bonuses</th><th>AWP</th><th>Notes</th><th></th>
-        </tr></thead>
-        <tbody id="logBody"></tbody>
-      </table>
+      <span class="sync-txt" id="syncTxt">Loading…</span>
+      <button class="btn-admin-trigger" id="adminLoginBtn" onclick="openLoginModal()">Admin</button>
+      <button class="btn-sm danger" id="logoutBtn" onclick="logout()" style="display:none">Logout admin</button>
     </div>
   </div>
-</div>
 
-<!-- ═══════════════ ADD ═══════════════ -->
-<div id="tab-add" class="panel">
-  <div class="card">
-    <p class="sec">New autonomous entry</p>
-    <div class="g3" style="margin-bottom:12px">
-      <div><label>Team #</label><input id="f-team" placeholder="e.g. 73017D"></div>
-      <div><label>Event name</label><input id="f-event" placeholder="e.g. Mall of America"></div>
-      <div><label>Round</label><input id="f-round" placeholder="e.g. R16 1-1"></div>
+  <!-- Tabs -->
+  <div class="tabs-wrap">
+    <div class="tabs">
+      <button class="tab active" data-tab="search" onclick="switchTab('search',this)">Search</button>
+      <button class="tab" data-tab="leaderboard" onclick="switchTab('leaderboard',this)">Leaderboard</button>
+      <button class="tab admin-only" data-tab="add" onclick="switchTab('add',this)">+ Add Entry</button>
+      <button class="tab admin-only" data-tab="log" onclick="switchTab('log',this)">Scout Log</button>
+      <button class="tab admin-only" data-tab="predict" onclick="switchTab('predict',this)">Win Probability</button>
+      <button class="tab admin-only" data-tab="routes" onclick="switchTab('routes',this)">Routes</button>
+      <button class="tab admin-only" data-tab="formulas" onclick="switchTab('formulas',this)">Formulas</button>
     </div>
-    <div class="g3" style="margin-bottom:12px">
-      <div><label>Side</label>
-        <select id="f-side"><option value="L">Left (L)</option><option value="R">Right (R)</option></select>
+  </div>
+
+  <!-- ── SEARCH (public) ── -->
+  <div id="tab-search" class="panel active">
+    <div class="page">
+      <div class="search-zone">
+        <input class="si" id="pubSearch" type="text" placeholder="Search team number (e.g. 73017D)…"
+          onkeydown="if(event.key==='Enter')pubDoSearch()">
+        <button class="sb" onclick="pubDoSearch()">Search</button>
       </div>
-      <div><label>Robot Type</label>
-        <select id="f-type">
-          <option>Basket Bot</option><option>Ruiguan</option><option>Ruiguan (Hero)</option>
-          <option>C Bot</option><option>Stack Bot</option><option>Other</option>
+      <div id="pubResult">
+        <div class="empty"><span class="spin"></span><br><br>Loading database…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── LEADERBOARD (public) ── -->
+  <div id="tab-leaderboard" class="panel">
+    <div class="page">
+      <div class="filters">
+        <span class="fl">Filter:</span>
+        <span class="chip on" onclick="lbFilter('all',this)">All teams</span>
+        <span class="chip"    onclick="lbFilter('sig',this)">Sig events</span>
+        <span class="chip"    onclick="lbFilter('awp',this)">AWP achieved</span>
+        <span class="chip"    onclick="lbFilter('top',this)">Top pins</span>
+      </div>
+      <div class="g4" id="lbCards" style="margin-bottom:1rem;display:none">
+        <div class="mc"><div class="mc-l">Teams</div><div class="mc-v" id="lbT">—</div></div>
+        <div class="mc"><div class="mc-l">Entries</div><div class="mc-v" id="lbE">—</div></div>
+        <div class="mc"><div class="mc-l">Avg pins</div><div class="mc-v" id="lbP">—</div></div>
+        <div class="mc"><div class="mc-l">AWP rate</div><div class="mc-v" id="lbA">—</div></div>
+      </div>
+      <div id="lbMain"><div class="empty"><span class="spin"></span><br><br>Loading…</div></div>
+      <div class="pager" id="lbPager" style="display:none">
+        <button class="pb" id="lbPrev" onclick="lbPage(-1)" disabled>← Prev</button>
+        <span class="pi" id="lbPi"></span>
+        <button class="pb" id="lbNext" onclick="lbPage(1)">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ADD ENTRY (admin) ── -->
+  <div id="tab-add" class="panel">
+    <div class="page">
+      <div class="card">
+        <p class="sec">New autonomous entry</p>
+        <div class="g3" style="margin-bottom:12px">
+          <div><label>Team #</label><input id="f-team" placeholder="e.g. 73017D"></div>
+          <div><label>Event name</label><input id="f-event" placeholder="e.g. Mall of America"></div>
+          <div><label>Round</label><input id="f-round" placeholder="e.g. R16 1-1"></div>
+        </div>
+        <div class="g3" style="margin-bottom:12px">
+          <div><label>Side</label>
+            <select id="f-side"><option value="L">Left (L)</option><option value="R">Right (R)</option></select>
+          </div>
+          <div><label>Robot Type</label>
+            <select id="f-type">
+              <option>Basket Bot</option><option>Ruiguan</option><option>Ruiguan (Hero)</option>
+              <option>C Bot</option><option>Stack Bot</option><option>Other</option>
+            </select>
+          </div>
+          <div><label>Sig event?</label>
+            <select id="f-sig"><option value="no">No</option><option value="yes">Yes — Worlds qualifier</option></select>
+          </div>
+        </div>
+        <div class="g2" style="margin-bottom:12px">
+          <div>
+            <label>Route  <span style="font-weight:400;color:var(--ink3)">(m · lg · l · mg · u · w)</span></label>
+            <input id="f-route" placeholder="e.g. m>l>lg>mg>w  or  Unknown route">
+          </div>
+          <div>
+            <label>Pins scored  <span style="font-weight:400;color:var(--ink3)">(longGoal+ownMid+oppMid)</span></label>
+            <input id="f-pins" placeholder="e.g. 2+1+2">
+            <p class="hint">A+B+C — A=long goal, B=own mid, C=opp mid</p>
+          </div>
+        </div>
+        <div class="g3" style="margin-bottom:12px">
+          <div><label>Control bonuses</label><input type="number" id="f-bonuses" min="0" max="10" value="0"></div>
+          <div><label>AWP achieved?</label>
+            <select id="f-awp"><option value="N">No</option><option value="Y">Yes</option><option value="?">Unknown</option></select>
+          </div>
+          <div><label>Max possible pins</label><input id="f-maxpins" placeholder="e.g. 7"></div>
+        </div>
+        <div style="margin-bottom:12px">
+          <label>Notes</label>
+          <textarea id="f-notes" rows="2" placeholder="Partner routes, errors, counter strategies…"></textarea>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-p" onclick="addEntry()">Save entry</button>
+          <button class="btn" onclick="clearForm()">Clear</button>
+        </div>
+        <div id="add-msg"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SCOUT LOG (admin) ── -->
+  <div id="tab-log" class="panel">
+    <div class="page">
+      <div class="row-bar">
+        <input type="text" id="logQ" placeholder="Search team, event, route…" oninput="renderLog()" style="max-width:260px">
+        <select id="logFil" onchange="renderLog()" style="max-width:150px">
+          <option value="">All entries</option>
+          <option value="sig">Sig events only</option>
+          <option value="awp">AWP achieved</option>
         </select>
+        <button class="btn btn-sm" onclick="exportCSV()">Export CSV</button>
+        <button class="btn btn-sm" onclick="importClick()">Import CSV</button>
+        <input type="file" id="importFile" accept=".csv" style="display:none" onchange="importCSV(event)">
       </div>
-      <div><label>Sig event?</label>
-        <select id="f-sig"><option value="no">No</option><option value="yes">Yes — qualifies to Worlds</option></select>
-      </div>
-    </div>
-    <div class="g2" style="margin-bottom:12px">
-      <div>
-        <label>Route  <span style="color:var(--text3);font-weight:400">(m · lg · l · mg · u · w)</span></label>
-        <input id="f-route" placeholder="e.g. m>l>lg>mg>w  or  Unknown route">
-      </div>
-      <div>
-        <label>Pins scored  <span style="color:var(--text3);font-weight:400">(longGoal + ownMid + oppMid)</span></label>
-        <input id="f-pins" placeholder="e.g. 2+1+2">
-        <p class="hint">A+B+C — A = long goal, B = own mid goal, C = opp mid goal</p>
-      </div>
-    </div>
-    <div class="g3" style="margin-bottom:12px">
-      <div><label>Control bonuses</label><input type="number" id="f-bonuses" min="0" max="10" value="0"></div>
-      <div><label>AWP achieved?</label>
-        <select id="f-awp"><option value="N">No</option><option value="Y">Yes</option><option value="?">Unknown</option></select>
-      </div>
-      <div><label>Max possible pins (if known)</label><input id="f-maxpins" placeholder="e.g. 7"></div>
-    </div>
-    <div style="margin-bottom:12px">
-      <label>Notes</label>
-      <textarea id="f-notes" rows="2" placeholder="e.g. Missed wing, partnered with 9123X on zeta, opponent ran psi to block lg…"></textarea>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-primary" onclick="addEntry()">Save entry</button>
-      <button class="btn" onclick="clearForm()">Clear</button>
-    </div>
-    <div id="add-msg"></div>
-  </div>
-</div>
-
-<!-- ═══════════════ PREDICT ═══════════════ -->
-<div id="tab-predict" class="panel">
-  <div class="g2" style="margin-bottom:1rem;align-items:start">
-    <div class="card alliance-panel red-panel">
-      <p class="sec" style="color:var(--red)">Red Alliance</p>
-      <div style="margin-bottom:10px"><label>Robot 1 — Team #</label>
-        <input id="r1" placeholder="Team # (auto-fills from DB)" oninput="autoFill('r1');calcProb()">
-      </div>
-      <div style="margin-bottom:10px"><label>Robot 1 — Avg pins placed per match</label>
-        <input type="number" id="r1pins" min="0" max="20" value="3" oninput="calcProb()">
-      </div>
-      <div style="margin-bottom:10px"><label>Robot 1 — AWP rate (%)</label>
-        <input type="number" id="r1awp" min="0" max="100" value="50" oninput="calcProb()">
-      </div>
-      <div style="margin-bottom:10px"><label>Robot 1 — Avg bonuses per match</label>
-        <input type="number" id="r1bon" min="0" max="10" value="0" oninput="calcProb()">
-      </div>
-      <div style="margin-bottom:10px"><label>Robot 1 — Consistency (1 erratic → 5 rock-solid)</label>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input type="range" id="r1cons" min="1" max="5" value="3" oninput="calcProb();document.getElementById('r1cv').textContent=this.value" style="flex:1">
-          <span id="r1cv" style="min-width:14px;font-size:13px;font-weight:500">3</span>
+      <div class="g4" id="logCards" style="margin-bottom:1rem"></div>
+      <div class="card">
+        <div class="tw">
+          <table>
+            <thead><tr>
+              <th>Team</th><th>Event</th><th>Round</th><th>Side</th><th>Robot Type</th>
+              <th>Route</th><th>Pins</th><th>Bonuses</th><th>AWP</th><th>Notes</th><th></th>
+            </tr></thead>
+            <tbody id="logBody"></tbody>
+          </table>
         </div>
       </div>
-      <hr style="border:none;border-top:0.5px solid var(--border);margin:12px 0">
-      <div style="margin-bottom:10px"><label>Robot 2 — Team #</label>
-        <input id="r2" placeholder="Team # (auto-fills from DB)" oninput="autoFill('r2');calcProb()">
-      </div>
-      <div style="margin-bottom:10px"><label>Robot 2 — Avg pins placed per match</label>
-        <input type="number" id="r2pins" min="0" max="20" value="3" oninput="calcProb()">
-      </div>
-      <div style="margin-bottom:10px"><label>Robot 2 — AWP rate (%)</label>
-        <input type="number" id="r2awp" min="0" max="100" value="50" oninput="calcProb()">
-      </div>
-      <div style="margin-bottom:10px"><label>Robot 2 — Avg bonuses per match</label>
-        <input type="number" id="r2bon" min="0" max="10" value="0" oninput="calcProb()">
-      </div>
-      <div><label>Robot 2 — Consistency <span id="r2cv">3</span>/5</label>
-        <input type="range" id="r2cons" min="1" max="5" value="3" oninput="calcProb();document.getElementById('r2cv').textContent=this.value">
-      </div>
     </div>
+  </div>
 
-    <div class="card alliance-panel blue-panel">
-      <p class="sec" style="color:var(--blue)">Blue Alliance</p>
-      <div style="margin-bottom:10px"><label>Robot 1 — Team #</label>
-        <input id="b1" placeholder="Team # (auto-fills from DB)" oninput="autoFill('b1');calcProb()">
-      </div>
-      <div style="margin-bottom:10px"><label>Robot 1 — Avg pins placed per match</label>
-        <input type="number" id="b1pins" min="0" max="20" value="3" oninput="calcProb()">
-      </div>
-      <div style="margin-bottom:10px"><label>Robot 1 — AWP rate (%)</label>
-        <input type="number" id="b1awp" min="0" max="100" value="50" oninput="calcProb()">
-      </div>
-      <div style="margin-bottom:10px"><label>Robot 1 — Avg bonuses per match</label>
-        <input type="number" id="b1bon" min="0" max="10" value="0" oninput="calcProb()">
-      </div>
-      <div style="margin-bottom:10px"><label>Robot 1 — Consistency <span id="b1cv">3</span>/5</label>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input type="range" id="b1cons" min="1" max="5" value="3" oninput="calcProb();document.getElementById('b1cv').textContent=this.value" style="flex:1">
-          <span style="min-width:14px;font-size:13px;font-weight:500" id="b1cv2">3</span>
+  <!-- ── WIN PROBABILITY (admin) ── -->
+  <div id="tab-predict" class="panel">
+    <div class="page">
+      <div class="g2" style="margin-bottom:1rem;align-items:start">
+        <div class="alliance-panel red-panel">
+          <p class="sec" style="color:var(--red)">Red Alliance</p>
+          <div style="margin-bottom:10px"><label>Robot 1 — Team # <span style="color:var(--ink3);font-weight:400">(auto-fills from DB)</span></label>
+            <input id="r1" placeholder="Team #" oninput="autoFill('r1');calcProb()"></div>
+          <div style="margin-bottom:10px"><label>Robot 1 — Avg pins</label><input type="number" id="r1pins" min="0" max="20" value="3" oninput="calcProb()"></div>
+          <div style="margin-bottom:10px"><label>Robot 1 — AWP rate (%)</label><input type="number" id="r1awp" min="0" max="100" value="50" oninput="calcProb()"></div>
+          <div style="margin-bottom:10px"><label>Robot 1 — Avg bonuses</label><input type="number" id="r1bon" min="0" max="10" value="0" oninput="calcProb()"></div>
+          <div style="margin-bottom:10px"><label>Robot 1 — Consistency <span id="r1cv">3</span>/5</label>
+            <input type="range" id="r1cons" min="1" max="5" value="3" oninput="calcProb();document.getElementById('r1cv').textContent=this.value"></div>
+          <hr style="border:none;border-top:.5px solid var(--paper3);margin:12px 0">
+          <div style="margin-bottom:10px"><label>Robot 2 — Team #</label><input id="r2" placeholder="Team #" oninput="autoFill('r2');calcProb()"></div>
+          <div style="margin-bottom:10px"><label>Robot 2 — Avg pins</label><input type="number" id="r2pins" min="0" max="20" value="3" oninput="calcProb()"></div>
+          <div style="margin-bottom:10px"><label>Robot 2 — AWP rate (%)</label><input type="number" id="r2awp" min="0" max="100" value="50" oninput="calcProb()"></div>
+          <div style="margin-bottom:10px"><label>Robot 2 — Avg bonuses</label><input type="number" id="r2bon" min="0" max="10" value="0" oninput="calcProb()"></div>
+          <div><label>Robot 2 — Consistency <span id="r2cv">3</span>/5</label>
+            <input type="range" id="r2cons" min="1" max="5" value="3" oninput="calcProb();document.getElementById('r2cv').textContent=this.value"></div>
+        </div>
+        <div class="alliance-panel blue-panel">
+          <p class="sec" style="color:var(--blue)">Blue Alliance</p>
+          <div style="margin-bottom:10px"><label>Robot 1 — Team #</label><input id="b1" placeholder="Team #" oninput="autoFill('b1');calcProb()"></div>
+          <div style="margin-bottom:10px"><label>Robot 1 — Avg pins</label><input type="number" id="b1pins" min="0" max="20" value="3" oninput="calcProb()"></div>
+          <div style="margin-bottom:10px"><label>Robot 1 — AWP rate (%)</label><input type="number" id="b1awp" min="0" max="100" value="50" oninput="calcProb()"></div>
+          <div style="margin-bottom:10px"><label>Robot 1 — Avg bonuses</label><input type="number" id="b1bon" min="0" max="10" value="0" oninput="calcProb()"></div>
+          <div style="margin-bottom:10px"><label>Robot 1 — Consistency <span id="b1cv">3</span>/5</label>
+            <input type="range" id="b1cons" min="1" max="5" value="3" oninput="calcProb();document.getElementById('b1cv').textContent=this.value"></div>
+          <hr style="border:none;border-top:.5px solid var(--paper3);margin:12px 0">
+          <div style="margin-bottom:10px"><label>Robot 2 — Team #</label><input id="b2" placeholder="Team #" oninput="autoFill('b2');calcProb()"></div>
+          <div style="margin-bottom:10px"><label>Robot 2 — Avg pins</label><input type="number" id="b2pins" min="0" max="20" value="3" oninput="calcProb()"></div>
+          <div style="margin-bottom:10px"><label>Robot 2 — AWP rate (%)</label><input type="number" id="b2awp" min="0" max="100" value="50" oninput="calcProb()"></div>
+          <div style="margin-bottom:10px"><label>Robot 2 — Avg bonuses</label><input type="number" id="b2bon" min="0" max="10" value="0" oninput="calcProb()"></div>
+          <div><label>Robot 2 — Consistency <span id="b2cv">3</span>/5</label>
+            <input type="range" id="b2cons" min="1" max="5" value="3" oninput="calcProb();document.getElementById('b2cv').textContent=this.value"></div>
         </div>
       </div>
-      <hr style="border:none;border-top:0.5px solid var(--border);margin:12px 0">
-      <div style="margin-bottom:10px"><label>Robot 2 — Team #</label>
-        <input id="b2" placeholder="Team # (auto-fills from DB)" oninput="autoFill('b2');calcProb()">
-      </div>
-      <div style="margin-bottom:10px"><label>Robot 2 — Avg pins placed per match</label>
-        <input type="number" id="b2pins" min="0" max="20" value="3" oninput="calcProb()">
-      </div>
-      <div style="margin-bottom:10px"><label>Robot 2 — AWP rate (%)</label>
-        <input type="number" id="b2awp" min="0" max="100" value="50" oninput="calcProb()">
-      </div>
-      <div style="margin-bottom:10px"><label>Robot 2 — Avg bonuses per match</label>
-        <input type="number" id="b2bon" min="0" max="10" value="0" oninput="calcProb()">
-      </div>
-      <div><label>Robot 2 — Consistency <span id="b2cv">3</span>/5</label>
-        <input type="range" id="b2cons" min="1" max="5" value="3" oninput="calcProb();document.getElementById('b2cv').textContent=this.value">
+      <div class="card">
+        <div style="margin-bottom:1.25rem">
+          <p class="prob-title">Expected autonomous points</p>
+          <div class="win-wrap">
+            <div class="bar-red" id="ptRed" style="width:50%">—</div>
+            <div class="bar-blue" id="ptBlue" style="width:50%">—</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--ink3)">
+            <span id="ptRL">Red</span><span id="ptBL">Blue</span>
+          </div>
+        </div>
+        <div style="margin-bottom:1.25rem">
+          <p class="prob-title">Alliance AWP probability (independent from points)</p>
+          <div class="win-wrap">
+            <div class="bar-green" id="awpRed" style="width:50%">—</div>
+            <div class="bar-green2" id="awpBlue" style="width:50%">—</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--ink3)"><span>Red AWP</span><span>Blue AWP</span></div>
+          <p class="hint" style="margin-top:6px">AWP earns ranking points (WP), not match score — shown separately.</p>
+        </div>
+        <p class="prob-title" style="margin-bottom:8px">Score breakdown</p>
+        <div id="bkTable"></div>
       </div>
     </div>
   </div>
 
-  <!-- Results -->
-  <div class="card">
-    <!-- Points bar -->
-    <div style="margin-bottom:1.25rem">
-      <p class="prob-title">Expected autonomous points</p>
-      <div class="win-wrap">
-        <div class="bar-red" id="ptRedBar" style="width:50%">—</div>
-        <div class="bar-blue" id="ptBlueBar" style="width:50%">—</div>
+  <!-- ── ROUTES (admin) ── -->
+  <div id="tab-routes" class="panel">
+    <div class="page">
+      <div class="g2" style="margin-bottom:1rem">
+        <div class="card">
+          <p class="sec">Route notation</p>
+          <table>
+            <tr><td style="width:36px"><code>m</code></td><td>Mid blocks</td></tr>
+            <tr><td><code>lg</code></td><td>Long goal</td></tr>
+            <tr><td><code>l</code></td><td>Loader</td></tr>
+            <tr><td><code>mg</code></td><td>Mid goal</td></tr>
+            <tr><td><code>u</code></td><td>Undergoal</td></tr>
+            <tr><td><code>w</code></td><td>Wing touch</td></tr>
+            <tr><td><code>&gt;</code></td><td>Sequence</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <p class="sec">AWP criteria</p>
+          <div style="font-size:13px;line-height:2.1">
+            <div>✅ 7+ alliance pins (own side)</div>
+            <div>✅ 3+ goals with 2+ pins each</div>
+            <div>✅ Neither robot touching perimeter</div>
+          </div>
+          <p class="hint" style="margin-top:8px">Auto bonus: 12 pts to higher-scoring alliance (SC7). Sig criteria tighten Sep 3 2026.</p>
+        </div>
       </div>
-      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2)">
-        <span id="ptRedLabel">Red</span><span id="ptBlueLabel">Blue</span>
+      <div class="card">
+        <p class="sec">Named routes</p>
+        <div class="tw"><table>
+          <thead><tr><th>Route</th><th>Name</th><th>Notes</th></tr></thead>
+          <tbody id="routeBody"></tbody>
+        </table></div>
       </div>
     </div>
+  </div>
 
-    <!-- AWP bar -->
-    <div style="margin-bottom:1.25rem">
-      <p class="prob-title">Alliance AWP probability</p>
-      <div class="win-wrap">
-        <div class="bar-green" id="awpRedBar" style="width:50%">—</div>
-        <div class="bar-green2" id="awpBlueBar" style="width:50%">—</div>
+  <!-- ── FORMULAS (admin) ── -->
+  <div id="tab-formulas" class="panel">
+    <div class="page">
+      <div class="card">
+        <p class="sec">Points calculation</p>
+        <div class="formula-box">RawPts     = (R1_avgPins + R2_avgPins) × 5 + R1_avgBonuses + R2_avgBonuses
+ConsFactor = (R1_cons + R2_cons) / 10   → range 0.2–1.0
+ExpPts     = RawPts × ConsFactor
+AutoBonus  = +12 pts to higher-scoring alliance (SC7)</div>
+        <p class="sec" style="margin-top:1rem">AWP probability</p>
+        <div class="formula-box">AWP% = (R1_awp/100) × (R2_awp/100) × ConsFactor × 100
+
+Both robots must succeed — joint probability.
+AWP earns WP (ranking pts), NOT match score.</div>
+        <p class="sec" style="margin-top:1rem">Worked example</p>
+        <div class="formula-box">Red: R1 → 4 pins, 80% AWP, cons 4/5 | R2 → 3 pins, 60% AWP, cons 3/5
+  RawPts = 7×5 = 35 | ConsFactor = 0.70 | ExpPts = 24.5
+  AWP%   = 0.80×0.60×0.70×100 = 33.6%
+
+Blue: R1 → 5 pins, 40% AWP, cons 5/5 | R2 → 5 pins, 70% AWP, cons 4/5
+  RawPts = 10×5 = 50 | ConsFactor = 0.90 | ExpPts = 45.0
+  AWP%   = 0.40×0.70×0.90×100 = 25.2%
+
+Blue wins points (45 > 24.5) → Blue gets +12 auto bonus
+Final: Red 24.5 pts, Blue 57.0 pts
+Red still more likely to achieve AWP (33.6% vs 25.2%)</div>
       </div>
-      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2)">
-        <span>Red AWP</span><span>Blue AWP</span>
-      </div>
-      <p class="hint" style="margin-top:6px">AWP probability = both robots' individual rates × consistency weight. Independent of points — AWP earns WP, not match score.</p>
     </div>
+  </div>
 
-    <!-- Breakdown table -->
-    <p class="prob-title" style="margin-bottom:8px">Score breakdown</p>
-    <div id="bkTable"></div>
+</div><!-- end appShell -->
 
-    <p class="hint" style="margin-top:12px">
-      Points formula: <code>(pins × 5) + bonuses</code>, adjusted by consistency factor.
-      AWP probability: <code>Robot1_AWP% × Robot2_AWP% × consistencyWeight / 10000</code>.
-      See Formulas tab for full derivation.
-    </p>
+<!-- Detail overlay (shared) -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeDetail()">
+  <div class="dcard">
+    <button class="dc-close" onclick="closeDetail()">✕</button>
+    <div id="dc"></div>
   </div>
 </div>
-
-<!-- ═══════════════ SEARCH ═══════════════ -->
-<div id="tab-search" class="panel">
-  <div class="row-bar">
-    <input type="text" id="teamQ" placeholder="Team number…" style="max-width:180px">
-    <button class="btn btn-primary" onclick="searchTeam()">Search local DB</button>
-  </div>
-  <div id="teamResult"></div>
-  <div class="card" style="margin-top:1rem">
-    <p class="sec">Free online scouting resources</p>
-    <div class="resource-row">
-      <div><strong>RobotEvents.com</strong><p class="hint">Official VEX — match results, team profiles, skills rankings, event listings</p></div>
-      <a href="https://www.robotevents.com" target="_blank" class="btn btn-sm">Open ↗</a>
-    </div>
-    <div class="resource-row">
-      <div><strong>VEX via (vexvia.app)</strong><p class="hint">Unofficial stats — OPR, DPR, CCWM, match predictions, team scouting</p></div>
-      <a href="https://vexvia.app" target="_blank" class="btn btn-sm">Open ↗</a>
-    </div>
-    <div class="resource-row">
-      <div><strong>VRC Data Analysis</strong><p class="hint">Skills leaderboards, qualification stats, historical data</p></div>
-      <a href="https://www.vrc-data-analysis.com" target="_blank" class="btn btn-sm">Open ↗</a>
-    </div>
-    <div class="resource-row">
-      <div><strong>VEX Forum</strong><p class="hint">Community strategy, autonomous route meta, Q&A</p></div>
-      <a href="https://www.vexforum.com" target="_blank" class="btn btn-sm">Open ↗</a>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════ ROUTES ═══════════════ -->
-<div id="tab-routes" class="panel">
-  <div class="g2" style="margin-bottom:1rem">
-    <div class="card">
-      <p class="sec">Route notation key</p>
-      <table>
-        <tr><td style="width:40px"><code>m</code></td><td>Mid blocks (center field)</td></tr>
-        <tr><td><code>lg</code></td><td>Long goal</td></tr>
-        <tr><td><code>l</code></td><td>Loader (match loads)</td></tr>
-        <tr><td><code>mg</code></td><td>Mid goal (either)</td></tr>
-        <tr><td><code>u</code></td><td>Undergoal blocks</td></tr>
-        <tr><td><code>w</code></td><td>Wing touch (auto line)</td></tr>
-        <tr><td><code>&gt;</code></td><td>Sequence separator</td></tr>
-      </table>
-      <p class="hint" style="margin-top:8px">Pins: A+B+C → A=long goal, B=own mid goal, C=opp mid goal</p>
-    </div>
-    <div class="card">
-      <p class="sec">AWP criteria — standard events</p>
-      <div style="font-size:13px;line-height:2.1">
-        <div>✅ 7+ alliance pins placed (own side of auto line only)</div>
-        <div>✅ 3+ goals each with 2+ alliance pins (own side only)</div>
-        <div>✅ Neither robot touching field perimeter at end</div>
-      </div>
-      <p class="hint" style="margin-top:10px">Autonomous Bonus: 12 pts to higher-scoring alliance. Tie → 6 pts each (SC7).</p>
-      <p class="hint" style="margin-top:6px">Sig/Worlds criteria tighten — check September 3 2026 update. Possibly 8+ pins / 4+ goals.</p>
-    </div>
-  </div>
-  <div class="card">
-    <p class="sec">Named route database</p>
-    <div class="tw">
-      <table>
-        <thead><tr><th>Route code</th><th>Name</th><th>Notes</th></tr></thead>
-        <tbody id="routeBody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════ FORMULAS ═══════════════ -->
-<div id="tab-formulas" class="panel">
-  <div class="card">
-    <p class="sec">Autonomous points calculation</p>
-
-    <div style="margin-bottom:1.25rem">
-      <p style="font-size:13px;font-weight:500;margin-bottom:6px">Master equation — expected auto points per alliance</p>
-      <div class="formula-box">RawPts  = (Robot1_avgPins + Robot2_avgPins) × 5
-              + Robot1_avgBonuses + Robot2_avgBonuses
-
-ConsFactor = (Robot1_cons + Robot2_cons) / 10   → range 0.2–1.0
-
-ExpectedPts = RawPts × ConsFactor
-
-AutoBonus   = 12 pts awarded to higher-scoring alliance (SC7)
-            → factored in as: if ExpectedPts_Red > ExpectedPts_Blue, Red +12</div>
-      <p class="hint">Each placed alliance pin = 5 pts (SC3). Bonuses are added directly — they are whole point values from game manual scoring. ConsFactor scales raw output down for erratic robots; two robots at 5/5 = ConsFactor 1.0 (no reduction).</p>
-    </div>
-
-    <div style="margin-bottom:1.25rem">
-      <p style="font-size:13px;font-weight:500;margin-bottom:6px">Consistency factor</p>
-      <div class="formula-box">ConsFactor = (R1_cons + R2_cons) / 10
-
-Examples:
-  Both at 5/5  → (5+5)/10 = 1.00  (full output, no reduction)
-  Both at 3/5  → (3+3)/10 = 0.60  (40% haircut on raw pts)
-  Both at 1/5  → (1+1)/10 = 0.20  (80% haircut — very erratic)</div>
-      <p class="hint">A team averaging 8 pins with consistency 2/5 is riskier than one averaging 6 pins at 5/5. The factor compresses expected output to reflect real-match variance. Enter consistency from your scouting observations.</p>
-    </div>
-
-    <div style="margin-bottom:1.25rem">
-      <p style="font-size:13px;font-weight:500;margin-bottom:6px">Autonomous bonus inclusion</p>
-      <div class="formula-box">FinalPts_Red  = ExpectedPts_Red  + (ExpectedPts_Red  > ExpectedPts_Blue  ? 12 : 0)
-FinalPts_Blue = ExpectedPts_Blue + (ExpectedPts_Blue > ExpectedPts_Red   ? 12 : 0)
-Tie           → each gets +6
-
-Points win probability = FinalPts_Red / (FinalPts_Red + FinalPts_Blue)</div>
-    </div>
-
-    <hr style="border:none;border-top:0.5px solid var(--border);margin:1.25rem 0">
-    <p class="sec">AWP probability calculation  <span style="font-weight:400;color:var(--text2);font-size:13px">(independent from points)</span></p>
-
-    <div style="margin-bottom:1.25rem">
-      <div class="formula-box">AWP_alliance% = (R1_AWP% / 100) × (R2_AWP% / 100) × consistencyWeight × 100
-
-consistencyWeight = (R1_cons + R2_cons) / 10   (same factor as points)
-
-Interpretation:
-  R1 = 80%, R2 = 70%, both cons 4/5:
-  → (0.80 × 0.70) × (4+4)/10 × 100
-  → 0.56 × 0.80 × 100 = 44.8%</div>
-      <p class="hint">AWP requires BOTH robots to succeed (SC8: 7+ pins, 3+ goals with 2+ each, neither touching perimeter). The joint probability multiplies individual rates — if either robot fails, the alliance loses AWP. Consistency further discounts the probability for unreliable partners. AWP earns WP (ranking points), NOT match score — displayed separately for this reason.</p>
-    </div>
-
-    <div style="margin-bottom:1.25rem">
-      <p style="font-size:13px;font-weight:500;margin-bottom:6px">Worked example</p>
-      <div class="formula-box">Red: Robot A → 4 avg pins, 2 bonuses, 80% AWP, cons 4/5
-     Robot B → 3 avg pins, 0 bonuses, 60% AWP, cons 3/5
-
-  RawPts      = (4+3)×5 + (2+0) = 37
-  ConsFactor  = (4+3)/10 = 0.70
-  ExpectedPts = 37 × 0.70 = 25.9
-
-  AWP%        = (0.80 × 0.60) × 0.70 × 100 = 33.6%
-
-Blue: Robot C → 5 avg pins, 1 bonus, 40% AWP, cons 5/5
-      Robot D → 5 avg pins, 1 bonus, 70% AWP, cons 4/5
-
-  RawPts      = (5+5)×5 + (1+1) = 52
-  ConsFactor  = (5+4)/10 = 0.90
-  ExpectedPts = 52 × 0.90 = 46.8
-
-  AWP%        = (0.40 × 0.70) × 0.90 × 100 = 25.2%
-
-Auto bonus → Blue wins points (46.8 > 25.9) → Blue +12
-FinalPts: Red 25.9,  Blue 58.8
-Points win%: Red 31%,  Blue 69%
-AWP:         Red 33.6%,  Blue 25.2%  (Red more likely to get AWP despite losing points)</div>
-      <p class="hint">Notice: Red has a higher AWP probability than Blue even though Blue dominates the point battle. This is realistic — a disciplined but lower-scoring alliance can still consistently hit AWP criteria, earning the ranking point even in a match they lose.</p>
-    </div>
-
-    <div>
-      <p style="font-size:13px;font-weight:500;margin-bottom:6px">What the model does not capture</p>
-      <p class="hint" style="line-height:1.8">
-        • Toggle control — 10 pts per owned yellow pin, massive swing, unpredictable in autonomous<br>
-        • Counter-routing — opponent's psi can physically block your long goal approach<br>
-        • Partner goal conflicts — two robots targeting the same goal simultaneously<br>
-        • Sig-specific AWP criteria — harder thresholds release September 3 2026<br>
-        • Match-specific variance — 15 seconds leaves no error recovery time<br><br>
-        Recalibrate as you collect data: if the model consistently over- or under-predicts, adjust the pin coefficient (currently 5, matches game manual) or the consistency divisor.
-      </p>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════ SHEETS SYNC ═══════════════ -->
-<div id="tab-sheets" class="panel">
-  <div class="config-box">
-    <p style="font-size:14px;font-weight:500;margin-bottom:12px">Google Sheets — two-way sync setup</p>
-    <div class="step-row"><span class="step-num">1</span><div>Open <a href="https://sheets.google.com" target="_blank" style="color:var(--blue)">Google Sheets</a>, create a new spreadsheet. Name it <strong>Override Scout DB</strong>.</div></div>
-    <div class="step-row"><span class="step-num">2</span><div>In the spreadsheet, go to <strong>Extensions → Apps Script</strong>. Delete any existing code, paste the Apps Script below, click Save.</div></div>
-    <div class="step-row"><span class="step-num">3</span><div>Click <strong>Deploy → New deployment → Web app</strong>. Set "Execute as" = <em>Me</em>, "Who has access" = <em>Anyone</em>. Click Deploy and copy the Web App URL.</div></div>
-    <div class="step-row"><span class="step-num">4</span><div>Paste the URL into the field below and click Connect.</div></div>
-  </div>
-
-  <div class="card">
-    <p class="sec">Apps Script code — paste this into your Google Apps Script editor</p>
-    <div class="formula-box" id="appsScriptCode" style="font-size:11px;max-height:320px;overflow-y:auto"></div>
-    <button class="btn btn-sm" style="margin-top:8px" onclick="copyScript()">Copy script</button>
-    <div id="copyMsg" style="font-size:12px;color:var(--green);margin-top:4px"></div>
-  </div>
-
-  <div class="card">
-    <p class="sec">Connect your deployment</p>
-    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-      <input type="text" id="sheetsUrl" placeholder="https://script.google.com/macros/s/…/exec" style="flex:1;min-width:200px">
-      <button class="btn btn-primary" onclick="connectSheets()">Connect</button>
-      <button class="btn" onclick="disconnectSheets()" id="disconnectBtn" style="display:none">Disconnect</button>
-    </div>
-    <div id="sheets-msg"></div>
-
-    <div id="syncOptions" style="display:none">
-      <hr style="border:none;border-top:0.5px solid var(--border);margin:12px 0">
-      <p style="font-size:13px;font-weight:500;margin-bottom:8px">Sync options</p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn" onclick="pushToSheets()">Push local → Sheets</button>
-        <button class="btn" onclick="pullFromSheets()">Pull Sheets → local</button>
-        <button class="btn" onclick="fullSync()">Full two-way sync</button>
-      </div>
-      <p class="hint" style="margin-top:8px">Auto-sync runs on every new entry. Full two-way sync merges by entry ID — no duplicates.</p>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════ SUPABASE ═══════════════ -->
-<div id="tab-supabase" class="panel">
-  <div class="card" id="sb-cfg-panel">
-    <p class="sec">Connect to Supabase</p>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">
-      Your credentials are saved in this browser only — you never need to edit any files.
-      Get these from <strong>supabase.com → your project → Settings → API Keys</strong>.
-    </p>
-    <div style="margin-bottom:12px">
-      <label>Project URL</label>
-      <input type="text" id="sb-url-input" placeholder="https://xxxxxxxxxxxxxx.supabase.co">
-      <p class="hint">Must start with https:// and end with .supabase.co — nothing after that</p>
-    </div>
-    <div style="margin-bottom:12px">
-      <label>Publishable / Anon Key</label>
-      <input type="text" id="sb-key-input" placeholder="sb_publishable_... or eyJ...">
-      <p class="hint">The long key from Settings → API Keys. NOT the secret key.</p>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-      <button class="btn btn-primary" onclick="saveSBConfig()">Save &amp; Connect</button>
-      <button class="btn" onclick="clearSBConfig()">Clear credentials</button>
-    </div>
-    <div id="sb-cfg-msg" style="font-size:13px;margin-top:4px"></div>
-  </div>
-  <div class="card" id="sb-status-card">
-    <p class="sec">Connection status</p>
-    <div style="font-size:13px;color:var(--text2);line-height:2">
-      <div>URL saved: <strong id="sb-url-display" style="color:var(--text)">—</strong></div>
-      <div>Key saved: <strong id="sb-key-display" style="color:var(--text)">—</strong></div>
-    </div>
-    <p class="hint" style="margin-top:8px">Every time you save a new entry in + Add Entry, it automatically pushes to Supabase. The sync dot in the top right turns green when it works.</p>
-  </div>
-</div>
-
-</div><!-- end .app -->
 
 <script>
-/* ─── SUPABASE CONFIG (stored in browser — no file editing needed) ─── */
-let SB_URL = localStorage.getItem('sb_url') || '';
-let SB_KEY = localStorage.getItem('sb_key') || '';
+/* ═══════════════════════════════════════════════════════
+   CONFIGURATION — set your admin password and Supabase keys
+════════════════════════════════════════════════════════ */
+const ADMIN_USER     = 'botgobrr';
+const ADMIN_PASSWORD = 'XtBX0-rq"9(>UbJ2C7w';
+const SB_URL = 'https://ajymmthxmdyhkiynwhuf.supabase.co';
+const SB_KEY = 'sb_publishable_1r5xHNrNLbRHB_GcJMgsjg_fwEvgdqS';
+/* ═══════════════════════════════════════════════════════ */
 
-function saveSBConfig() {
-  const url = document.getElementById('sb-url-input').value.trim().replace(/\/+$/, '');
-  const key = document.getElementById('sb-key-input').value.trim();
-  const msg = document.getElementById('sb-cfg-msg');
-  if(!url.startsWith('https://') || !url.includes('.supabase.co')) {
-    msg.textContent = '\u26a0 URL must look like: https://xxxxxx.supabase.co';
-    msg.style.color = 'var(--red-text)'; return;
-  }
-  if(!key || key.length < 20) {
-    msg.textContent = '\u26a0 Key looks too short — copy the full publishable key';
-    msg.style.color = 'var(--red-text)'; return;
-  }
-  SB_URL = url; SB_KEY = key;
-  localStorage.setItem('sb_url', url);
-  localStorage.setItem('sb_key', key);
-  msg.textContent = '\u2713 Saved! Supabase is now connected.';
-  msg.style.color = 'var(--green)';
-  setSyncStatus('ok', 'Connected to Supabase \u2713');
+const HDRS = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Accept': 'application/json' };
+
+/* ── State ── */
+let isAdmin = false;
+let allEntries = [], allTeams = [];
+let localDb = JSON.parse(localStorage.getItem('override_scout_v3') || '[]');
+
+/* ── Helpers ── */
+function pins(e){ return (e.pins||'0').split('+').map(n=>parseInt(n)||0).reduce((a,b)=>a+b,0); }
+function parseTotal(s){ return (s||'0').split('+').map(n=>parseInt(n)||0).reduce((a,b)=>a+b,0); }
+
+/* ═══════════════════════════════════════════════════════
+   AUTH
+════════════════════════════════════════════════════════ */
+function openLoginModal() {
+  document.getElementById('loginModal').classList.add('open');
+  document.getElementById('unInput').focus();
+  document.getElementById('loginErr').textContent = '';
+}
+function closeLoginModal() {
+  document.getElementById('loginModal').classList.remove('open');
+  document.getElementById('pwInput').value = '';
+  document.getElementById('unInput').value = '';
+  document.getElementById('loginErr').textContent = '';
 }
 
-function clearSBConfig() {
-  localStorage.removeItem('sb_url'); localStorage.removeItem('sb_key');
-  SB_URL = ''; SB_KEY = '';
-  document.getElementById('sb-url-input').value = '';
-  document.getElementById('sb-key-input').value = '';
-  document.getElementById('sb-cfg-msg').textContent = 'Credentials cleared.';
-  setSyncStatus('', 'Not connected');
+function tryLogin() {
+  const un = document.getElementById('unInput').value.trim();
+  const pw = document.getElementById('pwInput').value;
+  if(un === ADMIN_USER && pw === ADMIN_PASSWORD) {
+    isAdmin = true;
+    sessionStorage.setItem('admin', '1');
+    closeLoginModal();
+    // Reveal admin tabs
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+    document.getElementById('modeBadge').textContent = 'Admin';
+    document.getElementById('modeBadge').className = 'mode-badge mode-admin';
+    document.getElementById('logoutBtn').style.display = '';
+    document.getElementById('adminLoginBtn').style.display = 'none';
+    renderLog();
+  } else {
+    document.getElementById('loginErr').textContent = 'Incorrect username or password.';
+    document.getElementById('pwInput').value = '';
+    document.getElementById('pwInput').focus();
+  }
 }
 
-async function pushToSupabase(entry) {
-  if(!SB_URL || !SB_KEY) return;
+function logout() {
+  sessionStorage.removeItem('admin');
+  isAdmin = false;
+  document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+  document.getElementById('modeBadge').textContent = 'Viewer';
+  document.getElementById('modeBadge').className = 'mode-badge mode-pub';
+  document.getElementById('logoutBtn').style.display = 'none';
+  document.getElementById('adminLoginBtn').style.display = '';
+  // Switch back to search tab
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelector('[data-tab="search"]').classList.add('active');
+  document.getElementById('tab-search').classList.add('active');
+}
+
+function launchApp(admin) {
+  document.getElementById('appShell').style.display = 'block';
+  // Admin tabs hidden by default for viewers
+  document.querySelectorAll('.admin-only').forEach(el => el.style.display = admin ? '' : 'none');
+  document.getElementById('modeBadge').textContent = admin ? 'Admin' : 'Viewer';
+  document.getElementById('modeBadge').className = 'mode-badge ' + (admin ? 'mode-admin' : 'mode-pub');
+  document.getElementById('logoutBtn').style.display = admin ? '' : 'none';
+  document.getElementById('adminLoginBtn').style.display = admin ? 'none' : '';
+  loadData();
+}
+
+/* ═══════════════════════════════════════════════════════
+   DATA LOADING
+════════════════════════════════════════════════════════ */
+async function loadData() {
+  setSyncStatus('syncing', 'Loading…');
   try {
-    const res = await fetch(SB_URL.replace(/\/+$/,'') + '/rest/v1/entries', {
-      method: 'POST',
-      headers: {
-        'apikey': SB_KEY,
-        'Authorization': 'Bearer ' + SB_KEY,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify(entry)
-    });
-    if(res.ok) setSyncStatus('ok', 'Synced to Supabase \u2713');
-    else setSyncStatus('err', 'Push failed (' + res.status + ')');
-  } catch(e) {
-    setSyncStatus('err', 'Supabase unreachable');
+    let rows = [], off = 0, batch;
+    do {
+      const r = await fetch(SB_URL+'/rest/v1/entries?select=*&order=created_at.desc&limit=1000&offset='+off, {headers:HDRS});
+      if(!r.ok) throw new Error('HTTP '+r.status+': '+(await r.text()).slice(0,120));
+      batch = await r.json();
+      rows = rows.concat(batch);
+      off += 1000;
+    } while(batch.length === 1000);
+
+    allEntries = rows;
+    allTeams   = buildStats(rows);
+
+    // Merge any local entries not yet in Supabase
+    if(isAdmin) {
+      localDb.forEach(le => {
+        if(!allEntries.find(e => String(e.id) === String(le.id))) allEntries.unshift(le);
+      });
+      allTeams = buildStats(allEntries);
+    }
+
+    setSyncStatus('ok', allTeams.length + ' teams · ' + allEntries.length + ' entries');
+
+    // Update summary cards
+    const totP = allEntries.reduce((s,e)=>s+pins(e),0);
+    const avgP = allEntries.length ? (totP/allEntries.length).toFixed(1) : '—';
+    const awpR = allEntries.length ? Math.round(allEntries.filter(e=>e.awp==='Y').length/allEntries.length*100) : 0;
+    document.getElementById('lbT').textContent = allTeams.length;
+    document.getElementById('lbE').textContent = allEntries.length;
+    document.getElementById('lbP').textContent = avgP;
+    document.getElementById('lbA').textContent = awpR + '%';
+    document.getElementById('lbCards').style.display = 'grid';
+
+    // Render
+    lbApplyFilter(lbActiveF);
+    pubRenderAll();
+    if(isAdmin) { renderLog(); renderRoutes(); }
+  } catch(err) {
+    setSyncStatus('err', 'Connection failed');
+    console.error(err);
+    document.getElementById('pubResult').innerHTML = `<div class="empty" style="color:var(--red-text)">Could not load database: ${err.message}</div>`;
   }
 }
-/* ─────────────────────────────────────────────────────── */
 
-/* ─── DATA ─── */
+function setSyncStatus(s, t) {
+  document.getElementById('syncDot').className = 'sync-dot' + (s==='ok'?' ok':s==='err'?' err':'');
+  document.getElementById('syncTxt').textContent = t;
+}
+
+/* ── Build team stats ── */
+function buildStats(entries) {
+  const m = {};
+  entries.forEach(e => {
+    const k = (e.team||'').toUpperCase().trim(); if(!k) return;
+    if(!m[k]) m[k] = {team:k,rows:[],routes:new Set(),types:new Set(),last:''};
+    m[k].rows.push(e);
+    if(e.route && e.route !== 'Unknown route') m[k].routes.add(e.route);
+    if(e.type) m[k].types.add(e.type);
+    if((e.created_at||'') > m[k].last) m[k].last = e.created_at||'';
+  });
+  return Object.values(m).map(g => {
+    const rows=g.rows, n=rows.length;
+    const totPins=rows.reduce((s,e)=>s+pins(e),0);
+    const totBon=rows.reduce((s,e)=>s+(parseInt(e.bonuses)||0),0);
+    const awpN=rows.filter(e=>e.awp==='Y').length;
+    const sigN=rows.filter(e=>e.sig==='yes').length;
+    return {
+      team:g.team, count:n,
+      avg_pins:n?(totPins/n).toFixed(2):0,
+      avg_bonuses:n?(totBon/n).toFixed(2):0,
+      awp_pct:n?(awpN/n*100).toFixed(1):0,
+      awp_count:awpN, sig_count:sigN,
+      routes:[...g.routes].join(' · ')||'—',
+      types:[...g.types].join(', ')||'—',
+      last:g.last, matches:rows
+    };
+  });
+}
+
+/* ═══════════════════════════════════════════════════════
+   PUBLIC SEARCH TAB
+════════════════════════════════════════════════════════ */
+function pubRenderAll() {
+  if(!allTeams.length) {
+    document.getElementById('pubResult').innerHTML = '<div class="empty">No teams in database yet.</div>';
+    return;
+  }
+  document.getElementById('pubResult').innerHTML = '<div class="empty" style="color:var(--ink3)">Type a team number above and press Search.<br><br>Or switch to the <strong>Leaderboard</strong> tab to browse all teams.</div>';
+}
+
+function pubDoSearch() {
+  const q = document.getElementById('pubSearch').value.trim().toUpperCase();
+  if(!q) { pubRenderAll(); return; }
+  const res = allTeams.filter(t => t.team.includes(q));
+  if(!res.length) {
+    document.getElementById('pubResult').innerHTML = `<div class="empty">No data found for "${q}".<br>Check the team number and try again.</div>`;
+    return;
+  }
+  if(res.length === 1) { openDetail(res[0]); return; }
+  // Multiple matches — show mini table
+  document.getElementById('pubResult').innerHTML = `
+    <div class="card">
+      <p class="sec">${res.length} teams matching "${q}"</p>
+      <div class="tw"><table>
+        <thead><tr><th>Team</th><th>Matches</th><th>Avg Pins</th><th>AWP Rate</th><th>Robot Type</th></tr></thead>
+        <tbody>
+          ${res.map(t=>`<tr onclick='openDetail(${JSON.stringify(JSON.stringify(t))})'>
+            <td><span class="tn">${t.team}</span></td>
+            <td style="font-family:var(--mono)">${t.count}</td>
+            <td style="font-family:var(--mono);font-weight:600">${parseFloat(t.avg_pins).toFixed(1)}</td>
+            <td style="font-family:var(--mono)">${parseFloat(t.awp_pct).toFixed(0)}%</td>
+            <td style="font-size:12px;color:var(--ink2)">${t.types}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>
+    </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════
+   LEADERBOARD TAB
+════════════════════════════════════════════════════════ */
+const LB_PG = 25;
+let lbFiltered = [], lbPg = 1, lbSortC = 'avg_pins', lbSortD = -1, lbActiveF = 'all';
+
+function lbFilter(f, el) {
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on'); lbActiveF=f; lbPg=1; lbApplyFilter(f);
+}
+function lbApplyFilter(f) {
+  if(f==='all') lbFiltered=[...allTeams];
+  else if(f==='sig') lbFiltered=allTeams.filter(t=>t.sig_count>0);
+  else if(f==='awp') lbFiltered=allTeams.filter(t=>t.awp_count>0);
+  else if(f==='top') lbFiltered=[...allTeams].sort((a,b)=>b.avg_pins-a.avg_pins);
+  lbSortRender();
+}
+function lbSortBy(col) {
+  if(lbSortC===col) lbSortD*=-1; else{lbSortC=col;lbSortD=-1;}
+  document.querySelectorAll('th.sorted').forEach(e=>e.classList.remove('sorted'));
+  document.getElementById('lbth-'+col)?.classList.add('sorted');
+  lbSortRender();
+}
+function lbSortRender() {
+  lbFiltered.sort((a,b)=>{
+    const d=(parseFloat(b[lbSortC])||0)-(parseFloat(a[lbSortC])||0);
+    return d*lbSortD || a.team.localeCompare(b.team);
+  });
+  lbRender();
+}
+function lbRender() {
+  const start=(lbPg-1)*LB_PG, sl=lbFiltered.slice(start,start+LB_PG), tot=lbFiltered.length, pages=Math.ceil(tot/LB_PG);
+  if(!sl.length){ document.getElementById('lbMain').innerHTML='<div class="empty">No teams match this filter.</div>'; return; }
+  document.getElementById('lbMain').innerHTML=`
+    <div style="border:1.5px solid var(--ink);border-radius:var(--radius-lg);overflow:hidden">
+    <div class="tw"><table>
+      <thead><tr>
+        <th style="width:24px;font-family:var(--mono);font-size:11px;color:var(--ink3)">#</th>
+        <th onclick="lbSortBy('team')" id="lbth-team">Team</th>
+        <th onclick="lbSortBy('count')" id="lbth-count">Matches</th>
+        <th onclick="lbSortBy('avg_pins')" id="lbth-avg_pins" class="sorted">Avg Pins ↕</th>
+        <th onclick="lbSortBy('avg_bonuses')" id="lbth-avg_bonuses">Avg Bonus</th>
+        <th onclick="lbSortBy('awp_pct')" id="lbth-awp_pct">AWP Rate</th>
+        <th onclick="lbSortBy('sig_count')" id="lbth-sig_count">Sig</th>
+        <th>Robot Type</th>
+      </tr></thead><tbody>
+      ${sl.map((t,i)=>`<tr onclick='openDetail(${JSON.stringify(JSON.stringify(t))})'>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--ink3)">${start+i+1}</td>
+        <td><span class="tn">${t.team}</span></td>
+        <td style="font-family:var(--mono)">${t.count}</td>
+        <td style="font-family:var(--mono);font-weight:600">${parseFloat(t.avg_pins).toFixed(1)}</td>
+        <td style="font-family:var(--mono)">${parseFloat(t.avg_bonuses).toFixed(1)}</td>
+        <td><div style="display:flex;align-items:center;gap:6px">
+          <span style="font-family:var(--mono);min-width:34px">${parseFloat(t.awp_pct).toFixed(0)}%</span>
+          <div class="awp-wrap"><div class="awp-fill" style="width:${Math.min(parseFloat(t.awp_pct),100)}%"></div></div>
+        </div></td>
+        <td>${t.sig_count>0?'<span class="badge b-sig">'+t.sig_count+'</span>':'<span class="badge b-no">—</span>'}</td>
+        <td style="font-size:12px;color:var(--ink2)">${t.types}</td>
+      </tr>`).join('')}
+      </tbody></table></div></div>`;
+  const pg=document.getElementById('lbPager');
+  if(pages>1){
+    pg.style.display='flex';
+    document.getElementById('lbPi').textContent=`Page ${lbPg} of ${pages} (${tot} teams)`;
+    document.getElementById('lbPrev').disabled=lbPg===1;
+    document.getElementById('lbNext').disabled=lbPg===pages;
+  } else pg.style.display='none';
+}
+function lbPage(d){ lbPg+=d; lbRender(); window.scrollTo(0,0); }
+
+/* ═══════════════════════════════════════════════════════
+   DETAIL OVERLAY (shared)
+════════════════════════════════════════════════════════ */
+function openDetail(t) {
+  if(typeof t==='string') t=JSON.parse(t);
+  const awpPct=parseFloat(t.awp_pct||0);
+  const routes=(t.routes||'—').split(' · ').map(r=>`<code>${r}</code>`).join(' ');
+  document.getElementById('dc').innerHTML=`
+    <div class="dc-team">${t.team}</div>
+    <div class="dc-sub">${t.types} · ${t.count} match${t.count!==1?'es':''} scouted</div>
+    <div class="sgrid">
+      <div class="sbox"><div class="sbox-l">Matches</div><div class="sbox-v">${t.count}</div></div>
+      <div class="sbox"><div class="sbox-l">Avg Pins</div><div class="sbox-v">${parseFloat(t.avg_pins).toFixed(1)}</div></div>
+      <div class="sbox"><div class="sbox-l">AWP Rate</div><div class="sbox-v">${awpPct.toFixed(0)}%</div></div>
+      <div class="sbox"><div class="sbox-l">Sig Matches</div><div class="sbox-v">${t.sig_count}</div></div>
+    </div>
+    <div class="dr"><span class="dk">AWP achieved</span><span class="dv">${t.awp_count} / ${t.count}</span></div>
+    <div class="dr"><span class="dk">Avg bonuses/match</span><span class="dv">${parseFloat(t.avg_bonuses).toFixed(1)}</span></div>
+    <div class="dr"><span class="dk">Known routes</span><span class="dv">${routes}</span></div>
+    <div class="dr"><span class="dk">Robot types</span><span class="dv">${t.types}</span></div>
+    <div class="dr"><span class="dk">Last scouted</span><span class="dv">${t.last?new Date(t.last).toLocaleDateString():'—'}</span></div>
+    ${t.matches&&t.matches.length?`
+    <div class="mh-hd">Match history (${t.matches.length})</div>
+    ${t.matches.slice(0,20).map(e=>`
+      <div class="mh-row">
+        <span style="font-size:11px;color:var(--ink2)">${e.event||'—'}</span>
+        <span style="font-family:var(--mono);font-size:11px">${e.round||'—'}</span>
+        <span style="font-family:var(--mono);font-size:12px">${e.pins||'0'} pins</span>
+        <span><span class="badge ${e.awp==='Y'?'b-awp':'b-no'}">${e.awp||'N'}</span></span>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--ink3)">${e.side||''}</span>
+      </div>`).join('')}
+    ${t.matches.length>20?`<div style="font-size:11px;color:var(--ink3);padding-top:6px;font-family:var(--mono)">+${t.matches.length-20} more</div>`:''}
+    `:''}`;
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeDetail() {
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeDetail(); });
+
+/* ═══════════════════════════════════════════════════════
+   ADMIN — ADD ENTRY
+════════════════════════════════════════════════════════ */
+async function addEntry() {
+  if(!isAdmin) return;
+  const team = document.getElementById('f-team').value.trim();
+  if(!team){ showMsg('add-msg','Team # required','err'); return; }
+  const entry = {
+    id: Date.now(),
+    team, event:document.getElementById('f-event').value.trim(),
+    round:document.getElementById('f-round').value.trim(),
+    side:document.getElementById('f-side').value,
+    sig:document.getElementById('f-sig').value,
+    type:document.getElementById('f-type').value,
+    route:document.getElementById('f-route').value.trim()||'Unknown route',
+    pins:document.getElementById('f-pins').value.trim()||'0',
+    maxpins:document.getElementById('f-maxpins').value.trim(),
+    bonuses:parseInt(document.getElementById('f-bonuses').value)||0,
+    awp:document.getElementById('f-awp').value,
+    notes:document.getElementById('f-notes').value.trim(),
+    ts:new Date().toLocaleDateString()
+  };
+  localDb.unshift(entry);
+  try{ localStorage.setItem('override_scout_v3', JSON.stringify(localDb)); }catch(e){}
+  clearForm();
+  showMsg('add-msg','Saved locally! Pushing to Supabase…','ok');
+  // Push to Supabase
+  try {
+    const r = await fetch(SB_URL+'/rest/v1/entries', {
+      method:'POST',
+      headers:{...HDRS,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify(entry)
+    });
+    if(r.ok){
+      showMsg('add-msg','✓ Entry saved for '+team+' and synced to database.','ok');
+      allEntries.unshift(entry);
+      allTeams = buildStats(allEntries);
+      setSyncStatus('ok', allTeams.length+' teams · '+allEntries.length+' entries');
+      renderLog(); lbApplyFilter(lbActiveF);
+    } else {
+      showMsg('add-msg','Saved locally but Supabase push failed ('+r.status+')','err');
+    }
+  } catch(e) {
+    showMsg('add-msg','Saved locally but could not reach Supabase.','err');
+  }
+}
+
+function clearForm() {
+  ['f-team','f-event','f-round','f-pins','f-maxpins','f-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-bonuses').value=0;
+  document.getElementById('f-awp').value='N';
+}
+
+function showMsg(id, txt, type) {
+  const el=document.getElementById(id);
+  el.textContent=txt; el.className=type==='ok'?'msg-ok':'msg-err';
+  setTimeout(()=>el.textContent='',3000);
+}
+
+/* ═══════════════════════════════════════════════════════
+   ADMIN — SCOUT LOG
+════════════════════════════════════════════════════════ */
+function renderLog() {
+  const q=(document.getElementById('logQ')?.value||'').toLowerCase();
+  const fil=document.getElementById('logFil')?.value||'';
+  const rows=allEntries.filter(e=>{
+    if(q&&!JSON.stringify(e).toLowerCase().includes(q)) return false;
+    if(fil==='sig'&&e.sig!=='yes') return false;
+    if(fil==='awp'&&e.awp!=='Y') return false;
+    return true;
+  });
+  const teams=new Set(allEntries.map(e=>e.team)).size;
+  const awps=allEntries.filter(e=>e.awp==='Y').length;
+  const avg=allEntries.length?(allEntries.reduce((s,e)=>s+pins(e),0)/allEntries.length).toFixed(1):'—';
+  document.getElementById('logCards').innerHTML=`
+    <div class="mc"><div class="mc-l">Entries</div><div class="mc-v">${allEntries.length}</div></div>
+    <div class="mc"><div class="mc-l">Teams</div><div class="mc-v">${teams}</div></div>
+    <div class="mc"><div class="mc-l">Avg pins</div><div class="mc-v">${avg}</div></div>
+    <div class="mc"><div class="mc-l">AWP achieved</div><div class="mc-v">${awps}</div></div>`;
+  if(!rows.length){ document.getElementById('logBody').innerHTML=`<tr><td colspan="11" class="empty">No entries yet.</td></tr>`; return; }
+  document.getElementById('logBody').innerHTML=rows.map(e=>`<tr>
+    <td><strong>${e.team}</strong></td>
+    <td>${e.event||'—'} ${e.sig==='yes'?'<span class="badge b-sig">Sig</span>':''}</td>
+    <td>${e.round||'—'}</td><td>${e.side||'—'}</td><td>${e.type||'—'}</td>
+    <td><code>${e.route||'—'}</code></td>
+    <td>${e.pins||'0'}${e.maxpins?' / '+e.maxpins:''}</td>
+    <td>${e.bonuses||0}</td>
+    <td><span class="badge ${e.awp==='Y'?'b-awp':e.awp==='?'?'b-q':'b-no'}">${e.awp||'N'}</span></td>
+    <td style="max-width:160px;font-size:12px;color:var(--ink2)">${e.notes||''}</td>
+    <td><button class="btn btn-sm btn-d" onclick="deleteEntry('${e.id}')">✕</button></td>
+  </tr>`).join('');
+}
+
+async function deleteEntry(id) {
+  if(!isAdmin) return;
+  if(!confirm('Delete this entry?')) return;
+  // Remove from Supabase
+  try {
+    await fetch(SB_URL+'/rest/v1/entries?id=eq.'+id, {
+      method:'DELETE', headers:{...HDRS,'Content-Type':'application/json'}
+    });
+  } catch(e){ console.error(e); }
+  // Remove locally
+  allEntries = allEntries.filter(e=>String(e.id)!==String(id));
+  localDb    = localDb.filter(e=>String(e.id)!==String(id));
+  try{ localStorage.setItem('override_scout_v3', JSON.stringify(localDb)); }catch(e){}
+  allTeams = buildStats(allEntries);
+  renderLog(); lbApplyFilter(lbActiveF);
+  setSyncStatus('ok', allTeams.length+' teams · '+allEntries.length+' entries');
+}
+
+function exportCSV() {
+  const hdr='Team,Event,Round,Side,Sig,RobotType,Route,Pins,MaxPins,Bonuses,AWP,Notes,Date';
+  const rows=allEntries.map(e=>[e.team,e.event,e.round,e.side,e.sig,e.type,e.route,e.pins,e.maxpins||'',e.bonuses,e.awp,'"'+(e.notes||'').replace(/"/g,"'")+'"',e.ts||e.created_at||''].join(','));
+  const blob=new Blob([hdr+'\n'+rows.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='override_scout_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+}
+
+function importClick(){ document.getElementById('importFile').click(); }
+function importCSV(ev) {
+  const file=ev.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    const lines=e.target.result.split('\n').slice(1).filter(l=>l.trim());
+    let added=0;
+    for(const line of lines){
+      const c=line.split(',');
+      if(!c[0]) continue;
+      const entry={id:Date.now()+Math.random(),team:c[0],event:c[1]||'',round:c[2]||'',side:c[3]||'L',sig:c[4]||'no',type:c[5]||'',route:c[6]||'Unknown route',pins:c[7]||'0',maxpins:c[8]||'',bonuses:parseInt(c[9])||0,awp:c[10]||'N',notes:(c[11]||'').replace(/^"|"$/g,''),ts:c[12]||''};
+      try{ await fetch(SB_URL+'/rest/v1/entries',{method:'POST',headers:{...HDRS,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(entry)}); }catch(e){}
+      allEntries.unshift(entry); added++;
+    }
+    allTeams=buildStats(allEntries);
+    renderLog(); lbApplyFilter(lbActiveF);
+    alert('Imported '+added+' entries.');
+  };
+  reader.readAsText(file); ev.target.value='';
+}
+
+/* ═══════════════════════════════════════════════════════
+   ADMIN — WIN PROBABILITY
+════════════════════════════════════════════════════════ */
+function autoFill(id) {
+  const team=document.getElementById(id).value.trim().toUpperCase();
+  if(!team) return;
+  const ms=allEntries.filter(e=>(e.team||'').toUpperCase()===team);
+  if(!ms.length) return;
+  const avgPins=Math.round(ms.reduce((s,e)=>s+pins(e),0)/ms.length);
+  const awpRate=Math.round(ms.filter(e=>e.awp==='Y').length/ms.length*100);
+  const avgBon=Math.round(ms.reduce((s,e)=>s+(parseInt(e.bonuses)||0),0)/ms.length);
+  const pm={r1:'r1pins',r2:'r2pins',b1:'b1pins',b2:'b2pins'};
+  const am={r1:'r1awp',r2:'r2awp',b1:'b1awp',b2:'b2awp'};
+  const bm={r1:'r1bon',r2:'r2bon',b1:'b1bon',b2:'b2bon'};
+  if(pm[id]) document.getElementById(pm[id]).value=avgPins;
+  if(am[id]) document.getElementById(am[id]).value=awpRate;
+  if(bm[id]) document.getElementById(bm[id]).value=avgBon;
+  calcProb();
+}
+
+function calcProb() {
+  const n=id=>parseFloat(document.getElementById(id)?.value)||0;
+  const rPins=n('r1pins')+n('r2pins'), bPins=n('b1pins')+n('b2pins');
+  const rBon=n('r1bon')+n('r2bon'),   bBon=n('b1bon')+n('b2bon');
+  const rCons=(n('r1cons')+n('r2cons'))/10, bCons=(n('b1cons')+n('b2cons'))/10;
+  const rRaw=rPins*5+rBon, bRaw=bPins*5+bBon;
+  const rExp=+(rRaw*rCons).toFixed(1), bExp=+(bRaw*bCons).toFixed(1);
+  let rFin=rExp, bFin=bExp;
+  if(rExp>bExp) rFin+=12; else if(bExp>rExp) bFin+=12; else{rFin+=6;bFin+=6;}
+  const tot=rFin+bFin||1;
+  const rP=Math.round(rFin/tot*100), bP=100-rP;
+  document.getElementById('ptRed').style.width=rP+'%'; document.getElementById('ptRed').textContent=rP+'%';
+  document.getElementById('ptBlue').style.width=bP+'%'; document.getElementById('ptBlue').textContent=bP+'%';
+  document.getElementById('ptRL').textContent='Red ~'+rFin.toFixed(1)+' pts';
+  document.getElementById('ptBL').textContent='Blue ~'+bFin.toFixed(1)+' pts';
+  const r1a=n('r1awp')/100,r2a=n('r2awp')/100,b1a=n('b1awp')/100,b2a=n('b2awp')/100;
+  const rA=+(r1a*r2a*rCons*100).toFixed(1), bA=+(b1a*b2a*bCons*100).toFixed(1);
+  const aT=rA+bA||1;
+  const rAB=Math.round(rA/aT*100), bAB=100-rAB;
+  document.getElementById('awpRed').style.width=rAB+'%'; document.getElementById('awpRed').textContent=rA.toFixed(0)+'%';
+  document.getElementById('awpBlue').style.width=bAB+'%'; document.getElementById('awpBlue').textContent=bA.toFixed(0)+'%';
+  document.getElementById('bkTable').innerHTML=`<table>
+    <thead><tr><th>Factor</th><th style="color:var(--red)">Red</th><th style="color:var(--blue)">Blue</th></tr></thead>
+    <tbody>
+      <tr><td>Avg pins placed</td><td>${rPins}</td><td>${bPins}</td></tr>
+      <tr><td>Pin points (×5)</td><td>${rPins*5}</td><td>${bPins*5}</td></tr>
+      <tr><td>Avg bonuses</td><td>${rBon}</td><td>${bBon}</td></tr>
+      <tr><td>Raw auto pts</td><td>${rRaw}</td><td>${bRaw}</td></tr>
+      <tr><td>Consistency factor</td><td>${rCons.toFixed(2)}</td><td>${bCons.toFixed(2)}</td></tr>
+      <tr><td>Expected pts</td><td><strong>${rExp}</strong></td><td><strong>${bExp}</strong></td></tr>
+      <tr><td>+ Auto bonus</td><td>${rFin-rExp>0?'+12':'—'}</td><td>${bFin-bExp>0?'+12':'—'}</td></tr>
+      <tr><td><strong>Final expected pts</strong></td><td><strong>${rFin.toFixed(1)}</strong></td><td><strong>${bFin.toFixed(1)}</strong></td></tr>
+      <tr><td>R1 AWP rate</td><td>${n('r1awp')}%</td><td>${n('b1awp')}%</td></tr>
+      <tr><td>R2 AWP rate</td><td>${n('r2awp')}%</td><td>${n('b2awp')}%</td></tr>
+      <tr><td><strong>Alliance AWP prob.</strong></td><td><strong>${rA.toFixed(1)}%</strong></td><td><strong>${bA.toFixed(1)}%</strong></td></tr>
+    </tbody></table>`;
+}
+
+/* ═══════════════════════════════════════════════════════
+   ROUTES
+════════════════════════════════════════════════════════ */
 const ROUTES=[
-  ['l>lg>m>mg>lg>w','psi','Full scoring — loader, long goal, mid, mid goal, second lg pass + wing'],
+  ['l>lg>m>mg>lg>w','psi','Full scoring — loader, long goal, mid, mid goal, second lg + wing'],
   ['m>lg>w','twi','Simple: mid + long goal + wing'],
   ['m>l>lg>mg>lg>w','zeta+','Aggressive: mid, loader, long goal, mid goal, second lg + wing'],
   ['m>l>lg>w','zeta','Classic: mid + loader + long goal + wing'],
   ['m>u>lg>w','rho','Undergoal: mid, undergoal, long goal + wing'],
   ['m>u>lg>l>mg>w','cocktail','5-stop: mid, undergoal, long goal, loader, mid goal + wing'],
-  ['l>lg>m>mg','psi (-wing)','Psi without wing touch'],
-  ['m>lg','twi (-wing)','Minimal — mid then long goal only'],
-  ['m>l>lg>mg','zeta+ (-wing)','Zeta+ without wing'],
-  ['m>l>lg','zeta (-wing)','Zeta without wing'],
-  ['m>u>lg','rho (-wing)','Rho without wing'],
-  ['m>u>lg>l>mg','cocktail (-wing)','Cocktail without wing'],
+  ['l>lg>m>mg','psi (-w)','Psi without wing'],['m>lg','twi (-w)','Minimal'],
+  ['m>l>lg>mg','zeta+ (-w)','Zeta+ without wing'],['m>l>lg','zeta (-w)','Zeta without wing'],
+  ['m>u>lg','rho (-w)','Rho without wing'],['m>u>lg>l>mg','cocktail (-w)','Cocktail without wing'],
   ['m>u>mg>l>lg>w','mocktail','Undergoal first, mid goal before long goal + wing'],
-  ['m>u>mg>l>lg','mocktail (-wing)','Mocktail without wing'],
   ['m>lg>l>mg>lg>w','hourglass','Crosses lg and mg twice + wing'],
-  ['m>lg>l>mg','hourglass (-wing)','Hourglass without wing'],
   ['l>lg>w','gamma','Loader + long goal + wing'],
   ['m>mg>l>lg>w','sju','Mid, mid goal, loader, long goal + wing'],
-  ['m>mg>l>lg','sju (-wing)','SJU without wing'],
-  ['l>lg>m>mg>m>mg','tsadi','Dual mid goal — high pin count potential'],
+  ['l>lg>m>mg>m>mg','tsadi','Dual mid goal — high pin potential'],
 ];
 
-const APPSSCRIPT = `const SHEET_NAME = 'Entries';
-const HEADERS = ['id','team','event','round','side','sig','type','route','pins','maxpins','bonuses','awp','notes','ts'];
-
-function doGet(e) {
-  const action = e.parameter.action;
-  if (action === 'pull') return pull();
-  if (action === 'push') return push(e);
-  if (action === 'sync') return sync(e);
-  return ok({status:'ready'});
-}
-
-function doPost(e) {
-  const body = JSON.parse(e.postData.contents);
-  if (body.action === 'push') return push(null, body.data);
-  if (body.action === 'sync') return sync(null, body.data);
-  return ok({status:'unknown action'});
-}
-
-function getSheet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let sh = ss.getSheetByName(SHEET_NAME);
-  if (!sh) {
-    sh = ss.insertSheet(SHEET_NAME);
-    sh.appendRow(HEADERS);
-    sh.getRange(1,1,1,HEADERS.length).setFontWeight('bold');
-  }
-  return sh;
-}
-
-function pull() {
-  const sh = getSheet();
-  const rows = sh.getDataRange().getValues();
-  if (rows.length <= 1) return ok([]);
-  const data = rows.slice(1).map(r => {
-    const obj = {};
-    HEADERS.forEach((h,i) => obj[h] = r[i] !== undefined ? String(r[i]) : '');
-    return obj;
-  });
-  return ok(data);
-}
-
-function push(e, incoming) {
-  const data = incoming || JSON.parse(e.parameter.data || '[]');
-  const sh = getSheet();
-  const existing = getExistingIds(sh);
-  let added = 0;
-  data.forEach(entry => {
-    if (!existing.has(String(entry.id))) {
-      sh.appendRow(HEADERS.map(h => entry[h] || ''));
-      added++;
-    }
-  });
-  return ok({added});
-}
-
-function sync(e, incoming) {
-  const localData = incoming || JSON.parse((e && e.parameter.data) || '[]');
-  const sh = getSheet();
-  const existing = getExistingIds(sh);
-  let added = 0;
-  localData.forEach(entry => {
-    if (!existing.has(String(entry.id))) {
-      sh.appendRow(HEADERS.map(h => entry[h] || ''));
-      added++;
-    }
-  });
-  const pullResult = JSON.parse(pull().getContent());
-  return ok({added, entries: pullResult});
-}
-
-function getExistingIds(sh) {
-  const rows = sh.getDataRange().getValues();
-  const ids = new Set();
-  rows.slice(1).forEach(r => ids.add(String(r[0])));
-  return ids;
-}
-
-function ok(data) {
-  return ContentService.createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON);
-}`;
-
-let db = JSON.parse(localStorage.getItem('override_scout_v3') || '[]');
-let sheetsUrl = localStorage.getItem('override_sheets_url') || '';
-function save() { try { localStorage.setItem('override_scout_v3', JSON.stringify(db)); } catch(e){} }
-
-/* ─── TABS ─── */
-function switchTab(t, el) {
-  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  if(el) el.classList.add('active');
-  document.getElementById('tab-'+t).classList.add('active');
-  if(t==='log') renderLog();
-  if(t==='routes') renderRoutes();
-  if(t==='predict') calcProb();
-  if(t==='sheets') renderSheetsTab();
-}
-
-/* ─── PARSE ─── */
-function parseTotal(s) {
-  return (s||'0').split('+').map(n=>parseInt(n)||0).reduce((a,b)=>a+b,0);
-}
-
-/* ─── ADD ─── */
-function addEntry() {
-  const team = document.getElementById('f-team').value.trim();
-  if(!team) { showMsg('add-msg','Team # required','err'); return; }
-  const entry = {
-    id: Date.now(),
-    team, 
-    event: document.getElementById('f-event').value.trim(),
-    round: document.getElementById('f-round').value.trim(),
-    side: document.getElementById('f-side').value,
-    sig: document.getElementById('f-sig').value,
-    type: document.getElementById('f-type').value,
-    route: document.getElementById('f-route').value.trim() || 'Unknown route',
-    pins: document.getElementById('f-pins').value.trim() || '0',
-    maxpins: document.getElementById('f-maxpins').value.trim(),
-    bonuses: parseInt(document.getElementById('f-bonuses').value) || 0,
-    awp: document.getElementById('f-awp').value,
-    notes: document.getElementById('f-notes').value.trim(),
-    ts: new Date().toLocaleDateString()
-  };
-  db.unshift(entry);
-  save();
-  updateCount();
-  showMsg('add-msg', 'Saved entry for ' + team + '!', 'ok');
-  clearForm();
-  pushToSupabase(entry);              // ← sends to Supabase automatically
-  if(sheetsUrl) pushEntryToSheets(entry);
-}
-
-function clearForm() {
-  ['f-team','f-event','f-round','f-pins','f-maxpins','f-notes'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('f-bonuses').value = 0;
-  document.getElementById('f-awp').value = 'N';
-}
-
-function showMsg(id, txt, type) {
-  const el = document.getElementById(id);
-  el.textContent = txt;
-  el.className = type === 'ok' ? 'msg-ok' : 'msg-err';
-  setTimeout(() => el.textContent = '', 2800);
-}
-
-function updateCount() {
-  document.getElementById('entryCount').textContent = db.length;
-}
-
-/* ─── LOG ─── */
-function renderLog() {
-  const q = (document.getElementById('logQ').value || '').toLowerCase();
-  const fil = document.getElementById('logFil').value;
-  const rows = db.filter(e => {
-    if(q && !JSON.stringify(e).toLowerCase().includes(q)) return false;
-    if(fil === 'sig' && e.sig !== 'yes') return false;
-    if(fil === 'awp' && e.awp !== 'Y') return false;
-    return true;
-  });
-
-  const teams = new Set(db.map(e => e.team)).size;
-  const awps = db.filter(e => e.awp === 'Y').length;
-  const avg = db.length ? (db.reduce((s,e) => s + parseTotal(e.pins), 0) / db.length).toFixed(1) : '—';
-  const awpRate = db.length ? Math.round(awps / db.length * 100) : 0;
-
-  document.getElementById('summaryCards').innerHTML = `
-    <div class="mc"><div class="mc-label">Entries</div><div class="mc-val">${db.length}</div></div>
-    <div class="mc"><div class="mc-label">Teams</div><div class="mc-val">${teams}</div></div>
-    <div class="mc"><div class="mc-label">Avg pins</div><div class="mc-val">${avg}</div></div>
-    <div class="mc"><div class="mc-label">AWP rate</div><div class="mc-val">${awpRate}%</div></div>
-  `;
-
-  if(!rows.length) {
-    document.getElementById('logBody').innerHTML = `<tr><td colspan="11" class="empty">No entries yet — add your first scouting record.</td></tr>`;
-    return;
-  }
-
-  document.getElementById('logBody').innerHTML = rows.map(e => `<tr>
-    <td><strong>${e.team}</strong></td>
-    <td>${e.event||'—'} ${e.sig==='yes'?'<span class="badge b-sig">Sig</span>':''}</td>
-    <td>${e.round||'—'}</td>
-    <td>${e.side}</td>
-    <td>${e.type}</td>
-    <td><code>${e.route}</code></td>
-    <td>${e.pins}${e.maxpins?' / '+e.maxpins:''}</td>
-    <td>${e.bonuses}</td>
-    <td><span class="badge ${e.awp==='Y'?'b-awp':e.awp==='?'?'b-q':'b-no'}">${e.awp}</span></td>
-    <td style="max-width:160px;font-size:12px;color:var(--text2)">${e.notes||''}</td>
-    <td><button class="btn btn-sm btn-del" onclick="deleteEntry(${e.id})">✕</button></td>
-  </tr>`).join('');
-}
-
-function deleteEntry(id) {
-  if(!confirm('Delete this entry?')) return;
-  db = db.filter(e => e.id !== id);
-  save(); renderLog(); updateCount();
-}
-
-/* ─── EXPORT / IMPORT ─── */
-function exportCSV() {
-  const hdr = 'Team,Event,Round,Side,Sig,RobotType,Route,Pins,MaxPins,Bonuses,AWP,Notes,Date';
-  const rows = db.map(e => [e.team,e.event,e.round,e.side,e.sig,e.type,e.route,e.pins,e.maxpins||'',e.bonuses,e.awp,'"'+(e.notes||'').replace(/"/g,"'")+'"',e.ts].join(','));
-  const blob = new Blob([hdr+'\n'+rows.join('\n')], {type:'text/csv'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'override_scout_'+new Date().toISOString().slice(0,10)+'.csv';
-  a.click();
-}
-
-function importClick() { document.getElementById('importFile').click(); }
-
-function importCSV(ev) {
-  const file = ev.target.files[0]; if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const lines = e.target.result.split('\n').slice(1).filter(l => l.trim());
-    let added = 0;
-    lines.forEach(line => {
-      const cols = line.split(',');
-      if(!cols[0]) return;
-      const entry = {
-        id: Date.now() + Math.random(),
-        team:cols[0], event:cols[1]||'', round:cols[2]||'', side:cols[3]||'L',
-        sig:cols[4]||'no', type:cols[5]||'', route:cols[6]||'Unknown route',
-        pins:cols[7]||'0', maxpins:cols[8]||'', bonuses:parseInt(cols[9])||0,
-        awp:cols[10]||'N', notes:(cols[11]||'').replace(/^"|"$/g,''), ts:cols[12]||''
-      };
-      const exists = db.some(d => d.team === entry.team && d.round === entry.round && d.event === entry.event);
-      if(!exists) { db.push(entry); added++; }
-    });
-    save(); renderLog(); updateCount();
-    alert('Imported '+added+' entries.');
-  };
-  reader.readAsText(file);
-  ev.target.value = '';
-}
-
-/* ─── AUTO-FILL PREDICT ─── */
-function autoFill(id) {
-  const team = document.getElementById(id).value.trim().toUpperCase();
-  if(!team) return;
-  const matches = db.filter(e => e.team.toUpperCase() === team);
-  if(!matches.length) return;
-  const avgPins = Math.round(matches.reduce((s,e) => s + parseTotal(e.pins), 0) / matches.length);
-  const awpRate = Math.round(matches.filter(e => e.awp === 'Y').length / matches.length * 100);
-  const avgBon = Math.round(matches.reduce((s,e) => s + (parseInt(e.bonuses)||0), 0) / matches.length);
-  const pMap = {r1:'r1pins',r2:'r2pins',b1:'b1pins',b2:'b2pins'};
-  const aMap = {r1:'r1awp',r2:'r2awp',b1:'b1awp',b2:'b2awp'};
-  const bMap = {r1:'r1bon',r2:'r2bon',b1:'b1bon',b2:'b2bon'};
-  if(pMap[id]) document.getElementById(pMap[id]).value = avgPins;
-  if(aMap[id]) document.getElementById(aMap[id]).value = awpRate;
-  if(bMap[id]) document.getElementById(bMap[id]).value = avgBon;
-}
-
-/* ─── PROBABILITY ─── */
-function calcProb() {
-  const n = id => parseFloat(document.getElementById(id).value) || 0;
-
-  // Points
-  const rPins = n('r1pins') + n('r2pins');
-  const bPins = n('b1pins') + n('b2pins');
-  const rBon  = n('r1bon') + n('r2bon');
-  const bBon  = n('b1bon') + n('b2bon');
-  const rCons = (n('r1cons') + n('r2cons')) / 10;
-  const bCons = (n('b1cons') + n('b2cons')) / 10;
-
-  const rRaw = rPins * 5 + rBon;
-  const bRaw = bPins * 5 + bBon;
-  const rExp = +(rRaw * rCons).toFixed(1);
-  const bExp = +(bRaw * bCons).toFixed(1);
-
-  // Auto bonus
-  let rFinal = rExp, bFinal = bExp;
-  if(rExp > bExp)      { rFinal = rExp + 12; }
-  else if(bExp > rExp) { bFinal = bExp + 12; }
-  else                 { rFinal = rExp + 6; bFinal = bExp + 6; }
-
-  const ptTotal = rFinal + bFinal || 1;
-  const rPtPct  = Math.round(rFinal / ptTotal * 100);
-  const bPtPct  = 100 - rPtPct;
-
-  document.getElementById('ptRedBar').style.width  = rPtPct + '%';
-  document.getElementById('ptBlueBar').style.width = bPtPct + '%';
-  document.getElementById('ptRedBar').textContent  = rPtPct + '%';
-  document.getElementById('ptBlueBar').textContent = bPtPct + '%';
-  document.getElementById('ptRedLabel').textContent  = 'Red ~' + rFinal.toFixed(1) + ' pts';
-  document.getElementById('ptBlueLabel').textContent = 'Blue ~' + bFinal.toFixed(1) + ' pts';
-
-  // AWP — joint probability × consistency
-  const r1awp = n('r1awp') / 100, r2awp = n('r2awp') / 100;
-  const b1awp = n('b1awp') / 100, b2awp = n('b2awp') / 100;
-  const rAwpPct = +(r1awp * r2awp * rCons * 100).toFixed(1);
-  const bAwpPct = +(b1awp * b2awp * bCons * 100).toFixed(1);
-  const awpTotal = rAwpPct + bAwpPct || 1;
-  const rAwpBar  = Math.round(rAwpPct / awpTotal * 100);
-  const bAwpBar  = 100 - rAwpBar;
-
-  document.getElementById('awpRedBar').style.width  = rAwpBar + '%';
-  document.getElementById('awpBlueBar').style.width = bAwpBar + '%';
-  document.getElementById('awpRedBar').textContent  = rAwpPct.toFixed(0) + '%';
-  document.getElementById('awpBlueBar').textContent = bAwpPct.toFixed(0) + '%';
-
-  // Breakdown table
-  document.getElementById('bkTable').innerHTML = `
-    <table>
-      <thead><tr><th>Factor</th><th style="color:var(--red)">Red</th><th style="color:var(--blue)">Blue</th></tr></thead>
-      <tbody>
-        <tr><td>Avg pins placed</td><td>${rPins}</td><td>${bPins}</td></tr>
-        <tr><td>Pin points (×5)</td><td>${rPins*5}</td><td>${bPins*5}</td></tr>
-        <tr><td>Avg bonuses</td><td>${rBon}</td><td>${bBon}</td></tr>
-        <tr><td>Raw auto pts</td><td>${rRaw}</td><td>${bRaw}</td></tr>
-        <tr><td>Consistency factor</td><td>${rCons.toFixed(2)}</td><td>${bCons.toFixed(2)}</td></tr>
-        <tr><td>Expected pts (adj.)</td><td><strong>${rExp}</strong></td><td><strong>${bExp}</strong></td></tr>
-        <tr><td>+ Auto bonus (12 pts)</td><td>${rFinal - rExp > 0 ? '+' + (rFinal - rExp) : '—'}</td><td>${bFinal - bExp > 0 ? '+' + (bFinal - bExp) : '—'}</td></tr>
-        <tr><td><strong>Final expected pts</strong></td><td><strong>${rFinal.toFixed(1)}</strong></td><td><strong>${bFinal.toFixed(1)}</strong></td></tr>
-        <tr><td>Robot 1 AWP rate</td><td>${n('r1awp')}%</td><td>${n('b1awp')}%</td></tr>
-        <tr><td>Robot 2 AWP rate</td><td>${n('r2awp')}%</td><td>${n('b2awp')}%</td></tr>
-        <tr><td><strong>Alliance AWP probability</strong></td><td><strong>${rAwpPct.toFixed(1)}%</strong></td><td><strong>${bAwpPct.toFixed(1)}%</strong></td></tr>
-      </tbody>
-    </table>
-  `;
-}
-
-/* ─── SEARCH ─── */
-function searchTeam() {
-  const q = document.getElementById('teamQ').value.trim().toUpperCase();
-  const matches = db.filter(e => e.team.toUpperCase() === q);
-  if(!matches.length) {
-    document.getElementById('teamResult').innerHTML = `<div class="card"><div class="empty">No local data for team ${q}.</div></div>`;
-    return;
-  }
-  const awps = matches.filter(e => e.awp === 'Y').length;
-  const avg  = (matches.reduce((s,e) => s + parseTotal(e.pins), 0) / matches.length).toFixed(1);
-  const awpRate = Math.round(awps / matches.length * 100);
-  const routes  = [...new Set(matches.map(e => e.route))];
-  const types   = [...new Set(matches.map(e => e.type))];
-  const avgBon  = (matches.reduce((s,e) => s + (parseInt(e.bonuses)||0), 0) / matches.length).toFixed(1);
-
-  document.getElementById('teamResult').innerHTML = `<div class="card">
-    <p class="sec">Team ${q} — ${matches.length} match${matches.length > 1 ? 'es' : ''} scouted</p>
-    <div class="g4" style="margin-bottom:1rem">
-      <div class="mc"><div class="mc-label">Matches</div><div class="mc-val">${matches.length}</div></div>
-      <div class="mc"><div class="mc-label">Avg pins</div><div class="mc-val">${avg}</div></div>
-      <div class="mc"><div class="mc-label">Avg bonuses</div><div class="mc-val">${avgBon}</div></div>
-      <div class="mc"><div class="mc-label">AWP rate</div><div class="mc-val">${awpRate}%</div></div>
-    </div>
-    <div style="margin-bottom:6px;font-size:13px"><strong>Routes:</strong> ${routes.map(r => '<code>'+r+'</code>').join(' ')}</div>
-    <div style="font-size:13px"><strong>Robot types:</strong> ${types.join(', ')}</div>
-  </div>`;
-}
-
-/* ─── ROUTES ─── */
 function renderRoutes() {
-  document.getElementById('routeBody').innerHTML = ROUTES.map(([c,n,d]) =>
-    `<tr><td><code>${c}</code></td><td><strong>${n}</strong></td><td style="font-size:12px;color:var(--text2)">${d}</td></tr>`
+  document.getElementById('routeBody').innerHTML=ROUTES.map(([c,n,d])=>
+    `<tr><td><code>${c}</code></td><td><strong>${n}</strong></td><td style="font-size:12px;color:var(--ink2)">${d}</td></tr>`
   ).join('');
 }
 
-/* ─── SHEETS SYNC ─── */
-function renderSheetsTab() {
-  document.getElementById('appsScriptCode').textContent = APPSSCRIPT;
-  if(sheetsUrl) {
-    document.getElementById('sheetsUrl').value = sheetsUrl;
-    document.getElementById('syncOptions').style.display = 'block';
-    document.getElementById('disconnectBtn').style.display = '';
-    document.getElementById('syncBtn').style.display = '';
-    setSyncStatus('ok', 'Connected');
-  }
+/* ═══════════════════════════════════════════════════════
+   TABS
+════════════════════════════════════════════════════════ */
+function switchTab(t, el) {
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+t).classList.add('active');
+  if(t==='predict') calcProb();
+  if(t==='routes') renderRoutes();
+  if(t==='log') renderLog();
 }
 
-function connectSheets() {
-  const url = document.getElementById('sheetsUrl').value.trim();
-  if(!url.startsWith('https://script.google.com')) {
-    showMsg('sheets-msg', 'URL must start with https://script.google.com/macros/s/…', 'err'); return;
-  }
-  sheetsUrl = url;
-  localStorage.setItem('override_sheets_url', url);
-  document.getElementById('syncOptions').style.display = 'block';
-  document.getElementById('disconnectBtn').style.display = '';
-  document.getElementById('syncBtn').style.display = '';
-  setSyncStatus('ok', 'Connected');
-  showMsg('sheets-msg', 'Connected! Running initial full sync…', 'ok');
-  fullSync();
-}
-
-function disconnectSheets() {
-  sheetsUrl = '';
-  localStorage.removeItem('override_sheets_url');
-  document.getElementById('syncOptions').style.display = 'none';
-  document.getElementById('disconnectBtn').style.display = 'none';
-  document.getElementById('syncBtn').style.display = 'none';
-  document.getElementById('sheetsUrl').value = '';
-  setSyncStatus('', 'Not connected');
-}
-
-function setSyncStatus(state, label) {
-  const dot = document.getElementById('syncDot');
-  dot.className = 'sync-dot' + (state ? ' '+state : '');
-  document.getElementById('syncLabel').textContent = label;
-}
-
-async function sheetsRequest(method, body) {
-  setSyncStatus('syncing', 'Syncing…');
-  try {
-    let res;
-    if(method === 'GET') {
-      res = await fetch(sheetsUrl + '?action=pull', {method:'GET', mode:'cors'});
-    } else {
-      res = await fetch(sheetsUrl, {
-        method: 'POST',
-        mode: 'cors',
-        body: JSON.stringify(body),
-        headers: {'Content-Type':'application/json'}
-      });
-    }
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const data = await res.json();
-    setSyncStatus('ok', 'Synced ' + new Date().toLocaleTimeString());
-    return data;
-  } catch(err) {
-    setSyncStatus('err', 'Sync failed');
-    throw err;
-  }
-}
-
-async function pushToSheets() {
-  try {
-    const result = await sheetsRequest('POST', {action:'push', data: db});
-    showMsg('sheets-msg', 'Pushed ' + result.added + ' new entries to Sheets.', 'ok');
-  } catch(e) { showMsg('sheets-msg', 'Push failed: ' + e.message, 'err'); }
-}
-
-async function pullFromSheets() {
-  try {
-    const data = await sheetsRequest('GET');
-    if(!Array.isArray(data)) { showMsg('sheets-msg','Unexpected response','err'); return; }
-    let added = 0;
-    data.forEach(entry => {
-      const exists = db.some(d => String(d.id) === String(entry.id));
-      if(!exists) {
-        entry.bonuses = parseInt(entry.bonuses) || 0;
-        db.push(entry);
-        added++;
-      }
-    });
-    save(); updateCount(); renderLog();
-    const banner = document.getElementById('pullBanner');
-    banner.textContent = 'Pulled ' + added + ' new entries from Google Sheets.';
-    banner.style.display = 'block';
-    setTimeout(() => banner.style.display = 'none', 4000);
-    showMsg('sheets-msg', 'Pulled ' + data.length + ' entries, ' + added + ' new.', 'ok');
-  } catch(e) { showMsg('sheets-msg', 'Pull failed: ' + e.message, 'err'); }
-}
-
-async function fullSync() {
-  try {
-    const result = await sheetsRequest('POST', {action:'sync', data: db});
-    if(result.entries && Array.isArray(result.entries)) {
-      let added = 0;
-      result.entries.forEach(entry => {
-        const exists = db.some(d => String(d.id) === String(entry.id));
-        if(!exists) { entry.bonuses = parseInt(entry.bonuses)||0; db.push(entry); added++; }
-      });
-      save(); updateCount(); renderLog();
-      showMsg('sheets-msg', 'Sync complete — pushed '+result.added+' to Sheets, pulled '+added+' new locally.', 'ok');
-    }
-  } catch(e) { showMsg('sheets-msg', 'Sync failed: '+e.message, 'err'); }
-}
-
-async function manualSync() { await fullSync(); }
-
-async function pushEntryToSheets(entry) {
-  if(!sheetsUrl) return;
-  try { await sheetsRequest('POST', {action:'push', data:[entry]}); } catch(e){}
-}
-
-function copyScript() {
-  navigator.clipboard.writeText(APPSSCRIPT).then(() => {
-    document.getElementById('copyMsg').textContent = 'Copied to clipboard!';
-    setTimeout(() => document.getElementById('copyMsg').textContent = '', 2000);
-  });
-}
-
-/* ─── INIT ─── */
-updateCount();
-renderLog();
-renderRoutes();
-if(sheetsUrl) {
-  setSyncStatus('ok','Connected');
-  document.getElementById('syncBtn').style.display = '';
-}
-// Pre-fill Supabase tab if credentials exist
-if(SB_URL) {
-  document.getElementById('sb-url-display').textContent = SB_URL;
-  document.getElementById('sb-key-display').textContent = SB_KEY.slice(0,20) + '...';
-  setSyncStatus('ok', 'Connected to Supabase \u2713');
+/* ═══════════════════════════════════════════════════════
+   INIT — check if already logged in this session
+════════════════════════════════════════════════════════ */
+// Always launch as public viewer immediately — admin login via button
+if(sessionStorage.getItem('admin') === '1') {
+  isAdmin = true;
+  launchApp(true);
 } else {
-  document.getElementById('sb-url-display').textContent = 'Not set';
-  document.getElementById('sb-key-display').textContent = 'Not set';
+  launchApp(false);
 }
 </script>
 </body>
