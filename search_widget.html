@@ -3,859 +3,346 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Override Scout — Team Search</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Override Scout DB</title>
 <style>
-/* ── Reset & Base ── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --ink:       #0f0f0d;
-  --ink2:      #4a4a46;
-  --ink3:      #9a9a94;
-  --paper:     #fafaf7;
-  --paper2:    #f0f0eb;
-  --paper3:    #e4e4de;
-  --accent:    #c8410a;        /* VEX orange-red */
-  --accent2:   #1a5fb4;        /* VEX blue */
-  --gold:      #b8860b;
-  --green:     #2d6a2d;
-  --green-bg:  #e8f5e8;
-  --amber-bg:  #fef3cd;
-  --amber:     #7a5c00;
-  --mono:      'DM Mono', monospace;
-  --sans:      'Syne', sans-serif;
-  --radius:    6px;
-  --radius-lg: 12px;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0f0f0d;--ink2:#4a4a46;--ink3:#9a9a94;
+  --paper:#fafaf7;--paper2:#f0f0eb;--paper3:#e4e4de;
+  --red:#c8410a;--blue:#1a5fb4;
+  --green:#2d6a2d;--green-bg:#e8f5e8;
+  --amber-bg:#fef3cd;--amber:#7a5c00;
+  --mono:'DM Mono','Courier New',monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --radius:6px;--radius-lg:10px;
 }
-
-body {
-  font-family: var(--sans);
-  background: var(--paper);
-  color: var(--ink);
-  min-height: 100vh;
-  padding: 0;
-}
-
-.shell {
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 2rem 1.25rem 3rem;
-}
-
-/* ── Header ── */
-.hd {
-  margin-bottom: 2rem;
-  padding-bottom: 1.25rem;
-  border-bottom: 1.5px solid var(--ink);
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-.hd-title {
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  line-height: 1;
-}
-.hd-title span { color: var(--accent); }
-.hd-sub {
-  font-size: 12px;
-  color: var(--ink3);
-  margin-top: 5px;
-  font-family: var(--mono);
-  text-transform: uppercase;
-  letter-spacing: .8px;
-}
-.db-status {
-  font-family: var(--mono);
-  font-size: 11px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--ink3);
-}
-.status-dot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: var(--ink3);
-  flex-shrink: 0;
-}
-.status-dot.live { background: var(--green); }
-.status-dot.err  { background: var(--accent); }
-
-/* ── Search bar ── */
-.search-zone {
-  display: flex;
-  gap: 0;
-  margin-bottom: 1.5rem;
-  border: 1.5px solid var(--ink);
-  border-radius: var(--radius);
-  overflow: hidden;
-  background: var(--paper);
-  transition: box-shadow .15s;
-}
-.search-zone:focus-within {
-  box-shadow: 3px 3px 0 var(--ink);
-}
-.search-input {
-  flex: 1;
-  border: none;
-  outline: none;
-  padding: 12px 16px;
-  font-family: var(--mono);
-  font-size: 15px;
-  background: transparent;
-  color: var(--ink);
-  min-width: 0;
-}
-.search-input::placeholder { color: var(--ink3); }
-.search-btn {
-  padding: 12px 20px;
-  background: var(--ink);
-  color: var(--paper);
-  border: none;
-  cursor: pointer;
-  font-family: var(--sans);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: .3px;
-  transition: background .15s;
-  white-space: nowrap;
-}
-.search-btn:hover { background: var(--accent); }
-.search-btn:active { transform: scale(.98); }
-
-/* ── Browse filters ── */
-.filters {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-  align-items: center;
-}
-.filter-label {
-  font-size: 11px;
-  font-family: var(--mono);
-  color: var(--ink3);
-  text-transform: uppercase;
-  letter-spacing: .6px;
-  margin-right: 4px;
-}
-.chip {
-  padding: 5px 12px;
-  border: 1px solid var(--paper3);
-  border-radius: 99px;
-  font-size: 12px;
-  cursor: pointer;
-  background: var(--paper2);
-  color: var(--ink2);
-  font-family: var(--mono);
-  transition: all .12s;
-}
-.chip.active, .chip:hover {
-  background: var(--ink);
-  color: var(--paper);
-  border-color: var(--ink);
-}
-
-/* ── Leaderboard table ── */
-.table-card {
-  border: 1.5px solid var(--ink);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin-bottom: 1.5rem;
-}
-.table-card table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-.table-card th {
-  background: var(--ink);
-  color: var(--paper);
-  font-family: var(--mono);
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: .8px;
-  padding: 9px 12px;
-  text-align: left;
-  white-space: nowrap;
-  cursor: pointer;
-  user-select: none;
-}
-.table-card th:hover { background: #2a2a26; }
-.table-card th.sorted { color: #ffd700; }
-.table-card td {
-  padding: 10px 12px;
-  border-bottom: 0.5px solid var(--paper3);
-  vertical-align: middle;
-}
-.table-card tr:last-child td { border-bottom: none; }
-.table-card tr:hover td { background: var(--paper2); cursor: pointer; }
-.team-num {
-  font-family: var(--mono);
-  font-weight: 500;
-  font-size: 14px;
-  color: var(--accent2);
-}
-.rank-num {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--ink3);
-  width: 28px;
-}
-
-/* ── Badges ── */
-.badge {
-  display: inline-block;
-  padding: 2px 7px;
-  border-radius: 3px;
-  font-size: 10px;
-  font-family: var(--mono);
-  font-weight: 500;
-  letter-spacing: .3px;
-}
-.b-awp { background: var(--green-bg); color: var(--green); border: 1px solid #b8ddb8; }
-.b-sig { background: var(--amber-bg); color: var(--amber); border: 1px solid #f0d070; }
-.b-no  { background: var(--paper2);   color: var(--ink3);  border: 1px solid var(--paper3); }
-
-/* ── Team detail card ── */
-.detail-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(15,15,13,.55);
-  z-index: 100;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  backdrop-filter: blur(3px);
-}
-.detail-overlay.open { display: flex; }
-.detail-card {
-  background: var(--paper);
-  border: 1.5px solid var(--ink);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  max-width: 640px;
-  width: 100%;
-  max-height: 85vh;
-  overflow-y: auto;
-  position: relative;
-  box-shadow: 6px 6px 0 var(--ink);
-}
-.detail-close {
-  position: absolute;
-  top: 12px; right: 14px;
-  background: none; border: none;
-  font-size: 20px; cursor: pointer;
-  color: var(--ink2); line-height: 1;
-}
-.detail-close:hover { color: var(--accent); }
-.detail-team {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: -1px;
-  margin-bottom: 4px;
-  font-family: var(--mono);
-  color: var(--accent2);
-}
-.detail-sub {
-  font-size: 12px;
-  color: var(--ink3);
-  font-family: var(--mono);
-  margin-bottom: 1.25rem;
-}
-.stat-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin-bottom: 1.25rem;
-}
-@media(max-width:500px){ .stat-grid { grid-template-columns: 1fr 1fr; } }
-.stat-box {
-  background: var(--paper2);
-  border: 1px solid var(--paper3);
-  border-radius: var(--radius);
-  padding: 10px 12px;
-}
-.stat-label {
-  font-size: 9px;
-  font-family: var(--mono);
-  text-transform: uppercase;
-  letter-spacing: .7px;
-  color: var(--ink3);
-  margin-bottom: 5px;
-}
-.stat-val {
-  font-size: 20px;
-  font-weight: 600;
-  font-family: var(--mono);
-  color: var(--ink);
-}
-.detail-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: 7px 0;
-  border-bottom: 0.5px solid var(--paper3);
-  font-size: 13px;
-  gap: 12px;
-}
-.detail-row:last-child { border-bottom: none; }
-.detail-key {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--ink3);
-  text-transform: uppercase;
-  letter-spacing: .5px;
-  white-space: nowrap;
-}
-.detail-val {
-  font-size: 13px;
-  text-align: right;
-  color: var(--ink);
-  word-break: break-all;
-}
-.match-history { margin-top: 1rem; }
-.mh-title {
-  font-size: 11px;
-  font-family: var(--mono);
-  text-transform: uppercase;
-  letter-spacing: .7px;
-  color: var(--ink3);
-  margin-bottom: 8px;
-}
-.mh-row {
-  display: grid;
-  grid-template-columns: 80px 1fr 50px 40px 40px;
-  gap: 8px;
-  padding: 7px 0;
-  border-bottom: 0.5px solid var(--paper3);
-  font-size: 12px;
-  align-items: center;
-}
-.mh-row:last-child { border-bottom: none; }
-
-/* ── AWP bar visual ── */
-.awp-bar-wrap {
-  display: flex;
-  height: 6px;
-  border-radius: 3px;
-  overflow: hidden;
-  background: var(--paper3);
-  margin-top: 4px;
-}
-.awp-bar-fill {
-  background: var(--green);
-  border-radius: 3px;
-  transition: width .5s ease;
-}
-
-/* ── States ── */
-.state-box {
-  text-align: center;
-  padding: 3rem 1rem;
-  color: var(--ink3);
-  font-family: var(--mono);
-  font-size: 13px;
-  line-height: 2;
-}
-.state-box .big { font-size: 32px; margin-bottom: .5rem; }
-.spinner {
-  display: inline-block;
-  width: 18px; height: 18px;
-  border: 2px solid var(--paper3);
-  border-top-color: var(--ink);
-  border-radius: 50%;
-  animation: spin .7s linear infinite;
-  margin-bottom: 8px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ── Pagination ── */
-.pager {
-  display: flex;
-  gap: 6px;
-  justify-content: center;
-  align-items: center;
-  margin-top: 1rem;
-  font-size: 13px;
-  font-family: var(--mono);
-}
-.pager-btn {
-  padding: 5px 12px;
-  border: 1px solid var(--paper3);
-  border-radius: var(--radius);
-  background: var(--paper2);
-  cursor: pointer;
-  color: var(--ink2);
-  font-family: var(--mono);
-  font-size: 12px;
-}
-.pager-btn:hover:not(:disabled) { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-.pager-btn:disabled { opacity: .35; cursor: default; }
-.pager-info { color: var(--ink3); padding: 0 8px; }
-
-/* ── Config warning ── */
-.config-warn {
-  background: #fff3cd;
-  border: 1.5px solid #f0c040;
-  border-radius: var(--radius);
-  padding: 1rem 1.25rem;
-  font-size: 13px;
-  margin-bottom: 1.5rem;
-  line-height: 1.7;
-  display: none;
-}
-.config-warn code {
-  background: rgba(0,0,0,.08);
-  padding: 1px 5px;
-  border-radius: 3px;
-  font-family: var(--mono);
-}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height:100vh;font-size:14px}
+.wrap{max-width:900px;margin:0 auto;padding:1.25rem 1rem 3rem}
+.hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:2px solid var(--ink);flex-wrap:wrap;gap:8px}
+.hd-title{font-size:22px;font-weight:700;letter-spacing:-0.5px}
+.hd-title span{color:var(--red)}
+.hd-sub{font-size:11px;color:var(--ink3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.6px;margin-top:3px}
+.status{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink3);font-family:var(--mono)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ink3);flex-shrink:0}
+.dot.live{background:var(--green)}.dot.err{background:var(--red)}
+.search-row{display:flex;gap:0;margin-bottom:1rem;border:1.5px solid var(--ink);border-radius:var(--radius);overflow:hidden}
+.search-row:focus-within{box-shadow:3px 3px 0 var(--ink)}
+.si{flex:1;border:none;outline:none;padding:10px 14px;font-size:14px;font-family:var(--mono);background:transparent;color:var(--ink);min-width:0}
+.si::placeholder{color:var(--ink3)}
+.sb{padding:10px 18px;background:var(--ink);color:var(--paper);border:none;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;font-family:var(--sans)}
+.sb:hover{background:var(--red)}
+.filters{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
+.fl{font-size:11px;font-family:var(--mono);color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-right:2px}
+.chip{padding:4px 12px;border:1px solid var(--paper3);border-radius:99px;font-size:12px;cursor:pointer;background:var(--paper2);color:var(--ink2);font-family:var(--mono)}
+.chip.on,.chip:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem}
+@media(max-width:500px){.cards{grid-template-columns:1fr 1fr}}
+.mc{background:var(--paper2);border:1px solid var(--paper3);border-radius:var(--radius);padding:.6rem .85rem}
+.mc-l{font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin-bottom:3px}
+.mc-v{font-size:20px;font-weight:600;font-family:var(--mono)}
+.tcard{border:1.5px solid var(--ink);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:1rem}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--ink);color:var(--paper);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.6px;padding:8px 10px;text-align:left;white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{background:#2a2a26}th.sorted{color:#ffd700}
+td{padding:9px 10px;border-bottom:.5px solid var(--paper3);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--paper2);cursor:pointer}
+.tn{font-family:var(--mono);font-weight:600;font-size:14px;color:var(--blue)}
+.rk{font-family:var(--mono);font-size:11px;color:var(--ink3);width:24px}
+.badge{display:inline-block;padding:2px 6px;border-radius:3px;font-size:10px;font-family:var(--mono);font-weight:500}
+.b-awp{background:var(--green-bg);color:var(--green);border:1px solid #b8ddb8}
+.b-sig{background:var(--amber-bg);color:var(--amber);border:1px solid #f0d070}
+.b-no{background:var(--paper2);color:var(--ink3);border:1px solid var(--paper3)}
+.awp-wrap{display:flex;height:5px;border-radius:3px;background:var(--paper3);overflow:hidden;flex:1;min-width:40px}
+.awp-fill{background:var(--green);border-radius:3px}
+.overlay{display:none;position:fixed;inset:0;background:rgba(15,15,13,.5);z-index:200;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(2px)}
+.overlay.open{display:flex}
+.dcard{background:var(--paper);border:1.5px solid var(--ink);border-radius:var(--radius-lg);padding:1.5rem;max-width:600px;width:100%;max-height:88vh;overflow-y:auto;position:relative;box-shadow:5px 5px 0 var(--ink)}
+.dc-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink2);line-height:1}
+.dc-close:hover{color:var(--red)}
+.dc-team{font-size:26px;font-weight:700;letter-spacing:-1px;font-family:var(--mono);color:var(--blue);margin-bottom:2px}
+.dc-sub{font-size:12px;color:var(--ink3);font-family:var(--mono);margin-bottom:1.25rem}
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.25rem}
+@media(max-width:440px){.sgrid{grid-template-columns:1fr 1fr}}
+.sbox{background:var(--paper2);border:1px solid var(--paper3);border-radius:var(--radius);padding:8px 10px}
+.sbox-l{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin-bottom:4px}
+.sbox-v{font-size:18px;font-weight:600;font-family:var(--mono)}
+.dr{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:.5px solid var(--paper3);font-size:13px;gap:12px}
+.dr:last-child{border-bottom:none}
+.dk{font-family:var(--mono);font-size:10px;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+.dv{font-size:13px;text-align:right;color:var(--ink);word-break:break-all}
+.mh-hd{font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin:1rem 0 6px}
+.mh-row{display:grid;grid-template-columns:1fr 70px 60px 36px 28px;gap:6px;padding:6px 0;border-bottom:.5px solid var(--paper3);font-size:12px;align-items:center}
+.mh-row:last-child{border-bottom:none}
+.pager{display:flex;gap:6px;justify-content:center;align-items:center;margin-top:.75rem;font-size:12px;font-family:var(--mono)}
+.pb{padding:4px 12px;border:1px solid var(--paper3);border-radius:var(--radius);background:var(--paper2);cursor:pointer;color:var(--ink2);font-family:var(--mono);font-size:12px}
+.pb:hover:not(:disabled){background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.pb:disabled{opacity:.35;cursor:default}
+.pi{color:var(--ink3);padding:0 8px}
+.state{text-align:center;padding:3rem 1rem;color:var(--ink3);font-family:var(--mono);font-size:13px;line-height:2}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--paper3);border-top-color:var(--ink);border-radius:50%;animation:sp .7s linear infinite;margin-bottom:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.err-box{background:#fff0ed;border:1px solid #f8c5b5;border-radius:var(--radius);padding:1rem;font-size:13px;color:#7a2a10;margin-bottom:1rem;line-height:1.7;display:none}
 </style>
 </head>
 <body>
-<div class="shell">
+<div class="wrap">
 
-  <!-- Config panel (shown when no credentials saved) -->
-  <div id="configPanel" style="display:none;max-width:520px;margin:2rem auto;border:1.5px solid var(--ink);border-radius:12px;padding:1.5rem;background:var(--paper)">
-    <div style="font-size:20px;font-weight:700;margin-bottom:4px">Connect to Supabase</div>
-    <div style="font-size:12px;color:var(--ink3);font-family:var(--mono);margin-bottom:1.25rem;text-transform:uppercase;letter-spacing:.5px">One-time setup · saved in this browser</div>
-    <div style="margin-bottom:12px">
-      <label style="font-size:12px;color:var(--ink2);display:block;margin-bottom:4px">Project URL</label>
-      <input id="cfg-url" type="text" placeholder="https://xxxxxxxxxxxxxx.supabase.co"
-        style="width:100%;padding:10px 12px;border:1.5px solid #ccc;border-radius:6px;font-size:14px;font-family:var(--mono)">
-      <div style="font-size:11px;color:var(--ink3);margin-top:4px">supabase.com → your project → Settings → API Keys → Project URL</div>
-    </div>
-    <div style="margin-bottom:16px">
-      <label style="font-size:12px;color:var(--ink2);display:block;margin-bottom:4px">Publishable / Anon Key</label>
-      <input id="cfg-key" type="text" placeholder="sb_publishable_... or eyJ..."
-        style="width:100%;padding:10px 12px;border:1.5px solid #ccc;border-radius:6px;font-size:14px;font-family:var(--mono)">
-      <div style="font-size:11px;color:var(--ink3);margin-top:4px">Settings → API Keys → Publishable key (NOT the secret key)</div>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:10px">
-      <button onclick="saveConfig()" style="padding:10px 20px;background:#0f0f0d;color:#fff;border:none;border-radius:6px;font-size:14px;cursor:pointer;font-family:var(--sans)">Save &amp; Connect</button>
-      <button onclick="clearConfig()" style="padding:10px 16px;background:transparent;border:1px solid #ccc;border-radius:6px;font-size:14px;cursor:pointer;font-family:var(--sans)">Clear</button>
-    </div>
-    <div id="cfg-msg" style="font-size:13px;min-height:20px"></div>
-  </div>
-
-  <!-- Main content (hidden while config panel is shown) -->
-  <div id="mainWrap">
-
-  <!-- Header -->
   <div class="hd">
     <div>
       <div class="hd-title">Override <span>Scout</span> DB</div>
-      <div class="hd-sub">V5RC 2026–27 · Autonomous statistics</div>
+      <div class="hd-sub">V5RC 2026–27 · Autonomous statistics · Read only</div>
     </div>
-    <div class="db-status">
-      <div class="status-dot" id="statusDot"></div>
-      <span id="statusLabel">Connecting…</span>
-      <button onclick="showConfig()" style="margin-left:8px;padding:3px 10px;border:1px solid #ccc;border-radius:4px;font-size:11px;cursor:pointer;background:transparent;font-family:var(--mono)">⚙ Configure</button>
+    <div class="status">
+      <div class="dot" id="dot"></div>
+      <span id="stxt">Connecting…</span>
     </div>
   </div>
 
-  <!-- Search -->
-  <div class="search-zone">
-    <input class="search-input" id="searchInput" type="text"
-      placeholder="Enter team number (e.g. 73017D)…"
+  <div id="errBox" class="err-box"></div>
+
+  <div class="search-row">
+    <input class="si" id="si" type="text" placeholder="Search team number (e.g. 73017D)…"
       onkeydown="if(event.key==='Enter')doSearch()">
-    <button class="search-btn" onclick="doSearch()">Search</button>
+    <button class="sb" onclick="doSearch()">Search</button>
   </div>
 
-  <!-- Browse filters -->
   <div class="filters">
-    <span class="filter-label">Browse:</span>
-    <span class="chip active" onclick="setFilter('all',this)">All teams</span>
-    <span class="chip" onclick="setFilter('sig',this)">Sig events</span>
-    <span class="chip" onclick="setFilter('awp',this)">AWP achieved</span>
-    <span class="chip" onclick="setFilter('top',this)">Top pin avg</span>
+    <span class="fl">Browse:</span>
+    <span class="chip on" onclick="setFilter('all',this)">All teams</span>
+    <span class="chip"    onclick="setFilter('sig',this)">Sig events</span>
+    <span class="chip"    onclick="setFilter('awp',this)">AWP achieved</span>
+    <span class="chip"    onclick="setFilter('top',this)">Top pins</span>
   </div>
 
-  <!-- Main content area -->
-  <div id="mainArea">
-    <div class="state-box">
-      <div class="spinner"></div><br>Loading database…
-    </div>
+  <div class="cards" id="cards" style="display:none">
+    <div class="mc"><div class="mc-l">Teams</div><div class="mc-v" id="cT">—</div></div>
+    <div class="mc"><div class="mc-l">Entries</div><div class="mc-v" id="cE">—</div></div>
+    <div class="mc"><div class="mc-l">Avg pins</div><div class="mc-v" id="cP">—</div></div>
+    <div class="mc"><div class="mc-l">AWP rate</div><div class="mc-v" id="cA">—</div></div>
   </div>
 
-  <!-- Pagination -->
+  <div id="main"><div class="state"><div class="spin"></div><br>Loading…</div></div>
+
   <div class="pager" id="pager" style="display:none">
-    <button class="pager-btn" id="prevBtn" onclick="changePage(-1)" disabled>← Prev</button>
-    <span class="pager-info" id="pagerInfo"></span>
-    <button class="pager-btn" id="nextBtn" onclick="changePage(1)">Next →</button>
+    <button class="pb" id="prev" onclick="goPage(-1)" disabled>← Prev</button>
+    <span class="pi" id="pi"></span>
+    <button class="pb" id="next" onclick="goPage(1)">Next →</button>
   </div>
 
-</div><!-- end shell -->
-</div><!-- end mainWrap -->
+</div>
 
-<!-- Team detail overlay -->
-<div class="detail-overlay" id="detailOverlay" onclick="closeDetail(event)">
-  <div class="detail-card" id="detailCard">
-    <button class="detail-close" onclick="closeOverlay()">✕</button>
-    <div id="detailContent"></div>
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeDetail()">
+  <div class="dcard">
+    <button class="dc-close" onclick="closeDetail()">✕</button>
+    <div id="dc"></div>
   </div>
 </div>
 
 <script>
-/* ── Config — saved in browser localStorage, no file editing needed ── */
-let SUPABASE_URL = 'https://ajymmthxmdyhkiynwhuf.supabase.co';
-let SUPABASE_KEY = 'sb_publishable_1r5xHNrNLbRHB_GcJMgsjg_fwEvgdqS';
+const SB_URL = 'https://ajymmthxmdyhkiynwhuf.supabase.co';
+const SB_KEY = 'sb_publishable_1r5xHNrNLbRHB_GcJMgsjg_fwEvgdqS';
+const HDRS   = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Accept': 'application/json' };
 
-const PAGE_SIZE = 20;
-let allTeams   = [];
-let filtered   = [];
-let currentPage= 1;
-let sortCol    = 'avg_pins';
-let sortDir    = -1;
-let activeFilter = 'all';
-let allEntries = [];
+const PG = 20;
+let allEntries=[], allTeams=[], filtered=[];
+let pg=1, sortC='avg_pins', sortD=-1, activeF='all';
 
-/* ── API helpers ── */
-function getHeaders() {
-  return {
-    'apikey': SUPABASE_KEY,
-    'Authorization': 'Bearer ' + SUPABASE_KEY,
-    'Content-Type': 'application/json'
-  };
-}
+function pins(e){ return (e.pins||'0').split('+').map(n=>parseInt(n)||0).reduce((a,b)=>a+b,0); }
 
-async function apiFetch(path) {
-  const base = SUPABASE_URL.replace(/\/+$/, '');
-  const res = await fetch(base + '/rest/v1/' + path, { headers: getHeaders() });
-  if(!res.ok) throw new Error('HTTP ' + res.status);
-  return res.json();
+/* ── Fetch all entries (handles pagination) ── */
+async function loadAll() {
+  let rows=[], off=0, batch;
+  do {
+    const r = await fetch(SB_URL+'/rest/v1/entries?select=*&order=created_at.desc&limit=1000&offset='+off, {headers:HDRS});
+    if(!r.ok){ const t=await r.text(); throw new Error('HTTP '+r.status+': '+t.slice(0,200)); }
+    batch = await r.json();
+    rows  = rows.concat(batch);
+    off  += 1000;
+  } while(batch.length===1000);
+  return rows;
 }
 
-/* ── Config panel functions ── */
-function showConfig() {
-  document.getElementById('configPanel').style.display = 'block';
-  document.getElementById('mainWrap').style.display = 'none';
-}
-function hideConfig() {
-  document.getElementById('configPanel').style.display = 'none';
-  document.getElementById('mainWrap').style.display = 'block';
-}
-function saveConfig() {
-  const url = document.getElementById('cfg-url').value.trim().replace(/\/+$/, '');
-  const key = document.getElementById('cfg-key').value.trim();
-  const msg = document.getElementById('cfg-msg');
-  if(!url.startsWith('https://') || !url.includes('.supabase.co')) {
-    msg.textContent = '⚠ URL must look like: https://xxxxxx.supabase.co';
-    msg.style.color = '#c8410a'; return;
-  }
-  if(!key || key.length < 20) {
-    msg.textContent = '⚠ Key too short — copy the full publishable key';
-    msg.style.color = '#c8410a'; return;
-  }
-  SUPABASE_URL = url;
-  SUPABASE_KEY = key;
-  localStorage.setItem('sw_sb_url', url);
-  localStorage.setItem('sw_sb_key', key);
-  msg.textContent = '✓ Saved! Connecting...';
-  msg.style.color = '#2d6a2d';
-  setTimeout(() => { hideConfig(); init(); }, 700);
-}
-function clearConfig() {
-  localStorage.removeItem('sw_sb_url');
-  localStorage.removeItem('sw_sb_key');
-  SUPABASE_URL = ''; SUPABASE_KEY = '';
-  document.getElementById('cfg-url').value = '';
-  document.getElementById('cfg-key').value = '';
-  document.getElementById('cfg-msg').textContent = 'Cleared.';
-}
-
-/* ── Build team stats from raw entries (no view dependency) ── */
-function buildTeamStats(entries) {
-  const map = {};
-  entries.forEach(e => {
-    const t = (e.team || '').toUpperCase().trim();
-    if(!t) return;
-    if(!map[t]) map[t] = { team: t, matches: [], routes: new Set(), types: new Set(), last_seen: '' };
-    map[t].matches.push(e);
-    if(e.route && e.route !== 'Unknown route') map[t].routes.add(e.route);
-    if(e.type) map[t].types.add(e.type);
-    if(e.created_at > map[t].last_seen) map[t].last_seen = e.created_at;
+/* ── Build per-team stats ── */
+function buildStats(entries) {
+  const m={};
+  entries.forEach(e=>{
+    const k=(e.team||'').toUpperCase().trim(); if(!k) return;
+    if(!m[k]) m[k]={team:k,rows:[],routes:new Set(),types:new Set(),last:''};
+    m[k].rows.push(e);
+    if(e.route&&e.route!=='Unknown route') m[k].routes.add(e.route);
+    if(e.type) m[k].types.add(e.type);
+    if((e.created_at||'')>m[k].last) m[k].last=e.created_at||'';
   });
-  return Object.values(map).map(g => {
-    const ms = g.matches;
-    const totalPins = ms.reduce((s, e) => {
-      return s + (e.pins||'0').split('+').map(n=>parseInt(n)||0).reduce((a,b)=>a+b,0);
-    }, 0);
-    const awpCount = ms.filter(e => e.awp === 'Y').length;
-    const sigCount = ms.filter(e => e.sig === 'yes').length;
-    const totalBon = ms.reduce((s,e) => s + (parseInt(e.bonuses)||0), 0);
+  return Object.values(m).map(g=>{
+    const rows=g.rows, n=rows.length;
+    const totPins=rows.reduce((s,e)=>s+pins(e),0);
+    const totBon =rows.reduce((s,e)=>s+(parseInt(e.bonuses)||0),0);
+    const awpN   =rows.filter(e=>e.awp==='Y').length;
+    const sigN   =rows.filter(e=>e.sig==='yes').length;
     return {
-      team: g.team,
-      match_count: ms.length,
-      avg_pins: ms.length ? (totalPins / ms.length).toFixed(2) : '0',
-      avg_bonuses: ms.length ? (totalBon / ms.length).toFixed(2) : '0',
-      awp_rate_pct: ms.length ? (awpCount / ms.length * 100).toFixed(1) : '0',
-      awp_count: awpCount,
-      sig_matches: sigCount,
-      known_routes: [...g.routes].join(' · ') || 'Unknown',
-      robot_types: [...g.types].join(', ') || '',
-      last_seen: g.last_seen,
-      raw_matches: ms
+      team:g.team, count:n,
+      avg_pins:   n?(totPins/n).toFixed(2):0,
+      avg_bonuses:n?(totBon/n).toFixed(2):0,
+      awp_pct:    n?(awpN/n*100).toFixed(1):0,
+      awp_count:awpN, sig_count:sigN,
+      routes:[...g.routes].join(' · ')||'—',
+      types:[...g.types].join(', ')||'—',
+      last:g.last, matches:rows
     };
   });
 }
 
 /* ── Init ── */
 async function init() {
-  showEmpty('Connecting to database…');
   try {
-    // Fetch all entries directly — no view needed
-    allEntries = await apiFetch('entries?select=*&order=created_at.desc&limit=2000');
-    allTeams   = buildTeamStats(allEntries);
-    setStatus('live', allTeams.length + ' team' + (allTeams.length !== 1 ? 's' : '') + ' in database');
-    applyFilter(activeFilter);
-  } catch(e) {
-    setStatus('err', 'Connection failed');
-    showEmpty('Could not connect to database. Check your Supabase URL and key.');
-    console.error(e);
+    allEntries = await loadAll();
+    allTeams   = buildStats(allEntries);
+    const totP = allEntries.reduce((s,e)=>s+pins(e),0);
+    const avgP = allEntries.length?(totP/allEntries.length).toFixed(1):'—';
+    const awpR = allEntries.length?Math.round(allEntries.filter(e=>e.awp==='Y').length/allEntries.length*100):0;
+    document.getElementById('cT').textContent = allTeams.length;
+    document.getElementById('cE').textContent = allEntries.length;
+    document.getElementById('cP').textContent = avgP;
+    document.getElementById('cA').textContent = awpR+'%';
+    document.getElementById('cards').style.display='grid';
+    setStatus('live', allTeams.length+' teams · '+allEntries.length+' entries');
+    applyFilter(activeF);
+  } catch(err) {
+    setStatus('err','Failed to load');
+    const eb=document.getElementById('errBox');
+    eb.style.display='block';
+    eb.innerHTML='<strong>Database error:</strong> '+err.message+'<br><br>Check: Supabase URL/key correct · RLS SELECT policy exists · entries table exists';
+    document.getElementById('main').innerHTML='';
+    console.error(err);
   }
 }
 
-/* ── Status ── */
-function setStatus(state, label) {
-  document.getElementById('statusDot').className = 'status-dot ' + state;
-  document.getElementById('statusLabel').textContent = label;
+function setStatus(s,t){
+  document.getElementById('dot').className='dot '+s;
+  document.getElementById('stxt').textContent=t;
 }
 
 /* ── Filter ── */
-function setFilter(f, el) {
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  activeFilter = f;
-  applyFilter(f);
+function setFilter(f,el){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on'); activeF=f; pg=1; applyFilter(f);
 }
-
-function applyFilter(f) {
-  if(f === 'all') filtered = [...allTeams];
-  else if(f === 'sig') filtered = allTeams.filter(t => parseInt(t.sig_matches) > 0);
-  else if(f === 'awp') filtered = allTeams.filter(t => parseFloat(t.awp_rate_pct) > 0);
-  else if(f === 'top') filtered = [...allTeams].sort((a,b) => b.avg_pins - a.avg_pins);
-  currentPage = 1;
-  sortAndRender();
+function applyFilter(f){
+  if(f==='all') filtered=[...allTeams];
+  else if(f==='sig') filtered=allTeams.filter(t=>t.sig_count>0);
+  else if(f==='awp') filtered=allTeams.filter(t=>t.awp_count>0);
+  else if(f==='top') filtered=[...allTeams].sort((a,b)=>b.avg_pins-a.avg_pins);
+  sortRender();
 }
 
 /* ── Sort ── */
-function sortBy(col) {
-  if(sortCol === col) sortDir *= -1;
-  else { sortCol = col; sortDir = -1; }
-  document.querySelectorAll('th.sorted').forEach(el => el.classList.remove('sorted'));
+function sortBy(col){
+  if(sortC===col) sortD*=-1; else{sortC=col;sortD=-1;}
+  document.querySelectorAll('th.sorted').forEach(e=>e.classList.remove('sorted'));
   document.getElementById('th-'+col)?.classList.add('sorted');
-  sortAndRender();
+  sortRender();
+}
+function sortRender(){
+  filtered.sort((a,b)=>(parseFloat(a[sortC])||0)-(parseFloat(b[sortC])||0)).sort((a,b)=>{
+    const d=(parseFloat(b[sortC])||0)-(parseFloat(a[sortC])||0); return d*sortD||a.team.localeCompare(b.team);
+  });
+  render();
 }
 
-function sortAndRender() {
-  const s = sortCol, d = sortDir;
-  filtered.sort((a,b) => {
-    const av = parseFloat(a[s]) || 0, bv = parseFloat(b[s]) || 0;
-    return (av - bv) * d;
-  });
-  renderTable();
+/* ── Render table ── */
+function render(){
+  const start=(pg-1)*PG, sl=filtered.slice(start,start+PG), tot=filtered.length, pages=Math.ceil(tot/PG);
+  if(!sl.length){showEmpty('No teams match this filter.');return;}
+  document.getElementById('main').innerHTML=`
+    <div class="tcard"><div class="tw"><table>
+      <thead><tr>
+        <th class="rk">#</th>
+        <th onclick="sortBy('team')" id="th-team">Team</th>
+        <th onclick="sortBy('count')" id="th-count">Matches</th>
+        <th onclick="sortBy('avg_pins')" id="th-avg_pins" class="sorted">Avg Pins ↕</th>
+        <th onclick="sortBy('avg_bonuses')" id="th-avg_bonuses">Avg Bonus</th>
+        <th onclick="sortBy('awp_pct')" id="th-awp_pct">AWP Rate</th>
+        <th onclick="sortBy('sig_count')" id="th-sig_count">Sig</th>
+        <th>Robot Type</th>
+      </tr></thead><tbody>
+      ${sl.map((t,i)=>`<tr onclick='openDetail(${JSON.stringify(JSON.stringify(t))})'>
+        <td class="rk">${start+i+1}</td>
+        <td><span class="tn">${t.team}</span></td>
+        <td style="font-family:var(--mono)">${t.count}</td>
+        <td style="font-family:var(--mono);font-weight:600">${parseFloat(t.avg_pins).toFixed(1)}</td>
+        <td style="font-family:var(--mono)">${parseFloat(t.avg_bonuses).toFixed(1)}</td>
+        <td><div style="display:flex;align-items:center;gap:6px">
+          <span style="font-family:var(--mono);min-width:34px">${parseFloat(t.awp_pct).toFixed(0)}%</span>
+          <div class="awp-wrap"><div class="awp-fill" style="width:${Math.min(parseFloat(t.awp_pct),100)}%"></div></div>
+        </div></td>
+        <td>${t.sig_count>0?'<span class="badge b-sig">'+t.sig_count+'</span>':'<span class="badge b-no">—</span>'}</td>
+        <td style="font-size:12px;color:var(--ink2)">${t.types}</td>
+      </tr>`).join('')}
+      </tbody></table></div></div>`;
+  const pager=document.getElementById('pager');
+  if(pages>1){
+    pager.style.display='flex';
+    document.getElementById('pi').textContent=`Page ${pg} of ${pages} (${tot} teams)`;
+    document.getElementById('prev').disabled=pg===1;
+    document.getElementById('next').disabled=pg===pages;
+  } else pager.style.display='none';
 }
+
+function goPage(d){pg+=d;render();window.scrollTo(0,0);}
+function showEmpty(msg){document.getElementById('main').innerHTML=`<div class="state">🔍<br>${msg}</div>`;document.getElementById('pager').style.display='none';}
 
 /* ── Search ── */
-async function doSearch() {
-  const q = document.getElementById('searchInput').value.trim().toUpperCase();
-  if(!q) { applyFilter(activeFilter); return; }
-  showLoading();
-  try {
-    // Search team_stats for this team
-    const stats = allTeams.filter(t => t.team.toUpperCase().includes(q));
-    if(stats.length === 0) {
-      showEmpty('No data found for "' + q + '". Check the team number and try again.');
-      return;
-    }
-    if(stats.length === 1) {
-      // Exact or single match — open detail card
-      openDetail(stats[0]);
-    } else {
-      filtered = stats;
-      currentPage = 1;
-      renderTable();
-    }
-  } catch(e) {
-    showEmpty('Search error: ' + e.message);
-  }
+function doSearch(){
+  const q=document.getElementById('si').value.trim().toUpperCase();
+  if(!q){applyFilter(activeF);return;}
+  const res=allTeams.filter(t=>t.team.includes(q));
+  if(!res.length){showEmpty('No data for "'+q+'" — check team number.');return;}
+  if(res.length===1){openDetail(JSON.stringify(res[0]));return;}
+  filtered=res;pg=1;sortRender();
 }
 
-/* ── Render leaderboard table ── */
-function renderTable() {
-  const start = (currentPage - 1) * PAGE_SIZE;
-  const page  = filtered.slice(start, start + PAGE_SIZE);
-  const total = filtered.length;
-  const pages = Math.ceil(total / PAGE_SIZE);
-
-  if(!page.length) { showEmpty('No teams match this filter.'); return; }
-
-  document.getElementById('mainArea').innerHTML = `
-    <div class="table-card">
-      <table>
-        <thead><tr>
-          <th class="rank-num">#</th>
-          <th onclick="sortBy('team')" id="th-team">Team</th>
-          <th onclick="sortBy('match_count')" id="th-match_count">Matches</th>
-          <th onclick="sortBy('avg_pins')" id="th-avg_pins" class="sorted">Avg Pins ↕</th>
-          <th onclick="sortBy('avg_bonuses')" id="th-avg_bonuses">Avg Bonus</th>
-          <th onclick="sortBy('awp_rate_pct')" id="th-awp_rate_pct">AWP Rate</th>
-          <th onclick="sortBy('sig_matches')" id="th-sig_matches">Sig</th>
-          <th>Robot Types</th>
-        </tr></thead>
-        <tbody>
-          ${page.map((t, i) => `
-            <tr onclick="openDetail(${JSON.stringify(t).replace(/"/g,'&quot;')})">
-              <td class="rank-num">${start + i + 1}</td>
-              <td><span class="team-num">${t.team}</span></td>
-              <td style="font-family:var(--mono)">${t.match_count}</td>
-              <td style="font-family:var(--mono);font-weight:500">${parseFloat(t.avg_pins).toFixed(1)}</td>
-              <td style="font-family:var(--mono)">${parseFloat(t.avg_bonuses||0).toFixed(1)}</td>
-              <td>
-                <div style="display:flex;align-items:center;gap:8px">
-                  <span style="font-family:var(--mono);min-width:36px">${parseFloat(t.awp_rate_pct||0).toFixed(0)}%</span>
-                  <div class="awp-bar-wrap" style="flex:1;min-width:50px">
-                    <div class="awp-bar-fill" style="width:${Math.min(parseFloat(t.awp_rate_pct||0),100)}%"></div>
-                  </div>
-                </div>
-              </td>
-              <td>${parseInt(t.sig_matches)>0 ? '<span class="badge b-sig">'+t.sig_matches+'</span>' : '<span class="badge b-no">—</span>'}</td>
-              <td style="font-size:12px;color:var(--ink2)">${(t.robot_types||'').replace(/,/g,', ')}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
+/* ── Detail ── */
+function openDetail(jsonStr){
+  const t=JSON.parse(jsonStr);
+  const awpPct=parseFloat(t.awp_pct||0);
+  const routes=(t.routes||'—').split(' · ').map(r=>`<code style="font-family:var(--mono);font-size:11px;background:var(--paper2);padding:1px 5px;border-radius:3px">${r}</code>`).join(' ');
+  document.getElementById('dc').innerHTML=`
+    <div class="dc-team">${t.team}</div>
+    <div class="dc-sub">${t.types} · ${t.count} match${t.count!==1?'es':''} scouted</div>
+    <div class="sgrid">
+      <div class="sbox"><div class="sbox-l">Matches</div><div class="sbox-v">${t.count}</div></div>
+      <div class="sbox"><div class="sbox-l">Avg Pins</div><div class="sbox-v">${parseFloat(t.avg_pins).toFixed(1)}</div></div>
+      <div class="sbox"><div class="sbox-l">AWP Rate</div><div class="sbox-v">${awpPct.toFixed(0)}%</div></div>
+      <div class="sbox"><div class="sbox-l">Sig Matches</div><div class="sbox-v">${t.sig_count}</div></div>
     </div>
-  `;
-
-  // Pagination
-  const pager = document.getElementById('pager');
-  if(pages > 1) {
-    pager.style.display = 'flex';
-    document.getElementById('pagerInfo').textContent = `Page ${currentPage} of ${pages} (${total} teams)`;
-    document.getElementById('prevBtn').disabled = currentPage === 1;
-    document.getElementById('nextBtn').disabled = currentPage === pages;
-  } else {
-    pager.style.display = 'none';
-  }
+    <div class="dr"><span class="dk">AWP achieved</span><span class="dv">${t.awp_count} / ${t.count}</span></div>
+    <div class="dr"><span class="dk">Avg bonuses</span><span class="dv">${parseFloat(t.avg_bonuses).toFixed(1)}</span></div>
+    <div class="dr"><span class="dk">Known routes</span><span class="dv">${routes}</span></div>
+    <div class="dr"><span class="dk">Robot types</span><span class="dv">${t.types}</span></div>
+    <div class="dr"><span class="dk">Last scouted</span><span class="dv">${t.last?new Date(t.last).toLocaleDateString():'—'}</span></div>
+    ${t.matches&&t.matches.length?`
+    <div class="mh-hd">Match history (${t.matches.length})</div>
+    ${t.matches.slice(0,20).map(e=>`
+      <div class="mh-row">
+        <span style="font-size:11px;color:var(--ink2)">${e.event||'—'}</span>
+        <span style="font-family:var(--mono);font-size:11px">${e.round||'—'}</span>
+        <span style="font-family:var(--mono);font-size:12px">${e.pins||'0'} pins</span>
+        <span><span class="badge ${e.awp==='Y'?'b-awp':'b-no'}">${e.awp||'N'}</span></span>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--ink3)">${e.side||''}</span>
+      </div>`).join('')}
+    ${t.matches.length>20?`<div style="font-size:11px;color:var(--ink3);padding-top:6px;font-family:var(--mono)">+${t.matches.length-20} more matches</div>`:''}
+    `:''}`;
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow='hidden';
 }
-
-function changePage(dir) {
-  currentPage += dir;
-  renderTable();
-  window.scrollTo(0, 0);
+function closeDetail(){
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow='';
 }
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDetail();});
 
-/* ── Detail overlay ── */
-function openDetail(team) {
-  const t = typeof team === 'string' ? JSON.parse(team) : team;
-  const teamEntries = t.raw_matches || allEntries.filter(e => (e.team||'').toUpperCase() === t.team.toUpperCase());
-  const awpPct = parseFloat(t.awp_rate_pct || 0);
-
-  const routes = (t.known_routes || 'Unknown').split(' · ').map(r =>
-    `<code style="font-family:var(--mono);font-size:11px;background:var(--paper2);padding:1px 5px;border-radius:3px;margin:1px">${r}</code>`
-  ).join(' ');
-
-  document.getElementById('detailContent').innerHTML = `
-    <div class="detail-team">${t.team}</div>
-    <div class="detail-sub">${t.robot_types || 'Robot type unknown'} · ${t.match_count} match${t.match_count!=1?'es':''} scouted</div>
-
-    <div class="stat-grid">
-      <div class="stat-box">
-        <div class="stat-label">Matches</div>
-        <div class="stat-val">${t.match_count}</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">Avg Pins</div>
-        <div class="stat-val">${parseFloat(t.avg_pins).toFixed(1)}</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">AWP Rate</div>
-        <div class="stat-val">${awpPct.toFixed(0)}%</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">Sig Matches</div>
-        <div class="stat-val">${t.sig_matches}</div>
-      </div>
-    </div>
-
-    <div class="detail-row">
-      <span class="detail-key">AWP probability bar</span>
-      <div style="flex:1;margin-left:16px">
-        <div class="awp-bar-wrap" style="height:10px">
-          <div class="awp-bar-fill" style="width:${Math.min(awpPct,100)}%"></div>
-        </div>
-      </div>
-    </div>
-    <div class="detail-row">
-      <span class="detail-key">Avg bonuses/match</span>
-      <span class="detail-val">${parseFloat(t.avg_bonuses||0).toFixed(1)}</span>
-    </div>
-    <div class="detail-row">
-      <span class="detail-key">AWP achieved</span>
-      <span class="detail-val">${t.awp_count} / ${t.match_count} matches</span>
-    </div>
-    <div class="detail-row">
-      <span class="detail-key">Known routes</span>
-      <span class="detail-val">${routes}</span>
-    </div>
-    <div class="detail-row">
-      <span class="detail-key">Last scouted</span>
-      <span class="detail-val">${t.last_seen ? new Date(t.last_seen).toLocaleDateString() : '—'}</span>
-    </div>
-
-    ${teamEntries.length ? `
-    <div class="match-history">
-      <div class="mh-title">Match history (${teamEntries.length})</div>
-      ${teamEntries.slice(0,15).map(e => `
-        <div class="mh-row">
-          <span style="font-family:var(--mono);font-size:11px;color:var(--ink2)">${e.event||'—'}</span>
-          <span style="font-family:var(--mono);font-size:11px">${e.round||'—'}</span>
-          <span style="font-family:var(--mono);font-size:12px">${e.pins||'0'} pins</span>
-          <span><span class="badge ${e.awp==='Y'?'b-awp':'b-no'}">${e.awp}</span></span>
-          <span style="font-family:var(--mono);font-size:11px">${e.side}</span>
-        </div>
-      `).join('')}
-      ${teamEntries.length > 15 ? `<div style="font-size:11px;color:var(--ink3);font-family:var(--mono);padding-top:8px">+ ${teamEntries.length-15} more matches</div>` : ''}
-    </div>` : ''}
-  `;
-
-  document.getElementById('detailOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeDetail(e) {
-  if(e.target === document.getElementById('detailOverlay')) closeOverlay();
-}
-function closeOverlay() {
-  document.getElementById('detailOverlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
-document.addEventListener('keydown', e => { if(e.key==='Escape') closeOverlay(); });
-
-/* ── State helpers ── */
-function showLoading() {
-  document.getElementById('mainArea').innerHTML =
-    '<div class="state-box"><div class="spinner"></div><br>Searching…</div>';
-}
-function showEmpty(msg) {
-  document.getElementById('mainArea').innerHTML =
-    `<div class="state-box"><div class="big">🔍</div>${msg}</div>`;
-  document.getElementById('pager').style.display = 'none';
-}
-
-/* ── Start ── */
-if(SUPABASE_URL) document.getElementById('cfg-url').value = SUPABASE_URL;
-if(SUPABASE_KEY) document.getElementById('cfg-key').value = SUPABASE_KEY;
 init();
 </script>
 </body>
