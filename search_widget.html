@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Override Scout — Team Search</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:       #0f0f0d;
+  --ink2:      #4a4a46;
+  --ink3:      #9a9a94;
+  --paper:     #fafaf7;
+  --paper2:    #f0f0eb;
+  --paper3:    #e4e4de;
+  --accent:    #c8410a;        /* VEX orange-red */
+  --accent2:   #1a5fb4;        /* VEX blue */
+  --gold:      #b8860b;
+  --green:     #2d6a2d;
+  --green-bg:  #e8f5e8;
+  --amber-bg:  #fef3cd;
+  --amber:     #7a5c00;
+  --mono:      'DM Mono', monospace;
+  --sans:      'Syne', sans-serif;
+  --radius:    6px;
+  --radius-lg: 12px;
+}
+
+body {
+  font-family: var(--sans);
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  padding: 0;
+}
+
+.shell {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+}
+
+/* ── Header ── */
+.hd {
+  margin-bottom: 2rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1.5px solid var(--ink);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.hd-title {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+.hd-title span { color: var(--accent); }
+.hd-sub {
+  font-size: 12px;
+  color: var(--ink3);
+  margin-top: 5px;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: .8px;
+}
+.db-status {
+  font-family: var(--mono);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink3);
+}
+.status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--ink3);
+  flex-shrink: 0;
+}
+.status-dot.live { background: var(--green); }
+.status-dot.err  { background: var(--accent); }
+
+/* ── Search bar ── */
+.search-zone {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1.5rem;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--paper);
+  transition: box-shadow .15s;
+}
+.search-zone:focus-within {
+  box-shadow: 3px 3px 0 var(--ink);
+}
+.search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 12px 16px;
+  font-family: var(--mono);
+  font-size: 15px;
+  background: transparent;
+  color: var(--ink);
+  min-width: 0;
+}
+.search-input::placeholder { color: var(--ink3); }
+.search-btn {
+  padding: 12px 20px;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .3px;
+  transition: background .15s;
+  white-space: nowrap;
+}
+.search-btn:hover { background: var(--accent); }
+.search-btn:active { transform: scale(.98); }
+
+/* ── Browse filters ── */
+.filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.filter-label {
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--ink3);
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  margin-right: 4px;
+}
+.chip {
+  padding: 5px 12px;
+  border: 1px solid var(--paper3);
+  border-radius: 99px;
+  font-size: 12px;
+  cursor: pointer;
+  background: var(--paper2);
+  color: var(--ink2);
+  font-family: var(--mono);
+  transition: all .12s;
+}
+.chip.active, .chip:hover {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+/* ── Leaderboard table ── */
+.table-card {
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+.table-card table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.table-card th {
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  padding: 9px 12px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+.table-card th:hover { background: #2a2a26; }
+.table-card th.sorted { color: #ffd700; }
+.table-card td {
+  padding: 10px 12px;
+  border-bottom: 0.5px solid var(--paper3);
+  vertical-align: middle;
+}
+.table-card tr:last-child td { border-bottom: none; }
+.table-card tr:hover td { background: var(--paper2); cursor: pointer; }
+.team-num {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--accent2);
+}
+.rank-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink3);
+  width: 28px;
+}
+
+/* ── Badges ── */
+.badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-family: var(--mono);
+  font-weight: 500;
+  letter-spacing: .3px;
+}
+.b-awp { background: var(--green-bg); color: var(--green); border: 1px solid #b8ddb8; }
+.b-sig { background: var(--amber-bg); color: var(--amber); border: 1px solid #f0d070; }
+.b-no  { background: var(--paper2);   color: var(--ink3);  border: 1px solid var(--paper3); }
+
+/* ── Team detail card ── */
+.detail-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15,15,13,.55);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  backdrop-filter: blur(3px);
+}
+.detail-overlay.open { display: flex; }
+.detail-card {
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  max-width: 640px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 6px 6px 0 var(--ink);
+}
+.detail-close {
+  position: absolute;
+  top: 12px; right: 14px;
+  background: none; border: none;
+  font-size: 20px; cursor: pointer;
+  color: var(--ink2); line-height: 1;
+}
+.detail-close:hover { color: var(--accent); }
+.detail-team {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  margin-bottom: 4px;
+  font-family: var(--mono);
+  color: var(--accent2);
+}
+.detail-sub {
+  font-size: 12px;
+  color: var(--ink3);
+  font-family: var(--mono);
+  margin-bottom: 1.25rem;
+}
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 1.25rem;
+}
+@media(max-width:500px){ .stat-grid { grid-template-columns: 1fr 1fr; } }
+.stat-box {
+  background: var(--paper2);
+  border: 1px solid var(--paper3);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+}
+.stat-label {
+  font-size: 9px;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  color: var(--ink3);
+  margin-bottom: 5px;
+}
+.stat-val {
+  font-size: 20px;
+  font-weight: 600;
+  font-family: var(--mono);
+  color: var(--ink);
+}
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 7px 0;
+  border-bottom: 0.5px solid var(--paper3);
+  font-size: 13px;
+  gap: 12px;
+}
+.detail-row:last-child { border-bottom: none; }
+.detail-key {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink3);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  white-space: nowrap;
+}
+.detail-val {
+  font-size: 13px;
+  text-align: right;
+  color: var(--ink);
+  word-break: break-all;
+}
+.match-history { margin-top: 1rem; }
+.mh-title {
+  font-size: 11px;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  color: var(--ink3);
+  margin-bottom: 8px;
+}
+.mh-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 50px 40px 40px;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 0.5px solid var(--paper3);
+  font-size: 12px;
+  align-items: center;
+}
+.mh-row:last-child { border-bottom: none; }
+
+/* ── AWP bar visual ── */
+.awp-bar-wrap {
+  display: flex;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--paper3);
+  margin-top: 4px;
+}
+.awp-bar-fill {
+  background: var(--green);
+  border-radius: 3px;
+  transition: width .5s ease;
+}
+
+/* ── States ── */
+.state-box {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--ink3);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 2;
+}
+.state-box .big { font-size: 32px; margin-bottom: .5rem; }
+.spinner {
+  display: inline-block;
+  width: 18px; height: 18px;
+  border: 2px solid var(--paper3);
+  border-top-color: var(--ink);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  margin-bottom: 8px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Pagination ── */
+.pager {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+  font-size: 13px;
+  font-family: var(--mono);
+}
+.pager-btn {
+  padding: 5px 12px;
+  border: 1px solid var(--paper3);
+  border-radius: var(--radius);
+  background: var(--paper2);
+  cursor: pointer;
+  color: var(--ink2);
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.pager-btn:hover:not(:disabled) { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.pager-btn:disabled { opacity: .35; cursor: default; }
+.pager-info { color: var(--ink3); padding: 0 8px; }
+
+/* ── Config warning ── */
+.config-warn {
+  background: #fff3cd;
+  border: 1.5px solid #f0c040;
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  font-size: 13px;
+  margin-bottom: 1.5rem;
+  line-height: 1.7;
+  display: none;
+}
+.config-warn code {
+  background: rgba(0,0,0,.08);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-family: var(--mono);
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Config warning (shown if keys not set) -->
+  <div class="config-warn" id="configWarn">
+    ⚠️ <strong>Setup needed:</strong> Open this file and replace <code>YOUR_SUPABASE_URL</code> and
+    <code>YOUR_SUPABASE_ANON_KEY</code> near the bottom of the file with your real Supabase credentials.
+    See the setup guide for instructions.
+  </div>
+
+  <!-- Header -->
+  <div class="hd">
+    <div>
+      <div class="hd-title">Override <span>Scout</span> DB</div>
+      <div class="hd-sub">V5RC 2026–27 · Autonomous statistics</div>
+    </div>
+    <div class="db-status">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusLabel">Connecting…</span>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-zone">
+    <input class="search-input" id="searchInput" type="text"
+      placeholder="Enter team number (e.g. 73017D)…"
+      onkeydown="if(event.key==='Enter')doSearch()">
+    <button class="search-btn" onclick="doSearch()">Search</button>
+  </div>
+
+  <!-- Browse filters -->
+  <div class="filters">
+    <span class="filter-label">Browse:</span>
+    <span class="chip active" onclick="setFilter('all',this)">All teams</span>
+    <span class="chip" onclick="setFilter('sig',this)">Sig events</span>
+    <span class="chip" onclick="setFilter('awp',this)">AWP achieved</span>
+    <span class="chip" onclick="setFilter('top',this)">Top pin avg</span>
+  </div>
+
+  <!-- Main content area -->
+  <div id="mainArea">
+    <div class="state-box">
+      <div class="spinner"></div><br>Loading database…
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pager" id="pager" style="display:none">
+    <button class="pager-btn" id="prevBtn" onclick="changePage(-1)" disabled>← Prev</button>
+    <span class="pager-info" id="pagerInfo"></span>
+    <button class="pager-btn" id="nextBtn" onclick="changePage(1)">Next →</button>
+  </div>
+
+</div><!-- end shell -->
+
+<!-- Team detail overlay -->
+<div class="detail-overlay" id="detailOverlay" onclick="closeDetail(event)">
+  <div class="detail-card" id="detailCard">
+    <button class="detail-close" onclick="closeOverlay()">✕</button>
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   ▶  CONFIGURATION — replace these two values
+   ══════════════════════════════════════════════════════ */
+const SUPABASE_URL  = 'https://ajymmthxmdyhkiynwhuf.supabase.co/rest/v1/';   // e.g. https://abcdefgh.supabase.co
+const SUPABASE_KEY  = 'sb_publishable_1r5xHNrNLbRHB_GcJMgsjg_fwEvgdqS';  // long string starting with eyJ…
+/* ══════════════════════════════════════════════════════ */
+
+const PAGE_SIZE = 20;
+let allTeams   = [];
+let filtered   = [];
+let currentPage= 1;
+let sortCol    = 'avg_pins';
+let sortDir    = -1; // -1 = desc
+let activeFilter = 'all';
+let allEntries = []; // raw entries for match history
+
+/* ── API helpers ── */
+function apiUrl(table, params='') {
+  return `${SUPABASE_URL}/rest/v1/${table}${params}`;
+}
+const HEADERS = {
+  'apikey': SUPABASE_KEY,
+  'Authorization': 'Bearer ' + SUPABASE_KEY,
+  'Content-Type': 'application/json'
+};
+
+async function apiFetch(path) {
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, { headers: HEADERS });
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+/* ── Init ── */
+async function init() {
+  if(SUPABASE_URL === 'YOUR_SUPABASE_URL') {
+    document.getElementById('configWarn').style.display = 'block';
+    setStatus('err', 'Not configured');
+    showEmpty('Set your Supabase URL and anon key in the HTML file to connect.');
+    return;
+  }
+  try {
+    [allTeams, allEntries] = await Promise.all([
+      apiFetch('team_stats?select=*&order=avg_pins.desc'),
+      apiFetch('entries?select=*&order=created_at.desc&limit=500')
+    ]);
+    setStatus('live', allTeams.length + ' teams in database');
+    applyFilter(activeFilter);
+  } catch(e) {
+    setStatus('err', 'Connection failed');
+    showEmpty('Could not connect to database. Check your Supabase URL and key.');
+    console.error(e);
+  }
+}
+
+/* ── Status ── */
+function setStatus(state, label) {
+  document.getElementById('statusDot').className = 'status-dot ' + state;
+  document.getElementById('statusLabel').textContent = label;
+}
+
+/* ── Filter ── */
+function setFilter(f, el) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  activeFilter = f;
+  applyFilter(f);
+}
+
+function applyFilter(f) {
+  if(f === 'all') filtered = [...allTeams];
+  else if(f === 'sig') filtered = allTeams.filter(t => parseInt(t.sig_matches) > 0);
+  else if(f === 'awp') filtered = allTeams.filter(t => parseFloat(t.awp_rate_pct) > 0);
+  else if(f === 'top') filtered = [...allTeams].sort((a,b) => b.avg_pins - a.avg_pins);
+  currentPage = 1;
+  sortAndRender();
+}
+
+/* ── Sort ── */
+function sortBy(col) {
+  if(sortCol === col) sortDir *= -1;
+  else { sortCol = col; sortDir = -1; }
+  document.querySelectorAll('th.sorted').forEach(el => el.classList.remove('sorted'));
+  document.getElementById('th-'+col)?.classList.add('sorted');
+  sortAndRender();
+}
+
+function sortAndRender() {
+  const s = sortCol, d = sortDir;
+  filtered.sort((a,b) => {
+    const av = parseFloat(a[s]) || 0, bv = parseFloat(b[s]) || 0;
+    return (av - bv) * d;
+  });
+  renderTable();
+}
+
+/* ── Search ── */
+async function doSearch() {
+  const q = document.getElementById('searchInput').value.trim().toUpperCase();
+  if(!q) { applyFilter(activeFilter); return; }
+  showLoading();
+  try {
+    // Search team_stats for this team
+    const stats = allTeams.filter(t => t.team.toUpperCase().includes(q));
+    if(stats.length === 0) {
+      showEmpty('No data found for "' + q + '". Check the team number and try again.');
+      return;
+    }
+    if(stats.length === 1) {
+      // Exact or single match — open detail card
+      openDetail(stats[0]);
+    } else {
+      filtered = stats;
+      currentPage = 1;
+      renderTable();
+    }
+  } catch(e) {
+    showEmpty('Search error: ' + e.message);
+  }
+}
+
+/* ── Render leaderboard table ── */
+function renderTable() {
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const page  = filtered.slice(start, start + PAGE_SIZE);
+  const total = filtered.length;
+  const pages = Math.ceil(total / PAGE_SIZE);
+
+  if(!page.length) { showEmpty('No teams match this filter.'); return; }
+
+  document.getElementById('mainArea').innerHTML = `
+    <div class="table-card">
+      <table>
+        <thead><tr>
+          <th class="rank-num">#</th>
+          <th onclick="sortBy('team')" id="th-team">Team</th>
+          <th onclick="sortBy('match_count')" id="th-match_count">Matches</th>
+          <th onclick="sortBy('avg_pins')" id="th-avg_pins" class="sorted">Avg Pins ↕</th>
+          <th onclick="sortBy('avg_bonuses')" id="th-avg_bonuses">Avg Bonus</th>
+          <th onclick="sortBy('awp_rate_pct')" id="th-awp_rate_pct">AWP Rate</th>
+          <th onclick="sortBy('sig_matches')" id="th-sig_matches">Sig</th>
+          <th>Robot Types</th>
+        </tr></thead>
+        <tbody>
+          ${page.map((t, i) => `
+            <tr onclick="openDetail(${JSON.stringify(t).replace(/"/g,'&quot;')})">
+              <td class="rank-num">${start + i + 1}</td>
+              <td><span class="team-num">${t.team}</span></td>
+              <td style="font-family:var(--mono)">${t.match_count}</td>
+              <td style="font-family:var(--mono);font-weight:500">${parseFloat(t.avg_pins).toFixed(1)}</td>
+              <td style="font-family:var(--mono)">${parseFloat(t.avg_bonuses||0).toFixed(1)}</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="font-family:var(--mono);min-width:36px">${parseFloat(t.awp_rate_pct||0).toFixed(0)}%</span>
+                  <div class="awp-bar-wrap" style="flex:1;min-width:50px">
+                    <div class="awp-bar-fill" style="width:${Math.min(parseFloat(t.awp_rate_pct||0),100)}%"></div>
+                  </div>
+                </div>
+              </td>
+              <td>${parseInt(t.sig_matches)>0 ? '<span class="badge b-sig">'+t.sig_matches+'</span>' : '<span class="badge b-no">—</span>'}</td>
+              <td style="font-size:12px;color:var(--ink2)">${(t.robot_types||'').replace(/,/g,', ')}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  // Pagination
+  const pager = document.getElementById('pager');
+  if(pages > 1) {
+    pager.style.display = 'flex';
+    document.getElementById('pagerInfo').textContent = `Page ${currentPage} of ${pages} (${total} teams)`;
+    document.getElementById('prevBtn').disabled = currentPage === 1;
+    document.getElementById('nextBtn').disabled = currentPage === pages;
+  } else {
+    pager.style.display = 'none';
+  }
+}
+
+function changePage(dir) {
+  currentPage += dir;
+  renderTable();
+  window.scrollTo(0, 0);
+}
+
+/* ── Detail overlay ── */
+function openDetail(team) {
+  const t = typeof team === 'string' ? JSON.parse(team) : team;
+  const teamEntries = allEntries.filter(e => e.team.toUpperCase() === t.team.toUpperCase());
+  const awpPct = parseFloat(t.awp_rate_pct || 0);
+
+  const routes = (t.known_routes || 'Unknown').split(' · ').map(r =>
+    `<code style="font-family:var(--mono);font-size:11px;background:var(--paper2);padding:1px 5px;border-radius:3px;margin:1px">${r}</code>`
+  ).join(' ');
+
+  document.getElementById('detailContent').innerHTML = `
+    <div class="detail-team">${t.team}</div>
+    <div class="detail-sub">${t.robot_types || 'Robot type unknown'} · ${t.match_count} match${t.match_count!=1?'es':''} scouted</div>
+
+    <div class="stat-grid">
+      <div class="stat-box">
+        <div class="stat-label">Matches</div>
+        <div class="stat-val">${t.match_count}</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Avg Pins</div>
+        <div class="stat-val">${parseFloat(t.avg_pins).toFixed(1)}</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">AWP Rate</div>
+        <div class="stat-val">${awpPct.toFixed(0)}%</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Sig Matches</div>
+        <div class="stat-val">${t.sig_matches}</div>
+      </div>
+    </div>
+
+    <div class="detail-row">
+      <span class="detail-key">AWP probability bar</span>
+      <div style="flex:1;margin-left:16px">
+        <div class="awp-bar-wrap" style="height:10px">
+          <div class="awp-bar-fill" style="width:${Math.min(awpPct,100)}%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="detail-row">
+      <span class="detail-key">Avg bonuses/match</span>
+      <span class="detail-val">${parseFloat(t.avg_bonuses||0).toFixed(1)}</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-key">AWP achieved</span>
+      <span class="detail-val">${t.awp_count} / ${t.match_count} matches</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-key">Known routes</span>
+      <span class="detail-val">${routes}</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-key">Last scouted</span>
+      <span class="detail-val">${t.last_seen ? new Date(t.last_seen).toLocaleDateString() : '—'}</span>
+    </div>
+
+    ${teamEntries.length ? `
+    <div class="match-history">
+      <div class="mh-title">Match history (${teamEntries.length})</div>
+      ${teamEntries.slice(0,15).map(e => `
+        <div class="mh-row">
+          <span style="font-family:var(--mono);font-size:11px;color:var(--ink2)">${e.event||'—'}</span>
+          <span style="font-family:var(--mono);font-size:11px">${e.round||'—'}</span>
+          <span style="font-family:var(--mono);font-size:12px">${e.pins||'0'} pins</span>
+          <span><span class="badge ${e.awp==='Y'?'b-awp':'b-no'}">${e.awp}</span></span>
+          <span style="font-family:var(--mono);font-size:11px">${e.side}</span>
+        </div>
+      `).join('')}
+      ${teamEntries.length > 15 ? `<div style="font-size:11px;color:var(--ink3);font-family:var(--mono);padding-top:8px">+ ${teamEntries.length-15} more matches</div>` : ''}
+    </div>` : ''}
+  `;
+
+  document.getElementById('detailOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDetail(e) {
+  if(e.target === document.getElementById('detailOverlay')) closeOverlay();
+}
+function closeOverlay() {
+  document.getElementById('detailOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeOverlay(); });
+
+/* ── State helpers ── */
+function showLoading() {
+  document.getElementById('mainArea').innerHTML =
+    '<div class="state-box"><div class="spinner"></div><br>Searching…</div>';
+}
+function showEmpty(msg) {
+  document.getElementById('mainArea').innerHTML =
+    `<div class="state-box"><div class="big">🔍</div>${msg}</div>`;
+  document.getElementById('pager').style.display = 'none';
+}
+
+/* ── Start ── */
+init();
+</script>
+</body>
+</html>
