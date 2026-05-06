@@ -19,1373 +19,1138 @@
 }
 body{font-family:var(--sans);background:var(--paper2);color:var(--ink);min-height:100vh}
 
-/* ── LOGIN MODAL ── */
+/* ── LOGIN SECURITY MODAL ── */
 .login-modal-bg{
-  display:none;position:fixed;inset:0;background:rgba(15,15,13,.55);z-index:500;
-  align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(3px);
+  position:fixed;top:0;left:0;width:100vw;height:100vh;
+  background:rgba(15,15,13,0.5);display:flex;align-items:center;justify-content:center;
+  z-index:1000;opacity:0;pointer-events:none;transition:opacity 0.2s ease;
 }
-.login-modal-bg.open{display:flex}
+.login-modal-bg.active{opacity:1;pointer-events:auto}
 .login-modal{
-  background:var(--paper);border:1.5px solid var(--ink);border-radius:var(--radius-lg);
-  padding:1.75rem;max-width:340px;width:100%;box-shadow:5px 5px 0 var(--ink);position:relative;
+  background:var(--paper);padding:1.5rem;border-radius:var(--radius-lg);
+  max-width:340px;width:90%;box-shadow:0 10px 25px rgba(0,0,0,0.15);
 }
-.login-modal-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--ink3)}
-.login-modal-close:hover{color:var(--red)}
-.login-logo{font-size:18px;font-weight:700;letter-spacing:-0.4px;margin-bottom:3px}
-.login-logo span{color:var(--red)}
-.login-sub{font-size:11px;font-family:var(--mono);color:var(--ink3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:1.25rem}
-.login-modal label{font-size:12px;color:var(--ink2);display:block;margin-bottom:4px}
-.login-modal input{
-  width:100%;padding:9px 11px;border:1px solid var(--paper3);border-radius:var(--radius);
-  font-size:13px;font-family:var(--mono);background:var(--paper);color:var(--ink);margin-bottom:10px;
-}
-.login-modal input:focus{outline:2px solid var(--blue);border-color:transparent}
-.btn-login{
-  width:100%;padding:10px;background:var(--ink);color:var(--paper);border:none;
-  border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans);
-}
-.btn-login:hover{background:var(--red)}
-.login-err{font-size:12px;color:var(--red);margin-top:6px;min-height:16px;font-family:var(--mono)}
-.btn-admin-trigger{
-  padding:5px 12px;border-radius:var(--radius);font-size:12px;cursor:pointer;
-  border:1px solid var(--paper3);background:var(--paper2);color:var(--ink3);
-  font-family:var(--sans);transition:all .15s;
-}
-.btn-admin-trigger:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 
-/* ── MAIN APP SHELL ── */
-#appShell{display:none}
-.topbar{
-  background:var(--paper);border-bottom:1.5px solid var(--ink);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:.75rem 1.25rem;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:50;
-}
-.topbar-left{display:flex;align-items:center;gap:12px}
-.site-title{font-size:17px;font-weight:700;letter-spacing:-0.4px}
-.site-title span{color:var(--red)}
-.mode-badge{
-  font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:99px;
-  font-weight:500;text-transform:uppercase;letter-spacing:.5px;
-}
-.mode-admin{background:var(--red-bg);color:var(--red-text);border:1px solid #f8c5b5}
-.mode-pub{background:var(--paper2);color:var(--ink3);border:1px solid var(--paper3)}
-.topbar-right{display:flex;align-items:center;gap:8px}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--ink3)}
-.sync-dot.ok{background:var(--green)}.sync-dot.err{background:var(--red)}
-.sync-txt{font-size:12px;color:var(--ink3);font-family:var(--mono)}
-.btn-sm{padding:5px 12px;border-radius:var(--radius);font-size:12px;cursor:pointer;border:1px solid var(--paper3);background:var(--paper2);color:var(--ink2);font-family:var(--sans)}
-.btn-sm:hover{background:var(--paper3)}
-.btn-sm.danger{color:var(--red-text);border-color:#f8c5b5}
-.btn-sm.danger:hover{background:var(--red-bg)}
-.btn-primary{background:var(--ink);color:var(--paper);border-color:transparent}
-.btn-primary:hover{background:var(--red)}
-
-/* ── TABS ── */
-.tabs-wrap{background:var(--paper);border-bottom:1px solid var(--paper3);padding:0 1.25rem;overflow-x:auto}
-.tabs{display:flex;gap:0;white-space:nowrap}
+/* ── APP NAVIGATION HEADERS ── */
+header{background:var(--paper);border-bottom:1px solid var(--paper3);position:sticky;top:0;z-index:100}
+.nav-wrap{max-width:1100px;margin:0 auto;padding:0.75rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.nav-title{font-weight:800;font-size:16px;letter-spacing:-0.5px;color:var(--ink);display:flex;align-items:center;gap:0.5rem}
+.nav-tabs{display:flex;gap:0.25rem;background:var(--paper2);padding:0.25rem;border-radius:var(--radius);flex-wrap:wrap}
 .tab{
-  padding:10px 16px;font-size:13px;cursor:pointer;border:none;background:transparent;
-  color:var(--ink3);border-bottom:2px solid transparent;margin-bottom:-1px;font-family:var(--sans);
+  padding:0.4rem 0.75rem;font-size:13px;font-weight:600;color:var(--ink2);
+  background:transparent;border:0;border-radius:var(--radius);cursor:pointer;
+  transition:all 0.15s ease;text-decoration:none;
 }
-.tab.active{color:var(--ink);font-weight:500;border-bottom-color:var(--ink)}
-.tab:hover:not(.active){color:var(--ink2);background:var(--paper2)}
-.tab.admin-only{display:none}.tab.admin-visible{display:block!important}
+.tab.active{background:var(--paper);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.sync-indicator{font-size:12px;font-family:var(--mono);display:flex;align-items:center;gap:0.35rem;padding:0.25rem 0.5rem;border-radius:4px}
+.sync-ok{background:var(--green-bg);color:var(--green)}
+.sync-warn{background:var(--red-bg);color:var(--red)}
 
-/* ── PANELS ── */
-.panel{display:none}.panel.active{display:block}
-.page{max-width:1100px;margin:0 auto;padding:1.5rem 1.25rem}
+/* ── STRUCTURAL WRAPPERS AND PANELS ── */
+.main-content{max-width:1100px;margin:0 auto;padding:1.5rem 1rem 5rem}
+.panel{display:none}
+.panel.active{display:block}
+.card{background:var(--paper);border:1px solid var(--paper3);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1.25rem;box-shadow:0 1px 2px rgba(0,0,0,0.02)}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
+.form-group{display:flex;flex-direction:column;gap:0.35rem}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.25rem}
 
-/* ── SHARED COMPONENTS ── */
-.card{background:var(--paper);border:.5px solid var(--paper3);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-.sec{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--ink)}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-@media(max-width:640px){.g2,.g3,.g4{grid-template-columns:1fr}}
-label{font-size:12px;color:var(--ink2);display:block;margin-bottom:4px}
-input,select,textarea{
-  width:100%;padding:7px 10px;border:.5px solid var(--paper3);border-radius:var(--radius);
-  background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:13px;
+/* ── DOM LAYOUT ELEMENTS ── */
+label{font-size:11px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:0.5px}
+input[type="text"],input[type="email"],input[type="password"],select,textarea{
+  padding:0.55rem 0.75rem;border:1px solid var(--paper3);background:var(--paper);
+  border-radius:var(--radius);color:var(--ink);font-family:inherit;font-size:14px;
+  transition:border-color 0.15s ease;width:100%;
 }
-input:focus,select:focus,textarea:focus{outline:2px solid var(--blue);border-color:transparent}
-textarea{resize:vertical}
-.btn{padding:7px 14px;border-radius:var(--radius);font-size:13px;cursor:pointer;border:.5px solid var(--paper3);background:transparent;color:var(--ink);font-family:var(--sans)}
-.btn:hover{background:var(--paper2)}.btn:active{transform:scale(.98)}
-.btn-p{background:var(--ink);color:var(--paper);border-color:transparent}
-.btn-p:hover{background:var(--red)}
-.btn-d{color:var(--red-text);border-color:transparent}.btn-d:hover{background:var(--red-bg)}
-.hint{font-size:12px;color:var(--ink3);margin-top:4px;line-height:1.5}
-code{font-family:var(--mono);font-size:11px;background:var(--paper2);padding:1px 5px;border-radius:3px}
-.row-bar{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
-.mc{background:var(--paper2);border:1px solid var(--paper3);border-radius:var(--radius);padding:.65rem 1rem}
-.mc-l{font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin-bottom:3px}
-.mc-v{font-size:22px;font-weight:600;font-family:var(--mono)}
-.badge{display:inline-block;padding:2px 7px;border-radius:99px;font-size:11px;font-weight:500}
-.b-awp{background:var(--green-bg);color:var(--green);border:1px solid #b8ddb8}
-.b-sig{background:var(--amber-bg);color:var(--amber);border:1px solid #f0d070}
-.b-q{background:var(--blue-bg);color:var(--blue)}
-.b-no{background:var(--paper2);color:var(--ink3);border:1px solid var(--paper3)}
-.tw{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{background:var(--ink);color:var(--paper);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.6px;padding:8px 10px;text-align:left;white-space:nowrap;cursor:pointer;user-select:none}
-th:hover{background:#2a2a26}th.sorted{color:#ffd700}
-td{padding:8px 10px;border-bottom:.5px solid var(--paper3);vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:var(--paper2);cursor:pointer}
-.tn{font-family:var(--mono);font-weight:600;font-size:13px;color:var(--blue)}
-.msg-ok{color:var(--green);font-size:13px;margin-top:6px}
-.msg-err{color:var(--red-text);font-size:13px;margin-top:6px}
-.empty{text-align:center;padding:2.5rem;color:var(--ink3);font-size:13px;font-family:var(--mono)}
-.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--paper3);border-top-color:var(--ink);border-radius:50%;animation:sp .7s linear infinite}
-@keyframes sp{to{transform:rotate(360deg)}}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--blue)}
+.btn{
+  padding:0.6rem 1.2rem;font-size:13px;font-weight:600;border-radius:var(--radius);
+  border:1px solid var(--paper3);background:var(--paper);color:var(--ink);
+  cursor:pointer;transition:all 0.15s ease;display:inline-flex;align-items:center;justify-content:center;gap:0.4rem;
+}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn-primary:hover{background:#154f94}
+.btn-danger{background:var(--red-bg);color:var(--red-text);border-color:var(--paper3)}
+.btn-danger:hover{background:#f3dad1}
 
-/* ── FILTERS / CHIPS ── */
-.filters{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
-.fl{font-size:11px;font-family:var(--mono);color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-right:2px}
-.chip{padding:4px 12px;border:1px solid var(--paper3);border-radius:99px;font-size:12px;cursor:pointer;background:var(--paper2);color:var(--ink2);font-family:var(--mono)}
-.chip.on,.chip:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+/* ── TOGGLE CONTROL GROUPS ── */
+.toggle-group{display:flex;background:var(--paper2);padding:0.2rem;border-radius:var(--radius);width:max-content}
+.toggle-btn{
+  padding:0.35rem 0.8rem;font-size:12px;font-weight:700;border:0;
+  background:transparent;color:var(--ink2);border-radius:var(--radius);
+  cursor:pointer;transition:all 0.1s ease;
+}
+.toggle-btn.active{background:var(--paper);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,0.05)}
 
-/* ── SEARCH ── */
-.search-zone{display:flex;border:1.5px solid var(--ink);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem}
-.search-zone:focus-within{box-shadow:3px 3px 0 var(--ink)}
-.si{flex:1;border:none;outline:none;padding:10px 14px;font-size:14px;font-family:var(--mono);background:transparent;color:var(--ink);min-width:0}
-.si::placeholder{color:var(--ink3)}
-.sb{padding:10px 18px;background:var(--ink);color:var(--paper);border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:var(--sans);white-space:nowrap}
-.sb:hover{background:var(--red)}
+/* ── TABLES AND DATA DISPLAY DATA BADGES ── */
+.table-wrap{width:100%;overflow-x:auto;margin-top:0.5rem;border-radius:var(--radius);border:1px solid var(--paper3)}
+table{width:100%;border-collapse:collapse;text-align:left;font-size:13px}
+th,td{padding:0.65rem 0.75rem;border-bottom:1px solid var(--paper3)}
+th{background:var(--paper);font-weight:700;color:var(--ink2);font-size:11px;text-transform:uppercase;letter-spacing:0.5px}
+tr.clickable-row{cursor:pointer}
+tr.clickable-row:hover td{background:rgba(26,95,180,0.04)}
+.team-link{font-weight:700;color:var(--blue);text-decoration:none;font-family:var(--mono)}
+.badge{padding:2px 5px;border-radius:4px;font-size:11px;font-weight:700;font-family:var(--mono)}
+.b-awp{background:var(--amber-bg);color:var(--amber)}
+.b-no{background:var(--paper2);color:var(--ink3)}
+.awp-wrap{background:var(--paper3);border-radius:3px;height:6px;width:60px;overflow:hidden}
+.awp-fill{background:var(--amber);height:100%}
 
-/* ── AWP BAR ── */
-.awp-wrap{display:flex;height:5px;border-radius:3px;background:var(--paper3);overflow:hidden;flex:1;min-width:40px}
-.awp-fill{background:var(--green);border-radius:3px}
+/* ── PREDICTOR GRAPH MATRICES ── */
+.alliance-panel{padding:1rem;border-radius:var(--radius);border:1px solid var(--paper3)}
+.red-panel{background:var(--red-bg);border-color:#f3dad1}
+.blue-panel{background:var(--blue-bg);border-color:#d4e6f7}
+.win-wrap{display:flex;height:24px;border-radius:var(--radius);overflow:hidden;margin:1rem 0;font-family:var(--mono);font-size:12px;color:#fff;font-weight:700;text-align:center;line-height:24px}
+.bar-red{background:var(--red);transition:width 0.3s ease}
+.bar-blue{background:var(--blue);transition:width 0.3s ease}
+.bk-row{display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--paper3)}
+.formula-box{background:var(--paper2);padding:0.75rem;border-radius:var(--radius);font-family:var(--mono);font-size:12px;white-space:pre-wrap;margin-top:0.35rem;margin-bottom:1rem;color:var(--ink2);border:1px solid var(--paper3)}
 
-/* ── DETAIL OVERLAY ── */
-.overlay{display:none;position:fixed;inset:0;background:rgba(15,15,13,.5);z-index:200;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(3px)}
-.overlay.open{display:flex}
-.dcard{background:var(--paper);border:1.5px solid var(--ink);border-radius:var(--radius-lg);padding:1.5rem;max-width:600px;width:100%;max-height:88vh;overflow-y:auto;position:relative;box-shadow:5px 5px 0 var(--ink)}
-.dc-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink2)}
-.dc-close:hover{color:var(--red)}
-.dc-team{font-size:26px;font-weight:700;letter-spacing:-1px;font-family:var(--mono);color:var(--blue);margin-bottom:2px}
-.dc-sub{font-size:12px;color:var(--ink3);font-family:var(--mono);margin-bottom:1.25rem}
-.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.25rem}
-@media(max-width:440px){.sgrid{grid-template-columns:1fr 1fr}}
-.sbox{background:var(--paper2);border:1px solid var(--paper3);border-radius:var(--radius);padding:8px 10px}
-.sbox-l{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin-bottom:4px}
-.sbox-v{font-size:18px;font-weight:600;font-family:var(--mono)}
-.dr{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:.5px solid var(--paper3);font-size:13px;gap:12px}
-.dr:last-child{border-bottom:none}
-.dk{font-family:var(--mono);font-size:10px;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
-.dv{font-size:13px;text-align:right;color:var(--ink);word-break:break-all}
-.mh-hd{font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin:1rem 0 6px}
-.mh-row{display:grid;grid-template-columns:1fr 70px 60px 36px 28px;gap:6px;padding:6px 0;border-bottom:.5px solid var(--paper3);font-size:12px;align-items:center}
-.mh-row:last-child{border-bottom:none}
+/* ── CHIPS EXTENSION ── */
+.chips-row{display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap}
+.chip{padding:0.35rem 0.75rem;background:var(--paper);border:1px solid var(--paper3);border-radius:20px;font-size:12px;cursor:pointer;font-weight:600;color:var(--ink2)}
+.chip.on{background:var(--blue);color:#fff;border-color:var(--blue)}
 
-/* ── PAGER ── */
-.pager{display:flex;gap:6px;justify-content:center;align-items:center;margin-top:.75rem;font-size:12px;font-family:var(--mono)}
-.pb{padding:4px 12px;border:1px solid var(--paper3);border-radius:var(--radius);background:var(--paper2);cursor:pointer;color:var(--ink2);font-family:var(--mono);font-size:12px}
-.pb:hover:not(:disabled){background:var(--ink);color:var(--paper);border-color:var(--ink)}
-.pb:disabled{opacity:.35;cursor:default}
-.pi{color:var(--ink3);padding:0 8px}
+/* ── OVERLAY POPUPS ── */
+.overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.4);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s ease}
+.overlay.open{opacity:1;pointer-events:auto}
+.dcard{background:var(--paper);padding:1.5rem;border-radius:var(--radius-lg);width:90%;max-width:540px;position:relative;box-shadow:0 12px 30px rgba(0,0,0,0.2)}
+.dc-close{position:absolute;top:1rem;right:1rem;background:transparent;border:0;font-size:16px;cursor:pointer;color:var(--ink3)}
+.dc-team{font-size:24px;font-weight:800;font-family:var(--mono);color:var(--ink)}
+.dc-sub{font-size:13px;color:var(--ink2);margin-bottom:1rem}
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-bottom:1rem}
+.sbox{background:var(--paper2);padding:0.5rem;border-radius:var(--radius);text-align:center}
+.sbox-l{font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase}
+.sbox-v{font-size:16px;font-weight:800;font-family:var(--mono);color:var(--ink)}
+.dr{display:flex;justify-content:space-between;font-size:12px;padding:0.4rem 0;border-bottom:1px solid var(--paper3)}
+.dk{font-weight:600;color:var(--ink2)}
+.mh-hd{font-size:12px;font-weight:700;text-transform:uppercase;margin:1rem 0 0.5rem;color:var(--ink2)}
+.mh-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:0.25rem;padding:0.35rem 0;font-size:12px;border-bottom:1px solid var(--paper3);align-items:center}
 
-/* ── PROBABILITY ── */
-.alliance-panel{border:.5px solid var(--paper3);border-radius:var(--radius-lg);padding:1rem;background:var(--paper)}
-.red-panel{border-left:3px solid var(--red)}.blue-panel{border-left:3px solid var(--blue)}
-.prob-title{font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin-bottom:6px}
-.win-wrap{display:flex;height:26px;border-radius:var(--radius);overflow:hidden;margin:8px 0}
-.bar-red{background:var(--red);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600;transition:width .5s;min-width:28px}
-.bar-blue{background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600;transition:width .5s;min-width:28px}
-.bar-green{background:#3B6D11;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600;transition:width .5s;min-width:28px}
-.bar-green2{background:#5a9e24;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600;transition:width .5s;min-width:28px}
-.bk-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:.5px solid var(--paper3);font-size:13px}
-.bk-row:last-child{border-bottom:none}
-.pdot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:6px}
-.dr_{background:var(--red)}.db_{background:var(--blue)}
-
-/* ── RESOURCE ROWS ── */
-.resource-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:.5px solid var(--paper3);gap:12px}
-.resource-row:last-child{border-bottom:none}
-
-/* ── FORMULA BOX ── */
-.formula-box{background:var(--paper2);border-radius:var(--radius);padding:1rem;font-family:var(--mono);font-size:12px;line-height:1.9;margin:8px 0;white-space:pre-wrap;overflow-x:auto}
+.admin-only{display:none}
+body.is-admin .admin-only{display:block}
+body.is-admin .btn-admin-login{display:none}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════
-     LOGIN MODAL
-════════════════════════════════════════════ -->
-<div class="login-modal-bg" id="loginModal" onclick="if(event.target===this)closeLoginModal()">
+<div id="loginModal" class="login-modal-bg">
   <div class="login-modal">
-    <button class="login-modal-close" onclick="closeLoginModal()">✕</button>
-    <div class="login-logo">Override <span>Scout</span></div>
-    <div class="login-sub">Admin login</div>
-    <label>Email</label>
-    <input type="email" id="unInput" placeholder="admin@example.com" autocomplete="email"
-      onkeydown="if(event.key==='Enter')document.getElementById('pwInput').focus()">
-    <label>Password</label>
-    <input type="password" id="pwInput" placeholder="Password" autocomplete="current-password"
-      onkeydown="if(event.key==='Enter')tryLogin()">
-    <button class="btn-login" onclick="tryLogin()">Login</button>
-    <div class="login-err" id="loginErr"></div>
+    <h3 style="margin-bottom:0.75rem;font-size:16px;">Admin Authentication</h3>
+    <div style="display:flex;flex-direction:column;gap:0.75rem;">
+      <div class="form-group">
+        <label>Email Access Address</label>
+        <input type="email" id="unInput" placeholder="admin@example.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="pwInput" placeholder="••••••••">
+      </div>
+      <div id="loginErr" style="color:var(--red);font-size:12px;font-weight:600;"></div>
+      <div style="display:flex;justify-content:end;gap:0.5rem;margin-top:0.25rem;">
+        <button class="btn" onclick="toggleModal(false)">Cancel</button>
+        <button class="btn btn-primary" onclick="tryLogin()">Verify System</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     MAIN APP
-════════════════════════════════════════════ -->
-<div id="appShell">
-
-  <!-- Top bar -->
-  <div class="topbar">
-    <div class="topbar-left">
-      <div class="site-title">Override <span>Scout</span></div>
-      <span class="mode-badge" id="modeBadge">Viewer</span>
+<header>
+  <div class="nav-wrap">
+    <div class="nav-title">🤖 OVERRIDE SCOUT</div>
+    <div class="nav-tabs">
+      <button class="tab active" data-tab="add">Add Entry</button>
+      <button class="tab" data-tab="leaderboard" onclick="lbSortRender()">Leaderboard</button>
+      <button class="tab" data-tab="log" onclick="renderLog()">Scout Log</button>
+      <button class="tab" data-tab="predict" onclick="runPredict()">Predictor</button>
+      <button class="tab" data-tab="routes" onclick="renderRoutesTab()">Strategy Paths</button>
+      <button class="tab" data-tab="calendar" onclick="renderCalendarTab()">Events Schedule</button>
+      <button class="tab" data-tab="formulas">Formulas</button>
     </div>
-    <div class="topbar-right">
-      <div class="sync-dot" id="syncDot"></div>
-      <span class="sync-txt" id="syncTxt">Loading…</span>
-      <button class="btn-admin-trigger" id="adminLoginBtn" onclick="openLoginModal()">Admin</button>
-      <button class="btn-sm danger" id="logoutBtn" onclick="logout()" style="display:none">Logout admin</button>
-    </div>
-  </div>
-
-  <!-- Tabs -->
-  <div class="tabs-wrap">
-    <div class="tabs">
-      <button class="tab active" data-tab="search" onclick="switchTab('search',this)">Search</button>
-      <button class="tab" data-tab="leaderboard" onclick="switchTab('leaderboard',this)">Leaderboard</button>
-      <button class="tab admin-only" data-tab="add" onclick="switchTab('add',this)">+ Add Entry</button>
-      <button class="tab admin-only" data-tab="log" onclick="switchTab('log',this)">Scout Log</button>
-      <button class="tab admin-only" data-tab="predict" onclick="switchTab('predict',this)">Win Probability</button>
-      <button class="tab admin-only" data-tab="routes" onclick="switchTab('routes',this)">Routes</button>
-      <button class="tab admin-only" data-tab="formulas" onclick="switchTab('formulas',this)">Formulas</button>
-      <button class="tab admin-only" data-tab="calendar" onclick="switchTab('calendar',this)">📅 Sig Calendar</button>
+    <div style="display:flex;align-items:center;gap:0.5rem;">
+      <div id="syncIndicator" class="sync-indicator sync-ok">Initializing Cache...</div>
+      <button class="btn btn-admin-login" style="padding:0.3rem 0.6rem;font-size:11px;" onclick="toggleModal(true)">Admin Login</button>
+      <button class="btn admin-only btn-danger" style="padding:0.3rem 0.6rem;font-size:11px;" onclick="logout()">Sign Out</button>
     </div>
   </div>
+</header>
 
-  <!-- ── SEARCH (public) ── -->
-  <div id="tab-search" class="panel active">
-    <div class="page">
-      <div class="search-zone">
-        <input class="si" id="pubSearch" type="text" placeholder="Search team number (e.g. 73017D)…"
-          onkeydown="if(event.key==='Enter')pubDoSearch()">
-        <button class="sb" onclick="pubDoSearch()">Search</button>
-      </div>
-      <div id="pubResult">
-        <div class="empty"><span class="spin"></span><br><br>Loading database…</div>
-      </div>
-    </div>
-  </div>
+<div class="main-content">
 
-  <!-- ── LEADERBOARD (public) ── -->
-  <div id="tab-leaderboard" class="panel">
-    <div class="page">
-      <div class="filters">
-        <span class="fl">Filter:</span>
-        <span class="chip on" onclick="lbFilter('all',this)">All teams</span>
-        <span class="chip"    onclick="lbFilter('sig',this)">Sig events</span>
-        <span class="chip"    onclick="lbFilter('awp',this)">AWP achieved</span>
-        <span class="chip"    onclick="lbFilter('top',this)">Top pins</span>
-      </div>
-      <div class="g4" id="lbCards" style="margin-bottom:1rem;display:none">
-        <div class="mc"><div class="mc-l">Teams</div><div class="mc-v" id="lbT">—</div></div>
-        <div class="mc"><div class="mc-l">Entries</div><div class="mc-v" id="lbE">—</div></div>
-        <div class="mc"><div class="mc-l">Avg pins</div><div class="mc-v" id="lbP">—</div></div>
-        <div class="mc"><div class="mc-l">AWP rate</div><div class="mc-v" id="lbA">—</div></div>
-      </div>
-      <div id="lbMain"><div class="empty"><span class="spin"></span><br><br>Loading…</div></div>
-      <div class="pager" id="lbPager" style="display:none">
-        <button class="pb" id="lbPrev" onclick="lbPage(-1)" disabled>← Prev</button>
-        <span class="pi" id="lbPi"></span>
-        <button class="pb" id="lbNext" onclick="lbPage(1)">Next →</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── ADD ENTRY (admin) ── -->
-  <div id="tab-add" class="panel">
-    <div class="page">
-      <div class="card">
-        <p class="sec">New autonomous entry</p>
-        <div class="g3" style="margin-bottom:12px">
-          <div><label>Team #</label><input id="f-team" placeholder="e.g. 73017D"></div>
-          <div><label>Event name</label><input id="f-event" placeholder="e.g. Mall of America"></div>
-          <div><label>Round</label><input id="f-round" placeholder="e.g. R16 1-1"></div>
+  <div id="tab-add" class="panel active">
+    <div class="card">
+      <h3 style="margin-bottom:1rem;">Log Qualification Match Dataset</h3>
+      <div class="form-grid">
+        
+        <div class="form-group">
+          <label>Team Identity Number</label>
+          <input type="text" id="f-team" placeholder="e.g. 73017D" style="text-transform:uppercase">
         </div>
-        <div class="g3" style="margin-bottom:12px">
-          <div><label>Side</label>
-            <select id="f-side"><option value="L">Left (L)</option><option value="R">Right (R)</option></select>
+
+        <div class="form-group">
+          <label>Match Reference / Round</label>
+          <input type="text" id="f-round" placeholder="e.g. Q12">
+        </div>
+
+        <div class="form-group">
+          <label>Target Scouting Event Location</label>
+          <select id="f-event-select">
+            <option value="">Default Regional Standings File</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Alliance Assigned Color / Side</label>
+          <div class="toggle-group" id="f-side-group">
+            <button class="toggle-btn active" data-val="L">Left (Red)</button>
+            <button class="toggle-btn" data-val="R">Right (Blue)</button>
           </div>
-          <div><label>Robot Type</label>
-            <select id="f-type">
-              <option>Basket Bot</option><option>Ruiguan</option><option>Ruiguan (Hero)</option>
-              <option>C Bot</option><option>Stack Bot</option><option>Other</option>
+        </div>
+
+        <div class="form-group">
+          <label>Tournament Grade Level</label>
+          <div class="toggle-group" id="f-sig-group">
+            <button class="toggle-btn active" data-val="no">Standard Regional</button>
+            <button class="toggle-btn" data-val="yes">Signature / Worlds</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Robot Build Profile</label>
+          <input type="text" id="f-type" value="Claw Bot" disabled style="background:var(--paper2); cursor:not-allowed;">
+        </div>
+
+        <div class="form-group" style="grid-column: 1 / -1; border-top: 1px solid var(--paper3); padding-top: 1rem;">
+          <label style="color:var(--blue); font-size:13px; margin-bottom:0.25rem;">Autonomous Strategy Setup</label>
+          <select id="f-auto-mode" onchange="handleAutoModeChange()">
+            <option value="Normal">Normal Autonomous Run</option>
+            <option value="SAWP">SAWP (Solo Autonomous Win Point Run)</option>
+          </select>
+        </div>
+
+        <div id="meta-container-normal" class="form-grid" style="grid-column: 1 / -1; gap:1rem;">
+          <div class="form-group">
+            <label>Goal 1 (Alliance Specific) Pins Scored</label>
+            <select id="f-pin-g1">
+              <option value="1">1 Pin Placed</option>
+              <option value="2">2 Pins Placed</option>
+              <option value="3">3 Pins Placed</option>
             </select>
           </div>
-          <div><label>Sig event?</label>
-            <select id="f-sig"><option value="no">No</option><option value="yes">Yes — Worlds qualifier</option></select>
+          <div class="form-group">
+            <label>Goal 2 Pins Scored</label>
+            <select id="f-pin-g2">
+              <option value="1">1 Pin Placed</option>
+              <option value="2">2 Pins Placed</option>
+              <option value="3">3 Pins Placed</option>
+            </select>
           </div>
         </div>
-        <div class="g2" style="margin-bottom:12px">
-          <div>
-            <label>Route  <span style="font-weight:400;color:var(--ink3)">(m · lg · l · mg · u · w)</span></label>
-            <input id="f-route" placeholder="e.g. m>l>lg>mg>w  or  Unknown route">
+
+        <div id="meta-container-sawp" class="form-grid" style="grid-column: 1 / -1; gap:1rem; display:none;">
+          <div class="form-group">
+            <label>Own Quadrant Pins Scored</label>
+            <select id="f-pin-own">
+              <option value="1">1 Pin Placed</option>
+              <option value="2">2 Pins Placed</option>
+              <option value="3">3 Pins Placed</option>
+            </select>
           </div>
-          <div>
-            <label>Pins scored  <span style="font-weight:400;color:var(--ink3)">(longGoal+ownMid+oppMid)</span></label>
-            <input id="f-pins" placeholder="e.g. 2+1+2">
-            <p class="hint">A+B+C — A=long goal, B=own mid, C=opp mid</p>
+          <div class="form-group">
+            <label>Teammate Quadrant Pins Scored</label>
+            <select id="f-pin-team">
+              <option value="1">1 Pin Placed</option>
+              <option value="2">2 Pins Placed</option>
+              <option value="3">3 Pins Placed</option>
+            </select>
           </div>
         </div>
-        <div class="g3" style="margin-bottom:12px">
-          <div><label>Control bonuses</label><input type="number" id="f-bonuses" min="0" max="10" value="0"></div>
-          <div><label>AWP achieved?</label>
-            <select id="f-awp"><option value="N">No</option><option value="Y">Yes</option><option value="?">Unknown</option></select>
+
+        <div class="form-group">
+          <label>Autonomous Win Point Achieved?</label>
+          <div class="toggle-group" id="f-awp-group">
+            <button class="toggle-btn" data-val="Y">Yes (AWP)</button>
+            <button class="toggle-btn active" data-val="N">No</button>
+            <button class="toggle-btn" data-val="?">Unknown</button>
           </div>
-          <div><label>Max possible pins</label><input id="f-maxpins" placeholder="e.g. 7"></div>
         </div>
-        <div style="margin-bottom:12px">
-          <label>Notes</label>
-          <textarea id="f-notes" rows="2" placeholder="Partner routes, errors, counter strategies…"></textarea>
+
+        <div class="form-group" style="grid-column: 1 / -1;">
+          <label>Qualitative Notes & Match Analysis</label>
+          <textarea id="f-notes" rows="3" placeholder="Describe driver competence, mechanical bottlenecks, macro counters..."></textarea>
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-p" onclick="addEntry()">Save entry</button>
-          <button class="btn" onclick="clearForm()">Clear</button>
-        </div>
-        <div id="add-msg"></div>
+
+      </div>
+      
+      <div style="margin-top:1.5rem; display:flex; justify-content:flex-end;">
+        <button class="btn btn-primary" style="padding:0.75rem 2rem;" onclick="submitEntry()">Save Entry & Upload to Database</button>
       </div>
     </div>
   </div>
 
-  <!-- ── SCOUT LOG (admin) ── -->
+  <div id="tab-leaderboard" class="panel">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+      <div>
+        <h3 style="font-size:18px;">Computational Performance Standings</h3>
+        <div id="cal-filter-status" style="font-size:12px; color:var(--blue); font-weight:600; margin-top:2px;"></div>
+      </div>
+      <div style="display:flex; gap:0.5rem; width:100%; max-width:320px;">
+        <input type="text" id="lbSearch" placeholder="Filter team number..." oninput="handleLbSearch()" style="padding:0.4rem 0.6rem; font-size:13px;">
+      </div>
+    </div>
+
+    <div class="chips-row">
+      <div class="chip on" onclick="lbFilter('all', this)">All Scouted Logs</div>
+      <div class="chip" onclick="lbFilter('sig', this)">Signature Tier Only</div>
+      <div class="chip" onclick="lbFilter('awp', this)">AWP Confirmed Runs</div>
+      <div class="chip" onclick="lbFilter('top', this)">High Ceiling (>=5 Pins)</div>
+    </div>
+
+    <div class="form-grid" style="margin-bottom:1rem;">
+      <div class="card" style="margin:0; padding:0.75rem 1rem;"><div style="font-size:11px;color:var(--ink2);font-weight:700;">TEAMS TRACKED</div><div id="lbT" style="font-size:22px;font-weight:800;font-family:var(--mono);">—</div></div>
+      <div class="card" style="margin:0; padding:0.75rem 1rem;"><div style="font-size:11px;color:var(--ink2);font-weight:700;">TOTAL MATCHES</div><div id="lbE" style="font-size:22px;font-weight:800;font-family:var(--mono);">—</div></div>
+      <div class="card" style="margin:0; padding:0.75rem 1rem;"><div style="font-size:11px;color:var(--ink2);font-weight:700;">AVG AUTON PINS</div><div id="lbP" style="font-size:22px;font-weight:800;font-family:var(--mono);">—</div></div>
+      <div class="card" style="margin:0; padding:0.75rem 1rem;"><div style="font-size:11px;color:var(--ink2);font-weight:700;">AWP SUCCESS RATE</div><div id="lbA" style="font-size:22px;font-weight:800;font-family:var(--mono);">—</div></div>
+    </div>
+
+    <div class="card" style="padding:0.5rem;" id="lbMainContainer">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th onclick="toggleSort('team')" style="cursor:pointer; user-select:none;">Team ⇅</th>
+              <th onclick="toggleSort('count')" style="cursor:pointer; user-select:none;">Runs Scouted ⇅</th>
+              <th onclick="toggleSort('avg_pins')" style="cursor:pointer; user-select:none;">Expected Pins (Mean) ⇅</th>
+              <th onclick="toggleSort('max_pins')" style="cursor:pointer; user-select:none;">Peak Run Ceiling ⇅</th>
+              <th onclick="toggleSort('awp_rate')" style="cursor:pointer; user-select:none;">AWP Conversion Rate ⇅</th>
+              <th>Robot Framework Profile</th>
+              <th class="admin-only">Admin Operations</th>
+            </tr>
+          </thead>
+          <tbody id="lbBody">
+            <tr><td colspan="7" style="text-align:center;color:var(--ink3);padding:2rem;">Connecting to server logs...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.75rem; padding:0 0.5rem;" id="lbPager">
+        <button class="btn" id="btn-prev" onclick="lbPageChange(-1)" style="padding:0.3rem 0.75rem; font-size:12px;">Previous</button>
+        <span id="lb-page-info" style="font-size:12px; color:var(--ink2); font-family:var(--mono);">Page 1 of 1</span>
+        <button class="btn" id="btn-next" onclick="lbPageChange(1)" style="padding:0.3rem 0.75rem; font-size:12px;">Next</button>
+      </div>
+    </div>
+  </div>
+
   <div id="tab-log" class="panel">
-    <div class="page">
-      <div class="row-bar">
-        <input type="text" id="logQ" placeholder="Search team, event, route…" oninput="renderLog()" style="max-width:260px">
-        <select id="logFil" onchange="renderLog()" style="max-width:150px">
-          <option value="">All entries</option>
-          <option value="sig">Sig events only</option>
-          <option value="awp">AWP achieved</option>
+    <div class="card" style="margin-bottom:1rem; padding:1rem;">
+      <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+        <input type="text" id="logQ" placeholder="Search team code, context arena..." oninput="renderLog()" style="max-width:260px; padding:0.4rem 0.6rem; font-size:13px;">
+        <select id="logFil" onchange="renderLog()" style="max-width:160px; padding:0.4rem 0.6rem; font-size:13px;">
+          <option value="">All Scored Entries</option>
+          <option value="yes">Signature Tier Only</option>
+          <option value="Y">AWP Success Runs</option>
         </select>
-        <button class="btn btn-sm" onclick="exportCSV()">Export CSV</button>
-        <button class="btn btn-sm" onclick="importClick()">Import CSV</button>
-        <input type="file" id="importFile" accept=".csv" style="display:none" onchange="importCSV(event)">
+        <div style="margin-left:auto; font-size:12px; color:var(--ink3); font-family:var(--mono)" id="logCount"></div>
       </div>
-      <div class="g4" id="logCards" style="margin-bottom:1rem"></div>
-      <div class="card">
-        <div class="tw">
-          <table>
-            <thead><tr>
-              <th>Team</th><th>Event</th><th>Round</th><th>Side</th><th>Robot Type</th>
-              <th>Route</th><th>Pins</th><th>Bonuses</th><th>AWP</th><th>Notes</th><th></th>
-            </tr></thead>
-            <tbody id="logBody"></tbody>
-          </table>
-        </div>
+    </div>
+    
+    <div class="card" style="padding:0.5rem;">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th onclick="logSort('team')" style="cursor:pointer;">Team ⇅</th>
+              <th onclick="logSort('event')" style="cursor:pointer;">Event Venue Context ⇅</th>
+              <th onclick="logSort('round')" style="cursor:pointer;">Round ⇅</th>
+              <th onclick="logSort('side')" style="cursor:pointer;">Side ⇅</th>
+              <th onclick="logSort('route')" style="cursor:pointer;">Strategy Mode ⇅</th>
+              <th onclick="logSort('pins')" style="cursor:pointer;">Calculated Pins ⇅</th>
+              <th>AWP Status</th>
+              <th class="admin-only">Purge Operations</th>
+            </tr>
+          </thead>
+          <tbody id="logBody"></tbody>
+        </table>
       </div>
     </div>
   </div>
 
-  <!-- ── WIN PROBABILITY (admin) ── -->
   <div id="tab-predict" class="panel">
-    <div class="page">
-      <div class="g2" style="margin-bottom:1rem;align-items:start">
+    <div class="card">
+      <h3 style="margin-bottom:0.25rem;">Match Predictive Analytical Simulator</h3>
+      <p style="font-size:13px; color:var(--ink2); margin-bottom:1.25rem;">Calculates prospective autonomous strength and conversions based on recorded baseline analytics profiles.</p>
+      
+      <div class="g2">
         <div class="alliance-panel red-panel">
-          <p class="sec" style="color:var(--red)">Red Alliance</p>
-          <div style="margin-bottom:10px"><label>Robot 1 — Team # <span style="color:var(--ink3);font-weight:400">(auto-fills from DB)</span></label>
-            <input id="r1" placeholder="Team #" oninput="autoFill('r1');calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 1 — Avg pins</label><input type="number" id="r1pins" min="0" max="20" value="3" oninput="calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 1 — AWP rate (%)</label><input type="number" id="r1awp" min="0" max="100" value="50" oninput="calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 1 — Avg bonuses</label><input type="number" id="r1bon" min="0" max="10" value="0" oninput="calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 1 — Consistency <span id="r1cv">3</span>/5</label>
-            <input type="range" id="r1cons" min="1" max="5" value="3" oninput="calcProb();document.getElementById('r1cv').textContent=this.value"></div>
-          <hr style="border:none;border-top:.5px solid var(--paper3);margin:12px 0">
-          <div style="margin-bottom:10px"><label>Robot 2 — Team #</label><input id="r2" placeholder="Team #" oninput="autoFill('r2');calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 2 — Avg pins</label><input type="number" id="r2pins" min="0" max="20" value="3" oninput="calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 2 — AWP rate (%)</label><input type="number" id="r2awp" min="0" max="100" value="50" oninput="calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 2 — Avg bonuses</label><input type="number" id="r2bon" min="0" max="10" value="0" oninput="calcProb()"></div>
-          <div><label>Robot 2 — Consistency <span id="r2cv">3</span>/5</label>
-            <input type="range" id="r2cons" min="1" max="5" value="3" oninput="calcProb();document.getElementById('r2cv').textContent=this.value"></div>
+          <label style="color:var(--red-text); font-weight:bold;">Red Alliance Strategy Pair</label>
+          <input type="text" id="p-r1" placeholder="Lead Team ID (e.g. 73017D)" style="margin:0.5rem 0;" oninput="runPredict()">
+          <input type="text" id="p-r2" placeholder="Support Team ID (Optional)" oninput="runPredict()">
         </div>
         <div class="alliance-panel blue-panel">
-          <p class="sec" style="color:var(--blue)">Blue Alliance</p>
-          <div style="margin-bottom:10px"><label>Robot 1 — Team #</label><input id="b1" placeholder="Team #" oninput="autoFill('b1');calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 1 — Avg pins</label><input type="number" id="b1pins" min="0" max="20" value="3" oninput="calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 1 — AWP rate (%)</label><input type="number" id="b1awp" min="0" max="100" value="50" oninput="calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 1 — Avg bonuses</label><input type="number" id="b1bon" min="0" max="10" value="0" oninput="calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 1 — Consistency <span id="b1cv">3</span>/5</label>
-            <input type="range" id="b1cons" min="1" max="5" value="3" oninput="calcProb();document.getElementById('b1cv').textContent=this.value"></div>
-          <hr style="border:none;border-top:.5px solid var(--paper3);margin:12px 0">
-          <div style="margin-bottom:10px"><label>Robot 2 — Team #</label><input id="b2" placeholder="Team #" oninput="autoFill('b2');calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 2 — Avg pins</label><input type="number" id="b2pins" min="0" max="20" value="3" oninput="calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 2 — AWP rate (%)</label><input type="number" id="b2awp" min="0" max="100" value="50" oninput="calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 2 — Avg bonuses</label><input type="number" id="b2bon" min="0" max="10" value="0" oninput="calcProb()"></div>
-          <div><label>Robot 2 — Consistency <span id="b2cv">3</span>/5</label>
-            <input type="range" id="b2cons" min="1" max="5" value="3" oninput="calcProb();document.getElementById('b2cv').textContent=this.value"></div>
+          <label style="color:var(--blue); font-weight:bold;">Blue Alliance Strategy Pair</label>
+          <input type="text" id="p-b1" placeholder="Lead Team ID (e.g. 100A)" style="margin:0.5rem 0;" oninput="runPredict()">
+          <input type="text" id="p-b2" placeholder="Support Team ID (Optional)" oninput="runPredict()">
         </div>
       </div>
+    </div>
+
+    <div id="predictResult" style="display:none;">
       <div class="card">
-        <div style="margin-bottom:1.25rem">
-          <p class="prob-title">Expected autonomous points</p>
-          <div class="win-wrap">
-            <div class="bar-red" id="ptRed" style="width:50%">—</div>
-            <div class="bar-blue" id="ptBlue" style="width:50%">—</div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--ink3)">
-            <span id="ptRL">Red</span><span id="ptBL">Blue</span>
-          </div>
+        <h4 style="font-size:14px; text-transform:uppercase; letter-spacing:0.5px;">Win Probability Projections (Autonomous Phase Control)</h4>
+        <div class="win-wrap">
+          <div id="barRed" class="bar-red" style="width:50%;">Red 50%</div>
+          <div id="barBlue" class="bar-blue" style="width:50%;">Blue 50%</div>
         </div>
-        <div style="margin-bottom:1.25rem">
-          <p class="prob-title">Alliance AWP probability (independent from points)</p>
-          <div class="win-wrap">
-            <div class="bar-green" id="awpRed" style="width:50%">—</div>
-            <div class="bar-green2" id="awpBlue" style="width:50%">—</div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--ink3)"><span>Red AWP</span><span>Blue AWP</span></div>
-          <p class="hint" style="margin-top:6px">AWP earns ranking points (WP), not match score — shown separately.</p>
+        <p id="probSummary" style="font-size:13px; text-align:center; font-family:var(--mono); color:var(--ink2);"></p>
+      </div>
+
+      <div class="g2">
+        <div class="card">
+          <h4 style="font-size:13px; margin-bottom:0.5rem;">Summed Expectations Framework</h4>
+          <div class="bk-row"><span class="dk">Red Expected Pins</span><span id="m-rPins" style="font-family:var(--mono); font-weight:bold;">—</span></div>
+          <div class="bk-row"><span class="dk">Blue Expected Pins</span><span id="m-bPins" style="font-family:var(--mono); font-weight:bold;">—</span></div>
+          <div class="bk-row"><span class="dk">Red Cumulative AWP Probability</span><span id="m-rAwp" style="font-family:var(--mono); color:var(--green)">—</span></div>
+          <div class="bk-row"><span class="dk">Blue Cumulative AWP Probability</span><span id="m-bAwp" style="font-family:var(--mono); color:var(--blue)">—</span></div>
         </div>
-        <p class="prob-title" style="margin-bottom:8px">Score breakdown</p>
-        <div id="bkTable"></div>
+        <div class="card">
+          <h4 style="font-size:13px; margin-bottom:0.5rem;">Peak Power Matrices</h4>
+          <div class="bk-row"><span class="dk">Red Peak Ceiling Limit</span><span id="m-rMax" style="font-family:var(--mono);">—</span></div>
+          <div class="bk-row"><span class="dk">Blue Peak Ceiling Limit</span><span id="m-bMax" style="font-family:var(--mono);">—</span></div>
+          <div class="bk-row"><span class="dk">Data Sample Verification Density</span><span id="m-conf" style="font-family:var(--mono); color:var(--ink3)">—</span></div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ── ROUTES (admin) ── -->
   <div id="tab-routes" class="panel">
-    <div class="page">
-      <div class="g2" style="margin-bottom:1rem">
-        <div class="card">
-          <p class="sec">Route notation</p>
-          <table>
-            <tr><td style="width:36px"><code>m</code></td><td>Mid blocks</td></tr>
-            <tr><td><code>lg</code></td><td>Long goal</td></tr>
-            <tr><td><code>l</code></td><td>Loader</td></tr>
-            <tr><td><code>mg</code></td><td>Mid goal</td></tr>
-            <tr><td><code>u</code></td><td>Undergoal</td></tr>
-            <tr><td><code>w</code></td><td>Wing touch</td></tr>
-            <tr><td><code>&gt;</code></td><td>Sequence</td></tr>
-          </table>
-        </div>
-        <div class="card">
-          <p class="sec">AWP criteria</p>
-          <div style="font-size:13px;line-height:2.1">
-            <div>✅ 7+ alliance pins (own side)</div>
-            <div>✅ 3+ goals with 2+ pins each</div>
-            <div>✅ Neither robot touching perimeter</div>
-          </div>
-          <p class="hint" style="margin-top:8px">Auto bonus: 12 pts to higher-scoring alliance (SC7). Sig criteria tighten Sep 3 2026.</p>
-        </div>
-      </div>
-      <div class="card">
-        <p class="sec">Named routes</p>
-        <div class="tw"><table>
-          <thead><tr><th>Route</th><th>Name</th><th>Notes</th></tr></thead>
-          <tbody id="routeBody"></tbody>
-        </table></div>
+    <div class="card">
+      <h3>Aggregated Routing Path Frameworks</h3>
+      <p style="font-size:13px; color:var(--ink2); margin-bottom:1rem;">Displays autonomous trajectories systematically isolated from standard logged sequences across runtime operations.</p>
+      
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Routing Configuration Model Notation</th>
+              <th>Frequency Multipliers</th>
+              <th>Avg Tracked Pin Telemetry</th>
+              <th>AWP Conversion Rates</th>
+            </tr>
+          </thead>
+          <tbody id="rtBody">
+            <tr><td colspan="4" style="text-align:center; color:var(--ink3); padding:2rem;">No routine arrays mapped.</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 
-  <!-- ── FORMULAS (admin) ── -->
-  <div id="tab-formulas" class="panel">
-    <div class="page">
-      <div class="card">
-        <p class="sec">Points calculation</p>
-        <div class="formula-box">RawPts     = (R1_avgPins + R2_avgPins) × 5 + R1_avgBonuses + R2_avgBonuses
-ConsFactor = (R1_cons + R2_cons) / 10   → range 0.2–1.0
-ExpPts     = RawPts × ConsFactor
-AutoBonus  = +12 pts to higher-scoring alliance (SC7)</div>
-        <p class="sec" style="margin-top:1rem">AWP probability</p>
-        <div class="formula-box">AWP% = (R1_awp/100) × (R2_awp/100) × ConsFactor × 100
-
-Both robots must succeed — joint probability.
-AWP earns WP (ranking pts), NOT match score.</div>
-        <p class="sec" style="margin-top:1rem">Worked example</p>
-        <div class="formula-box">Red: R1 → 4 pins, 80% AWP, cons 4/5 | R2 → 3 pins, 60% AWP, cons 3/5
-  RawPts = 7×5 = 35 | ConsFactor = 0.70 | ExpPts = 24.5
-  AWP%   = 0.80×0.60×0.70×100 = 33.6%
-
-Blue: R1 → 5 pins, 40% AWP, cons 5/5 | R2 → 5 pins, 70% AWP, cons 4/5
-  RawPts = 10×5 = 50 | ConsFactor = 0.90 | ExpPts = 45.0
-  AWP%   = 0.40×0.70×0.90×100 = 25.2%
-
-Blue wins points (45 > 24.5) → Blue gets +12 auto bonus
-Final: Red 24.5 pts, Blue 57.0 pts
-Red still more likely to achieve AWP (33.6% vs 25.2%)</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── SIG CALENDAR (admin) ── -->
   <div id="tab-calendar" class="panel">
-    <div class="page">
-
-      <!-- Add event form -->
-      <div class="card">
-        <p class="sec">Add Sig Event</p>
-        <div class="g3" style="margin-bottom:12px">
-          <div><label>Event name</label><input id="cal-name" placeholder="e.g. Mall of America Sig"></div>
-          <div><label>Start date</label><input type="date" id="cal-start"></div>
-          <div><label>End date</label><input type="date" id="cal-end"></div>
-        </div>
-        <div class="g2" style="margin-bottom:12px">
-          <div><label>Location (optional)</label><input id="cal-loc" placeholder="e.g. Minneapolis, MN"></div>
-          <div><label>Notes (optional)</label><input id="cal-notes" placeholder="e.g. Worlds qualifying event"></div>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-p" onclick="addCalEvent()">Add event</button>
-          <button class="btn" onclick="clearCalForm()">Clear</button>
-        </div>
-        <div id="cal-msg"></div>
+    <div class="card">
+      <h3>VEX V5RC Regional Event Tracker</h3>
+      <p style="font-size:13px; color:var(--ink2); margin-top:0.25rem; margin-bottom:1.25rem;">Select an event dashboard below to isolate standings updates exclusively down to that regional footprint.</p>
+      
+      <div style="margin-bottom:1.5rem; max-width:340px;">
+        <label>Quick Isolate Dropdown</label>
+        <select id="cal-filter-select" onchange="onCalSelectChange()" style="margin-top:0.35rem;"></select>
       </div>
 
-      <!-- Filter leaderboard by event period -->
-      <div class="card">
-        <p class="sec">Filter leaderboard by event period</p>
-        <p class="hint" style="margin-bottom:12px">Select a Sig event below to see the leaderboard using only entries from that time window.</p>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
-          <select id="cal-filter-select" onchange="applyCalFilter()" style="max-width:320px">
-            <option value="">— Show all entries (no filter) —</option>
-          </select>
-          <button class="btn btn-sm" onclick="clearCalFilter()">Clear filter</button>
-        </div>
-        <div id="cal-filter-status" style="font-size:13px;color:var(--ink3);font-family:var(--mono)"></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Target Venue Name</th>
+              <th>Geographic Location</th>
+              <th>Tracking Code / SKU</th>
+              <th>Telemetry Filter Trigger</th>
+            </tr>
+          </thead>
+          <tbody id="calBody"></tbody>
+        </table>
       </div>
-
-      <!-- Event list -->
-      <div class="card">
-        <p class="sec">Scheduled Sig events</p>
-        <div id="calList"><div class="empty" style="padding:1.5rem">No events added yet.</div></div>
-      </div>
-
     </div>
   </div>
 
-</div><!-- end appShell -->
+  <div id="tab-formulas" class="panel">
+    <div style="max-width:750px; margin:0 auto; display:flex; flex-direction:column; gap:1.25rem;">
+      <div class="card" style="border-left: 4px solid var(--blue); margin:0;">
+        <h3 style="margin-bottom:0.5rem;">🎯 V5RC Override Scoring Matrix</h3>
+        <p style="color:var(--ink2); font-size:14px; line-height:1.5;">
+          Scouting metrics track how effectively teams clear and plant <strong>Pins</strong> into the <strong>Goals</strong> during both the Autonomous and Driver Controlled periods.
+        </p>
+      </div>
 
-<!-- Detail overlay (shared) -->
-<div class="overlay" id="overlay" onclick="if(event.target===this)closeDetail()">
+      <div class="card" style="margin:0;">
+        <h4 style="margin-bottom:0.75rem;">Scoring Reference Table</h4>
+        <table style="width:100%; border-collapse:collapse; font-size:14px;">
+          <thead>
+            <tr style="border-bottom:2px solid var(--paper3); color:var(--ink2);">
+              <th style="padding:0.5rem 0;">Scoring Action</th>
+              <th style="padding:0.5rem 0; text-align:right;">Points</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--paper3);">
+              <td style="padding:0.75rem 0;"><strong>Pin Scored In/On Goal</strong></td>
+              <td style="padding:0.75rem 0; text-align:right; font-family:var(--mono); font-weight:bold; color:var(--green);">3 pts</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--paper3);">
+              <td style="padding:0.75rem 0;"><strong>Autonomous Bonus</strong> (Winner of 15s period)</td>
+              <td style="padding:0.75rem 0; text-align:right; font-family:var(--mono); font-weight:bold; color:var(--blue);">6 pts</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem 0;"><strong>Autonomous Win Point (AWP)</strong></td>
+              <td style="padding:0.75rem 0; text-align:right; font-family:var(--mono); font-weight:bold; color:var(--amber);">1 WP</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card" style="background:var(--amber-bg); border:1px solid #ffeeba; color:var(--amber); margin:0;">
+        <h4 style="margin-bottom:0.5rem;">🤖 Autonomous Win Point (AWP) Logic</h4>
+        <p style="font-size:13px; line-height:1.5; color:#533f03;">
+          To earn the Autonomous Win Point, an alliance must have at least <strong>7 Pins</strong> scored in their respective goals at the conclusion of the Autonomous Period.
+        </p>
+        <div style="margin-top:0.75rem; background:rgba(255,255,255,0.6); padding:0.6rem; border-radius:var(--radius); font-family:var(--mono); font-size:12px;">
+          📌 <strong>Pre-Scored State:</strong> 2 Pins are pre-arranged in the 2 Alliance Goals (2/7 Req met).<br>
+          🚀 <strong>Scouting Target:</strong> The robot must introduce and score <strong>+5 more Pins</strong> during Autonomous.
+        </div>
+      </div>
+
+      <div class="card" style="margin:0;">
+        <h4 style="margin-bottom:0.5rem;">Equation Matrices Reference Panel</h4>
+        <label>Pin String Transformation Calculation</label>
+        <div class="formula-box">pins(entry) = String components of format "G1+G2+0" or "Own+Team+SAWP" parsed as integers into a cumulative summation.</div>
+        
+        <label>Differential Analytical Engine Model</label>
+        <div class="formula-box">Differential = E[Red Alliance Pins] - E[Blue Alliance Pins]
+Base Victory Projection Chance = 0.50 + (Differential * 0.125) [Bounded inside 5% - 95%]</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="overlay" id="detailOverlay" onclick="if(event.target===this)closeDetailOverlay()">
   <div class="dcard">
-    <button class="dc-close" onclick="closeDetail()">✕</button>
-    <div id="dc"></div>
+    <button class="dc-close" onclick="closeDetailOverlay()">✕</button>
+    <div class="dc-team" id="dcTeam">—</div>
+    <div class="dc-sub" id="dcSub">—</div>
+    
+    <div class="sgrid">
+      <div class="sbox"><div class="sbox-l">Runs</div><div class="sbox-v" id="dcCount">—</div></div>
+      <div class="sbox"><div class="sbox-l">Mean Pins</div><div class="sbox-v" id="dcAvg">—</div></div>
+      <div class="sbox"><div class="sbox-l">Max Pins</div><div class="sbox-v" id="dcMax">—</div></div>
+      <div class="sbox"><div class="sbox-l">AWP Conversion</div><div class="sbox-v" id="dcAwp" style="color:var(--green)">—</div></div>
+    </div>
+
+    <div class="dr"><span class="dk">Mapped Routing Framework Modes</span><span id="dcRoutes">—</span></div>
+    <div class="dr"><span class="dk">Chronological Registry Stamp</span><span id="dcLast">—</span></div>
+    
+    <div class="mh-hd">Scouted Run History Analytics Logs</div>
+    <div style="max-height:200px; overflow-y:auto; border:1px solid var(--paper3); border-radius:var(--radius); padding:0.5rem; background:var(--paper2);">
+      <div id="dcMatchHistory"></div>
+    </div>
   </div>
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════════
-   CONFIGURATION — set your admin password and Supabase keys
-════════════════════════════════════════════════════════ */
-const SB_URL = 'https://ajymmthxmdyhkiynwhuf.supabase.co';
-const SB_KEY = 'sb_publishable_1r5xHNrNLbRHB_GcJMgsjg_fwEvgdqS';
-/* ═══════════════════════════════════════════════════════ */
+// SUPABASE LIVE SERVER ENVIRONMENT ENDPOINTS
+const SUPABASE_URL = "https://ajymmthxmdyhkiynwhuf.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_1r5xHNrNLbRHB_GcJMgsjg_fwEvgdqS";
 
-// Public read-only headers (anon key — safe to expose)
-const HDRS = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Accept': 'application/json' };
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Admin auth token — set after Supabase login, cleared on logout
-let adminToken = null;
-function adminHdrs() {
-  return {
-    'apikey': SB_KEY,
-    'Authorization': 'Bearer ' + adminToken,
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  };
-}
+// CENTRAL EVENT CALENDAR LOCAL DATA MATRIX 
+const TOURNAMENTS = [
+  { id: 'all', name: 'Global Regional Logs', loc: 'All Venues Combined', sku: 'ALL-2026' },
+  { id: 'tx_sig', name: 'Texas Premium Signature Event', loc: 'Dallas, TX', sku: 'RE-V5RC-26-0001' },
+  { id: 'ca_reg', name: 'California State Championship', loc: 'San Jose, CA', sku: 'RE-V5RC-26-0002' },
+  { id: 'mi_hi', name: 'Great Lakes High Stakes Regional', loc: 'Detroit, MI', sku: 'RE-V5RC-26-0003' },
+  { id: 'world_27', name: 'VEX Robotics World Championship 2027', loc: 'Dallas, TX', sku: 'RE-V5RC-27-0001' }
+];
 
-/* ── State ── */
 let isAdmin = false;
-let allEntries = [], allTeams = [];
-let localDb = JSON.parse(localStorage.getItem('override_scout_v3') || '[]');
+let allEntries = [];
+let allTeams = [];
+let lbFiltered = [];
+let activeCalFilter = null;
 
-/* ── Helpers ── */
-function pins(e){ return (e.pins||'0').split('+').map(n=>parseInt(n)||0).reduce((a,b)=>a+b,0); }
-function parseTotal(s){ return (s||'0').split('+').map(n=>parseInt(n)||0).reduce((a,b)=>a+b,0); }
+// VIEW CONTROL FILTRATION INDICES
+let currentLbFilter = 'all';
+let lbPg = 1;
+const lbPerPg = 10;
+let currentSortField = 'avg_pins';
+let currentSortOrder = 'desc';
 
-/* ═══════════════════════════════════════════════════════
-   AUTH
-════════════════════════════════════════════════════════ */
-function openLoginModal() {
-  document.getElementById('loginModal').classList.add('open');
-  document.getElementById('unInput').focus();
-  document.getElementById('loginErr').textContent = '';
+let logSortField = 'team';
+let logSortOrder = 'asc';
+
+document.addEventListener('DOMContentLoaded', () => {
+  setupSegmentedControls();
+  setupNavigationTabs();
+  populateDropdownOptions();
+  initSupabaseSession();
+});
+
+function setSyncStatus(state, msg) {
+  const el = document.getElementById('syncIndicator');
+  if(!el) return;
+  el.className = 'sync-indicator ' + (state === 'ok' ? 'sync-ok' : 'sync-warn');
+  el.textContent = msg;
 }
-function closeLoginModal() {
-  document.getElementById('loginModal').classList.remove('open');
-  document.getElementById('pwInput').value = '';
-  document.getElementById('unInput').value = '';
-  document.getElementById('loginErr').textContent = '';
+
+async function initSupabaseSession() {
+  setSyncStatus('ok', 'Connecting...');
+  const { data: { session } } = await _supabase.auth.getSession();
+  if (session) {
+    isAdmin = true;
+    document.body.classList.add('is-admin');
+    setSyncStatus('ok', 'Admin Terminal Online');
+  } else {
+    setSyncStatus('ok', 'Live Public Mode (Read-Only)');
+  }
+  pullData();
+}
+
+function setupNavigationTabs() {
+  document.querySelectorAll('.nav-tabs .tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.nav-tabs .tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      
+      btn.classList.add('active');
+      const target = btn.getAttribute('data-tab');
+      document.getElementById('tab-' + target).classList.add('active');
+    });
+  });
+}
+
+function setupSegmentedControls() {
+  document.querySelectorAll('.toggle-group').forEach(group => {
+    group.querySelectorAll('.toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+  });
+}
+
+function populateDropdownOptions() {
+  const selectBox = document.getElementById('f-event-select');
+  const calSelect = document.getElementById('cal-filter-select');
+  if(!selectBox || !calSelect) return;
+
+  selectBox.innerHTML = '';
+  calSelect.innerHTML = '<option value="">-- No Calendar Filter Active --</option>';
+
+  TOURNAMENTS.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t.name;
+    opt.textContent = t.name;
+    selectBox.appendChild(opt);
+
+    if (t.id !== 'all') {
+      const cOpt = document.createElement('option');
+      cOpt.value = t.id;
+      cOpt.textContent = t.name;
+      calSelect.appendChild(cOpt);
+    }
+  });
+}
+
+function handleAutoModeChange() {
+  const mode = document.getElementById('f-auto-mode').value;
+  const normalBox = document.getElementById('meta-container-normal');
+  const sawpBox = document.getElementById('meta-container-sawp');
+
+  if(mode === 'Normal') {
+    normalBox.style.display = 'grid';
+    sawpBox.style.display = 'none';
+  } else {
+    normalBox.style.display = 'none';
+    sawpBox.style.display = 'grid';
+  }
+}
+
+function toggleModal(show) {
+  document.getElementById('loginModal').classList.toggle('active', show);
 }
 
 async function tryLogin() {
   const email = document.getElementById('unInput').value.trim();
-  const pw    = document.getElementById('pwInput').value;
-  const errEl = document.getElementById('loginErr');
-  const btn   = document.querySelector('.btn-login');
-
-  if(!email || !pw) { errEl.textContent = 'Enter your email and password.'; return; }
-
-  errEl.textContent = 'Signing in…';
-  errEl.style.color = 'var(--ink3)';
-  btn.disabled = true;
-
-  try {
-    // Supabase Auth REST endpoint — no client library needed
-    const res = await fetch(SB_URL + '/auth/v1/token?grant_type=password', {
-      method: 'POST',
-      headers: {
-        'apikey': SB_KEY,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email, password: pw })
-    });
-    const data = await res.json();
-
-    if(!res.ok || data.error) {
-      errEl.textContent = 'Invalid email or password.';
-      errEl.style.color = 'var(--red)';
-      document.getElementById('pwInput').value = '';
-      document.getElementById('pwInput').focus();
-      btn.disabled = false;
-      return;
-    }
-
-    // Supabase returned a valid JWT — store it for authenticated requests
-    adminToken = data.access_token;
-    sessionStorage.setItem('sb_token', adminToken);
-    sessionStorage.setItem('sb_token_exp', Date.now() + (data.expires_in * 1000));
-
+  const password = document.getElementById('pwInput').value;
+  const loginErr = document.getElementById('loginErr');
+  loginErr.textContent = "Verifying Credentials...";
+  
+  const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    loginErr.textContent = "Invalid entry signature nodes match.";
+  } else {
     isAdmin = true;
-    errEl.textContent = '';
-    btn.disabled = false;
-    closeLoginModal();
-
-    // Reveal admin tabs
-    document.querySelectorAll('.admin-only').forEach(el => el.classList.add('admin-visible'));
-    document.getElementById('modeBadge').textContent = 'Admin';
-    document.getElementById('modeBadge').className = 'mode-badge mode-admin';
-    document.getElementById('logoutBtn').style.display = '';
-    document.getElementById('adminLoginBtn').style.display = 'none';
-    renderLog();
-
-  } catch(e) {
-    errEl.textContent = 'Network error — check your connection.';
-    errEl.style.color = 'var(--red)';
-    btn.disabled = false;
-    console.error('Login error:', e);
+    loginErr.textContent = "";
+    toggleModal(false);
+    document.body.classList.add('is-admin');
+    setSyncStatus('ok', 'Admin Terminal Online');
+    computeStandings();
   }
 }
 
 async function logout() {
-  // Sign out from Supabase (invalidates the JWT server-side)
-  if(adminToken) {
-    try {
-      await fetch(SB_URL + '/auth/v1/logout', {
-        method: 'POST',
-        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + adminToken }
-      });
-    } catch(e) { /* best effort */ }
-  }
-  adminToken = null;
+  await _supabase.auth.signOut();
   isAdmin = false;
-  sessionStorage.removeItem('sb_token');
-  sessionStorage.removeItem('sb_token_exp');
-  document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('admin-visible'));
-  document.getElementById('modeBadge').textContent = 'Viewer';
-  document.getElementById('modeBadge').className = 'mode-badge mode-pub';
-  document.getElementById('logoutBtn').style.display = 'none';
-  document.getElementById('adminLoginBtn').style.display = '';
-  // Switch back to search tab
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.querySelector('[data-tab="search"]').classList.add('active');
-  document.getElementById('tab-search').classList.add('active');
+  document.body.classList.remove('is-admin');
+  setSyncStatus('ok', 'Disconnected safely');
+  computeStandings();
 }
 
-function launchApp(admin) {
-  document.getElementById('appShell').style.display = 'block';
-  // Admin tabs hidden by default for viewers
-  document.querySelectorAll('.admin-only').forEach(el => {
-    if(admin) el.classList.add('admin-visible');
-    else el.classList.remove('admin-visible');
-  });
-  document.getElementById('modeBadge').textContent = admin ? 'Admin' : 'Viewer';
-  document.getElementById('modeBadge').className = 'mode-badge ' + (admin ? 'mode-admin' : 'mode-pub');
-  document.getElementById('logoutBtn').style.display = admin ? '' : 'none';
-  document.getElementById('adminLoginBtn').style.display = admin ? 'none' : '';
-  loadData();
+// DATA MATH EXTRACTION UTILITIES
+function parsePins(str) {
+  if(!str) return 0;
+  const parts = str.split('+');
+  return (parseInt(parts[0], 10) || 0) + (parseInt(parts[1], 10) || 0);
 }
 
-/* ═══════════════════════════════════════════════════════
-   DATA LOADING
-════════════════════════════════════════════════════════ */
-async function loadData() {
-  setSyncStatus('syncing', 'Loading…');
-  try {
-    let rows = [], off = 0, batch;
-    do {
-      const r = await fetch(SB_URL+'/rest/v1/entries?select=*&order=created_at.desc&limit=1000&offset='+off, {headers:HDRS});
-      if(!r.ok) throw new Error('HTTP '+r.status+': '+(await r.text()).slice(0,120));
-      batch = await r.json();
-      rows = rows.concat(batch);
-      off += 1000;
-    } while(batch.length === 1000);
+function getActiveVal(groupId) {
+  const activeBtn = document.querySelector(`#${groupId} .toggle-btn.active`);
+  return activeBtn ? activeBtn.getAttribute('data-val') : '';
+}
 
-    allEntries = rows;
-    allTeams   = buildStats(rows);
+async function submitEntry() {
+  const teamInput = document.getElementById('f-team').value.trim().toUpperCase();
+  if(!teamInput) return alert("Please specify a valid Robot Team Identity Code.");
 
-    // Merge any local entries not yet in Supabase
-    if(isAdmin) {
-      localDb.forEach(le => {
-        if(!allEntries.find(e => String(e.id) === String(le.id))) allEntries.unshift(le);
-      });
-      allTeams = buildStats(allEntries);
-    }
+  setSyncStatus('warn', 'Syncing record matrix block...');
+  
+  const mode = document.getElementById('f-auto-mode').value;
+  let pinsString = "";
+  if(mode === 'Normal') {
+    pinsString = `${document.getElementById('f-pin-g1').value}+${document.getElementById('f-pin-g2').value}+0`;
+  } else {
+    pinsString = `${document.getElementById('f-pin-own').value}+${document.getElementById('f-pin-team').value}+SAWP`;
+  }
 
-    setSyncStatus('ok', allTeams.length + ' teams · ' + allEntries.length + ' entries');
+  const row = {
+    id: Date.now(),
+    team: teamInput,
+    event: document.getElementById('f-event-select').value || 'Global Regional Logs',
+    round: document.getElementById('f-round').value.trim() || 'N/A',
+    side: getActiveVal('f-side-group'),
+    sig: getActiveVal('f-sig-group'),
+    type: 'Claw Bot',
+    route: mode,
+    pins: pinsString,
+    awp: getActiveVal('f-awp-group'),
+    notes: document.getElementById('f-notes').value.trim(),
+    ts: new Date().toISOString()
+  };
 
-    // Update summary cards
-    const totP = allEntries.reduce((s,e)=>s+pins(e),0);
-    const avgP = allEntries.length ? (totP/allEntries.length).toFixed(1) : '—';
-    const awpR = allEntries.length ? Math.round(allEntries.filter(e=>e.awp==='Y').length/allEntries.length*100) : 0;
-    document.getElementById('lbT').textContent = allTeams.length;
-    document.getElementById('lbE').textContent = allEntries.length;
-    document.getElementById('lbP').textContent = avgP;
-    document.getElementById('lbA').textContent = awpR + '%';
-    document.getElementById('lbCards').style.display = 'grid';
-
-    // Render
-    lbApplyFilter(lbActiveF);
-    pubRenderAll();
-    if(isAdmin) { renderLog(); renderRoutes(); }
-  } catch(err) {
-    setSyncStatus('err', 'Connection failed');
-    console.error(err);
-    document.getElementById('pubResult').innerHTML = `<div class="empty" style="color:var(--red-text)">Could not load database: ${err.message}</div>`;
+  const { error } = await _supabase.from('entries').insert([row]);
+  if(error) {
+    alert("Database sync fault: " + error.message);
+    setSyncStatus('warn', 'Database push failed.');
+  } else {
+    document.getElementById('f-team').value = '';
+    document.getElementById('f-round').value = '';
+    document.getElementById('f-notes').value = '';
+    setSyncStatus('ok', 'Data logs successfully synced online.');
+    pullData();
   }
 }
 
-function setSyncStatus(s, t) {
-  document.getElementById('syncDot').className = 'sync-dot' + (s==='ok'?' ok':s==='err'?' err':'');
-  document.getElementById('syncTxt').textContent = t;
+async function pullData() {
+  const { data, error } = await _supabase.from('entries').select('*');
+  if(error) return setSyncStatus('warn', 'Failed online telemetry synchronization.');
+  allEntries = data || [];
+  computeStandings();
 }
 
-/* ── Build team stats ── */
-function buildStats(entries) {
-  const m = {};
-  entries.forEach(e => {
-    const k = (e.team||'').toUpperCase().trim(); if(!k) return;
-    if(!m[k]) m[k] = {team:k,rows:[],routes:new Set(),types:new Set(),last:''};
-    m[k].rows.push(e);
-    if(e.route && e.route !== 'Unknown route') m[k].routes.add(e.route);
-    if(e.type) m[k].types.add(e.type);
-    if((e.created_at||'') > m[k].last) m[k].last = e.created_at||'';
+function computeStandings() {
+  let targets = [...allEntries];
+  if(activeCalFilter) {
+    targets = targets.filter(e => e.event === activeCalFilter);
+  }
+
+  const map = {};
+  targets.forEach(e => {
+    if(!map[e.team]) map[e.team] = { team: e.team, runs: [] };
+    map[e.team].runs.push(e);
   });
-  return Object.values(m).map(g => {
-    const rows=g.rows, n=rows.length;
-    const totPins=rows.reduce((s,e)=>s+pins(e),0);
-    const totBon=rows.reduce((s,e)=>s+(parseInt(e.bonuses)||0),0);
-    const awpN=rows.filter(e=>e.awp==='Y').length;
-    const sigN=rows.filter(e=>e.sig==='yes').length;
+
+  allTeams = Object.values(map).map(t => {
+    const total = t.runs.reduce((sum, e) => sum + parsePins(e.pins), 0);
+    const max = t.runs.reduce((peak, e) => Math.max(peak, parsePins(e.pins)), 0);
+    const awpCount = t.runs.filter(e => e.awp === 'Y').length;
+
     return {
-      team:g.team, count:n,
-      avg_pins:n?(totPins/n).toFixed(2):0,
-      avg_bonuses:n?(totBon/n).toFixed(2):0,
-      awp_pct:n?(awpN/n*100).toFixed(1):0,
-      awp_count:awpN, sig_count:sigN,
-      routes:[...g.routes].join(' · ')||'—',
-      types:[...g.types].join(', ')||'—',
-      last:g.last, matches:rows
+      team: t.team,
+      count: t.runs.length,
+      avg_pins: t.runs.length ? parseFloat((total / t.runs.length).toFixed(1)) : 0,
+      max_pins: max,
+      awp_rate: t.runs.length ? Math.round((awpCount / t.runs.length) * 100) : 0,
+      isSig: t.runs.some(e => e.sig === 'yes')
     };
   });
+
+  // Calculate top quick tracking overview card blocks counters
+  const totalGlobalPins = targets.reduce((s, e) => s + parsePins(e.pins), 0);
+  document.getElementById('lbT').textContent = allTeams.length;
+  document.getElementById('lbE').textContent = targets.length;
+  document.getElementById('lbP').textContent = targets.length ? (totalGlobalPins / targets.length).toFixed(1) : '—';
+  document.getElementById('lbA').textContent = targets.length ? Math.round(targets.filter(e=>e.awp==='Y').length / targets.length * 100) + '%' : '—';
+
+  handleLbSearch();
 }
 
-/* ═══════════════════════════════════════════════════════
-   PUBLIC SEARCH TAB
-════════════════════════════════════════════════════════ */
-function pubRenderAll() {
-  if(!allTeams.length) {
-    document.getElementById('pubResult').innerHTML = '<div class="empty">No teams in database yet.</div>';
-    return;
+function lbFilter(filterMode, element) {
+  if (element) {
+    element.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+    element.classList.add('on');
   }
-  document.getElementById('pubResult').innerHTML = '<div class="empty" style="color:var(--ink3)">Type a team number above and press Search.<br><br>Or switch to the <strong>Leaderboard</strong> tab to browse all teams.</div>';
-}
-
-function pubDoSearch() {
-  const q = document.getElementById('pubSearch').value.trim().toUpperCase();
-  if(!q) { pubRenderAll(); return; }
-  const res = allTeams.filter(t => t.team.includes(q));
-  if(!res.length) {
-    document.getElementById('pubResult').innerHTML = `<div class="empty">No data found for "${q}".<br>Check the team number and try again.</div>`;
-    return;
-  }
-  if(res.length === 1) { openDetail(res[0]); return; }
-  // Multiple matches — show mini table
-  document.getElementById('pubResult').innerHTML = `
-    <div class="card">
-      <p class="sec">${res.length} teams matching "${q}"</p>
-      <div class="tw"><table>
-        <thead><tr><th>Team</th><th>Matches</th><th>Avg Pins</th><th>AWP Rate</th><th>Robot Type</th></tr></thead>
-        <tbody>
-          ${res.map(t=>`<tr onclick='openDetail(${JSON.stringify(JSON.stringify(t))})'>
-            <td><span class="tn">${t.team}</span></td>
-            <td style="font-family:var(--mono)">${t.count}</td>
-            <td style="font-family:var(--mono);font-weight:600">${parseFloat(t.avg_pins).toFixed(1)}</td>
-            <td style="font-family:var(--mono)">${parseFloat(t.awp_pct).toFixed(0)}%</td>
-            <td style="font-size:12px;color:var(--ink2)">${t.types}</td>
-          </tr>`).join('')}
-        </tbody>
-      </table></div>
-    </div>`;
-}
-
-/* ═══════════════════════════════════════════════════════
-   LEADERBOARD TAB
-════════════════════════════════════════════════════════ */
-const LB_PG = 25;
-let lbFiltered = [], lbPg = 1, lbSortC = 'avg_pins', lbSortD = -1, lbActiveF = 'all';
-
-function lbFilter(f, el) {
-  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on'); lbActiveF=f; lbPg=1; lbApplyFilter(f);
-}
-function lbApplyFilter(f) {
-  if(f==='all') lbFiltered=[...allTeams];
-  else if(f==='sig') lbFiltered=allTeams.filter(t=>t.sig_count>0);
-  else if(f==='awp') lbFiltered=allTeams.filter(t=>t.awp_count>0);
-  else if(f==='top') lbFiltered=[...allTeams].sort((a,b)=>b.avg_pins-a.avg_pins);
-  lbSortRender();
-}
-function lbSortBy(col) {
-  if(lbSortC===col) lbSortD*=-1; else{lbSortC=col;lbSortD=-1;}
-  document.querySelectorAll('th.sorted').forEach(e=>e.classList.remove('sorted'));
-  document.getElementById('lbth-'+col)?.classList.add('sorted');
-  lbSortRender();
-}
-function lbSortRender() {
-  lbFiltered.sort((a,b)=>{
-    const d=(parseFloat(b[lbSortC])||0)-(parseFloat(a[lbSortC])||0);
-    return d*lbSortD || a.team.localeCompare(b.team);
-  });
-  lbRender();
-}
-function lbRender() {
-  const start=(lbPg-1)*LB_PG, sl=lbFiltered.slice(start,start+LB_PG), tot=lbFiltered.length, pages=Math.ceil(tot/LB_PG);
-  if(!sl.length){ document.getElementById('lbMain').innerHTML='<div class="empty">No teams match this filter.</div>'; return; }
-  document.getElementById('lbMain').innerHTML=`
-    <div style="border:1.5px solid var(--ink);border-radius:var(--radius-lg);overflow:hidden">
-    <div class="tw"><table>
-      <thead><tr>
-        <th style="width:24px;font-family:var(--mono);font-size:11px;color:var(--ink3)">#</th>
-        <th onclick="lbSortBy('team')" id="lbth-team">Team</th>
-        <th onclick="lbSortBy('count')" id="lbth-count">Matches</th>
-        <th onclick="lbSortBy('avg_pins')" id="lbth-avg_pins" class="sorted">Avg Pins ↕</th>
-        <th onclick="lbSortBy('avg_bonuses')" id="lbth-avg_bonuses">Avg Bonus</th>
-        <th onclick="lbSortBy('awp_pct')" id="lbth-awp_pct">AWP Rate</th>
-        <th onclick="lbSortBy('sig_count')" id="lbth-sig_count">Sig</th>
-        <th>Robot Type</th>
-      </tr></thead><tbody>
-      ${sl.map((t,i)=>`<tr onclick='openDetail(${JSON.stringify(JSON.stringify(t))})'>
-        <td style="font-family:var(--mono);font-size:11px;color:var(--ink3)">${start+i+1}</td>
-        <td><span class="tn">${t.team}</span></td>
-        <td style="font-family:var(--mono)">${t.count}</td>
-        <td style="font-family:var(--mono);font-weight:600">${parseFloat(t.avg_pins).toFixed(1)}</td>
-        <td style="font-family:var(--mono)">${parseFloat(t.avg_bonuses).toFixed(1)}</td>
-        <td><div style="display:flex;align-items:center;gap:6px">
-          <span style="font-family:var(--mono);min-width:34px">${parseFloat(t.awp_pct).toFixed(0)}%</span>
-          <div class="awp-wrap"><div class="awp-fill" style="width:${Math.min(parseFloat(t.awp_pct),100)}%"></div></div>
-        </div></td>
-        <td>${t.sig_count>0?'<span class="badge b-sig">'+t.sig_count+'</span>':'<span class="badge b-no">—</span>'}</td>
-        <td style="font-size:12px;color:var(--ink2)">${t.types}</td>
-      </tr>`).join('')}
-      </tbody></table></div></div>`;
-  const pg=document.getElementById('lbPager');
-  if(pages>1){
-    pg.style.display='flex';
-    document.getElementById('lbPi').textContent=`Page ${lbPg} of ${pages} (${tot} teams)`;
-    document.getElementById('lbPrev').disabled=lbPg===1;
-    document.getElementById('lbNext').disabled=lbPg===pages;
-  } else pg.style.display='none';
-}
-function lbPage(d){ lbPg+=d; lbRender(); window.scrollTo(0,0); }
-
-/* ═══════════════════════════════════════════════════════
-   DETAIL OVERLAY (shared)
-════════════════════════════════════════════════════════ */
-function openDetail(t) {
-  if(typeof t==='string') t=JSON.parse(t);
-  const awpPct=parseFloat(t.awp_pct||0);
-  const routes=(t.routes||'—').split(' · ').map(r=>`<code>${r}</code>`).join(' ');
-  document.getElementById('dc').innerHTML=`
-    <div class="dc-team">${t.team}</div>
-    <div class="dc-sub">${t.types} · ${t.count} match${t.count!==1?'es':''} scouted</div>
-    <div class="sgrid">
-      <div class="sbox"><div class="sbox-l">Matches</div><div class="sbox-v">${t.count}</div></div>
-      <div class="sbox"><div class="sbox-l">Avg Pins</div><div class="sbox-v">${parseFloat(t.avg_pins).toFixed(1)}</div></div>
-      <div class="sbox"><div class="sbox-l">AWP Rate</div><div class="sbox-v">${awpPct.toFixed(0)}%</div></div>
-      <div class="sbox"><div class="sbox-l">Sig Matches</div><div class="sbox-v">${t.sig_count}</div></div>
-    </div>
-    <div class="dr"><span class="dk">AWP achieved</span><span class="dv">${t.awp_count} / ${t.count}</span></div>
-    <div class="dr"><span class="dk">Avg bonuses/match</span><span class="dv">${parseFloat(t.avg_bonuses).toFixed(1)}</span></div>
-    <div class="dr"><span class="dk">Known routes</span><span class="dv">${routes}</span></div>
-    <div class="dr"><span class="dk">Robot types</span><span class="dv">${t.types}</span></div>
-    <div class="dr"><span class="dk">Last scouted</span><span class="dv">${t.last?new Date(t.last).toLocaleDateString():'—'}</span></div>
-    ${t.matches&&t.matches.length?`
-    <div class="mh-hd">Match history (${t.matches.length})</div>
-    ${t.matches.slice(0,20).map(e=>`
-      <div class="mh-row">
-        <span style="font-size:11px;color:var(--ink2)">${e.event||'—'}</span>
-        <span style="font-family:var(--mono);font-size:11px">${e.round||'—'}</span>
-        <span style="font-family:var(--mono);font-size:12px">${e.pins||'0'} pins</span>
-        <span><span class="badge ${e.awp==='Y'?'b-awp':'b-no'}">${e.awp||'N'}</span></span>
-        <span style="font-family:var(--mono);font-size:11px;color:var(--ink3)">${e.side||''}</span>
-      </div>`).join('')}
-    ${t.matches.length>20?`<div style="font-size:11px;color:var(--ink3);padding-top:6px;font-family:var(--mono)">+${t.matches.length-20} more</div>`:''}
-    `:''}`;
-  document.getElementById('overlay').classList.add('open');
-  document.body.style.overflow='hidden';
-}
-function closeDetail() {
-  document.getElementById('overlay').classList.remove('open');
-  document.body.style.overflow='';
-}
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeDetail(); });
-
-/* ═══════════════════════════════════════════════════════
-   ADMIN — ADD ENTRY
-════════════════════════════════════════════════════════ */
-async function addEntry() {
-  if(!isAdmin) return;
-  const team = document.getElementById('f-team').value.trim();
-  if(!team){ showMsg('add-msg','Team # required','err'); return; }
-  const entry = {
-    id: Date.now(),
-    team, event:document.getElementById('f-event').value.trim(),
-    round:document.getElementById('f-round').value.trim(),
-    side:document.getElementById('f-side').value,
-    sig:document.getElementById('f-sig').value,
-    type:document.getElementById('f-type').value,
-    route:document.getElementById('f-route').value.trim()||'Unknown route',
-    pins:document.getElementById('f-pins').value.trim()||'0',
-    maxpins:document.getElementById('f-maxpins').value.trim(),
-    bonuses:parseInt(document.getElementById('f-bonuses').value)||0,
-    awp:document.getElementById('f-awp').value,
-    notes:document.getElementById('f-notes').value.trim(),
-    ts:new Date().toLocaleDateString()
-  };
-  localDb.unshift(entry);
-  try{ localStorage.setItem('override_scout_v3', JSON.stringify(localDb)); }catch(e){}
-  clearForm();
-  showMsg('add-msg','Saved locally! Pushing to Supabase…','ok');
-  // Push to Supabase
-  try {
-    const r = await fetch(SB_URL+'/rest/v1/entries', {
-      method:'POST',
-      headers:{...adminHdrs(),'Prefer':'return=minimal'},
-      body:JSON.stringify(entry)
-    });
-    if(r.ok){
-      showMsg('add-msg','✓ Entry saved for '+team+' and synced to database.','ok');
-      allEntries.unshift(entry);
-      allTeams = buildStats(allEntries);
-      setSyncStatus('ok', allTeams.length+' teams · '+allEntries.length+' entries');
-      renderLog(); lbApplyFilter(lbActiveF);
-    } else {
-      showMsg('add-msg','Saved locally but Supabase push failed ('+r.status+')','err');
-    }
-  } catch(e) {
-    showMsg('add-msg','Saved locally but could not reach Supabase.','err');
-  }
-}
-
-function clearForm() {
-  ['f-team','f-event','f-round','f-pins','f-maxpins','f-notes'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('f-bonuses').value=0;
-  document.getElementById('f-awp').value='N';
-}
-
-function showMsg(id, txt, type) {
-  const el=document.getElementById(id);
-  el.textContent=txt; el.className=type==='ok'?'msg-ok':'msg-err';
-  setTimeout(()=>el.textContent='',3000);
-}
-
-/* ═══════════════════════════════════════════════════════
-   ADMIN — SCOUT LOG
-════════════════════════════════════════════════════════ */
-function renderLog() {
-  const q=(document.getElementById('logQ')?.value||'').toLowerCase();
-  const fil=document.getElementById('logFil')?.value||'';
-  const rows=allEntries.filter(e=>{
-    if(q&&!JSON.stringify(e).toLowerCase().includes(q)) return false;
-    if(fil==='sig'&&e.sig!=='yes') return false;
-    if(fil==='awp'&&e.awp!=='Y') return false;
-    return true;
-  });
-  const teams=new Set(allEntries.map(e=>e.team)).size;
-  const awps=allEntries.filter(e=>e.awp==='Y').length;
-  const avg=allEntries.length?(allEntries.reduce((s,e)=>s+pins(e),0)/allEntries.length).toFixed(1):'—';
-  document.getElementById('logCards').innerHTML=`
-    <div class="mc"><div class="mc-l">Entries</div><div class="mc-v">${allEntries.length}</div></div>
-    <div class="mc"><div class="mc-l">Teams</div><div class="mc-v">${teams}</div></div>
-    <div class="mc"><div class="mc-l">Avg pins</div><div class="mc-v">${avg}</div></div>
-    <div class="mc"><div class="mc-l">AWP achieved</div><div class="mc-v">${awps}</div></div>`;
-  if(!rows.length){ document.getElementById('logBody').innerHTML=`<tr><td colspan="11" class="empty">No entries yet.</td></tr>`; return; }
-  document.getElementById('logBody').innerHTML=rows.map(e=>`<tr>
-    <td><strong>${e.team}</strong></td>
-    <td>${e.event||'—'} ${e.sig==='yes'?'<span class="badge b-sig">Sig</span>':''}</td>
-    <td>${e.round||'—'}</td><td>${e.side||'—'}</td><td>${e.type||'—'}</td>
-    <td><code>${e.route||'—'}</code></td>
-    <td>${e.pins||'0'}${e.maxpins?' / '+e.maxpins:''}</td>
-    <td>${e.bonuses||0}</td>
-    <td><span class="badge ${e.awp==='Y'?'b-awp':e.awp==='?'?'b-q':'b-no'}">${e.awp||'N'}</span></td>
-    <td style="max-width:160px;font-size:12px;color:var(--ink2)">${e.notes||''}</td>
-    <td><button class="btn btn-sm btn-d" onclick="deleteEntry('${e.id}')">✕</button></td>
-  </tr>`).join('');
-}
-
-async function deleteEntry(id) {
-  if(!isAdmin) return;
-  if(!confirm('Delete this entry?')) return;
-  // Remove from Supabase
-  try {
-    await fetch(SB_URL+'/rest/v1/entries?id=eq.'+id, {
-      method:'DELETE', headers: adminHdrs()
-    });
-  } catch(e){ console.error(e); }
-  // Remove locally
-  allEntries = allEntries.filter(e=>String(e.id)!==String(id));
-  localDb    = localDb.filter(e=>String(e.id)!==String(id));
-  try{ localStorage.setItem('override_scout_v3', JSON.stringify(localDb)); }catch(e){}
-  allTeams = buildStats(allEntries);
-  renderLog(); lbApplyFilter(lbActiveF);
-  setSyncStatus('ok', allTeams.length+' teams · '+allEntries.length+' entries');
-}
-
-function exportCSV() {
-  const hdr='Team,Event,Round,Side,Sig,RobotType,Route,Pins,MaxPins,Bonuses,AWP,Notes,Date';
-  const rows=allEntries.map(e=>[e.team,e.event,e.round,e.side,e.sig,e.type,e.route,e.pins,e.maxpins||'',e.bonuses,e.awp,'"'+(e.notes||'').replace(/"/g,"'")+'"',e.ts||e.created_at||''].join(','));
-  const blob=new Blob([hdr+'\n'+rows.join('\n')],{type:'text/csv'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='override_scout_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
-}
-
-function importClick(){ document.getElementById('importFile').click(); }
-function importCSV(ev) {
-  const file=ev.target.files[0]; if(!file) return;
-  const reader=new FileReader();
-  reader.onload=async e=>{
-    const lines=e.target.result.split('\n').slice(1).filter(l=>l.trim());
-    let added=0;
-    for(const line of lines){
-      const c=line.split(',');
-      if(!c[0]) continue;
-      const entry={id:Date.now()+Math.random(),team:c[0],event:c[1]||'',round:c[2]||'',side:c[3]||'L',sig:c[4]||'no',type:c[5]||'',route:c[6]||'Unknown route',pins:c[7]||'0',maxpins:c[8]||'',bonuses:parseInt(c[9])||0,awp:c[10]||'N',notes:(c[11]||'').replace(/^"|"$/g,''),ts:c[12]||''};
-      try{ await fetch(SB_URL+'/rest/v1/entries',{method:'POST',headers:{...adminHdrs(),'Prefer':'return=minimal'},body:JSON.stringify(entry)}); }catch(e){}
-      allEntries.unshift(entry); added++;
-    }
-    allTeams=buildStats(allEntries);
-    renderLog(); lbApplyFilter(lbActiveF);
-    alert('Imported '+added+' entries.');
-  };
-  reader.readAsText(file); ev.target.value='';
-}
-
-/* ═══════════════════════════════════════════════════════
-   ADMIN — WIN PROBABILITY
-════════════════════════════════════════════════════════ */
-function autoFill(id) {
-  const team=document.getElementById(id).value.trim().toUpperCase();
-  if(!team) return;
-  const ms=allEntries.filter(e=>(e.team||'').toUpperCase()===team);
-  if(!ms.length) return;
-  const avgPins=Math.round(ms.reduce((s,e)=>s+pins(e),0)/ms.length);
-  const awpRate=Math.round(ms.filter(e=>e.awp==='Y').length/ms.length*100);
-  const avgBon=Math.round(ms.reduce((s,e)=>s+(parseInt(e.bonuses)||0),0)/ms.length);
-  const pm={r1:'r1pins',r2:'r2pins',b1:'b1pins',b2:'b2pins'};
-  const am={r1:'r1awp',r2:'r2awp',b1:'b1awp',b2:'b2awp'};
-  const bm={r1:'r1bon',r2:'r2bon',b1:'b1bon',b2:'b2bon'};
-  if(pm[id]) document.getElementById(pm[id]).value=avgPins;
-  if(am[id]) document.getElementById(am[id]).value=awpRate;
-  if(bm[id]) document.getElementById(bm[id]).value=avgBon;
-  calcProb();
-}
-
-function calcProb() {
-  const n=id=>parseFloat(document.getElementById(id)?.value)||0;
-  const rPins=n('r1pins')+n('r2pins'), bPins=n('b1pins')+n('b2pins');
-  const rBon=n('r1bon')+n('r2bon'),   bBon=n('b1bon')+n('b2bon');
-  const rCons=(n('r1cons')+n('r2cons'))/10, bCons=(n('b1cons')+n('b2cons'))/10;
-  const rRaw=rPins*5+rBon, bRaw=bPins*5+bBon;
-  const rExp=+(rRaw*rCons).toFixed(1), bExp=+(bRaw*bCons).toFixed(1);
-  let rFin=rExp, bFin=bExp;
-  if(rExp>bExp) rFin+=12; else if(bExp>rExp) bFin+=12; else{rFin+=6;bFin+=6;}
-  const tot=rFin+bFin||1;
-  const rP=Math.round(rFin/tot*100), bP=100-rP;
-  document.getElementById('ptRed').style.width=rP+'%'; document.getElementById('ptRed').textContent=rP+'%';
-  document.getElementById('ptBlue').style.width=bP+'%'; document.getElementById('ptBlue').textContent=bP+'%';
-  document.getElementById('ptRL').textContent='Red ~'+rFin.toFixed(1)+' pts';
-  document.getElementById('ptBL').textContent='Blue ~'+bFin.toFixed(1)+' pts';
-  const r1a=n('r1awp')/100,r2a=n('r2awp')/100,b1a=n('b1awp')/100,b2a=n('b2awp')/100;
-  const rA=+(r1a*r2a*rCons*100).toFixed(1), bA=+(b1a*b2a*bCons*100).toFixed(1);
-  const aT=rA+bA||1;
-  const rAB=Math.round(rA/aT*100), bAB=100-rAB;
-  document.getElementById('awpRed').style.width=rAB+'%'; document.getElementById('awpRed').textContent=rA.toFixed(0)+'%';
-  document.getElementById('awpBlue').style.width=bAB+'%'; document.getElementById('awpBlue').textContent=bA.toFixed(0)+'%';
-  document.getElementById('bkTable').innerHTML=`<table>
-    <thead><tr><th>Factor</th><th style="color:var(--red)">Red</th><th style="color:var(--blue)">Blue</th></tr></thead>
-    <tbody>
-      <tr><td>Avg pins placed</td><td>${rPins}</td><td>${bPins}</td></tr>
-      <tr><td>Pin points (×5)</td><td>${rPins*5}</td><td>${bPins*5}</td></tr>
-      <tr><td>Avg bonuses</td><td>${rBon}</td><td>${bBon}</td></tr>
-      <tr><td>Raw auto pts</td><td>${rRaw}</td><td>${bRaw}</td></tr>
-      <tr><td>Consistency factor</td><td>${rCons.toFixed(2)}</td><td>${bCons.toFixed(2)}</td></tr>
-      <tr><td>Expected pts</td><td><strong>${rExp}</strong></td><td><strong>${bExp}</strong></td></tr>
-      <tr><td>+ Auto bonus</td><td>${rFin-rExp>0?'+12':'—'}</td><td>${bFin-bExp>0?'+12':'—'}</td></tr>
-      <tr><td><strong>Final expected pts</strong></td><td><strong>${rFin.toFixed(1)}</strong></td><td><strong>${bFin.toFixed(1)}</strong></td></tr>
-      <tr><td>R1 AWP rate</td><td>${n('r1awp')}%</td><td>${n('b1awp')}%</td></tr>
-      <tr><td>R2 AWP rate</td><td>${n('r2awp')}%</td><td>${n('b2awp')}%</td></tr>
-      <tr><td><strong>Alliance AWP prob.</strong></td><td><strong>${rA.toFixed(1)}%</strong></td><td><strong>${bA.toFixed(1)}%</strong></td></tr>
-    </tbody></table>`;
-}
-
-/* ═══════════════════════════════════════════════════════
-   ROUTES
-════════════════════════════════════════════════════════ */
-const ROUTES=[
-  ['l>lg>m>mg>lg>w','psi','Full scoring — loader, long goal, mid, mid goal, second lg + wing'],
-  ['m>lg>w','twi','Simple: mid + long goal + wing'],
-  ['m>l>lg>mg>lg>w','zeta+','Aggressive: mid, loader, long goal, mid goal, second lg + wing'],
-  ['m>l>lg>w','zeta','Classic: mid + loader + long goal + wing'],
-  ['m>u>lg>w','rho','Undergoal: mid, undergoal, long goal + wing'],
-  ['m>u>lg>l>mg>w','cocktail','5-stop: mid, undergoal, long goal, loader, mid goal + wing'],
-  ['l>lg>m>mg','psi (-w)','Psi without wing'],['m>lg','twi (-w)','Minimal'],
-  ['m>l>lg>mg','zeta+ (-w)','Zeta+ without wing'],['m>l>lg','zeta (-w)','Zeta without wing'],
-  ['m>u>lg','rho (-w)','Rho without wing'],['m>u>lg>l>mg','cocktail (-w)','Cocktail without wing'],
-  ['m>u>mg>l>lg>w','mocktail','Undergoal first, mid goal before long goal + wing'],
-  ['m>lg>l>mg>lg>w','hourglass','Crosses lg and mg twice + wing'],
-  ['l>lg>w','gamma','Loader + long goal + wing'],
-  ['m>mg>l>lg>w','sju','Mid, mid goal, loader, long goal + wing'],
-  ['l>lg>m>mg>m>mg','tsadi','Dual mid goal — high pin potential'],
-];
-
-function renderRoutes() {
-  document.getElementById('routeBody').innerHTML=ROUTES.map(([c,n,d])=>
-    `<tr><td><code>${c}</code></td><td><strong>${n}</strong></td><td style="font-size:12px;color:var(--ink2)">${d}</td></tr>`
-  ).join('');
-}
-
-/* ═══════════════════════════════════════════════════════
-   TABS
-════════════════════════════════════════════════════════ */
-function switchTab(t, el) {
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('tab-'+t).classList.add('active');
-  if(t==='predict') calcProb();
-  if(t==='routes') renderRoutes();
-  if(t==='log') renderLog();
-}
-
-/* ═══════════════════════════════════════════════════════
-   INIT — check if already logged in this session
-════════════════════════════════════════════════════════ */
-// Restore admin session if JWT is still valid (not expired)
-const storedToken = sessionStorage.getItem('sb_token');
-const storedExp   = parseInt(sessionStorage.getItem('sb_token_exp') || '0');
-if(storedToken && Date.now() < storedExp) {
-  adminToken = storedToken;
-  isAdmin = true;
-  launchApp(true);
-} else {
-  // Clear any stale session data
-  sessionStorage.removeItem('sb_token');
-  sessionStorage.removeItem('sb_token_exp');
-  launchApp(false);
-}
-
-/* ═══════════════════════════════════════════════════════
-   SIG CALENDAR — Supabase backed
-════════════════════════════════════════════════════════ */
-let calEvents = [];
-let activeCalFilter = null;
-
-/* ── Load events from Supabase (public — anyone can read) ── */
-async function loadCalEvents() {
-  try {
-    const r = await fetch(SB_URL + '/rest/v1/sig_events?select=*&order=start_date.asc', { headers: HDRS });
-    if(!r.ok) throw new Error('HTTP ' + r.status);
-    calEvents = await r.json();
-    renderCalList();
-    updateCalSelect();
-  } catch(e) {
-    console.error('Could not load sig events:', e);
-    document.getElementById('calList').innerHTML = '<div class="empty" style="color:var(--red-text)">Could not load events from database.</div>';
-  }
-}
-
-/* ── Add event → Supabase (admin only) ── */
-async function addCalEvent() {
-  if(!isAdmin) return;
-  const name  = document.getElementById('cal-name').value.trim();
-  const start = document.getElementById('cal-start').value;
-  const end   = document.getElementById('cal-end').value;
-  const loc   = document.getElementById('cal-loc').value.trim();
-  const notes = document.getElementById('cal-notes').value.trim();
-  if(!name || !start || !end) { showMsg('cal-msg','Name, start and end date are required.','err'); return; }
-  if(start > end)             { showMsg('cal-msg','Start date must be before end date.','err'); return; }
-
-  showMsg('cal-msg','Saving…','ok');
-  try {
-    const r = await fetch(SB_URL + '/rest/v1/sig_events', {
-      method: 'POST',
-      headers: { ...adminHdrs(), 'Prefer': 'return=representation' },
-      body: JSON.stringify({ name, start_date: start, end_date: end, location: loc, notes })
-    });
-    if(!r.ok) { const t=await r.text(); throw new Error(t); }
-    clearCalForm();
-    showMsg('cal-msg', '✓ Event saved to database!', 'ok');
-    await loadCalEvents();
-  } catch(e) {
-    showMsg('cal-msg', 'Failed to save: ' + e.message, 'err');
-    console.error(e);
-  }
-}
-
-function clearCalForm() {
-  ['cal-name','cal-start','cal-end','cal-loc','cal-notes'].forEach(id => document.getElementById(id).value = '');
-}
-
-/* ── Delete event (admin only) ── */
-async function deleteCalEvent(id) {
-  if(!isAdmin) return;
-  if(!confirm('Delete this event?')) return;
-  try {
-    const r = await fetch(SB_URL + '/rest/v1/sig_events?id=eq.' + id, {
-      method: 'DELETE',
-      headers: adminHdrs()
-    });
-    if(!r.ok) throw new Error('HTTP ' + r.status);
-    if(activeCalFilter && activeCalFilter.id === id) clearCalFilter();
-    await loadCalEvents();
-  } catch(e) {
-    alert('Could not delete event: ' + e.message);
-  }
-}
-
-/* ── Render calendar list ── */
-function renderCalList() {
-  const el = document.getElementById('calList');
-  if(!calEvents.length) {
-    el.innerHTML = '<div class="empty" style="padding:1.5rem">No Sig events added yet.</div>';
-    return;
-  }
-  const now = new Date().toISOString().slice(0,10);
-  el.innerHTML = calEvents.map(e => {
-    const isPast    = e.end_date < now;
-    const isCurrent = e.start_date <= now && e.end_date >= now;
-    const status    = isCurrent
-      ? '<span class="badge b-awp">LIVE</span>'
-      : isPast
-        ? '<span class="badge b-no">Past</span>'
-        : '<span class="badge b-sig">Upcoming</span>';
-    const entryCount = allEntries.filter(en => {
-      const d = (en.created_at||en.ts||'').slice(0,10);
-      return d >= e.start_date && d <= e.end_date;
-    }).length;
-    return `
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:14px 0;border-bottom:.5px solid var(--paper3);gap:12px;flex-wrap:wrap">
-      <div style="flex:1;min-width:200px">
-        <div style="font-weight:600;font-size:14px;margin-bottom:5px">${e.name} ${status}</div>
-        <div style="font-size:12px;font-family:var(--mono);color:var(--ink3)">
-          ${e.start_date} → ${e.end_date}${e.location?' · '+e.location:''}
-        </div>
-        ${e.notes ? `<div style="font-size:12px;color:var(--ink2);margin-top:3px">${e.notes}</div>` : ''}
-        <div style="font-size:11px;font-family:var(--mono);color:var(--ink3);margin-top:5px">
-          ${entryCount} scouting entr${entryCount!==1?'ies':'y'} in this window
-        </div>
-      </div>
-      <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
-        <button class="btn btn-sm" onclick="filterByEvent('${e.id}')">Filter leaderboard</button>
-        ${isAdmin ? `<button class="btn btn-sm btn-d" onclick="deleteCalEvent('${e.id}')">✕</button>` : ''}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-/* ── Update the filter dropdown ── */
-function updateCalSelect() {
-  const sel = document.getElementById('cal-filter-select');
-  const cur = sel.value;
-  sel.innerHTML = '<option value="">— Show all entries (no filter) —</option>';
-  calEvents.forEach(e => {
-    const opt = document.createElement('option');
-    opt.value = e.id;
-    opt.textContent = e.name + ' (' + e.start_date + ' → ' + e.end_date + ')';
-    sel.appendChild(opt);
-  });
-  if(cur) sel.value = cur;
-}
-
-function filterByEvent(id) {
-  const ev = calEvents.find(e => String(e.id) === String(id));
-  if(!ev) return;
-  activeCalFilter = ev;
-  applyCalFilterToLeaderboard(ev);
-}
-
-function applyCalFilter() {
-  const id = document.getElementById('cal-filter-select').value;
-  if(!id) { clearCalFilter(); return; }
-  const ev = calEvents.find(e => String(e.id) === String(id));
-  if(ev) { activeCalFilter = ev; applyCalFilterToLeaderboard(ev); }
-}
-
-function applyCalFilterToLeaderboard(ev) {
-  const filtered = allEntries.filter(en => {
-    const d = (en.created_at||en.ts||'').slice(0,10);
-    return d >= ev.start_date && d <= ev.end_date;
-  });
-  const filteredTeams = buildStats(filtered);
-  lbFiltered = [...filteredTeams];
+  currentLbFilter = filterMode;
   lbPg = 1;
+  handleLbSearch();
+}
+
+function handleLbSearch() {
+  const query = document.getElementById('lbSearch').value.trim().toUpperCase();
+  let baseList = [...allTeams];
+
+  if(currentLbFilter === 'sig') baseList = baseList.filter(t => t.isSig);
+  else if(currentLbFilter === 'awp') baseList = baseList.filter(t => t.awp_rate > 0);
+  else if(currentLbFilter === 'top') baseList = baseList.filter(t => t.max_pins >= 5);
+
+  if(query) {
+    lbFiltered = baseList.filter(t => t.team.toUpperCase().includes(query));
+  } else {
+    lbFiltered = baseList;
+  }
+  
   lbSortRender();
-  const totP = filtered.reduce((s,e)=>s+pins(e),0);
-  const avgP = filtered.length ? (totP/filtered.length).toFixed(1) : '—';
-  const awpR = filtered.length ? Math.round(filtered.filter(e=>e.awp==='Y').length/filtered.length*100) : 0;
-  document.getElementById('lbT').textContent = filteredTeams.length;
-  document.getElementById('lbE').textContent = filtered.length;
-  document.getElementById('lbP').textContent = avgP;
-  document.getElementById('lbA').textContent = awpR + '%';
-  document.getElementById('cal-filter-status').innerHTML =
-    '✓ Filtered to <strong>' + ev.name + '</strong> (' + ev.start_date + ' → ' + ev.end_date + ') — ' +
-    filtered.length + ' entries, ' + filteredTeams.length + ' teams. ' +
-    '<a href="#" onclick="clearCalFilter();return false;" style="color:var(--blue)">Clear filter</a>';
-  // Jump to leaderboard
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+}
+
+function toggleSort(field) {
+  if(currentSortField === field) {
+    currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+  } else {
+    currentSortField = field;
+    currentSortOrder = 'desc';
+  }
+  lbSortRender();
+}
+
+function lbPageChange(direction) {
+  const maxPage = Math.max(1, Math.ceil(lbFiltered.length / lbPerPg));
+  const target = lbPg + direction;
+  if(target >= 1 && target <= maxPage) {
+    lbPg = target;
+    lbSortRender();
+  }
+}
+
+function lbSortRender() {
+  lbFiltered.sort((a, b) => {
+    let v1 = a[currentSortField];
+    let v2 = b[currentSortField];
+    return currentSortOrder === 'asc' ? (v1 > v2 ? 1 : -1) : (v1 < v2 ? 1 : -1);
+  });
+
+  const maxPage = Math.max(1, Math.ceil(lbFiltered.length / lbPerPg));
+  if(lbPg > maxPage) lbPg = maxPage;
+
+  document.getElementById('lb-page-info').textContent = `Page ${lbPg} of ${maxPage}`;
+  document.getElementById('btn-prev').disabled = (lbPg === 1);
+  document.getElementById('btn-next').disabled = (lbPg === maxPage);
+
+  const startIdx = (lbPg - 1) * lbPerPg;
+  const slice = lbFiltered.slice(startIdx, startIdx + lbPerPg);
+
+  const tbody = document.getElementById('lbBody');
+  if(!tbody) return;
+
+  if(!slice.length) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--ink3);padding:2rem;">No matching standings tracks indexed.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = slice.map(t => `
+    <tr class="clickable-row" onclick="openDetailOverlay('${t.team}')">
+      <td><span class="team-link">${t.team}</span></td>
+      <td>${t.count} runs</td>
+      <td style="font-weight:bold;color:var(--blue);">${t.avg_pins}</td>
+      <td>${t.max_pins} pins</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-family:var(--mono);width:32px">${t.awp_rate}%</span>
+          <div class="awp-wrap"><div class="awp-fill" style="width:${t.awp_rate}%"></div></div>
+        </div>
+      </td>
+      <td style="font-style:italic;color:var(--ink2);">Claw Bot</td>
+      <td class="admin-only">
+        <button class="btn btn-danger" style="padding:2px 6px; font-size:11px;" onclick="event.stopPropagation(); deleteTeamRecords('${t.team}')">Purge Data</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// DRILLDOWN INSPECTION DIALOG HOOKS
+function openDetailOverlay(teamCode) {
+  const t = allTeams.find(x => x.team === teamCode);
+  const runs = allEntries.filter(e => e.team === teamCode);
+  if(!t) return;
+
+  document.getElementById('dcTeam').textContent = t.team;
+  document.getElementById('dcSub').innerHTML = `Robot Baseline Configuration Layout: <strong>Claw Bot</strong>`;
+  document.getElementById('dcCount').textContent = t.count;
+  document.getElementById('dcAvg').textContent = t.avg_pins;
+  document.getElementById('dcMax').textContent = t.max_pins;
+  document.getElementById('dcAwp').textContent = t.awp_rate + '%';
+
+  const modes = [...new Set(runs.map(e => e.route))];
+  document.getElementById('dcRoutes').textContent = modes.join(' · ') || '—';
+  document.getElementById('dcLast').textContent = runs.length ? new Date(runs[runs.length-1].ts).toLocaleDateString() : '—';
+
+  document.getElementById('dcMatchHistory').innerHTML = runs.map(m => `
+    <div class="mh-row">
+      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${m.event}</span>
+      <span style="font-family:var(--mono);">${m.round}</span>
+      <span style="font-family:var(--mono); font-weight:bold; color:var(--blue);">${parsePins(m.pins)} pts</span>
+      <span class="badge ${m.awp==='Y'?'b-awp':'b-no'}">${m.awp}</span>
+      <span style="color:var(--ink3); font-family:var(--mono)">Side:${m.side}</span>
+    </div>
+    ${m.notes ? `<div style="font-size:11px; color:var(--ink2); font-style:italic; padding-left:4px; margin-bottom:4px;">↳ ${m.notes}</div>` : ''}
+  `).join('');
+
+  document.getElementById('detailOverlay').classList.add('open');
+}
+
+function closeDetailOverlay() {
+  document.getElementById('detailOverlay').classList.remove('open');
+}
+
+// RAW RUNS LOG PANEL FUNCTIONS
+function logSort(field) {
+  if (logSortField === field) {
+    logSortOrder = logSortOrder === 'asc' ? 'desc' : 'asc';
+  } else {
+    logSortField = field;
+    logSortOrder = 'asc';
+  }
+  renderLog();
+}
+
+function renderLog() {
+  const query = document.getElementById('logQ').value.trim().toLowerCase();
+  const selectFilter = document.getElementById('logFil').value;
+  const tbody = document.getElementById('logBody');
+  if(!tbody) return;
+
+  let tracked = [...allEntries];
+
+  if(selectFilter === 'yes') tracked = tracked.filter(e => e.sig === 'yes');
+  else if(selectFilter === 'Y') tracked = tracked.filter(e => e.awp === 'Y');
+
+  if(query) {
+    tracked = tracked.filter(e => e.team.toLowerCase().includes(query) || e.event.toLowerCase().includes(query));
+  }
+
+  tracked.sort((a, b) => {
+    let valA = a[logSortField];
+    let valB = b[logSortField];
+    if (logSortField === 'pins') {
+      valA = parsePins(a.pins);
+      valB = parsePins(b.pins);
+    }
+    return logSortOrder === 'asc' ? (valA > valB ? 1 : -1) : (valA < valB ? 1 : -1);
+  });
+
+  document.getElementById('logCount').textContent = `${tracked.length} total rows listed`;
+
+  if(!tracked.length) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--ink3); padding:2rem;">No explicit log entries match the criteria.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = tracked.map(e => `
+    <tr>
+      <td><span class="team-link" style="cursor:pointer;" onclick="openDetailOverlay('${e.team}')">${e.team}</span></td>
+      <td style="max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${e.event}</td>
+      <td style="font-family:var(--mono);">${e.round}</td>
+      <td style="font-family:var(--mono);">${e.side}</td>
+      <td><span style="font-size:12px;" class="badge b-no">${e.route}</span></td>
+      <td style="font-family:var(--mono); font-weight:bold; color:var(--blue);">${parsePins(e.pins)} <span style="font-size:10px; font-weight:normal; color:var(--ink3)">(${e.pins})</span></td>
+      <td><span class="badge ${e.awp==='Y'?'b-awp':'b-no'}">${e.awp}</span></td>
+      <td class="admin-only">
+        <button class="btn btn-danger" style="padding:2px 6px; font-size:11px;" onclick="deleteSingleRecord(${e.id})">Purge</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ALLIANCE PROBABILITY MATCH PREDICTOR ENGINE
+function runPredict() {
+  const r1 = document.getElementById('p-r1').value.trim().toUpperCase();
+  const r2 = document.getElementById('p-r2').value.trim().toUpperCase();
+  const b1 = document.getElementById('p-b1').value.trim().toUpperCase();
+  const b2 = document.getElementById('p-b2').value.trim().toUpperCase();
+
+  const resultContainer = document.getElementById('predictResult');
+  if(!r1 && !r2 && !b1 && !b2) {
+    resultContainer.style.display = 'none';
+    return;
+  }
+  resultContainer.style.display = 'block';
+
+  const findStats = (id) => allTeams.find(x => x.team === id) || { team: id, avg_pins: 0, max_pins: 0, awp_rate: 0, count: 0 };
+
+  const redAlliance = [r1, r2].filter(Boolean).map(findStats);
+  const blueAlliance = [b1, b2].filter(Boolean).map(findStats);
+
+  const redExp = redAlliance.reduce((s, t) => s + t.avg_pins, 0);
+  const blueExp = blueAlliance.reduce((s, t) => s + t.avg_pins, 0);
+
+  const redMax = redAlliance.reduce((s, t) => s + t.max_pins, 0);
+  const blueMax = blueAlliance.reduce((s, t) => s + t.max_pins, 0);
+
+  let redAwpInverse = 1, blueAwpInverse = 1;
+  redAlliance.forEach(t => redAwpInverse *= (1 - t.awp_rate / 100));
+  blueAlliance.forEach(t => blueAwpInverse *= (1 - t.awp_rate / 100));
+
+  const diff = redExp - blueExp;
+  let redProb = 0.50 + (diff * 0.125);
+  if(redProb > 0.95) redProb = 0.95;
+  if(redProb < 0.05) redProb = 0.05;
+
+  const rPct = Math.round(redProb * 100);
+  const bPct = 100 - rPct;
+
+  document.getElementById('barRed').style.width = rPct + '%';
+  document.getElementById('barRed').textContent = `Red ${rPct}%`;
+  document.getElementById('barBlue').style.width = bPct + '%';
+  document.getElementById('barBlue').textContent = `Blue ${bPct}%`;
+
+  const totalRunsSampled = redAlliance.reduce((s,t)=>s+t.count, 0) + blueAlliance.reduce((s,t)=>s+t.count, 0);
+  const confidenceMetric = Math.min(100, Math.round((totalRunsSampled / 8) * 100));
+
+  document.getElementById('m-rPins').textContent = redExp.toFixed(1) + ' expected pins';
+  document.getElementById('m-bPins').textContent = blueExp.toFixed(1) + ' expected pins';
+  document.getElementById('m-rAwp').textContent = redAlliance.length ? Math.round((1 - redAwpInverse)*100) + '%' : '0%';
+  document.getElementById('m-bAwp').textContent = blueAlliance.length ? Math.round((1 - blueAwpInverse)*100) + '%' : '0%';
+  document.getElementById('m-rMax').textContent = redMax + ' pins max';
+  document.getElementById('m-bMax').textContent = blueMax + ' pins max';
+  document.getElementById('m-conf').textContent = confidenceMetric + '% data reliability index';
+
+  document.getElementById('probSummary').innerHTML = `Differential projection margin favors <strong>${rPct >= 50 ? 'RED' : 'BLUE'}</strong> by an average vector of ${Math.abs(diff).toFixed(1)} mean autonomous pins.`;
+}
+
+// STRATEGY ROUTING PATH AGGREGATION CALCULATIONS
+function renderRoutesTab() {
+  const tbody = document.getElementById('rtBody');
+  if(!tbody) return;
+
+  const paths = {};
+  allEntries.forEach(e => {
+    if(!e.route) return;
+    if(!paths[e.route]) paths[e.route] = { name: e.route, total: 0, count: 0, awpY: 0 };
+    paths[e.route].count++;
+    paths[e.route].total += parsePins(e.pins);
+    if(e.awp === 'Y') paths[e.route].awpY++;
+  });
+
+  const list = Object.values(paths).sort((a,b) => b.count - a.count);
+  if(!list.length) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--ink3); padding:2rem;">No operational strategies recorded.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(r => `
+    <tr>
+      <td style="font-family:var(--mono); font-weight:bold;">${r.name} Strategy Routine</td>
+      <td>${r.count} matches scouted</td>
+      <td style="font-family:var(--mono); font-weight:bold; color:var(--blue);">${(r.total / r.count).toFixed(1)} mean pins</td>
+      <td><span class="badge b-awp">${Math.round((r.awpY / r.count)*100)}% conversion</span></td>
+    </tr>
+  `).join('');
+}
+
+// TOURNAMENT CALENDAR TRACK LOGIC WIDGETS
+function renderCalendarTab() {
+  const tbody = document.getElementById('calBody');
+  if(!tbody) return;
+
+  tbody.innerHTML = TOURNAMENTS.map(t => `
+    <tr>
+      <td style="font-weight:bold;">${t.name}</td>
+      <td style="color:var(--ink2);">${t.loc}</td>
+      <td style="font-family:var(--mono); color:var(--ink3); font-size:12px;">${t.sku}</td>
+      <td>
+        <button class="btn btn-primary" style="padding:2px 8px; font-size:11px;" onclick="activateCalendarFilter('${t.id}')">
+          Isolate Location Context
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function onCalSelectChange() {
+  const val = document.getElementById('cal-filter-select').value;
+  if(!val) {
+    clearCalFilter();
+  } else {
+    activateCalendarFilter(val);
+  }
+}
+
+function activateCalendarFilter(id) {
+  const t = TOURNAMENTS.find(x => x.id === id);
+  if(!t) return;
+
+  if (id === 'all') {
+    activeCalFilter = null;
+    document.getElementById('cal-filter-status').textContent = '';
+    document.getElementById('cal-filter-select').value = '';
+  } else {
+    activeCalFilter = t.name;
+    document.getElementById('cal-filter-select').value = id;
+    document.getElementById('cal-filter-status').innerHTML = `Location Filtered Scope: <span>${t.name}</span> <a href="#" onclick="clearCalFilter(); return false;" style="margin-left:6px; color:var(--red);">[Clear Context]</a>`;
+  }
+
+  // Auto focus leap directly back to leaderboard grid metrics
+  document.querySelectorAll('.nav-tabs .tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelector('[data-tab="leaderboard"]').classList.add('active');
   document.getElementById('tab-leaderboard').classList.add('active');
-  setSyncStatus('ok', 'Filtered: ' + ev.name);
+
+  lbPg = 1;
+  computeStandings();
 }
 
 function clearCalFilter() {
   activeCalFilter = null;
-  document.getElementById('cal-filter-select').value = '';
   document.getElementById('cal-filter-status').textContent = '';
-  lbFiltered = [...allTeams];
+  document.getElementById('cal-filter-select').value = '';
   lbPg = 1;
-  lbSortRender();
-  const totP = allEntries.reduce((s,e)=>s+pins(e),0);
-  const avgP = allEntries.length ? (totP/allEntries.length).toFixed(1) : '—';
-  const awpR = allEntries.length ? Math.round(allEntries.filter(e=>e.awp==='Y').length/allEntries.length*100) : 0;
-  document.getElementById('lbT').textContent = allTeams.length;
-  document.getElementById('lbE').textContent = allEntries.length;
-  document.getElementById('lbP').textContent = avgP;
-  document.getElementById('lbA').textContent = awpR + '%';
-  setSyncStatus('ok', allTeams.length+' teams · '+allEntries.length+' entries');
+  computeStandings();
 }
 
-// Load calendar on init
-loadCalEvents();
+// DATA ADMINISTRATIVE PURGING ENGINES
+async function deleteSingleRecord(id) {
+  if(!confirm("Are you confident you want to delete this specific individual match row parameter node?")) return;
+  setSyncStatus('warn', 'Deleting row entry...');
+  const { error } = await _supabase.from('entries').delete().eq('id', id);
+  if(error) alert("Deletion denied: " + error.message);
+  else pullData();
+}
+
+async function deleteTeamRecords(teamCode) {
+  if(!confirm(`Are you completely sure you want to purge all database metrics for team ${teamCode}?`)) return;
+  setSyncStatus('warn', 'Purging team logs metrics...');
+  const { error } = await _supabase.from('entries').delete().eq('team', teamCode);
+  if(error) alert("Deletion denied: " + error.message);
+  else pullData();
+}
 </script>
 </body>
 </html>
