@@ -369,8 +369,8 @@ tr:hover td{background:var(--paper2);cursor:pointer}
         <div style="margin-bottom:16px;padding:12px 14px;background:var(--paper2);border-radius:var(--radius);border:.5px solid var(--paper3)">
           <label style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;color:var(--ink2);margin-bottom:6px">Autonomous Type</label>
           <select id="f-auto-mode" onchange="toggleAutoMode(this.value)" style="font-size:14px;font-weight:500">
-            <option value="Normal">Normal — Standard match autonomous</option>
-            <option value="SAWP">SAWP — Solo Autonomous Win Point Run</option>
+            <option value="Normal">Normal — Standard</option>
+            <option value="SAWP">SAWP — Solo Autonomous Win Point</option>
           </select>
           <p class="hint">SAWP = your robot runs both quadrants solo. Shows separate goal tracking for each quadrant.</p>
         </div>
@@ -489,7 +489,7 @@ tr:hover td{background:var(--paper2);cursor:pointer}
           <div>
             <!-- Max pins = total number of pins available on field for this auto.
                  Used to calculate efficiency (scored / possible). Optional. -->
-            <label>Max possible pins <span style="font-weight:400;color:var(--ink3)">(optional)</span></label>
+            <label>Max Possible Pins <span style="font-weight:400;color:var(--ink3)">(optional)</span></label>
             <input id="f-maxpins" placeholder="e.g. 6" type="number" min="0" max="20">
           </div>
         </div>
@@ -615,9 +615,14 @@ tr:hover td{background:var(--paper2);cursor:pointer}
             <tr><td style="width:36px"><code>m</code></td><td>Mid blocks</td></tr>
             <tr><td><code>g1</code></td><td>Goal1(Alliance)</td></tr>
             <tr><td><code>g2</code></td><td>Goal2</td></tr>
-            <tr><td><code>mg</code></td><td>Mid goal</td></tr>
-            <tr><td><code>u</code></td><td>Undergoal</td></tr>
-            <tr><td><code>w</code></td><td>Wing touch</td></tr>
+            <tr><td><code>mp</code></td><td>Middle Pin</td></tr>
+            <tr><td><code>up</code></td><td>Upper Pin</td></tr>
+            <tr><td><code>lp</code></td><td>Lower Pin</td></tr>
+            <tr><td><code>uc</code></td><td>Upper Cup</td></tr>
+            <tr><td><code>lc</code></td><td>Lower Cup</td></tr>
+            <tr><td><code>wcl</code></td><td>Left Wall Cup</td></tr>
+            <tr><td><code>wcm</code></td><td>Middle Wall Cup</td></tr>
+            <tr><td><code>wcr</code></td><td>Right Wall Cup</td></tr>
             <tr><td><code>&gt;</code></td><td>Sequence</td></tr>
           </table>
         </div>
@@ -628,7 +633,7 @@ tr:hover td{background:var(--paper2);cursor:pointer}
             <div>✅ 3+ goals with 2+ pins each</div>
             <div>✅ Neither robot touching perimeter</div>
           </div>
-          <p class="hint" style="margin-top:8px">Auto bonus: 12 pts to higher-scoring alliance (SC7). Sig criteria tighten Sep 3 2026.</p>
+          <p class="hint" style="margin-top:8px">Auto bonus: 12 pts to higher-scoring alliance (SC7). Sig criteria tightens Sep 3 2026.</p>
         </div>
       </div>
       <div class="card">
