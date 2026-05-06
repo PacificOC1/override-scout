@@ -237,6 +237,33 @@ tr:hover td{background:var(--paper2);cursor:pointer}
 .pdot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:6px}
 .dr_{background:var(--red)}.db_{background:var(--blue)}
 
+/* ── OUTCOME BAR ── */
+.outcome-bar-wrap{display:flex;height:48px;border-radius:var(--radius);overflow:hidden;margin:10px 0;border:1.5px solid var(--ink);cursor:pointer}
+.outcome-seg{display:flex;align-items:center;justify-content:center;transition:filter .15s,flex .4s;position:relative;overflow:hidden;min-width:0}
+.outcome-seg:hover{filter:brightness(1.15)}
+.outcome-seg.selected{filter:brightness(1.25);outline:3px solid var(--ink);outline-offset:-3px}
+.outcome-seg-label{font-size:10px;font-weight:700;color:#fff;font-family:var(--mono);white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.4);pointer-events:none;padding:0 4px;overflow:hidden;text-overflow:ellipsis}
+.outcome-legend{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.outcome-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;font-family:var(--mono);color:var(--ink2)}
+.outcome-legend-swatch{width:12px;height:12px;border-radius:2px;flex-shrink:0}
+/* Outcome detail panel */
+.outcome-detail{background:var(--paper2);border:1.5px solid var(--ink);border-radius:var(--radius-lg);padding:1.25rem;margin-top:1rem;animation:fadeSlide .18s ease}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.outcome-detail-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px}
+.outcome-detail-title{font-size:15px;font-weight:700;letter-spacing:-.3px}
+.outcome-detail-prob{font-family:var(--mono);font-size:13px;background:var(--ink);color:var(--paper);padding:3px 10px;border-radius:99px}
+.outcome-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem}
+@media(max-width:600px){.outcome-stat-grid{grid-template-columns:1fr 1fr}}
+.outcome-stat{background:var(--paper);border-radius:var(--radius);padding:8px 10px;border:.5px solid var(--paper3)}
+.outcome-stat-l{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin-bottom:3px}
+.outcome-stat-v{font-size:17px;font-weight:700;font-family:var(--mono)}
+.outcome-robot-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.outcome-robot-card{border-radius:var(--radius);padding:8px 10px;font-size:12px}
+.outcome-robot-card.success{background:var(--green-bg);border:1px solid #b8ddb8}
+.outcome-robot-card.fail{background:var(--red-bg);border:1px solid #f8c5b5}
+.outcome-robot-name{font-weight:600;margin-bottom:4px;font-family:var(--mono);font-size:11px}
+.outcome-robot-pins{color:var(--ink2)}
+
 /* ── RESOURCE ROWS ── */
 .resource-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:.5px solid var(--paper3);gap:12px}
 .resource-row:last-child{border-bottom:none}
@@ -353,10 +380,14 @@ tr:hover td{background:var(--paper2);cursor:pointer}
           <div><label>Side</label>
             <select id="f-side"><option value="L">Left (L)</option><option value="R">Right (R)</option></select>
           </div>
-          <div><label>Robot Type</label>
-            <select id="f-type">
-              <option>Claw Bot</option><option>Other</option>
+          <div>
+            <label>Robot Type</label>
+            <select id="f-type" onchange="toggleCustomType(this.value)" style="margin-bottom:4px">
+              <option>Claw Bot</option>
+              <option value="Other">Other (type below)</option>
             </select>
+            <input id="f-type-custom" placeholder="Enter robot type…"
+              style="display:none;margin-top:2px" autocomplete="off">
           </div>
           <div><label>Sig Event?</label>
             <select id="f-sig"><option value="no">No</option><option value="yes">Yes — Worlds qualifier</option></select>
@@ -549,119 +580,181 @@ tr:hover td{background:var(--paper2);cursor:pointer}
   </div>
 
   <!-- ── WIN PROBABILITY (admin) ── -->
-  <div id="tab-predict" class="panel">
-    <div class="page">
-      <div class="g2" style="margin-bottom:1rem;align-items:start">
-        <div class="alliance-panel red-panel">
-          <p class="sec" style="color:var(--red)">Red Alliance</p>
-          <div style="margin-bottom:10px"><label>Robot 1 — Team # <span style="color:var(--ink3);font-weight:400">(auto-fills from DB)</span></label>
-            <input id="r1" placeholder="Team #" oninput="autoFill('r1');calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 1 — Avg pins</label><input type="number" id="r1pins" min="0" max="20" value="3" oninput="calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 1 — AWP rate (%)</label><input type="number" id="r1awp" min="0" max="100" value="50" oninput="calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 1 — Avg bonuses</label><input type="number" id="r1bon" min="0" max="10" value="0" oninput="calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 1 — Consistency <span id="r1cv">3</span>/5</label>
-            <input type="range" id="r1cons" min="1" max="5" value="3" oninput="calcProb();document.getElementById('r1cv').textContent=this.value"></div>
-          <hr style="border:none;border-top:.5px solid var(--paper3);margin:12px 0">
-          <div style="margin-bottom:10px"><label>Robot 2 — Team #</label><input id="r2" placeholder="Team #" oninput="autoFill('r2');calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 2 — Avg pins</label><input type="number" id="r2pins" min="0" max="20" value="3" oninput="calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 2 — AWP rate (%)</label><input type="number" id="r2awp" min="0" max="100" value="50" oninput="calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 2 — Avg bonuses</label><input type="number" id="r2bon" min="0" max="10" value="0" oninput="calcProb()"></div>
-          <div><label>Robot 2 — Consistency <span id="r2cv">3</span>/5</label>
-            <input type="range" id="r2cons" min="1" max="5" value="3" oninput="calcProb();document.getElementById('r2cv').textContent=this.value"></div>
+ <div id="tab-predict" class="panel">
+  <div class="page">
+    <div class="g2" style="margin-bottom:1rem; align-items:start">
+      
+      <div class="alliance-panel red-panel">
+        <p class="sec" style="color:var(--red)">🔴 Red Alliance</p>
+        <p style="font-size:11px; color:var(--ink3); font-family:var(--mono); margin-bottom:10px">
+          Type a team # — stats auto-fill from database
+        </p>
+        
+        <div style="background:var(--paper2); border-radius:var(--radius); padding:10px; margin-bottom:10px">
+          <div style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; color:var(--red); margin-bottom:8px">Robot 1</div>
+          <div style="margin-bottom:8px">
+            <label>Team #</label>
+            <input id="r1" placeholder="e.g. 73017D" oninput="autoFill('r1')">
+          </div>
+          <div class="g2" style="margin-bottom:8px">
+            <div><label>Avg G1 pins</label><input type="number" id="r1g1" min="0" max="10" value="2" oninput="calcProb()"></div>
+            <div><label>Avg G2 pins</label><input type="number" id="r1g2" min="0" max="10" value="1" oninput="calcProb()"></div>
+          </div>
+          <div class="g2">
+            <div><label>Failure rate %</label><input type="number" id="r1fail" min="0" max="100" value="0" oninput="calcProb()"></div>
+            <div><label>AWP contrib. %</label><input type="number" id="r1awp" min="0" max="100" value="50" oninput="calcProb()"></div>
+          </div>
         </div>
-        <div class="alliance-panel blue-panel">
-          <p class="sec" style="color:var(--blue)">Blue Alliance</p>
-          <div style="margin-bottom:10px"><label>Robot 1 — Team #</label><input id="b1" placeholder="Team #" oninput="autoFill('b1');calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 1 — Avg pins</label><input type="number" id="b1pins" min="0" max="20" value="3" oninput="calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 1 — AWP rate (%)</label><input type="number" id="b1awp" min="0" max="100" value="50" oninput="calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 1 — Avg bonuses</label><input type="number" id="b1bon" min="0" max="10" value="0" oninput="calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 1 — Consistency <span id="b1cv">3</span>/5</label>
-            <input type="range" id="b1cons" min="1" max="5" value="3" oninput="calcProb();document.getElementById('b1cv').textContent=this.value"></div>
-          <hr style="border:none;border-top:.5px solid var(--paper3);margin:12px 0">
-          <div style="margin-bottom:10px"><label>Robot 2 — Team #</label><input id="b2" placeholder="Team #" oninput="autoFill('b2');calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 2 — Avg pins</label><input type="number" id="b2pins" min="0" max="20" value="3" oninput="calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 2 — AWP rate (%)</label><input type="number" id="b2awp" min="0" max="100" value="50" oninput="calcProb()"></div>
-          <div style="margin-bottom:10px"><label>Robot 2 — Avg bonuses</label><input type="number" id="b2bon" min="0" max="10" value="0" oninput="calcProb()"></div>
-          <div><label>Robot 2 — Consistency <span id="b2cv">3</span>/5</label>
-            <input type="range" id="b2cons" min="1" max="5" value="3" oninput="calcProb();document.getElementById('b2cv').textContent=this.value"></div>
+        
+        <div style="background:var(--paper2); border-radius:var(--radius); padding:10px">
+          <div style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; color:var(--red); margin-bottom:8px">Robot 2</div>
+          <div style="margin-bottom:8px">
+            <label>Team #</label>
+            <input id="r2" placeholder="e.g. 9123X" oninput="autoFill('r2')">
+          </div>
+          <div class="g2" style="margin-bottom:8px">
+            <div><label>Avg G1 pins</label><input type="number" id="r2g1" min="0" max="10" value="2" oninput="calcProb()"></div>
+            <div><label>Avg G2 pins</label><input type="number" id="r2g2" min="0" max="10" value="1" oninput="calcProb()"></div>
+          </div>
+          <div class="g2">
+            <div><label>Failure rate %</label><input type="number" id="r2fail" min="0" max="100" value="0" oninput="calcProb()"></div>
+            <div><label>AWP contrib. %</label><input type="number" id="r2awp" min="0" max="100" value="50" oninput="calcProb()"></div>
+          </div>
         </div>
       </div>
-      <div class="card">
-        <div style="margin-bottom:1.25rem">
-          <p class="prob-title">Expected autonomous points</p>
-          <div class="win-wrap">
-            <div class="bar-red" id="ptRed" style="width:50%">—</div>
-            <div class="bar-blue" id="ptBlue" style="width:50%">—</div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--ink3)">
-            <span id="ptRL">Red</span><span id="ptBL">Blue</span>
-          </div>
-        </div>
-        <div style="margin-bottom:1.25rem">
-          <p class="prob-title">Alliance AWP probability (independent from points)</p>
-          <div class="win-wrap">
-            <div class="bar-green" id="awpRed" style="width:50%">—</div>
-            <div class="bar-green2" id="awpBlue" style="width:50%">—</div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--ink3)"><span>Red AWP</span><span>Blue AWP</span></div>
-          <p class="hint" style="margin-top:6px">AWP earns ranking points (WP), not match score — shown separately.</p>
-        </div>
-        <p class="prob-title" style="margin-bottom:8px">Score breakdown</p>
-        <div id="bkTable"></div>
-      </div>
-    </div>
-  </div>
 
-  <!-- ── ROUTES (admin) ── -->
-  <div id="tab-routes" class="panel">
-    <div class="page">
-      <div class="g2" style="margin-bottom:1rem">
-        <div class="card">
-          <p class="sec">Route notation</p>
-          <table>
-            <tr><td style="width:36px"><code>m</code></td><td>Mid blocks</td></tr>
-            <tr><td><code>g1</code></td><td>Goal1(Alliance)</td></tr>
-            <tr><td><code>g2</code></td><td>Goal2</td></tr>
-            <tr><td><code>mp</code></td><td>Middle Pin</td></tr>
-            <tr><td><code>up</code></td><td>Upper Pin</td></tr>
-            <tr><td><code>lp</code></td><td>Lower Pin</td></tr>
-            <tr><td><code>uc</code></td><td>Upper Cup</td></tr>
-            <tr><td><code>lc</code></td><td>Lower Cup</td></tr>
-            <tr><td><code>wcl</code></td><td>Left Wall Cup</td></tr>
-            <tr><td><code>wcm</code></td><td>Middle Wall Cup</td></tr>
-            <tr><td><code>wcr</code></td><td>Right Wall Cup</td></tr>
-            <tr><td><code>&gt;</code></td><td>Sequence</td></tr>
-          </table>
-        </div>
-        <div class="card">
-          <p class="sec">AWP criteria</p>
-          <div style="font-size:13px;line-height:2.1">
-            <div>✅ 7+ alliance pins (own side)</div>
-            <div>✅ 3+ goals with 2+ pins each</div>
-            <div>✅ Neither robot touching perimeter</div>
+      <div class="alliance-panel blue-panel">
+        <p class="sec" style="color:var(--blue)">🔵 Blue Alliance</p>
+        <p style="font-size:11px; color:var(--ink3); font-family:var(--mono); margin-bottom:10px">
+          Type a team # — stats auto-fill from database
+        </p>
+        
+        <div style="background:var(--paper2); border-radius:var(--radius); padding:10px; margin-bottom:10px">
+          <div style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; color:var(--blue); margin-bottom:8px">Robot 1</div>
+          <div style="margin-bottom:8px">
+            <label>Team #</label>
+            <input id="b1" placeholder="e.g. 5678A" oninput="autoFill('b1')">
           </div>
-          <p class="hint" style="margin-top:8px">Auto bonus: 12 pts to higher-scoring alliance (SC7). Sig criteria tightens Sep 3 2026.</p>
+          <div class="g2" style="margin-bottom:8px">
+            <div><label>Avg G1 pins</label><input type="number" id="b1g1" min="0" max="10" value="2" oninput="calcProb()"></div>
+            <div><label>Avg G2 pins</label><input type="number" id="b1g2" min="0" max="10" value="1" oninput="calcProb()"></div>
+          </div>
+          <div class="g2">
+            <div><label>Failure rate %</label><input type="number" id="b1fail" min="0" max="100" value="0" oninput="calcProb()"></div>
+            <div><label>AWP contrib. %</label><input type="number" id="b1awp" min="0" max="100" value="50" oninput="calcProb()"></div>
+          </div>
+        </div>
+        
+        <div style="background:var(--paper2); border-radius:var(--radius); padding:10px">
+          <div style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; color:var(--blue); margin-bottom:8px">Robot 2</div>
+          <div style="margin-bottom:8px">
+            <label>Team #</label>
+            <input id="b2" placeholder="e.g. 9999Z" oninput="autoFill('b2')">
+          </div>
+          <div class="g2" style="margin-bottom:8px">
+            <div><label>Avg G1 pins</label><input type="number" id="b2g1" min="0" max="10" value="2" oninput="calcProb()"></div>
+            <div><label>Avg G2 pins</label><input type="number" id="b2g2" min="0" max="10" value="1" oninput="calcProb()"></div>
+          </div>
+          <div class="g2">
+            <div><label>Failure rate %</label><input type="number" id="b2fail" min="0" max="100" value="0" oninput="calcProb()"></div>
+            <div><label>AWP contrib. %</label><input type="number" id="b2awp" min="0" max="100" value="50" oninput="calcProb()"></div>
+          </div>
         </div>
       </div>
+      <div style="margin: 1.5rem 0 1rem 0; text-align: center;">
+  <button type="button" class="btn btn-p" style="width: 100%; max-width: 280px; padding: 10px 18px; font-weight: 600;" onclick="calcProb()">
+    📊 Calculate Win Probability
+  </button>
+</div>
+
+    </div>
+
+    <div class="card" id="probResults">
+      <p class="sec" id="mostOutcome">Most probable outcome: —</p>
+      <p class="hint" style="margin-bottom:10px">All 16 possible robot success/failure combinations. Each segment width = probability. Click any segment to see full stats for that outcome.</p>
+
+      <!-- Legend -->
+      <div class="outcome-legend" id="outcomeLegend"></div>
+
+      <!-- The segmented bar -->
+      <div class="outcome-bar-wrap" id="outcomeBar"></div>
+
+      <!-- Axis labels -->
+      <div style="display:flex;justify-content:space-between;font-size:10px;font-family:var(--mono);color:var(--ink3);margin-bottom:1rem">
+        <span>← Red wins</span><span>Tie zone</span><span>Blue wins →</span>
+      </div>
+
+      <!-- Clicked outcome detail panel -->
+      <div id="outcomeDetail" style="display:none"></div>
+    </div>
+    
+  </div>
+</div>
+
+<div id="tab-routes" class="panel">
+  <div class="page">
+    <div class="g2" style="margin-bottom:1rem">
+      
       <div class="card">
-        <p class="sec">Named routes</p>
-        <div class="tw"><table>
-          <thead><tr><th>Route</th><th>Name</th><th>Notes</th></tr></thead>
-          <tbody id="routeBody"></tbody>
-        </table></div>
+        <p class="sec">Route notation</p>
+        <table>
+          <tr><td style="width:36px"><code>m</code></td><td>Mid blocks</td></tr>
+          <tr><td><code>g1</code></td><td>Goal1(Alliance)</td></tr>
+          <tr><td><code>g2</code></td><td>Goal2</td></tr>
+          <tr><td><code>mp</code></td><td>Middle Pin</td></tr>
+          <tr><td><code>up</code></td><td>Upper Pin</td></tr>
+          <tr><td><code>lp</code></td><td>Lower Pin</td></tr>
+          <tr><td><code>uc</code></td><td>Upper Cup</td></tr>
+          <tr><td><code>lc</code></td><td>Lower Cup</td></tr>
+          <tr><td><code>wcl</code></td><td>Left Wall Cup</td></tr>
+          <tr><td><code>wcm</code></td><td>Middle Wall Cup</td></tr>
+          <tr><td><code>wcr</code></td><td>Right Wall Cup</td></tr>
+          <tr><td><code>&gt;</code></td><td>Sequence</td></tr>
+        </table>
+      </div>
+      
+      <div class="card">
+        <p class="sec">AWP criteria</p>
+        <div style="font-size:13px; line-height:2.1">
+          <div>✅ 7+ alliance pins (own side)</div>
+          <div>✅ 3+ goals with 2+ pins each</div>
+          <div>✅ Neither robot touching perimeter</div>
+        </div>
+        <p class="hint" style="margin-top:8px">Auto bonus: 12 pts to higher-scoring alliance (SC7). Sig criteria tightens Sep 3 2026.</p>
+      </div>
+
+    </div>
+
+    <div class="card">
+      <p class="sec">Named routes</p>
+      <div class="tw">
+        <table>
+          <thead>
+            <tr>
+              <th>Route</th>
+              <th>Name</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="routeBody">
+            </tbody>
+        </table>
       </div>
     </div>
+
   </div>
+</div>
 
   <!-- ── FORMULAS (admin) ── -->
   <div id="tab-formulas" class="panel">
     <div class="page">
       <div class="card">
         <p class="sec">Points calculation</p>
-        <div class="formula-box">RawPts     = (R1_avgPins + R2_avgPins) × 5 + R1_avgBonuses + R2_avgBonuses
-ConsFactor = (R1_cons + R2_cons) / 10   → range 0.2–1.0
-ExpPts     = RawPts × ConsFactor
-AutoBonus  = +12 pts to higher-scoring alliance (SC7)</div>
+        <div class="formula-box">Alliance Score = (T1_G1 + T1_G2 + T2_G1 + T2_G2) × 5
+Consistency   = (1 - T1_FailRate + 1 - T2_FailRate) / 2
+ExpectedPts   = Alliance Score × Consistency
+AutoBonus     = +12 pts to higher-scoring alliance (SC7)
+               +6 to each alliance if tie</div>
         <p class="sec" style="margin-top:1rem">AWP probability</p>
         <div class="formula-box">AWP% = (R1_awp/100) × (R2_awp/100) × ConsFactor × 100
 
@@ -1072,12 +1165,14 @@ function buildStats(entries) {
     const totBon=rows.reduce((s,e)=>s+(parseInt(e.bonuses)||0),0);
     const awpN=rows.filter(e=>e.awp==='Y').length;
     const sigN=rows.filter(e=>e.sig==='yes').length;
+    const failN=rows.filter(e=>e.failed==='N').length;
     return {
       team:g.team, count:n,
       avg_pins:n?(totPins/n).toFixed(2):0,
       avg_bonuses:n?(totBon/n).toFixed(2):0,
       awp_pct:n?(awpN/n*100).toFixed(1):0,
       awp_count:awpN, sig_count:sigN,
+      success_pct:n?(failN/n*100).toFixed(1):0,
       routes:[...g.routes].join(' · ')||'—',
       types:[...g.types].join(', ')||'—',
       last:g.last, matches:rows
@@ -1208,7 +1303,13 @@ function openDetail(t) {
       <div class="sbox"><div class="sbox-l">Matches</div><div class="sbox-v">${t.count}</div></div>
       <div class="sbox"><div class="sbox-l">Avg Pins</div><div class="sbox-v">${parseFloat(t.avg_pins).toFixed(1)}</div></div>
       <div class="sbox"><div class="sbox-l">AWP Rate</div><div class="sbox-v">${awpPct.toFixed(0)}%</div></div>
-      <div class="sbox"><div class="sbox-l">Sig Matches</div><div class="sbox-v">${t.sig_count}</div></div>
+      <div class="sbox" style="cursor:pointer;position:relative" onclick="this.querySelector('.success-detail').style.display=this.querySelector('.success-detail').style.display==='block'?'none':'block'">
+        <div class="sbox-l">Success %</div>
+        <div class="sbox-v" style="color:var(--green)">${parseFloat(t.success_pct||0).toFixed(0)}%</div>
+        <div class="success-detail" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--paper);border:1px solid var(--paper3);border-radius:var(--radius);padding:8px;font-size:11px;color:var(--ink2);z-index:10;box-shadow:2px 2px 6px rgba(0,0,0,.12);white-space:normal;font-family:var(--mono)">
+          Matches recorded as "auton did NOT fail": <strong>${parseFloat(t.success_pct||0).toFixed(0)}%</strong> (${Math.round(parseFloat(t.success_pct||0)/100*t.count)}/${t.count})
+        </div>
+      </div>
     </div>
     <div class="dr"><span class="dk">AWP achieved</span><span class="dv">${t.awp_count} / ${t.count}</span></div>
     <div class="dr"><span class="dk">Avg bonuses/match</span><span class="dv">${parseFloat(t.avg_bonuses).toFixed(1)}</span></div>
@@ -1221,7 +1322,7 @@ function openDetail(t) {
       <div class="mh-row">
         <span style="font-size:11px;color:var(--ink2)">${e.event||'—'}</span>
         <span style="font-family:var(--mono);font-size:11px">${e.round||'—'}</span>
-        <span style="font-family:var(--mono);font-size:12px">${e.pins||'0'} pins</span>
+        <span style="font-family:var(--mono);font-size:11px">${(()=>{const p=(e.pins||'0').split('+');return p.length>=2?`G1:${p[0]} G2:${p[1]}${p[2]!==undefined?' G3:'+p[2]:''}${p[3]!==undefined?' G4:'+p[3]:''}`:e.pins+' pins';})()}</span>
         <span><span class="badge ${e.awp==='Y'?'b-awp':'b-no'}">${e.awp||'N'}</span></span>
         <span style="font-family:var(--mono);font-size:11px;color:var(--ink3)">${e.side||''}</span>
       </div>`).join('')}
@@ -1272,6 +1373,7 @@ async function addEntry() {
     maxpins:document.getElementById('f-maxpins').value.trim(),
     bonuses: 0,
     awp:document.getElementById('f-awp').value,
+    failed:document.getElementById('f-failed').value,
     notes:document.getElementById('f-notes').value.trim(),
     ts:new Date().toLocaleDateString()
   };
@@ -1306,6 +1408,7 @@ function clearForm() {
   ['f-team','f-event','f-round','f-maxpins','f-notes'].forEach(id=>document.getElementById(id).value='');
   // Reset dropdowns
   document.getElementById('f-awp').value = 'N';
+  document.getElementById('f-failed').value = 'N';
   document.getElementById('f-auto-mode').value = 'Normal';
   document.getElementById('f-pin-g1').value = '0';
   document.getElementById('f-pin-g2').value = '0';
@@ -1418,54 +1521,244 @@ function autoFill(id) {
   if(!team) return;
   const ms=allEntries.filter(e=>(e.team||'').toUpperCase()===team);
   if(!ms.length) return;
-  const avgPins=Math.round(ms.reduce((s,e)=>s+pins(e),0)/ms.length);
+  // Compute avg G1 and G2 pins separately from stored "g1+g2[+g3+g4]" string
+  const avgG1=ms.reduce((s,e)=>{const p=(e.pins||'0').split('+');return s+(parseInt(p[0])||0);},0)/ms.length;
+  const avgG2=ms.reduce((s,e)=>{const p=(e.pins||'0').split('+');return s+(parseInt(p[1])||0);},0)/ms.length;
   const awpRate=Math.round(ms.filter(e=>e.awp==='Y').length/ms.length*100);
-  const avgBon=Math.round(ms.reduce((s,e)=>s+(parseInt(e.bonuses)||0),0)/ms.length);
-  const pm={r1:'r1pins',r2:'r2pins',b1:'b1pins',b2:'b2pins'};
+  // Failure rate: entries where failed === 'Y' (or unknown = treat as neither)
+  const knownEntries=ms.filter(e=>e.failed==='Y'||e.failed==='N');
+  const failRate=knownEntries.length ? Math.round(knownEntries.filter(e=>e.failed==='Y').length/knownEntries.length*100) : 0;
+  const g1m={r1:'r1g1',r2:'r2g1',b1:'b1g1',b2:'b2g1'};
+  const g2m={r1:'r1g2',r2:'r2g2',b1:'b1g2',b2:'b2g2'};
   const am={r1:'r1awp',r2:'r2awp',b1:'b1awp',b2:'b2awp'};
-  const bm={r1:'r1bon',r2:'r2bon',b1:'b1bon',b2:'b2bon'};
-  if(pm[id]) document.getElementById(pm[id]).value=avgPins;
+  const fm={r1:'r1fail',r2:'r2fail',b1:'b1fail',b2:'b2fail'};
+  if(g1m[id]) document.getElementById(g1m[id]).value=avgG1.toFixed(1);
+  if(g2m[id]) document.getElementById(g2m[id]).value=avgG2.toFixed(1);
   if(am[id]) document.getElementById(am[id]).value=awpRate;
-  if(bm[id]) document.getElementById(bm[id]).value=avgBon;
+  if(fm[id]) document.getElementById(fm[id]).value=failRate;
   calcProb();
 }
 
+// ── Colour palette for outcome segments (red-wins → tie → blue-wins) ──
+const OUTCOME_COLOURS = {
+  'Red wins':  ['#c8410a','#d4521e','#e06535','#c03000','#b82e00','#cc4415','#d85030','#c03818'],
+  'Tie':       ['#7a5c00','#8a6800'],
+  'Blue wins': ['#1a5fb4','#2468bf','#2e72ca','#1050a0','#1a4898','#204fa8','#245ab4','#1845a0']
+};
+
+function outcomeColour(winner, index) {
+  const arr = OUTCOME_COLOURS[winner] || OUTCOME_COLOURS['Tie'];
+  return arr[index % arr.length];
+}
+
 function calcProb() {
-  const n=id=>parseFloat(document.getElementById(id)?.value)||0;
-  const rPins=n('r1pins')+n('r2pins'), bPins=n('b1pins')+n('b2pins');
-  const rBon=n('r1bon')+n('r2bon'),   bBon=n('b1bon')+n('b2bon');
-  const rCons=(n('r1cons')+n('r2cons'))/10, bCons=(n('b1cons')+n('b2cons'))/10;
-  const rRaw=rPins*5+rBon, bRaw=bPins*5+bBon;
-  const rExp=+(rRaw*rCons).toFixed(1), bExp=+(bRaw*bCons).toFixed(1);
-  let rFin=rExp, bFin=bExp;
-  if(rExp>bExp) rFin+=12; else if(bExp>rExp) bFin+=12; else{rFin+=6;bFin+=6;}
-  const tot=rFin+bFin||1;
-  const rP=Math.round(rFin/tot*100), bP=100-rP;
-  document.getElementById('ptRed').style.width=rP+'%'; document.getElementById('ptRed').textContent=rP+'%';
-  document.getElementById('ptBlue').style.width=bP+'%'; document.getElementById('ptBlue').textContent=bP+'%';
-  document.getElementById('ptRL').textContent='Red ~'+rFin.toFixed(1)+' pts';
-  document.getElementById('ptBL').textContent='Blue ~'+bFin.toFixed(1)+' pts';
-  const r1a=n('r1awp')/100,r2a=n('r2awp')/100,b1a=n('b1awp')/100,b2a=n('b2awp')/100;
-  const rA=+(r1a*r2a*rCons*100).toFixed(1), bA=+(b1a*b2a*bCons*100).toFixed(1);
-  const aT=rA+bA||1;
-  const rAB=Math.round(rA/aT*100), bAB=100-rAB;
-  document.getElementById('awpRed').style.width=rAB+'%'; document.getElementById('awpRed').textContent=rA.toFixed(0)+'%';
-  document.getElementById('awpBlue').style.width=bAB+'%'; document.getElementById('awpBlue').textContent=bA.toFixed(0)+'%';
-  document.getElementById('bkTable').innerHTML=`<table>
-    <thead><tr><th>Factor</th><th style="color:var(--red)">Red</th><th style="color:var(--blue)">Blue</th></tr></thead>
-    <tbody>
-      <tr><td>Avg pins placed</td><td>${rPins}</td><td>${bPins}</td></tr>
-      <tr><td>Pin points (×5)</td><td>${rPins*5}</td><td>${bPins*5}</td></tr>
-      <tr><td>Avg bonuses</td><td>${rBon}</td><td>${bBon}</td></tr>
-      <tr><td>Raw auto pts</td><td>${rRaw}</td><td>${bRaw}</td></tr>
-      <tr><td>Consistency factor</td><td>${rCons.toFixed(2)}</td><td>${bCons.toFixed(2)}</td></tr>
-      <tr><td>Expected pts</td><td><strong>${rExp}</strong></td><td><strong>${bExp}</strong></td></tr>
-      <tr><td>+ Auto bonus</td><td>${rFin-rExp>0?'+12':'—'}</td><td>${bFin-bExp>0?'+12':'—'}</td></tr>
-      <tr><td><strong>Final expected pts</strong></td><td><strong>${rFin.toFixed(1)}</strong></td><td><strong>${bFin.toFixed(1)}</strong></td></tr>
-      <tr><td>R1 AWP rate</td><td>${n('r1awp')}%</td><td>${n('b1awp')}%</td></tr>
-      <tr><td>R2 AWP rate</td><td>${n('r2awp')}%</td><td>${n('b2awp')}%</td></tr>
-      <tr><td><strong>Alliance AWP prob.</strong></td><td><strong>${rA.toFixed(1)}%</strong></td><td><strong>${bA.toFixed(1)}%</strong></td></tr>
-    </tbody></table>`;
+  const nv = id => parseFloat(document.getElementById(id)?.value) || 0;
+
+  // Per-robot inputs
+  const robots = [
+    { id:'r1', side:'red',  g1:nv('r1g1'), g2:nv('r1g2'), fail:nv('r1fail')/100, awp:nv('r1awp')/100,
+      label: (document.getElementById('r1')?.value.trim().toUpperCase() || 'R1') },
+    { id:'r2', side:'red',  g1:nv('r2g1'), g2:nv('r2g2'), fail:nv('r2fail')/100, awp:nv('r2awp')/100,
+      label: (document.getElementById('r2')?.value.trim().toUpperCase() || 'R2') },
+    { id:'b1', side:'blue', g1:nv('b1g1'), g2:nv('b1g2'), fail:nv('b1fail')/100, awp:nv('b1awp')/100,
+      label: (document.getElementById('b1')?.value.trim().toUpperCase() || 'B1') },
+    { id:'b2', side:'blue', g1:nv('b2g1'), g2:nv('b2g2'), fail:nv('b2fail')/100, awp:nv('b2awp')/100,
+      label: (document.getElementById('b2')?.value.trim().toUpperCase() || 'B2') },
+  ];
+
+  // Enumerate all 16 outcomes (each robot succeeds/fails)
+  const outcomes = [];
+  for (let mask = 0; mask < 16; mask++) {
+    const robotStates = robots.map((r, i) => {
+      const succeeds = !!(mask & (1 << i));
+      const prob = succeeds ? (1 - r.fail) : r.fail;
+      const pins = succeeds ? (r.g1 + r.g2) : 0;
+      return { ...r, succeeds, prob, pins };
+    });
+
+    // Joint probability of this exact combination
+    const probability = robotStates.reduce((p, r) => p * r.prob, 1);
+
+    // Scores per alliance
+    const redPins  = robotStates.filter(r => r.side==='red' ).reduce((s,r)=>s+r.pins,0);
+    const bluePins = robotStates.filter(r => r.side==='blue').reduce((s,r)=>s+r.pins,0);
+    const redRaw   = redPins  * 5;
+    const blueRaw  = bluePins * 5;
+
+    // Auto bonus (+12 to winner, +6 each if tied)
+    let redScore  = redRaw;
+    let blueScore = blueRaw;
+    if      (redRaw > blueRaw)  { redScore  += 12; }
+    else if (blueRaw > redRaw)  { blueScore += 12; }
+    else                        { redScore  += 6; blueScore += 6; }
+
+    // AWP probabilities (only if robot succeeded AND contributes AWP)
+    const redAwpProb  = robotStates.filter(r=>r.side==='red' ).reduce((p,r)=>p*(r.succeeds?r.awp:0),1)*100;
+    const blueAwpProb = robotStates.filter(r=>r.side==='blue').reduce((p,r)=>p*(r.succeeds?r.awp:0),1)*100;
+
+    const winner = redScore > blueScore ? 'Red wins' : blueScore > redScore ? 'Blue wins' : 'Tie';
+
+    // Human-readable label for which robots ran
+    const successLabels = robotStates.filter(r=>r.succeeds).map(r=>r.label);
+    const failLabels    = robotStates.filter(r=>!r.succeeds).map(r=>r.label);
+
+    outcomes.push({
+      mask, probability, robotStates,
+      redPins, bluePins, redRaw, blueRaw, redScore, blueScore,
+      redAwpProb, blueAwpProb, winner,
+      successLabels, failLabels
+    });
+  }
+
+  // Sort by probability descending for the bar (largest segments first within each category)
+  // Actually sort by winner category then probability so colours group nicely
+  const winOrder = {'Red wins':0,'Tie':1,'Blue wins':2};
+  outcomes.sort((a,b) => {
+    const wdiff = winOrder[a.winner] - winOrder[b.winner];
+    return wdiff !== 0 ? wdiff : b.probability - a.probability;
+  });
+
+  const totalProb = outcomes.reduce((s,o)=>s+o.probability,0) || 1;
+  const mostLikely = [...outcomes].sort((a,b)=>b.probability-a.probability)[0];
+
+  // ── Update header
+  document.getElementById('mostOutcome').textContent =
+    'Most probable: ' + mostLikely.winner + ' — ' +
+    mostLikely.robotStates.filter(r=>r.succeeds).map(r=>r.label).join('+') +
+    ' succeed (' + (mostLikely.probability*100).toFixed(1) + '%)';
+
+  // ── Build the bar
+  const bar = document.getElementById('outcomeBar');
+  bar.innerHTML = '';
+  let colourCounters = {'Red wins':0,'Tie':0,'Blue wins':0};
+
+  outcomes.forEach((o, idx) => {
+    const pct = (o.probability / totalProb) * 100;
+    if (pct < 0.1) return; // skip invisible slivers
+    const colour = outcomeColour(o.winner, colourCounters[o.winner]++);
+    const seg = document.createElement('div');
+    seg.className = 'outcome-seg';
+    seg.style.cssText = `flex:${pct};background:${colour};`;
+    seg.title = o.winner + ' · ' + (o.probability*100).toFixed(1) + '%';
+    if (pct > 3) {
+      const lbl = document.createElement('span');
+      lbl.className = 'outcome-seg-label';
+      lbl.textContent = (o.probability*100).toFixed(0) + '%';
+      seg.appendChild(lbl);
+    }
+    seg.addEventListener('click', () => showOutcomeDetail(o, seg, outcomes));
+    bar.appendChild(seg);
+  });
+
+  // ── Build legend
+  const legend = document.getElementById('outcomeLegend');
+  const redTotal  = outcomes.filter(o=>o.winner==='Red wins').reduce((s,o)=>s+o.probability,0);
+  const tieTotal  = outcomes.filter(o=>o.winner==='Tie').reduce((s,o)=>s+o.probability,0);
+  const blueTotal = outcomes.filter(o=>o.winner==='Blue wins').reduce((s,o)=>s+o.probability,0);
+  legend.innerHTML = [
+    { label:'Red wins', colour:'#c8410a', prob:redTotal },
+    { label:'Tie',      colour:'#7a5c00', prob:tieTotal },
+    { label:'Blue wins',colour:'#1a5fb4', prob:blueTotal },
+  ].map(l=>`
+    <div class="outcome-legend-item">
+      <div class="outcome-legend-swatch" style="background:${l.colour}"></div>
+      <span>${l.label}: <strong>${(l.prob*100).toFixed(1)}%</strong></span>
+    </div>`).join('');
+
+  // Clear any open detail
+  const det = document.getElementById('outcomeDetail');
+  det.style.display = 'none';
+  det.innerHTML = '';
+
+  // Auto-show the most likely outcome
+  const mostSeg = bar.children[0];
+  if (mostSeg) mostSeg.click();
+}
+
+function showOutcomeDetail(o, clickedSeg, allOutcomes) {
+  // Highlight selected segment
+  document.querySelectorAll('.outcome-seg').forEach(s=>s.classList.remove('selected'));
+  clickedSeg.classList.add('selected');
+
+  const det = document.getElementById('outcomeDetail');
+  det.style.display = 'block';
+
+  // Rank of this outcome by probability
+  const sorted = [...allOutcomes].sort((a,b)=>b.probability-a.probability);
+  const rank = sorted.indexOf(o) + 1;
+
+  const winColor = o.winner==='Red wins' ? 'var(--red)' : o.winner==='Blue wins' ? 'var(--blue)' : 'var(--amber)';
+
+  const robotCards = o.robotStates.map(r=>`
+    <div class="outcome-robot-card ${r.succeeds?'success':'fail'}">
+      <div class="outcome-robot-name" style="color:${r.side==='red'?'var(--red)':'var(--blue)'}">${r.label} (${r.side})</div>
+      <div class="outcome-robot-pins">
+        ${r.succeeds
+          ? `✅ Ran — G1: ${r.g1} pins, G2: ${r.g2} pins → <strong>${r.pins} total</strong>`
+          : `❌ Failed — 0 pins scored`
+        }
+      </div>
+      <div style="font-size:11px;color:var(--ink3);margin-top:3px;font-family:var(--mono)">
+        Failure rate: ${(r.fail*100).toFixed(0)}% · AWP contrib: ${(r.awp*100).toFixed(0)}%
+      </div>
+    </div>`).join('');
+
+  det.innerHTML = `
+    <div class="outcome-detail">
+      <div class="outcome-detail-head">
+        <div>
+          <div class="outcome-detail-title" style="color:${winColor}">${o.winner}</div>
+          <div style="font-size:12px;color:var(--ink3);font-family:var(--mono);margin-top:2px">
+            Outcome #${rank} most likely of 16 · Robots that ran: ${o.successLabels.join(', ')||'none'}
+            ${o.failLabels.length ? ' · Failed: '+o.failLabels.join(', ') : ''}
+          </div>
+        </div>
+        <div class="outcome-detail-prob">${(o.probability*100).toFixed(2)}% chance</div>
+      </div>
+
+      <div class="outcome-stat-grid">
+        <div class="outcome-stat">
+          <div class="outcome-stat-l" style="color:var(--red)">Red final score</div>
+          <div class="outcome-stat-v" style="color:var(--red)">${o.redScore}</div>
+        </div>
+        <div class="outcome-stat">
+          <div class="outcome-stat-l" style="color:var(--blue)">Blue final score</div>
+          <div class="outcome-stat-v" style="color:var(--blue)">${o.blueScore}</div>
+        </div>
+        <div class="outcome-stat">
+          <div class="outcome-stat-l">Red pins</div>
+          <div class="outcome-stat-v">${o.redPins}</div>
+        </div>
+        <div class="outcome-stat">
+          <div class="outcome-stat-l">Blue pins</div>
+          <div class="outcome-stat-v">${o.bluePins}</div>
+        </div>
+        <div class="outcome-stat">
+          <div class="outcome-stat-l">Red pin pts</div>
+          <div class="outcome-stat-v">${o.redRaw}</div>
+        </div>
+        <div class="outcome-stat">
+          <div class="outcome-stat-l">Blue pin pts</div>
+          <div class="outcome-stat-v">${o.blueRaw}</div>
+        </div>
+        <div class="outcome-stat">
+          <div class="outcome-stat-l">Red AWP prob</div>
+          <div class="outcome-stat-v" style="font-size:14px">${o.redAwpProb.toFixed(1)}%</div>
+        </div>
+        <div class="outcome-stat">
+          <div class="outcome-stat-l">Blue AWP prob</div>
+          <div class="outcome-stat-v" style="font-size:14px">${o.blueAwpProb.toFixed(1)}%</div>
+        </div>
+      </div>
+
+      <div style="font-size:11px;font-family:var(--mono);color:var(--ink3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">Robot states in this outcome</div>
+      <div class="outcome-robot-row">${robotCards}</div>
+
+      <div style="margin-top:12px;font-size:11px;color:var(--ink3);font-family:var(--mono);border-top:.5px solid var(--paper3);padding-top:8px">
+        Score breakdown: ${o.redPins} red pins × 5 = ${o.redRaw} pts${o.redScore>o.redRaw?' + 12 auto bonus':o.redScore===o.redRaw+6?' + 6 tie bonus':''} = <strong>${o.redScore}</strong> &nbsp;|&nbsp;
+        ${o.bluePins} blue pins × 5 = ${o.blueRaw} pts${o.blueScore>o.blueRaw?' + 12 auto bonus':o.blueScore===o.blueRaw+6?' + 6 tie bonus':''} = <strong>${o.blueScore}</strong>
+      </div>
+    </div>`;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -1484,20 +1777,7 @@ function sidebarNav(tab) {
 }
 
 const ROUTES=[
-  ['l>lg>m>mg>lg>w','psi','Full scoring — loader, long goal, mid, mid goal, second lg + wing'],
-  ['m>lg>w','twi','Simple: mid + long goal + wing'],
-  ['m>l>lg>mg>lg>w','zeta+','Aggressive: mid, loader, long goal, mid goal, second lg + wing'],
-  ['m>l>lg>w','zeta','Classic: mid + loader + long goal + wing'],
-  ['m>u>lg>w','rho','Undergoal: mid, undergoal, long goal + wing'],
-  ['m>u>lg>l>mg>w','cocktail','5-stop: mid, undergoal, long goal, loader, mid goal + wing'],
-  ['l>lg>m>mg','psi (-w)','Psi without wing'],['m>lg','twi (-w)','Minimal'],
-  ['m>l>lg>mg','zeta+ (-w)','Zeta+ without wing'],['m>l>lg','zeta (-w)','Zeta without wing'],
-  ['m>u>lg','rho (-w)','Rho without wing'],['m>u>lg>l>mg','cocktail (-w)','Cocktail without wing'],
-  ['m>u>mg>l>lg>w','mocktail','Undergoal first, mid goal before long goal + wing'],
-  ['m>lg>l>mg>lg>w','hourglass','Crosses lg and mg twice + wing'],
-  ['l>lg>w','gamma','Loader + long goal + wing'],
-  ['m>mg>l>lg>w','sju','Mid, mid goal, loader, long goal + wing'],
-  ['l>lg>m>mg>m>mg','tsadi','Dual mid goal — high pin potential'],
+  
 ];
 
 function renderRoutes() {
