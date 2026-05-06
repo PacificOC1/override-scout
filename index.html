@@ -417,7 +417,7 @@ tr:hover td{background:var(--paper2);cursor:pointer}
         <div id="section-sawp" style="margin-bottom:16px;display:none">
           <!-- Own quadrant — the robot's primary side -->
           <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--ink2);border-bottom:1px solid var(--paper3);padding-bottom:6px;margin-bottom:10px">
-            🔴 SAWP — Own quadrant
+            🔴 SAWP — Own Quadrant
           </div>
           <div class="g2" style="margin-bottom:14px">
             <div>
@@ -445,7 +445,7 @@ tr:hover td{background:var(--paper2);cursor:pointer}
           </div>
           <!-- Teammate quadrant — the other side the robot crosses into -->
           <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--ink2);border-bottom:1px solid var(--paper3);padding-bottom:6px;margin-bottom:10px">
-            🔵 SAWP — Teammate quadrant
+            🔵 SAWP — Teammate Quadrant
           </div>
           <div class="g2">
             <div>
@@ -613,8 +613,8 @@ tr:hover td{background:var(--paper2);cursor:pointer}
           <p class="sec">Route notation</p>
           <table>
             <tr><td style="width:36px"><code>m</code></td><td>Mid blocks</td></tr>
-            <tr><td><code>lg</code></td><td>Long goal</td></tr>
-            <tr><td><code>l</code></td><td>Loader</td></tr>
+            <tr><td><code>g1</code></td><td>Goal1(Alliance)</td></tr>
+            <tr><td><code>g2</code></td><td>Goal2</td></tr>
             <tr><td><code>mg</code></td><td>Mid goal</td></tr>
             <tr><td><code>u</code></td><td>Undergoal</td></tr>
             <tr><td><code>w</code></td><td>Wing touch</td></tr>
@@ -679,16 +679,16 @@ Red still more likely to achieve AWP (33.6% vs 25.2%)</div>
       <div class="card">
         <p class="sec">Add Sig Event</p>
         <div class="g3" style="margin-bottom:12px">
-          <div><label>Event name</label><input id="cal-name" placeholder="e.g. Mall of America Sig"></div>
-          <div><label>Start date</label><input type="date" id="cal-start"></div>
-          <div><label>End date</label><input type="date" id="cal-end"></div>
+          <div><label>Event Name</label><input id="cal-name" placeholder="e.g. Mall of America"></div>
+          <div><label>Start Date</label><input type="date" id="cal-start"></div>
+          <div><label>End Date</label><input type="date" id="cal-end"></div>
         </div>
         <div class="g2" style="margin-bottom:12px">
           <div><label>Location (optional)</label><input id="cal-loc" placeholder="e.g. Minneapolis, MN"></div>
           <div><label>Notes (optional)</label><input id="cal-notes" placeholder="e.g. Worlds qualifying event"></div>
         </div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-p" onclick="addCalEvent()">Add event</button>
+          <button class="btn btn-p" onclick="addCalEvent()">Add Event</button>
           <button class="btn" onclick="clearCalForm()">Clear</button>
         </div>
         <div id="cal-msg"></div>
@@ -702,7 +702,7 @@ Red still more likely to achieve AWP (33.6% vs 25.2%)</div>
           <select id="cal-filter-select" onchange="applyCalFilter()" style="max-width:320px">
             <option value="">— Show all entries (no filter) —</option>
           </select>
-          <button class="btn btn-sm" onclick="clearCalFilter()">Clear filter</button>
+          <button class="btn btn-sm" onclick="clearCalFilter()">Clear Filter</button>
         </div>
         <div id="cal-filter-status" style="font-size:13px;color:var(--ink3);font-family:var(--mono)"></div>
       </div>
