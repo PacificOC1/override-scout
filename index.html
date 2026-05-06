@@ -306,7 +306,7 @@ tr:hover td{background:var(--paper2);cursor:pointer}
       <div class="card">
         <p class="sec">New autonomous entry</p>
         <div class="g3" style="margin-bottom:12px">
-          <div><label>Team #</label><input id="f-team" placeholder="e.g. 73017D"></div>
+          <div><label>Team #</label><input id="f-team" placeholder="e.g. 97230F"></div>
           <div><label>Event name</label><input id="f-event" placeholder="e.g. Mall of America"></div>
           <div><label>Round</label><input id="f-round" placeholder="e.g. R16 1-1"></div>
         </div>
@@ -316,31 +316,29 @@ tr:hover td{background:var(--paper2);cursor:pointer}
           </div>
           <div><label>Robot Type</label>
             <select id="f-type">
-              <option>Basket Bot</option><option>Ruiguan</option><option>Ruiguan (Hero)</option>
-              <option>C Bot</option><option>Stack Bot</option><option>Other</option>
+              <option>Claw Bot</option><option>Other</option>
             </select>
           </div>
-          <div><label>Sig event?</label>
+          <div><label>Sig Event?</label>
             <select id="f-sig"><option value="no">No</option><option value="yes">Yes — Worlds qualifier</option></select>
           </div>
         </div>
         <div class="g2" style="margin-bottom:12px">
           <div>
-            <label>Route  <span style="font-weight:400;color:var(--ink3)">(m · lg · l · mg · u · w)</span></label>
-            <input id="f-route" placeholder="e.g. m>l>lg>mg>w  or  Unknown route">
+            <label>Route  <span style="font-weight:400;color:var(--ink3)">(placeholer)</span></label>
+            <input id="f-route" placeholder="placeholder">
           </div>
           <div>
-            <label>Pins scored  <span style="font-weight:400;color:var(--ink3)">(longGoal+ownMid+oppMid)</span></label>
-            <input id="f-pins" placeholder="e.g. 2+1+2">
-            <p class="hint">A+B+C — A=long goal, B=own mid, C=opp mid</p>
+            <label>Pins scored  <span style="font-weight:400;color:var(--ink3)">(Goal 1 + Goal 2)</span></label>
+            <input id="f-pins" placeholder="e.g. 2+2">
+            <p class="hint">A+B+C — A=Goal 1, B=Goal 2</p>
           </div>
         </div>
         <div class="g3" style="margin-bottom:12px">
-          <div><label>Control bonuses</label><input type="number" id="f-bonuses" min="0" max="10" value="0"></div>
           <div><label>AWP achieved?</label>
             <select id="f-awp"><option value="N">No</option><option value="Y">Yes</option><option value="?">Unknown</option></select>
           </div>
-          <div><label>Max possible pins</label><input id="f-maxpins" placeholder="e.g. 7"></div>
+          <div><label>Max possible pins</label><input id="f-maxpins" placeholder="e.g. 4"></div>
         </div>
         <div style="margin-bottom:12px">
           <label>Notes</label>
