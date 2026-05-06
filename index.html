@@ -217,8 +217,8 @@ tr:hover td{background:var(--paper2);cursor:pointer}
     <button class="login-modal-close" onclick="closeLoginModal()">✕</button>
     <div class="login-logo">Override <span>Scout</span></div>
     <div class="login-sub">Admin login</div>
-    <label>Username</label>
-    <input type="text" id="unInput" placeholder="Username" autocomplete="username"
+    <label>Email</label>
+    <input type="email" id="unInput" placeholder="admin@example.com" autocomplete="email"
       onkeydown="if(event.key==='Enter')document.getElementById('pwInput').focus()">
     <label>Password</label>
     <input type="password" id="pwInput" placeholder="Password" autocomplete="current-password"
@@ -573,13 +573,23 @@ Red still more likely to achieve AWP (33.6% vs 25.2%)</div>
 /* ═══════════════════════════════════════════════════════
    CONFIGURATION — set your admin password and Supabase keys
 ════════════════════════════════════════════════════════ */
-const ADMIN_USER     = 'botgobrr';
-const ADMIN_PASSWORD = 'XtBX0-rq"9(>UbJ2C7w';
 const SB_URL = 'https://ajymmthxmdyhkiynwhuf.supabase.co';
 const SB_KEY = 'sb_publishable_1r5xHNrNLbRHB_GcJMgsjg_fwEvgdqS';
 /* ═══════════════════════════════════════════════════════ */
 
+// Public read-only headers (anon key — safe to expose)
 const HDRS = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Accept': 'application/json' };
+
+// Admin auth token — set after Supabase login, cleared on logout
+let adminToken = null;
+function adminHdrs() {
+  return {
+    'apikey': SB_KEY,
+    'Authorization': 'Bearer ' + adminToken,
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  };
+}
 
 /* ── State ── */
 let isAdmin = false;
@@ -605,13 +615,49 @@ function closeLoginModal() {
   document.getElementById('loginErr').textContent = '';
 }
 
-function tryLogin() {
-  const un = document.getElementById('unInput').value.trim();
-  const pw = document.getElementById('pwInput').value;
-  if(un === ADMIN_USER && pw === ADMIN_PASSWORD) {
+async function tryLogin() {
+  const email = document.getElementById('unInput').value.trim();
+  const pw    = document.getElementById('pwInput').value;
+  const errEl = document.getElementById('loginErr');
+  const btn   = document.querySelector('.btn-login');
+
+  if(!email || !pw) { errEl.textContent = 'Enter your email and password.'; return; }
+
+  errEl.textContent = 'Signing in…';
+  errEl.style.color = 'var(--ink3)';
+  btn.disabled = true;
+
+  try {
+    // Supabase Auth REST endpoint — no client library needed
+    const res = await fetch(SB_URL + '/auth/v1/token?grant_type=password', {
+      method: 'POST',
+      headers: {
+        'apikey': SB_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password: pw })
+    });
+    const data = await res.json();
+
+    if(!res.ok || data.error) {
+      errEl.textContent = 'Invalid email or password.';
+      errEl.style.color = 'var(--red)';
+      document.getElementById('pwInput').value = '';
+      document.getElementById('pwInput').focus();
+      btn.disabled = false;
+      return;
+    }
+
+    // Supabase returned a valid JWT — store it for authenticated requests
+    adminToken = data.access_token;
+    sessionStorage.setItem('sb_token', adminToken);
+    sessionStorage.setItem('sb_token_exp', Date.now() + (data.expires_in * 1000));
+
     isAdmin = true;
-    sessionStorage.setItem('admin', '1');
+    errEl.textContent = '';
+    btn.disabled = false;
     closeLoginModal();
+
     // Reveal admin tabs
     document.querySelectorAll('.admin-only').forEach(el => el.classList.add('admin-visible'));
     document.getElementById('modeBadge').textContent = 'Admin';
@@ -619,16 +665,29 @@ function tryLogin() {
     document.getElementById('logoutBtn').style.display = '';
     document.getElementById('adminLoginBtn').style.display = 'none';
     renderLog();
-  } else {
-    document.getElementById('loginErr').textContent = 'Incorrect username or password.';
-    document.getElementById('pwInput').value = '';
-    document.getElementById('pwInput').focus();
+
+  } catch(e) {
+    errEl.textContent = 'Network error — check your connection.';
+    errEl.style.color = 'var(--red)';
+    btn.disabled = false;
+    console.error('Login error:', e);
   }
 }
 
-function logout() {
-  sessionStorage.removeItem('admin');
+async function logout() {
+  // Sign out from Supabase (invalidates the JWT server-side)
+  if(adminToken) {
+    try {
+      await fetch(SB_URL + '/auth/v1/logout', {
+        method: 'POST',
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + adminToken }
+      });
+    } catch(e) { /* best effort */ }
+  }
+  adminToken = null;
   isAdmin = false;
+  sessionStorage.removeItem('sb_token');
+  sessionStorage.removeItem('sb_token_exp');
   document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('admin-visible'));
   document.getElementById('modeBadge').textContent = 'Viewer';
   document.getElementById('modeBadge').className = 'mode-badge mode-pub';
@@ -920,7 +979,7 @@ async function addEntry() {
   try {
     const r = await fetch(SB_URL+'/rest/v1/entries', {
       method:'POST',
-      headers:{...HDRS,'Content-Type':'application/json','Prefer':'return=minimal'},
+      headers:{...adminHdrs(),'Prefer':'return=minimal'},
       body:JSON.stringify(entry)
     });
     if(r.ok){
@@ -989,7 +1048,7 @@ async function deleteEntry(id) {
   // Remove from Supabase
   try {
     await fetch(SB_URL+'/rest/v1/entries?id=eq.'+id, {
-      method:'DELETE', headers:{...HDRS,'Content-Type':'application/json'}
+      method:'DELETE', headers: adminHdrs()
     });
   } catch(e){ console.error(e); }
   // Remove locally
@@ -1019,7 +1078,7 @@ function importCSV(ev) {
       const c=line.split(',');
       if(!c[0]) continue;
       const entry={id:Date.now()+Math.random(),team:c[0],event:c[1]||'',round:c[2]||'',side:c[3]||'L',sig:c[4]||'no',type:c[5]||'',route:c[6]||'Unknown route',pins:c[7]||'0',maxpins:c[8]||'',bonuses:parseInt(c[9])||0,awp:c[10]||'N',notes:(c[11]||'').replace(/^"|"$/g,''),ts:c[12]||''};
-      try{ await fetch(SB_URL+'/rest/v1/entries',{method:'POST',headers:{...HDRS,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(entry)}); }catch(e){}
+      try{ await fetch(SB_URL+'/rest/v1/entries',{method:'POST',headers:{...adminHdrs(),'Prefer':'return=minimal'},body:JSON.stringify(entry)}); }catch(e){}
       allEntries.unshift(entry); added++;
     }
     allTeams=buildStats(allEntries);
@@ -1129,11 +1188,17 @@ function switchTab(t, el) {
 /* ═══════════════════════════════════════════════════════
    INIT — check if already logged in this session
 ════════════════════════════════════════════════════════ */
-// Always launch as public viewer immediately — admin login via button
-if(sessionStorage.getItem('admin') === '1') {
+// Restore admin session if JWT is still valid (not expired)
+const storedToken = sessionStorage.getItem('sb_token');
+const storedExp   = parseInt(sessionStorage.getItem('sb_token_exp') || '0');
+if(storedToken && Date.now() < storedExp) {
+  adminToken = storedToken;
   isAdmin = true;
   launchApp(true);
 } else {
+  // Clear any stale session data
+  sessionStorage.removeItem('sb_token');
+  sessionStorage.removeItem('sb_token_exp');
   launchApp(false);
 }
 
