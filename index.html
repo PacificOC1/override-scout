@@ -1203,72 +1203,115 @@ if(storedToken && Date.now() < storedExp) {
 }
 
 /* ═══════════════════════════════════════════════════════
-   SIG CALENDAR
+   SIG CALENDAR — Supabase backed
 ════════════════════════════════════════════════════════ */
-let calEvents = JSON.parse(localStorage.getItem('override_cal') || '[]');
-let activeCalFilter = null; // { start, end, name } or null
+let calEvents = [];
+let activeCalFilter = null;
 
-function saveCalEvents() {
-  try { localStorage.setItem('override_cal', JSON.stringify(calEvents)); } catch(e){}
+/* ── Load events from Supabase (public — anyone can read) ── */
+async function loadCalEvents() {
+  try {
+    const r = await fetch(SB_URL + '/rest/v1/sig_events?select=*&order=start_date.asc', { headers: HDRS });
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    calEvents = await r.json();
+    renderCalList();
+    updateCalSelect();
+  } catch(e) {
+    console.error('Could not load sig events:', e);
+    document.getElementById('calList').innerHTML = '<div class="empty" style="color:var(--red-text)">Could not load events from database.</div>';
+  }
 }
 
-function addCalEvent() {
+/* ── Add event → Supabase (admin only) ── */
+async function addCalEvent() {
+  if(!isAdmin) return;
   const name  = document.getElementById('cal-name').value.trim();
   const start = document.getElementById('cal-start').value;
   const end   = document.getElementById('cal-end').value;
   const loc   = document.getElementById('cal-loc').value.trim();
   const notes = document.getElementById('cal-notes').value.trim();
   if(!name || !start || !end) { showMsg('cal-msg','Name, start and end date are required.','err'); return; }
-  if(start > end) { showMsg('cal-msg','Start date must be before end date.','err'); return; }
-  calEvents.push({ id: Date.now(), name, start, end, loc, notes });
-  calEvents.sort((a,b) => a.start.localeCompare(b.start));
-  saveCalEvents();
-  renderCalList();
-  updateCalSelect();
-  clearCalForm();
-  showMsg('cal-msg','Event added!','ok');
+  if(start > end)             { showMsg('cal-msg','Start date must be before end date.','err'); return; }
+
+  showMsg('cal-msg','Saving…','ok');
+  try {
+    const r = await fetch(SB_URL + '/rest/v1/sig_events', {
+      method: 'POST',
+      headers: { ...adminHdrs(), 'Prefer': 'return=representation' },
+      body: JSON.stringify({ name, start_date: start, end_date: end, location: loc, notes })
+    });
+    if(!r.ok) { const t=await r.text(); throw new Error(t); }
+    clearCalForm();
+    showMsg('cal-msg', '✓ Event saved to database!', 'ok');
+    await loadCalEvents();
+  } catch(e) {
+    showMsg('cal-msg', 'Failed to save: ' + e.message, 'err');
+    console.error(e);
+  }
 }
 
 function clearCalForm() {
   ['cal-name','cal-start','cal-end','cal-loc','cal-notes'].forEach(id => document.getElementById(id).value = '');
 }
 
-function deleteCalEvent(id) {
+/* ── Delete event (admin only) ── */
+async function deleteCalEvent(id) {
+  if(!isAdmin) return;
   if(!confirm('Delete this event?')) return;
-  calEvents = calEvents.filter(e => e.id !== id);
-  saveCalEvents();
-  renderCalList();
-  updateCalSelect();
-  if(activeCalFilter && activeCalFilter.id === id) clearCalFilter();
+  try {
+    const r = await fetch(SB_URL + '/rest/v1/sig_events?id=eq.' + id, {
+      method: 'DELETE',
+      headers: adminHdrs()
+    });
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    if(activeCalFilter && activeCalFilter.id === id) clearCalFilter();
+    await loadCalEvents();
+  } catch(e) {
+    alert('Could not delete event: ' + e.message);
+  }
 }
 
+/* ── Render calendar list ── */
 function renderCalList() {
   const el = document.getElementById('calList');
-  if(!calEvents.length) { el.innerHTML = '<div class="empty" style="padding:1.5rem">No events added yet.</div>'; return; }
+  if(!calEvents.length) {
+    el.innerHTML = '<div class="empty" style="padding:1.5rem">No Sig events added yet.</div>';
+    return;
+  }
   const now = new Date().toISOString().slice(0,10);
   el.innerHTML = calEvents.map(e => {
-    const isPast    = e.end < now;
-    const isCurrent = e.start <= now && e.end >= now;
-    const status    = isCurrent ? '<span class="badge b-awp">LIVE</span>' : isPast ? '<span class="badge b-no">Past</span>' : '<span class="badge b-sig">Upcoming</span>';
+    const isPast    = e.end_date < now;
+    const isCurrent = e.start_date <= now && e.end_date >= now;
+    const status    = isCurrent
+      ? '<span class="badge b-awp">LIVE</span>'
+      : isPast
+        ? '<span class="badge b-no">Past</span>'
+        : '<span class="badge b-sig">Upcoming</span>';
     const entryCount = allEntries.filter(en => {
       const d = (en.created_at||en.ts||'').slice(0,10);
-      return d >= e.start && d <= e.end;
+      return d >= e.start_date && d <= e.end_date;
     }).length;
-    return `<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0;border-bottom:.5px solid var(--paper3);gap:12px;flex-wrap:wrap">
+    return `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:14px 0;border-bottom:.5px solid var(--paper3);gap:12px;flex-wrap:wrap">
       <div style="flex:1;min-width:200px">
-        <div style="font-weight:600;font-size:14px;margin-bottom:4px">${e.name} ${status}</div>
-        <div style="font-size:12px;font-family:var(--mono);color:var(--ink3)">${e.start} → ${e.end}${e.loc?' · '+e.loc:''}</div>
-        ${e.notes?`<div style="font-size:12px;color:var(--ink2);margin-top:3px">${e.notes}</div>`:''}
-        <div style="font-size:11px;font-family:var(--mono);color:var(--ink3);margin-top:4px">${entryCount} scouting entr${entryCount!==1?'ies':'y'} in this window</div>
+        <div style="font-weight:600;font-size:14px;margin-bottom:5px">${e.name} ${status}</div>
+        <div style="font-size:12px;font-family:var(--mono);color:var(--ink3)">
+          ${e.start_date} → ${e.end_date}${e.location?' · '+e.location:''}
+        </div>
+        ${e.notes ? `<div style="font-size:12px;color:var(--ink2);margin-top:3px">${e.notes}</div>` : ''}
+        <div style="font-size:11px;font-family:var(--mono);color:var(--ink3);margin-top:5px">
+          ${entryCount} scouting entr${entryCount!==1?'ies':'y'} in this window
+        </div>
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
-        <button class="btn btn-sm" onclick="filterByEvent(${e.id})">Filter leaderboard</button>
-        <button class="btn btn-sm btn-d" onclick="deleteCalEvent(${e.id})">✕</button>
+        <button class="btn btn-sm" onclick="filterByEvent('${e.id}')">Filter leaderboard</button>
+        ${isAdmin ? `<button class="btn btn-sm btn-d" onclick="deleteCalEvent('${e.id}')">✕</button>` : ''}
       </div>
     </div>`;
   }).join('');
 }
 
+/* ── Update the filter dropdown ── */
 function updateCalSelect() {
   const sel = document.getElementById('cal-filter-select');
   const cur = sel.value;
@@ -1276,40 +1319,35 @@ function updateCalSelect() {
   calEvents.forEach(e => {
     const opt = document.createElement('option');
     opt.value = e.id;
-    opt.textContent = e.name + ' (' + e.start + ' → ' + e.end + ')';
+    opt.textContent = e.name + ' (' + e.start_date + ' → ' + e.end_date + ')';
     sel.appendChild(opt);
   });
   if(cur) sel.value = cur;
 }
 
 function filterByEvent(id) {
-  const ev = calEvents.find(e => e.id === id);
+  const ev = calEvents.find(e => String(e.id) === String(id));
   if(!ev) return;
   activeCalFilter = ev;
   applyCalFilterToLeaderboard(ev);
 }
 
 function applyCalFilter() {
-  const id = parseInt(document.getElementById('cal-filter-select').value);
+  const id = document.getElementById('cal-filter-select').value;
   if(!id) { clearCalFilter(); return; }
-  const ev = calEvents.find(e => e.id === id);
+  const ev = calEvents.find(e => String(e.id) === String(id));
   if(ev) { activeCalFilter = ev; applyCalFilterToLeaderboard(ev); }
 }
 
 function applyCalFilterToLeaderboard(ev) {
-  // Filter allEntries to only entries within this event window
   const filtered = allEntries.filter(en => {
     const d = (en.created_at||en.ts||'').slice(0,10);
-    return d >= ev.start && d <= ev.end;
+    return d >= ev.start_date && d <= ev.end_date;
   });
   const filteredTeams = buildStats(filtered);
-
-  // Update leaderboard with filtered data
   lbFiltered = [...filteredTeams];
   lbPg = 1;
   lbSortRender();
-
-  // Update summary cards
   const totP = filtered.reduce((s,e)=>s+pins(e),0);
   const avgP = filtered.length ? (totP/filtered.length).toFixed(1) : '—';
   const awpR = filtered.length ? Math.round(filtered.filter(e=>e.awp==='Y').length/filtered.length*100) : 0;
@@ -1317,18 +1355,15 @@ function applyCalFilterToLeaderboard(ev) {
   document.getElementById('lbE').textContent = filtered.length;
   document.getElementById('lbP').textContent = avgP;
   document.getElementById('lbA').textContent = awpR + '%';
-
-  // Show status
   document.getElementById('cal-filter-status').innerHTML =
-    '✓ Leaderboard filtered to <strong>' + ev.name + '</strong> (' + ev.start + ' → ' + ev.end + ') — ' +
-    filtered.length + ' entries, ' + filteredTeams.length + ' teams. <a href="#" onclick="clearCalFilter();return false;" style="color:var(--blue)">Clear filter</a>';
-
-  // Switch to leaderboard tab to show result
+    '✓ Filtered to <strong>' + ev.name + '</strong> (' + ev.start_date + ' → ' + ev.end_date + ') — ' +
+    filtered.length + ' entries, ' + filteredTeams.length + ' teams. ' +
+    '<a href="#" onclick="clearCalFilter();return false;" style="color:var(--blue)">Clear filter</a>';
+  // Jump to leaderboard
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelector('[data-tab="leaderboard"]').classList.add('active');
   document.getElementById('tab-leaderboard').classList.add('active');
-
   setSyncStatus('ok', 'Filtered: ' + ev.name);
 }
 
@@ -1339,7 +1374,6 @@ function clearCalFilter() {
   lbFiltered = [...allTeams];
   lbPg = 1;
   lbSortRender();
-  // Restore full counts
   const totP = allEntries.reduce((s,e)=>s+pins(e),0);
   const avgP = allEntries.length ? (totP/allEntries.length).toFixed(1) : '—';
   const awpR = allEntries.length ? Math.round(allEntries.filter(e=>e.awp==='Y').length/allEntries.length*100) : 0;
@@ -1350,9 +1384,8 @@ function clearCalFilter() {
   setSyncStatus('ok', allTeams.length+' teams · '+allEntries.length+' entries');
 }
 
-// Init calendar UI
-updateCalSelect();
-renderCalList();
+// Load calendar on init
+loadCalEvents();
 </script>
 </body>
 </html>
