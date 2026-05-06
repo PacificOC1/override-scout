@@ -493,10 +493,17 @@ tr:hover td{background:var(--paper2);cursor:pointer}
             <input id="f-maxpins" placeholder="e.g. 6" type="number" min="0" max="20">
           </div>
         </div>
+        <div>
+            <label>Auton Failed? <span style="font-weight:400;color:var(--ink3)"></span></label>
+            <select id="f-failed" style="font-size:14px">
+              <option value="N">No — ran successfully</option>
+              <option value="Y">Yes — auton failed</option>
+            </select>
+          </div>
 
         <!-- Notes field — free text for anything unusual:
              partner coordination, errors, opponent counter-routes, etc. -->
-        <div style="margin-bottom:16px">
+        <div style="margin-bottom:12px">
           <label>Notes <span style="font-weight:400;color:var(--ink3)">(optional)</span></label>
           <textarea id="f-notes" rows="2" placeholder="Partner routes, errors, counter strategies, field conditions…"></textarea>
         </div>
