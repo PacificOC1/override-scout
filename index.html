@@ -301,82 +301,59 @@ tr:hover td{background:var(--paper2);cursor:pointer}
   </div>
 
   <!-- ── ADD ENTRY (admin) ── -->
-<div class="form-group">
-        <label>Robot Build Profile</label>
-        <input type="text" id="f-type" value="Claw Bot" disabled style="background:var(--paper2); cursor:not-allowed;">
+  <div id="tab-add" class="panel">
+    <div class="page">
+      <div class="card">
+        <p class="sec">New autonomous entry</p>
+        <div class="g3" style="margin-bottom:12px">
+          <div><label>Team #</label><input id="f-team" placeholder="e.g. 73017D"></div>
+          <div><label>Event name</label><input id="f-event" placeholder="e.g. Mall of America"></div>
+          <div><label>Round</label><input id="f-round" placeholder="e.g. R16 1-1"></div>
+        </div>
+        <div class="g3" style="margin-bottom:12px">
+          <div><label>Side</label>
+            <select id="f-side"><option value="L">Left (L)</option><option value="R">Right (R)</option></select>
+          </div>
+          <div><label>Robot Type</label>
+            <select id="f-type">
+              <option>Basket Bot</option><option>Ruiguan</option><option>Ruiguan (Hero)</option>
+              <option>C Bot</option><option>Stack Bot</option><option>Other</option>
+            </select>
+          </div>
+          <div><label>Sig event?</label>
+            <select id="f-sig"><option value="no">No</option><option value="yes">Yes — Worlds qualifier</option></select>
+          </div>
+        </div>
+        <div class="g2" style="margin-bottom:12px">
+          <div>
+            <label>Route  <span style="font-weight:400;color:var(--ink3)">(m · lg · l · mg · u · w)</span></label>
+            <input id="f-route" placeholder="e.g. m>l>lg>mg>w  or  Unknown route">
+          </div>
+          <div>
+            <label>Pins scored  <span style="font-weight:400;color:var(--ink3)">(longGoal+ownMid+oppMid)</span></label>
+            <input id="f-pins" placeholder="e.g. 2+1+2">
+            <p class="hint">A+B+C — A=long goal, B=own mid, C=opp mid</p>
+          </div>
+        </div>
+        <div class="g3" style="margin-bottom:12px">
+          <div><label>Control bonuses</label><input type="number" id="f-bonuses" min="0" max="10" value="0"></div>
+          <div><label>AWP achieved?</label>
+            <select id="f-awp"><option value="N">No</option><option value="Y">Yes</option><option value="?">Unknown</option></select>
+          </div>
+          <div><label>Max possible pins</label><input id="f-maxpins" placeholder="e.g. 7"></div>
+        </div>
+        <div style="margin-bottom:12px">
+          <label>Notes</label>
+          <textarea id="f-notes" rows="2" placeholder="Partner routes, errors, counter strategies…"></textarea>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-p" onclick="addEntry()">Save entry</button>
+          <button class="btn" onclick="clearForm()">Clear</button>
+        </div>
+        <div id="add-msg"></div>
       </div>
-
-      <div class="form-group" style="grid-column: 1 / -1; border-top: 1px solid var(--paper3); padding-top: 1rem;">
-        <label style="color:var(--blue); font-size:13px; margin-bottom:0.25rem;">Autonomous Run Mode</label>
-        <select id="f-auto-mode" onchange="
-          const isSAWP = this.value === 'SAWP';
-          document.querySelectorAll('.f-group-normal').forEach(el => el.style.display = isSAWP ? 'none' : 'block');
-          document.querySelectorAll('.f-group-sawp').forEach(el => el.style.display = isSAWP ? 'block' : 'none');
-        ">
-          <option value="Normal">Normal Autonomous Run</option>
-          <option value="SAWP">SAWP (Solo Autonomous Win Point Run)</option>
-        </select>
-      </div>
-
-      <div class="form-group f-group-normal" style="grid-column: 1 / -1; margin-top: 0.5rem; display: block;">
-        <h4 style="font-size:12px; color:var(--ink2); text-transform:uppercase; border-bottom:1px solid var(--paper3); padding-bottom:4px;">Normal Run Trackers</h4>
-      </div>
-      <div class="form-group f-group-normal" style="display: block;">
-        <label>Goal 1 (Alliance Specific) Pins Scored</label>
-        <select id="f-pin-g1">
-          <option value="1">1 Pin Placed</option>
-          <option value="2">2 Pins Placed</option>
-          <option value="3">3 Pins Placed</option>
-        </select>
-      </div>
-      <div class="form-group f-group-normal" style="display: block;">
-        <label>Goal 2 Pins Scored</label>
-        <select id="f-pin-g2">
-          <option value="1">1 Pin Placed</option>
-          <option value="2">2 Pins Placed</option>
-          <option value="3">3 Pins Placed</option>
-        </select>
-      </div>
-
-      <div class="form-group f-group-sawp" style="grid-column: 1 / -1; margin-top: 0.5rem; display: none;">
-        <h4 style="font-size:12px; color:var(--ink2); text-transform:uppercase; border-bottom:1px solid var(--paper3); padding-bottom:4px;">SAWP: Own Quadrant</h4>
-      </div>
-      <div class="form-group f-group-sawp" style="display: none;">
-        <label>Goal 1 (Alliance Specific) Pins Scored</label>
-        <select id="f-sawp-own-g1">
-          <option value="1">1 Pin Placed</option>
-          <option value="2">2 Pins Placed</option>
-          <option value="3">3 Pins Placed</option>
-        </select>
-      </div>
-      <div class="form-group f-group-sawp" style="display: none;">
-        <label>Goal 2 Pins Scored</label>
-        <select id="f-sawp-own-g2">
-          <option value="1">1 Pin Placed</option>
-          <option value="2">2 Pins Placed</option>
-          <option value="3">3 Pins Placed</option>
-        </select>
-      </div>
-
-      <div class="form-group f-group-sawp" style="grid-column: 1 / -1; margin-top: 0.5rem; display: none;">
-        <h4 style="font-size:12px; color:var(--ink2); text-transform:uppercase; border-bottom:1px solid var(--paper3); padding-bottom:4px;">SAWP: Teammate Quadrant</h4>
-      </div>
-      <div class="form-group f-group-sawp" style="display: none;">
-        <label>Goal 1 (Alliance Specific) Pins Scored</label>
-        <select id="f-sawp-team-g1">
-          <option value="1">1 Pin Placed</option>
-          <option value="2">2 Pins Placed</option>
-          <option value="3">3 Pins Placed</option>
-        </select>
-      </div>
-      <div class="form-group f-group-sawp" style="display: none;">
-        <label>Goal 2 Pins Scored</label>
-        <select id="f-sawp-team-g2">
-          <option value="1">1 Pin Placed</option>
-          <option value="2">2 Pins Placed</option>
-          <option value="3">3 Pins Placed</option>
-        </select>
-      </div>
+    </div>
+  </div>
 
   <!-- ── SCOUT LOG (admin) ── -->
   <div id="tab-log" class="panel">
