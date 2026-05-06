@@ -308,17 +308,20 @@ tr:hover td{background:var(--paper2);cursor:pointer}
 
       <div class="form-group" style="grid-column: 1 / -1; border-top: 1px solid var(--paper3); padding-top: 1rem;">
         <label style="color:var(--blue); font-size:13px; margin-bottom:0.25rem;">Autonomous Run Mode</label>
-        <select id="f-auto-mode">
+        <select id="f-auto-mode" onchange="
+          const isSAWP = this.value === 'SAWP';
+          document.querySelectorAll('.f-group-normal').forEach(el => el.style.display = isSAWP ? 'none' : 'block');
+          document.querySelectorAll('.f-group-sawp').forEach(el => el.style.display = isSAWP ? 'block' : 'none');
+        ">
           <option value="Normal">Normal Autonomous Run</option>
           <option value="SAWP">SAWP (Solo Autonomous Win Point Run)</option>
         </select>
       </div>
 
-      <div class="form-group" style="grid-column: 1 / -1; margin-top: 0.5rem;">
+      <div class="form-group f-group-normal" style="grid-column: 1 / -1; margin-top: 0.5rem; display: block;">
         <h4 style="font-size:12px; color:var(--ink2); text-transform:uppercase; border-bottom:1px solid var(--paper3); padding-bottom:4px;">Normal Run Trackers</h4>
       </div>
-
-      <div class="form-group">
+      <div class="form-group f-group-normal" style="display: block;">
         <label>Goal 1 (Alliance Specific) Pins Scored</label>
         <select id="f-pin-g1">
           <option value="1">1 Pin Placed</option>
@@ -326,8 +329,7 @@ tr:hover td{background:var(--paper2);cursor:pointer}
           <option value="3">3 Pins Placed</option>
         </select>
       </div>
-
-      <div class="form-group">
+      <div class="form-group f-group-normal" style="display: block;">
         <label>Goal 2 Pins Scored</label>
         <select id="f-pin-g2">
           <option value="1">1 Pin Placed</option>
@@ -336,11 +338,10 @@ tr:hover td{background:var(--paper2);cursor:pointer}
         </select>
       </div>
 
-      <div class="form-group" style="grid-column: 1 / -1; margin-top: 0.5rem;">
+      <div class="form-group f-group-sawp" style="grid-column: 1 / -1; margin-top: 0.5rem; display: none;">
         <h4 style="font-size:12px; color:var(--ink2); text-transform:uppercase; border-bottom:1px solid var(--paper3); padding-bottom:4px;">SAWP: Own Quadrant</h4>
       </div>
-
-      <div class="form-group">
+      <div class="form-group f-group-sawp" style="display: none;">
         <label>Goal 1 (Alliance Specific) Pins Scored</label>
         <select id="f-sawp-own-g1">
           <option value="1">1 Pin Placed</option>
@@ -348,8 +349,7 @@ tr:hover td{background:var(--paper2);cursor:pointer}
           <option value="3">3 Pins Placed</option>
         </select>
       </div>
-
-      <div class="form-group">
+      <div class="form-group f-group-sawp" style="display: none;">
         <label>Goal 2 Pins Scored</label>
         <select id="f-sawp-own-g2">
           <option value="1">1 Pin Placed</option>
@@ -358,11 +358,10 @@ tr:hover td{background:var(--paper2);cursor:pointer}
         </select>
       </div>
 
-      <div class="form-group" style="grid-column: 1 / -1; margin-top: 0.5rem;">
+      <div class="form-group f-group-sawp" style="grid-column: 1 / -1; margin-top: 0.5rem; display: none;">
         <h4 style="font-size:12px; color:var(--ink2); text-transform:uppercase; border-bottom:1px solid var(--paper3); padding-bottom:4px;">SAWP: Teammate Quadrant</h4>
       </div>
-
-      <div class="form-group">
+      <div class="form-group f-group-sawp" style="display: none;">
         <label>Goal 1 (Alliance Specific) Pins Scored</label>
         <select id="f-sawp-team-g1">
           <option value="1">1 Pin Placed</option>
@@ -370,8 +369,7 @@ tr:hover td{background:var(--paper2);cursor:pointer}
           <option value="3">3 Pins Placed</option>
         </select>
       </div>
-
-      <div class="form-group">
+      <div class="form-group f-group-sawp" style="display: none;">
         <label>Goal 2 Pins Scored</label>
         <select id="f-sawp-team-g2">
           <option value="1">1 Pin Placed</option>
