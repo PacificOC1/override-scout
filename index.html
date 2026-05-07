@@ -268,7 +268,29 @@ tr:hover td{background:var(--paper2);cursor:pointer}
 .resource-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:.5px solid var(--paper3);gap:12px}
 .resource-row:last-child{border-bottom:none}
 
-/* ── FORMULA BOX ── */
+/* ── SAWP MODE TOGGLE ── */
+.sawp-toggle{
+  display:none;align-items:center;gap:0;
+  background:var(--paper3);border-radius:99px;padding:3px;
+  margin:8px 0 4px;border:1px solid var(--paper3);
+}
+.sawp-toggle input[type=radio]{display:none}
+.sawp-toggle label{
+  padding:4px 12px;border-radius:99px;font-size:11px;font-family:var(--mono);
+  cursor:pointer;color:var(--ink3);transition:all .15s;white-space:nowrap;user-select:none;
+}
+.sawp-toggle input[type=radio]:checked + label{
+  background:var(--paper);color:var(--ink);font-weight:600;
+  box-shadow:0 1px 3px rgba(0,0,0,.12);
+}
+.sawp-toggle input[type=radio]#r1-mode-sawp:checked + label,
+.sawp-toggle input[type=radio]#r2-mode-sawp:checked + label,
+.sawp-toggle input[type=radio]#b1-mode-sawp:checked + label,
+.sawp-toggle input[type=radio]#b2-mode-sawp:checked + label{
+  background:var(--blue);color:#fff;
+}
+.sawp-badge{font-size:10px;font-family:var(--mono);color:var(--ink3);margin-bottom:6px;height:14px}
+
 .formula-box{background:var(--paper2);border-radius:var(--radius);padding:1rem;font-family:var(--mono);font-size:12px;line-height:1.9;margin:8px 0;white-space:pre-wrap;overflow-x:auto}
 </style>
 </head>
@@ -387,7 +409,7 @@ tr:hover td{background:var(--paper2);cursor:pointer}
               <option value="Other">Other (type below)</option>
             </select>
             <input id="f-type-custom" placeholder="Enter robot type…"
-              style="display:none;margin-top:2px" autocomplete="off">
+              style="display:none;margin-top:2px" autocomplete="off" onblur="onCustomTypeBlur()">
           </div>
           <div><label>Sig Event?</label>
             <select id="f-sig"><option value="no">No</option><option value="yes">Yes — Worlds qualifier</option></select>
@@ -596,9 +618,32 @@ tr:hover td{background:var(--paper2);cursor:pointer}
             <label>Team #</label>
             <input id="r1" placeholder="e.g. 73017D" oninput="autoFill('r1')">
           </div>
-          <div class="g2" style="margin-bottom:8px">
-            <div><label>Avg G1 pins</label><input type="number" id="r1g1" min="0" max="10" value="2" oninput="calcProb()"></div>
-            <div><label>Avg G2 pins</label><input type="number" id="r1g2" min="0" max="10" value="1" oninput="calcProb()"></div>
+          <div class="sawp-toggle" id="r1-sawp-toggle">
+            <input type="radio" name="r1-mode" id="r1-mode-normal" value="normal" checked onchange="switchAutoMode('r1')">
+            <label for="r1-mode-normal">Normal auton</label>
+            <input type="radio" name="r1-mode" id="r1-mode-sawp" value="sawp" onchange="switchAutoMode('r1')">
+            <label for="r1-mode-sawp">⚡ SAWP run</label>
+          </div>
+          <div class="sawp-badge" id="r1-sawp-badge"></div>
+          <!-- Normal pin inputs -->
+          <div id="r1-pins-normal" style="margin-bottom:8px">
+            <div class="g2">
+              <div><label>Avg G1 pins</label><input type="number" id="r1g1" min="0" max="10" value="2" oninput="calcProb()"></div>
+              <div><label>Avg G2 pins</label><input type="number" id="r1g2" min="0" max="10" value="1" oninput="calcProb()"></div>
+            </div>
+          </div>
+          <!-- SAWP pin inputs (own + alliance quadrant) -->
+          <div id="r1-pins-sawp" style="display:none;margin-bottom:8px">
+            <div style="font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.4px;color:var(--ink3);margin-bottom:5px">🔴 Own quadrant</div>
+            <div class="g2" style="margin-bottom:6px">
+              <div><label>Own G1 pins</label><input type="number" id="r1-own-g1" min="0" max="10" value="2" oninput="syncSawpPins('r1')"></div>
+              <div><label>Own G2 pins</label><input type="number" id="r1-own-g2" min="0" max="10" value="1" oninput="syncSawpPins('r1')"></div>
+            </div>
+            <div style="font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.4px;color:var(--ink3);margin-bottom:5px">🔵 Alliance quadrant</div>
+            <div class="g2">
+              <div><label>Alliance G1 pins</label><input type="number" id="r1-ally-g1" min="0" max="10" value="1" oninput="syncSawpPins('r1')"></div>
+              <div><label>Alliance G2 pins</label><input type="number" id="r1-ally-g2" min="0" max="10" value="0" oninput="syncSawpPins('r1')"></div>
+            </div>
           </div>
           <div class="g2">
             <div><label>Failure rate %</label><input type="number" id="r1fail" min="0" max="100" value="0" oninput="calcProb()"></div>
@@ -612,9 +657,30 @@ tr:hover td{background:var(--paper2);cursor:pointer}
             <label>Team #</label>
             <input id="r2" placeholder="e.g. 9123X" oninput="autoFill('r2')">
           </div>
-          <div class="g2" style="margin-bottom:8px">
-            <div><label>Avg G1 pins</label><input type="number" id="r2g1" min="0" max="10" value="2" oninput="calcProb()"></div>
-            <div><label>Avg G2 pins</label><input type="number" id="r2g2" min="0" max="10" value="1" oninput="calcProb()"></div>
+          <div class="sawp-toggle" id="r2-sawp-toggle">
+            <input type="radio" name="r2-mode" id="r2-mode-normal" value="normal" checked onchange="switchAutoMode('r2')">
+            <label for="r2-mode-normal">Normal auton</label>
+            <input type="radio" name="r2-mode" id="r2-mode-sawp" value="sawp" onchange="switchAutoMode('r2')">
+            <label for="r2-mode-sawp">⚡ SAWP run</label>
+          </div>
+          <div class="sawp-badge" id="r2-sawp-badge"></div>
+          <div id="r2-pins-normal" style="margin-bottom:8px">
+            <div class="g2">
+              <div><label>Avg G1 pins</label><input type="number" id="r2g1" min="0" max="10" value="2" oninput="calcProb()"></div>
+              <div><label>Avg G2 pins</label><input type="number" id="r2g2" min="0" max="10" value="1" oninput="calcProb()"></div>
+            </div>
+          </div>
+          <div id="r2-pins-sawp" style="display:none;margin-bottom:8px">
+            <div style="font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.4px;color:var(--ink3);margin-bottom:5px">🔴 Own quadrant</div>
+            <div class="g2" style="margin-bottom:6px">
+              <div><label>Own G1 pins</label><input type="number" id="r2-own-g1" min="0" max="10" value="2" oninput="syncSawpPins('r2')"></div>
+              <div><label>Own G2 pins</label><input type="number" id="r2-own-g2" min="0" max="10" value="1" oninput="syncSawpPins('r2')"></div>
+            </div>
+            <div style="font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.4px;color:var(--ink3);margin-bottom:5px">🔵 Alliance quadrant</div>
+            <div class="g2">
+              <div><label>Alliance G1 pins</label><input type="number" id="r2-ally-g1" min="0" max="10" value="1" oninput="syncSawpPins('r2')"></div>
+              <div><label>Alliance G2 pins</label><input type="number" id="r2-ally-g2" min="0" max="10" value="0" oninput="syncSawpPins('r2')"></div>
+            </div>
           </div>
           <div class="g2">
             <div><label>Failure rate %</label><input type="number" id="r2fail" min="0" max="100" value="0" oninput="calcProb()"></div>
@@ -635,9 +701,30 @@ tr:hover td{background:var(--paper2);cursor:pointer}
             <label>Team #</label>
             <input id="b1" placeholder="e.g. 5678A" oninput="autoFill('b1')">
           </div>
-          <div class="g2" style="margin-bottom:8px">
-            <div><label>Avg G1 pins</label><input type="number" id="b1g1" min="0" max="10" value="2" oninput="calcProb()"></div>
-            <div><label>Avg G2 pins</label><input type="number" id="b1g2" min="0" max="10" value="1" oninput="calcProb()"></div>
+          <div class="sawp-toggle" id="b1-sawp-toggle">
+            <input type="radio" name="b1-mode" id="b1-mode-normal" value="normal" checked onchange="switchAutoMode('b1')">
+            <label for="b1-mode-normal">Normal auton</label>
+            <input type="radio" name="b1-mode" id="b1-mode-sawp" value="sawp" onchange="switchAutoMode('b1')">
+            <label for="b1-mode-sawp">⚡ SAWP run</label>
+          </div>
+          <div class="sawp-badge" id="b1-sawp-badge"></div>
+          <div id="b1-pins-normal" style="margin-bottom:8px">
+            <div class="g2">
+              <div><label>Avg G1 pins</label><input type="number" id="b1g1" min="0" max="10" value="2" oninput="calcProb()"></div>
+              <div><label>Avg G2 pins</label><input type="number" id="b1g2" min="0" max="10" value="1" oninput="calcProb()"></div>
+            </div>
+          </div>
+          <div id="b1-pins-sawp" style="display:none;margin-bottom:8px">
+            <div style="font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.4px;color:var(--ink3);margin-bottom:5px">🔵 Own quadrant</div>
+            <div class="g2" style="margin-bottom:6px">
+              <div><label>Own G1 pins</label><input type="number" id="b1-own-g1" min="0" max="10" value="2" oninput="syncSawpPins('b1')"></div>
+              <div><label>Own G2 pins</label><input type="number" id="b1-own-g2" min="0" max="10" value="1" oninput="syncSawpPins('b1')"></div>
+            </div>
+            <div style="font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.4px;color:var(--ink3);margin-bottom:5px">🔴 Alliance quadrant</div>
+            <div class="g2">
+              <div><label>Alliance G1 pins</label><input type="number" id="b1-ally-g1" min="0" max="10" value="1" oninput="syncSawpPins('b1')"></div>
+              <div><label>Alliance G2 pins</label><input type="number" id="b1-ally-g2" min="0" max="10" value="0" oninput="syncSawpPins('b1')"></div>
+            </div>
           </div>
           <div class="g2">
             <div><label>Failure rate %</label><input type="number" id="b1fail" min="0" max="100" value="0" oninput="calcProb()"></div>
@@ -651,9 +738,30 @@ tr:hover td{background:var(--paper2);cursor:pointer}
             <label>Team #</label>
             <input id="b2" placeholder="e.g. 9999Z" oninput="autoFill('b2')">
           </div>
-          <div class="g2" style="margin-bottom:8px">
-            <div><label>Avg G1 pins</label><input type="number" id="b2g1" min="0" max="10" value="2" oninput="calcProb()"></div>
-            <div><label>Avg G2 pins</label><input type="number" id="b2g2" min="0" max="10" value="1" oninput="calcProb()"></div>
+          <div class="sawp-toggle" id="b2-sawp-toggle">
+            <input type="radio" name="b2-mode" id="b2-mode-normal" value="normal" checked onchange="switchAutoMode('b2')">
+            <label for="b2-mode-normal">Normal auton</label>
+            <input type="radio" name="b2-mode" id="b2-mode-sawp" value="sawp" onchange="switchAutoMode('b2')">
+            <label for="b2-mode-sawp">⚡ SAWP run</label>
+          </div>
+          <div class="sawp-badge" id="b2-sawp-badge"></div>
+          <div id="b2-pins-normal" style="margin-bottom:8px">
+            <div class="g2">
+              <div><label>Avg G1 pins</label><input type="number" id="b2g1" min="0" max="10" value="2" oninput="calcProb()"></div>
+              <div><label>Avg G2 pins</label><input type="number" id="b2g2" min="0" max="10" value="1" oninput="calcProb()"></div>
+            </div>
+          </div>
+          <div id="b2-pins-sawp" style="display:none;margin-bottom:8px">
+            <div style="font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.4px;color:var(--ink3);margin-bottom:5px">🔵 Own quadrant</div>
+            <div class="g2" style="margin-bottom:6px">
+              <div><label>Own G1 pins</label><input type="number" id="b2-own-g1" min="0" max="10" value="2" oninput="syncSawpPins('b2')"></div>
+              <div><label>Own G2 pins</label><input type="number" id="b2-own-g2" min="0" max="10" value="1" oninput="syncSawpPins('b2')"></div>
+            </div>
+            <div style="font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.4px;color:var(--ink3);margin-bottom:5px">🔴 Alliance quadrant</div>
+            <div class="g2">
+              <div><label>Alliance G1 pins</label><input type="number" id="b2-ally-g1" min="0" max="10" value="1" oninput="syncSawpPins('b2')"></div>
+              <div><label>Alliance G2 pins</label><input type="number" id="b2-ally-g2" min="0" max="10" value="0" oninput="syncSawpPins('b2')"></div>
+            </div>
           </div>
           <div class="g2">
             <div><label>Failure rate %</label><input type="number" id="b2fail" min="0" max="100" value="0" oninput="calcProb()"></div>
@@ -942,7 +1050,21 @@ Red still more likely to achieve AWP (33.6% vs 25.2%)</div>
 // ─────────────────────────────────────────────────────────────────
 const SB_URL = 'https://ajymmthxmdyhkiynwhuf.supabase.co';
 const SB_KEY = 'sb_publishable_1r5xHNrNLbRHB_GcJMgsjg_fwEvgdqS';
-/* ═══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════
+   SUPABASE TABLE REQUIRED — run once in SQL editor:
+
+   create table if not exists robot_types (
+     id   serial primary key,
+     name text not null unique
+   );
+   -- Allow anyone to read, only authenticated users to insert:
+   alter table robot_types enable row level security;
+   create policy "public read"  on robot_types for select using (true);
+   create policy "admin insert" on robot_types for insert with check (auth.role() = 'authenticated');
+
+   -- Seed default types:
+   insert into robot_types (name) values ('Claw Bot') on conflict do nothing;
+════════════════════════════════════════════════════════ */
 
 // Public read-only headers (anon key — safe to expose)
 const HDRS = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Accept': 'application/json' };
@@ -1079,6 +1201,7 @@ function launchApp(admin) {
   document.getElementById('logoutBtn').style.display = admin ? '' : 'none';
   document.getElementById('adminLoginBtn').style.display = admin ? 'none' : '';
   loadData();
+  loadRobotTypes();
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -1350,7 +1473,7 @@ async function addEntry() {
     round:document.getElementById('f-round').value.trim(),
     side:document.getElementById('f-side').value,
     sig:document.getElementById('f-sig').value,
-    type:document.getElementById('f-type').value,
+    type:(()=>{ const sel=document.getElementById('f-type').value; return sel==='Other'?(document.getElementById('f-type-custom').value.trim()||'Other'):sel; })(),
     // Calculate pins string from dropdowns based on auto mode
     // Normal: Goal1+Goal2  |  SAWP: OwnG1+OwnG2+TeamG1+TeamG2
     route: document.getElementById('f-auto-mode').value,
@@ -1418,6 +1541,18 @@ function clearForm() {
   document.getElementById('f-sawp-team-g2').value = '0';
   // Reset auto mode back to Normal view
   toggleAutoMode('Normal');
+}
+
+// toggleCustomType: shows/hides the free-text robot type input
+function toggleCustomType(val) {
+  const customInput = document.getElementById('f-type-custom');
+  if(val === 'Other') {
+    customInput.style.display = 'block';
+    customInput.focus();
+  } else {
+    customInput.style.display = 'none';
+    customInput.value = '';
+  }
 }
 
 // toggleAutoMode: shows/hides pin sections based on selected auto type
@@ -1521,22 +1656,195 @@ function autoFill(id) {
   if(!team) return;
   const ms=allEntries.filter(e=>(e.team||'').toUpperCase()===team);
   if(!ms.length) return;
-  // Compute avg G1 and G2 pins separately from stored "g1+g2[+g3+g4]" string
-  const avgG1=ms.reduce((s,e)=>{const p=(e.pins||'0').split('+');return s+(parseInt(p[0])||0);},0)/ms.length;
-  const avgG2=ms.reduce((s,e)=>{const p=(e.pins||'0').split('+');return s+(parseInt(p[1])||0);},0)/ms.length;
-  const awpRate=Math.round(ms.filter(e=>e.awp==='Y').length/ms.length*100);
-  // Failure rate: entries where failed === 'Y' (or unknown = treat as neither)
-  const knownEntries=ms.filter(e=>e.failed==='Y'||e.failed==='N');
+
+  // Detect whether this team has any SAWP entries
+  // addEntry() stores the auto mode in the 'route' field (value = 'SAWP' or 'Normal')
+  const sawpEntries   = ms.filter(e=>(e.route||'').toUpperCase()==='SAWP');
+  const normalEntries = ms.filter(e=>(e.route||'').toUpperCase()!=='SAWP');
+  const hasSawp = sawpEntries.length > 0;
+
+  // Show / hide the SAWP toggle pill for this robot slot
+  const toggleEl = document.getElementById(id+'-sawp-toggle');
+  if(toggleEl) {
+    toggleEl.style.display = hasSawp ? 'flex' : 'none';
+    if(!hasSawp) {
+      const radio = document.getElementById(id+'-mode-normal');
+      if(radio) radio.checked = true;
+    }
+  }
+
+  // Read which mode is currently selected (defaults to normal)
+  const useSawp = hasSawp && document.getElementById(id+'-mode-sawp')?.checked;
+  const src = useSawp ? sawpEntries : (normalEntries.length ? normalEntries : ms);
+
+  // Compute averages from chosen source
+  const avgG1=src.reduce((s,e)=>{const p=(e.pins||'0').split('+');return s+(parseInt(p[0])||0);},0)/src.length;
+  const avgG2=src.reduce((s,e)=>{const p=(e.pins||'0').split('+');return s+(parseInt(p[1])||0);},0)/src.length;
+  const awpRate=Math.round(src.filter(e=>e.awp==='Y').length/src.length*100);
+  const knownEntries=src.filter(e=>e.failed==='Y'||e.failed==='N');
   const failRate=knownEntries.length ? Math.round(knownEntries.filter(e=>e.failed==='Y').length/knownEntries.length*100) : 0;
+
   const g1m={r1:'r1g1',r2:'r2g1',b1:'b1g1',b2:'b2g1'};
   const g2m={r1:'r1g2',r2:'r2g2',b1:'b1g2',b2:'b2g2'};
   const am={r1:'r1awp',r2:'r2awp',b1:'b1awp',b2:'b2awp'};
   const fm={r1:'r1fail',r2:'r2fail',b1:'b1fail',b2:'b2fail'};
-  if(g1m[id]) document.getElementById(g1m[id]).value=avgG1.toFixed(1);
-  if(g2m[id]) document.getElementById(g2m[id]).value=avgG2.toFixed(1);
-  if(am[id]) document.getElementById(am[id]).value=awpRate;
-  if(fm[id]) document.getElementById(fm[id]).value=failRate;
+
+  if(useSawp) {
+    // Populate 4-field SAWP layout: own quadrant = p[0]+p[1], alliance quadrant = p[2]+p[3]
+    const avgOwnG1  = src.reduce((s,e)=>{const p=(e.pins||'0').split('+');return s+(parseInt(p[0])||0);},0)/src.length;
+    const avgOwnG2  = src.reduce((s,e)=>{const p=(e.pins||'0').split('+');return s+(parseInt(p[1])||0);},0)/src.length;
+    const avgAllyG1 = src.reduce((s,e)=>{const p=(e.pins||'0').split('+');return s+(parseInt(p[2])||0);},0)/src.length;
+    const avgAllyG2 = src.reduce((s,e)=>{const p=(e.pins||'0').split('+');return s+(parseInt(p[3])||0);},0)/src.length;
+    const ownG1el  = document.getElementById(id+'-own-g1');
+    const ownG2el  = document.getElementById(id+'-own-g2');
+    const allyG1el = document.getElementById(id+'-ally-g1');
+    const allyG2el = document.getElementById(id+'-ally-g2');
+    if(ownG1el)  ownG1el.value  = avgOwnG1.toFixed(1);
+    if(ownG2el)  ownG2el.value  = avgOwnG2.toFixed(1);
+    if(allyG1el) allyG1el.value = avgAllyG1.toFixed(1);
+    if(allyG2el) allyG2el.value = avgAllyG2.toFixed(1);
+    // g1/g2 for calcProb = total across both quadrants
+    if(g1m[id]) document.getElementById(g1m[id]).value = (avgOwnG1 + avgAllyG1).toFixed(1);
+    if(g2m[id]) document.getElementById(g2m[id]).value = (avgOwnG2 + avgAllyG2).toFixed(1);
+  } else {
+    // Only write if the field isn't locked by a partner's SAWP mode
+    const g1el = g1m[id] ? document.getElementById(g1m[id]) : null;
+    const g2el = g2m[id] ? document.getElementById(g2m[id]) : null;
+    if(g1el && !g1el.disabled) g1el.value = avgG1.toFixed(1);
+    if(g2el && !g2el.disabled) g2el.value = avgG2.toFixed(1);
+  }
+
+  // Toggle the visible pin section
+  const normalSec = document.getElementById(id+'-pins-normal');
+  const sawpSec   = document.getElementById(id+'-pins-sawp');
+  if(normalSec) normalSec.style.display = useSawp ? 'none' : 'block';
+  if(sawpSec)   sawpSec.style.display   = useSawp ? 'block' : 'none';
+  if(am[id])  document.getElementById(am[id]).value=awpRate;
+  if(fm[id])  document.getElementById(fm[id]).value=failRate;
+
+  // Update the stats badge shown under the toggle
+  const badge = document.getElementById(id+'-sawp-badge');
+  if(badge && hasSawp) {
+    badge.textContent = useSawp
+      ? `SAWP mode · ${sawpEntries.length} entr${sawpEntries.length!==1?'ies':'y'}`
+      : `Normal mode · ${src.length} entr${src.length!==1?'ies':'y'}`;
+    badge.style.color = useSawp ? 'var(--blue)' : 'var(--ink3)';
+  }
+
   calcProb();
+}
+
+// Called when the Normal/SAWP radio is switched — toggles pin layout and re-fills stats.
+// When SAWP is active, the partner robot sits idle — zero and lock their pin inputs.
+function switchAutoMode(id) {
+  const useSawp = document.getElementById(id+'-mode-sawp')?.checked;
+  document.getElementById(id+'-pins-normal').style.display = useSawp ? 'none' : 'block';
+  document.getElementById(id+'-pins-sawp').style.display   = useSawp ? 'block' : 'none';
+
+  // Determine partner slot
+  const partner = {r1:'r2', r2:'r1', b1:'b2', b2:'b1'}[id];
+  const g1map   = {r1:'r1g1',r2:'r2g1',b1:'b1g1',b2:'b2g1'};
+  const g2map   = {r1:'r1g2',r2:'r2g2',b1:'b1g2',b2:'b2g2'};
+
+  if(partner) {
+    const pg1 = document.getElementById(g1map[partner]);
+    const pg2 = document.getElementById(g2map[partner]);
+    const pNormalSec = document.getElementById(partner+'-pins-normal');
+    const pSawpSec   = document.getElementById(partner+'-pins-sawp');
+
+    if(useSawp) {
+      // Partner is idle — zero pins and grey out their section
+      if(pg1) { pg1.value = 0; pg1.disabled = true; }
+      if(pg2) { pg2.value = 0; pg2.disabled = true; }
+      if(pNormalSec) pNormalSec.style.opacity = '0.35';
+      if(pSawpSec)   pSawpSec.style.opacity   = '0.35';
+      // Add idle label if not already there
+      const pPanel = pNormalSec || pSawpSec;
+      if(pPanel && !document.getElementById(partner+'-idle-note')) {
+        const note = document.createElement('div');
+        note.id = partner+'-idle-note';
+        note.style.cssText = 'font-size:11px;font-family:var(--mono);color:var(--amber);background:var(--amber-bg);border-radius:var(--radius);padding:5px 8px;margin-bottom:6px';
+        note.textContent = '⚠ Idle — partner is running SAWP solo';
+        pPanel.parentElement.insertBefore(note, pPanel);
+      }
+    } else {
+      // Restore partner fields
+      if(pg1) { pg1.disabled = false; }
+      if(pg2) { pg2.disabled = false; }
+      if(pNormalSec) pNormalSec.style.opacity = '';
+      if(pSawpSec)   pSawpSec.style.opacity   = '';
+      const note = document.getElementById(partner+'-idle-note');
+      if(note) note.remove();
+      // Re-run autofill on partner to restore their real stats
+      autoFill(partner);
+    }
+  }
+
+  autoFill(id);
+}
+
+// syncSawpPins: when SAWP 4-field inputs change manually, sum into g1/g2 for calcProb
+function syncSawpPins(id) {
+  const v = fid => parseFloat(document.getElementById(fid)?.value) || 0;
+  const totalG1 = v(id+'-own-g1') + v(id+'-ally-g1');
+  const totalG2 = v(id+'-own-g2') + v(id+'-ally-g2');
+  const g1map = {r1:'r1g1',r2:'r2g1',b1:'b1g1',b2:'b2g1'};
+  const g2map = {r1:'r1g2',r2:'r2g2',b1:'b1g2',b2:'b2g2'};
+  if(g1map[id]) document.getElementById(g1map[id]).value = totalG1.toFixed(1);
+  if(g2map[id]) document.getElementById(g2map[id]).value = totalG2.toFixed(1);
+  calcProb();
+}
+
+/* ═══════════════════════════════════════════════════════
+   ROBOT TYPES — Supabase-backed persistent list
+   Table: robot_types (id serial, name text unique)
+   Anyone can read; admins can insert.
+════════════════════════════════════════════════════════ */
+let knownRobotTypes = ['Claw Bot'];
+
+async function loadRobotTypes() {
+  try {
+    const r = await fetch(SB_URL + '/rest/v1/robot_types?select=name&order=name.asc', { headers: HDRS });
+    if(!r.ok) return;
+    const data = await r.json();
+    if(data.length) {
+      knownRobotTypes = data.map(d => d.name);
+      rebuildTypeSelect();
+    }
+  } catch(e) { /* non-critical, silently ignore */ }
+}
+
+async function saveRobotType(name) {
+  if(!name || !isAdmin) return;
+  if(knownRobotTypes.includes(name)) return; // already saved
+  try {
+    const r = await fetch(SB_URL + '/rest/v1/robot_types', {
+      method: 'POST',
+      headers: { ...adminHdrs(), 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ name })
+    });
+    if(r.ok) {
+      knownRobotTypes.push(name);
+      knownRobotTypes.sort();
+      rebuildTypeSelect();
+    }
+  } catch(e) { /* best effort */ }
+}
+
+function rebuildTypeSelect() {
+  const sel = document.getElementById('f-type');
+  if(!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = knownRobotTypes.map(t => `<option value="${t}">${t}</option>`).join('')
+    + '<option value="Other">Other (type below)…</option>';
+  // Restore selection if still valid
+  if(knownRobotTypes.includes(cur)) sel.value = cur;
+}
+
+// Hook: when admin blurs the custom type input, persist it
+function onCustomTypeBlur() {
+  const val = document.getElementById('f-type-custom').value.trim();
+  if(val) saveRobotType(val);
 }
 
 // ── Colour palette for outcome segments (red-wins → tie → blue-wins) ──
