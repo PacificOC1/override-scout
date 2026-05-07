@@ -1514,7 +1514,7 @@ async function addEntry() {
   const team = document.getElementById('f-team').value.trim();
   if(!team){ showMsg('add-msg','Team # required','err'); return; }
   const entry = {
-    id: Date.now(),
+    id: crypto.randomUUID(),
     team, event:document.getElementById('f-event').value.trim(),
     round:document.getElementById('f-round').value.trim(),
     side:document.getElementById('f-side').value,
