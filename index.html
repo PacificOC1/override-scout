@@ -128,6 +128,7 @@ body{font-family:var(--sans);background:var(--paper2);color:var(--ink);min-heigh
 .tab.active{color:var(--ink);font-weight:500;border-bottom-color:var(--ink)}
 .tab:hover:not(.active){color:var(--ink2);background:var(--paper2)}
 .tab.admin-only{display:none}.tab.admin-visible{display:block!important}
+.admin-only:not(.tab){display:none!important}.admin-visible.admin-only:not(.tab){display:block!important}
 
 /* ── PANELS ── */
 .panel{display:none}.panel.active{display:block}
@@ -900,9 +901,35 @@ With 0% fail rates → P(both succeed) = 100%
   <div id="tab-calendar" class="panel">
     <div class="page">
 
+      <!-- RobotEvents API sync (admin only) -->
+      <div class="card admin-only" id="cal-re-card">
+        <p class="sec">🤖 Sync from RobotEvents</p>
+        <p class="hint" style="margin-bottom:12px">Automatically import VRC Signature events from the official RobotEvents API. Your key is saved in your browser only — never sent to anyone except RobotEvents.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px">
+          <div style="flex:1;min-width:200px">
+            <label>RobotEvents API Token</label>
+            <input type="password" id="re-token" placeholder="Paste your Bearer token here…" style="font-family:var(--mono);font-size:12px" oninput="saveReToken()">
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn btn-p" onclick="syncFromRobotEvents()">⬇ Fetch Sig Events</button>
+            <button class="btn" onclick="clearReToken()">Clear key</button>
+          </div>
+        </div>
+        <div id="re-msg" style="font-size:12px;font-family:var(--mono);color:var(--ink3);margin-bottom:8px"></div>
+        <!-- Preview table shown before import -->
+        <div id="re-preview" style="display:none">
+          <div style="font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin-bottom:8px">Events found — select which to import:</div>
+          <div id="re-preview-list"></div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn btn-p" onclick="importSelectedReEvents()">✓ Import selected</button>
+            <button class="btn" onclick="document.getElementById('re-preview').style.display='none'">Cancel</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Add event form (admin only) -->
       <div class="card admin-only" id="cal-add-card">
-        <p class="sec">Add Sig Event</p>
+        <p class="sec">Add Event Manually</p>
         <div class="g3" style="margin-bottom:12px">
           <div><label>Event Name</label><input id="cal-name" placeholder="e.g. Mall of America"></div>
           <div><label>Start Date</label><input type="date" id="cal-start"></div>
@@ -912,6 +939,10 @@ With 0% fail rates → P(both succeed) = 100%
           <div><label>Location (optional)</label><input id="cal-loc" placeholder="e.g. Minneapolis, MN"></div>
           <div><label>Notes (optional)</label><input id="cal-notes" placeholder="e.g. Worlds qualifying event"></div>
         </div>
+        <div style="margin-bottom:12px">
+          <label>Google Maps Link <span style="font-weight:400;color:var(--ink3)">(optional)</span></label>
+          <input id="cal-maps" placeholder="e.g. https://maps.google.com/…" type="url">
+        </div>
         <div style="display:flex;gap:8px">
           <button class="btn btn-p" onclick="addCalEvent()">Add Event</button>
           <button class="btn" onclick="clearCalForm()">Clear</button>
@@ -919,8 +950,8 @@ With 0% fail rates → P(both succeed) = 100%
         <div id="cal-msg"></div>
       </div>
 
-      <!-- Filter leaderboard by event period (admin only) -->
-      <div class="card admin-only" id="cal-filter-card">
+      <!-- Filter leaderboard by event period -->
+      <div class="card" id="cal-filter-card">
         <p class="sec">Filter leaderboard by event period</p>
         <p class="hint" style="margin-bottom:12px">Select a Sig event below to see the leaderboard using only entries from that time window.</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
@@ -2287,6 +2318,7 @@ async function addCalEvent() {
   const end   = document.getElementById('cal-end').value;
   const loc   = document.getElementById('cal-loc').value.trim();
   const notes = document.getElementById('cal-notes').value.trim();
+  const maps  = document.getElementById('cal-maps').value.trim();
   if(!name || !start || !end) { showMsg('cal-msg','Name, start and end date are required.','err'); return; }
   if(start > end)             { showMsg('cal-msg','Start date must be before end date.','err'); return; }
 
@@ -2295,7 +2327,7 @@ async function addCalEvent() {
     const r = await fetch(SB_URL + '/rest/v1/sig_events', {
       method: 'POST',
       headers: { ...adminHdrs(), 'Prefer': 'return=representation' },
-      body: JSON.stringify({ name, start_date: start, end_date: end, location: loc, notes })
+      body: JSON.stringify({ name, start_date: start, end_date: end, location: loc, notes, maps_url: maps||null })
     });
     if(!r.ok) { const t=await r.text(); throw new Error(t); }
     clearCalForm();
@@ -2308,7 +2340,7 @@ async function addCalEvent() {
 }
 
 function clearCalForm() {
-  ['cal-name','cal-start','cal-end','cal-loc','cal-notes'].forEach(id => document.getElementById(id).value = '');
+  ['cal-name','cal-start','cal-end','cal-loc','cal-notes','cal-maps'].forEach(id => document.getElementById(id).value = '');
 }
 
 /* ── Delete event (admin only) ── */
@@ -2355,13 +2387,14 @@ function renderCalList() {
         <div style="font-size:12px;font-family:var(--mono);color:var(--ink3)">
           ${e.start_date} → ${e.end_date}${e.location?' · '+e.location:''}
         </div>
+        ${e.maps_url ? `<a href="${e.maps_url}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-family:var(--mono);color:var(--blue);text-decoration:none;margin-top:3px">📍 View on Google Maps</a>` : ''}
         ${e.notes ? `<div style="font-size:12px;color:var(--ink2);margin-top:3px">${e.notes}</div>` : ''}
         <div style="font-size:11px;font-family:var(--mono);color:var(--ink3);margin-top:5px">
           ${entryCount} scouting entr${entryCount!==1?'ies':'y'} in this window
         </div>
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
-        ${isAdmin ? `<button class="btn btn-sm" onclick="filterByEvent('${e.id}')">Filter leaderboard</button>` : ''}
+        <button class="btn btn-sm" onclick="filterByEvent('${e.id}')">Filter leaderboard</button>
         ${isAdmin ? `<button class="btn btn-sm btn-d" onclick="deleteCalEvent('${e.id}')">✕</button>` : ''}
       </div>
     </div>`;
@@ -2443,6 +2476,198 @@ function clearCalFilter() {
 
 // Load calendar on init
 loadCalEvents();
+
+/* ═══════════════════════════════════════════════════════
+   ROBOTEVENTS API INTEGRATION
+   Fetches VRC Signature events and imports them into
+   the Supabase sig_events table.
+   API key stored in localStorage (browser only).
+════════════════════════════════════════════════════════ */
+
+const RE_API = 'https://www.robotevents.com/api/v2';
+const RE_TOKEN_KEY = 'override_scout_re_token';
+
+// VRC program ID on RobotEvents is 1
+const RE_VRC_PROGRAM = 1;
+
+/* ── Token persistence ── */
+function saveReToken() {
+  const val = document.getElementById('re-token').value.trim();
+  try { localStorage.setItem(RE_TOKEN_KEY, val); } catch(e) {}
+}
+function clearReToken() {
+  try { localStorage.removeItem(RE_TOKEN_KEY); } catch(e) {}
+  document.getElementById('re-token').value = '';
+  document.getElementById('re-msg').textContent = 'API key cleared.';
+}
+function loadReToken() {
+  try {
+    const t = localStorage.getItem(RE_TOKEN_KEY);
+    if(t) document.getElementById('re-token').value = t;
+  } catch(e) {}
+}
+
+/* ── Main sync function ── */
+async function syncFromRobotEvents() {
+  const token = document.getElementById('re-token').value.trim();
+  if(!token) {
+    setReMsg('⚠ Paste your RobotEvents API token first.', 'err');
+    return;
+  }
+
+  setReMsg('Fetching Signature events from RobotEvents…', 'ok');
+  document.getElementById('re-preview').style.display = 'none';
+
+  try {
+    // Fetch all upcoming VRC Signature events
+    // We paginate until we have everything (RobotEvents returns max 250/page)
+    const today = new Date().toISOString().slice(0, 10);
+    let page = 1, allFetched = [], lastMeta;
+
+    do {
+      const url = new URL(RE_API + '/events');
+      url.searchParams.set('program[]', RE_VRC_PROGRAM);
+      url.searchParams.set('level[]', 'Signature');
+      url.searchParams.set('start', today + 'T00:00:00.000Z');
+      url.searchParams.set('per_page', '250');
+      url.searchParams.set('page', page);
+
+      const r = await fetch(url.toString(), {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Accept': 'application/json'
+        }
+      });
+
+      if(r.status === 401) throw new Error('Invalid API token — check your key and try again.');
+      if(r.status === 403) throw new Error('Access denied — your token may not have permission to read events.');
+      if(!r.ok) throw new Error('RobotEvents returned HTTP ' + r.status);
+
+      const data = await r.json();
+      allFetched = allFetched.concat(data.data || []);
+      lastMeta = data.meta;
+      page++;
+    } while(lastMeta && lastMeta.current_page < lastMeta.last_page);
+
+    if(!allFetched.length) {
+      setReMsg('No upcoming VRC Signature events found.', 'err');
+      return;
+    }
+
+    // Filter out events already in our Supabase list (match by name + start_date)
+    const existingKeys = new Set(calEvents.map(e => e.name + '|' + e.start_date));
+
+    const newEvents = allFetched.filter(re => {
+      const start = (re.start || '').slice(0, 10);
+      return !existingKeys.has(re.name + '|' + start);
+    });
+
+    setReMsg(`Found ${allFetched.length} Sig event${allFetched.length!==1?'s':''} total, ${newEvents.length} new.`, 'ok');
+
+    // Show preview
+    renderRePreview(allFetched, existingKeys);
+
+  } catch(e) {
+    setReMsg('Error: ' + e.message, 'err');
+    console.error(e);
+  }
+}
+
+/* ── Render the preview list with checkboxes ── */
+function renderRePreview(events, existingKeys) {
+  const now = new Date().toISOString().slice(0, 10);
+  const list = document.getElementById('re-preview-list');
+
+  list.innerHTML = events.map((re, i) => {
+    const start    = (re.start || '').slice(0, 10);
+    const end      = (re.end   || '').slice(0, 10);
+    const location = [re.location?.city, re.location?.region, re.location?.country]
+                       .filter(Boolean).join(', ');
+    const alreadyIn = existingKeys.has(re.name + '|' + start);
+    const isUpcoming = start >= now;
+
+    return `
+    <label style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:.5px solid var(--paper3);cursor:${alreadyIn?'default':'pointer'};opacity:${alreadyIn?'0.5':'1'}">
+      <input type="checkbox" data-re-idx="${i}" ${alreadyIn?'disabled checked':''} ${isUpcoming&&!alreadyIn?'checked':''} style="margin-top:3px;flex-shrink:0">
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:13px;margin-bottom:2px">
+          ${re.name}
+          ${alreadyIn ? '<span class="badge b-no" style="margin-left:6px">Already imported</span>' : '<span class="badge b-sig" style="margin-left:6px">New</span>'}
+        </div>
+        <div style="font-size:11px;font-family:var(--mono);color:var(--ink3)">
+          ${start} → ${end}${location?' · '+location:''}
+        </div>
+        ${re.location?.venue ? `<div style="font-size:11px;color:var(--ink3)">${re.location.venue}</div>` : ''}
+      </div>
+    </label>`;
+  }).join('');
+
+  // Store the events array so importSelected can access it
+  window._reEventsFetched = events;
+
+  document.getElementById('re-preview').style.display = 'block';
+}
+
+/* ── Import checked events into Supabase ── */
+async function importSelectedReEvents() {
+  const checkboxes = document.querySelectorAll('#re-preview-list input[type=checkbox]:not(:disabled):checked');
+  if(!checkboxes.length) {
+    setReMsg('No new events selected.', 'err');
+    return;
+  }
+
+  const events = window._reEventsFetched || [];
+  setReMsg(`Importing ${checkboxes.length} event${checkboxes.length!==1?'s':''}…`, 'ok');
+
+  let saved = 0, failed = 0;
+  for(const cb of checkboxes) {
+    const re = events[parseInt(cb.dataset.reIdx)];
+    if(!re) continue;
+
+    const start = (re.start || '').slice(0, 10);
+    const end   = (re.end   || '').slice(0, 10);
+    const location = [re.location?.venue, re.location?.city, re.location?.region]
+                       .filter(Boolean).join(', ');
+    const notes = re.location?.country && re.location.country !== 'United States'
+      ? re.location.country
+      : '';
+
+    try {
+      const r = await fetch(SB_URL + '/rest/v1/sig_events', {
+        method: 'POST',
+        headers: { ...adminHdrs(), 'Prefer': 'return=minimal' },
+        body: JSON.stringify({
+          name:       re.name,
+          start_date: start,
+          end_date:   end,
+          location:   location || null,
+          notes:      notes || null
+        })
+      });
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      saved++;
+    } catch(e) {
+      console.error('Failed to save', re.name, e);
+      failed++;
+    }
+  }
+
+  document.getElementById('re-preview').style.display = 'none';
+  setReMsg(
+    `✓ Imported ${saved} event${saved!==1?'s':''}${failed?' · '+failed+' failed':''}`,
+    failed ? 'err' : 'ok'
+  );
+  await loadCalEvents();
+}
+
+function setReMsg(msg, type) {
+  const el = document.getElementById('re-msg');
+  el.textContent = msg;
+  el.style.color = type === 'err' ? 'var(--red-text)' : 'var(--green)';
+}
+
+// Restore saved token on load
+loadReToken();
 </script>
 </body>
 </html>
