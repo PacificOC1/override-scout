@@ -1092,7 +1092,7 @@ With 0% fail rates → P(both succeed) = 100%
 // adminHdrs(): builds headers using your JWT token for write operations.
 // ─────────────────────────────────────────────────────────────────
 const SB_URL = 'https://ajymmthxmdyhkiynwhuf.supabase.co';
-const SB_KEY = 'sb_publishable_1r5xHNrNLbRHB_GcJMgsjg_fwEvgdqS';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqeW1tdGh4bWR5aGtpeW53aHVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTcwNjcsImV4cCI6MjA5MzQ5MzA2N30.AJO6Espsp9ceY3gbnjwAf2k4G3pygwkDejIZxMktZso';
 /* ═══════════════════════════════════════════════════════
    SUPABASE TABLE REQUIRED — run once in SQL editor:
 
@@ -1225,11 +1225,11 @@ async function logout() {
   document.getElementById('modeBadge').className = 'mode-badge mode-pub';
   document.getElementById('logoutBtn').style.display = 'none';
   document.getElementById('adminLoginBtn').style.display = '';
-  // Switch back to search tab
+  // Switch back to leaderboard tab
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.querySelector('[data-tab="search"]').classList.add('active');
-  document.getElementById('tab-search').classList.add('active');
+  document.querySelector('[data-tab="leaderboard"]').classList.add('active');
+  document.getElementById('tab-leaderboard').classList.add('active');
 }
 
 function launchApp(admin) {
@@ -1417,7 +1417,12 @@ function lbSortRender() {
 }
 function lbRender() {
   const start=(lbPg-1)*LB_PG, sl=lbFiltered.slice(start,start+LB_PG), tot=lbFiltered.length, pages=Math.ceil(tot/LB_PG);
-  if(!sl.length){ document.getElementById('lbMain').innerHTML='<div class="empty">No teams match this filter.</div>'; return; }
+  if(!sl.length){ 
+    document.getElementById('lbMain').innerHTML = allTeams.length === 0
+      ? '<div class="empty"><span class="spin"></span><br><br>Loading…</div>'
+      : '<div class="empty">No teams match this filter.</div>';
+    return; 
+  }
   document.getElementById('lbMain').innerHTML=`
     <div style="border:1.5px solid var(--ink);border-radius:var(--radius-lg);overflow:hidden">
     <div class="tw"><table>
