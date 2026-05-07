@@ -1948,11 +1948,19 @@ function calcProb() {
     seg.className = 'outcome-seg';
     seg.style.cssText = `flex:${pct};background:${colour};`;
     seg.title = o.winner + ' · ' + (o.probability*100).toFixed(1) + '%';
+    seg.dataset.mask = o.mask; // unique key for reliable lookup
     if (pct > 3) {
       const lbl = document.createElement('span');
       lbl.className = 'outcome-seg-label';
       lbl.textContent = (o.probability*100).toFixed(0) + '%';
       seg.appendChild(lbl);
+    }
+    // Add a golden star to the highest-probability segment
+    if (o === mostLikely) {
+      const star = document.createElement('span');
+      star.textContent = '★';
+      star.style.cssText = 'font-size:14px;color:#ffd700;text-shadow:0 0 4px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.4);margin-left:3px;pointer-events:none;line-height:1;filter:drop-shadow(0 0 3px rgba(255,215,0,.7))';
+      seg.appendChild(star);
     }
     seg.addEventListener('click', () => showOutcomeDetail(o, seg, outcomes));
     bar.appendChild(seg);
@@ -1973,6 +1981,13 @@ function calcProb() {
       <span>${l.label}: <strong>${(l.prob*100).toFixed(1)}%</strong></span>
     </div>`).join('');
 
+  // Store both orderings for arrow navigation
+  const filtered = outcomes.filter(o => (o.probability / totalProb) * 100 >= 0.1);
+  window._outcomesBarOrder  = [...filtered]; // bar visual order (red→tie→blue, prob desc within)
+  window._outcomesProbOrder = [...filtered].sort((a,b) => b.probability - a.probability);
+  window._currentOutcomeIdx = 0;
+  if (!window._outcomeNavMode) window._outcomeNavMode = 'prob'; // 'prob' | 'bar'
+
   // Clear any open detail
   const det = document.getElementById('outcomeDetail');
   det.style.display = 'none';
@@ -1984,89 +1999,181 @@ function calcProb() {
 }
 
 function showOutcomeDetail(o, clickedSeg, allOutcomes) {
-  // Highlight selected segment
+  // Highlight selected segment using data-mask for reliable matching
   document.querySelectorAll('.outcome-seg').forEach(s=>s.classList.remove('selected'));
-  clickedSeg.classList.add('selected');
+  if (clickedSeg) {
+    clickedSeg.classList.add('selected');
+  } else {
+    // Find by mask if no seg reference passed
+    const bar = document.getElementById('outcomeBar');
+    if (bar) {
+      const found = bar.querySelector('[data-mask="'+o.mask+'"]');
+      if (found) found.classList.add('selected');
+    }
+  }
+
+  // Pick the active ordered list based on current nav mode
+  const mode = window._outcomeNavMode || 'prob';
+  const activeList = mode === 'bar'
+    ? (window._outcomesBarOrder  || [...allOutcomes])
+    : (window._outcomesProbOrder || [...allOutcomes].sort((a,b)=>b.probability-a.probability));
+
+  const idx = activeList.indexOf(o);
+  if (idx !== -1) window._currentOutcomeIdx = idx;
 
   const det = document.getElementById('outcomeDetail');
   det.style.display = 'block';
 
-  // Rank of this outcome by probability
-  const sorted = [...allOutcomes].sort((a,b)=>b.probability-a.probability);
-  const rank = sorted.indexOf(o) + 1;
+  const rank  = idx + 1;
+  const total = activeList.length;
 
   const winColor = o.winner==='Red wins' ? 'var(--red)' : o.winner==='Blue wins' ? 'var(--blue)' : 'var(--amber)';
+  const modeLabel = mode === 'bar' ? 'bar order' : 'high→low probability';
 
-  const robotCards = o.robotStates.map(r=>`
-    <div class="outcome-robot-card ${r.succeeds?'success':'fail'}">
-      <div class="outcome-robot-name" style="color:${r.side==='red'?'var(--red)':'var(--blue)'}">${r.label} (${r.side})</div>
-      <div class="outcome-robot-pins">
+  // ── Alliance stat columns (red | blue), each robot in its own row ──
+  const redRobots  = o.robotStates.filter(r=>r.side==='red');
+  const blueRobots = o.robotStates.filter(r=>r.side==='blue');
+
+  function robotRow(r) {
+    const c = r.side==='red' ? 'var(--red)' : 'var(--blue)';
+    const bg = r.side==='red' ? 'rgba(200,65,10,.07)' : 'rgba(26,95,180,.07)';
+    return `<div style="background:${bg};border-radius:var(--radius);padding:7px 9px;margin-bottom:5px;border:1px solid ${r.succeeds?(r.side==='red'?'rgba(200,65,10,.2)':'rgba(26,95,180,.2)'):'var(--paper3)'}">
+      <div style="font-weight:600;font-family:var(--mono);font-size:12px;color:${c};margin-bottom:3px">${r.label} ${r.succeeds?'✅':'❌'}</div>
+      <div style="font-size:11px;color:var(--ink2)">
         ${r.succeeds
-          ? `✅ Ran — G1: ${r.g1} pins, G2: ${r.g2} pins → <strong>${r.pins} total</strong>`
-          : `❌ Failed — 0 pins scored`
-        }
+          ? `G1: <strong>${r.g1}</strong> · G2: <strong>${r.g2}</strong> · Total: <strong>${r.pins}</strong> pins`
+          : `<span style="color:var(--ink3)">Failed — 0 pins</span>`}
       </div>
-      <div style="font-size:11px;color:var(--ink3);margin-top:3px;font-family:var(--mono)">
-        Failure rate: ${(r.fail*100).toFixed(0)}% · AWP contrib: ${(r.awp*100).toFixed(0)}%
-      </div>
-    </div>`).join('');
-
-  det.innerHTML = `
-    <div class="outcome-detail">
-      <div class="outcome-detail-head">
-        <div>
-          <div class="outcome-detail-title" style="color:${winColor}">${o.winner}</div>
-          <div style="font-size:12px;color:var(--ink3);font-family:var(--mono);margin-top:2px">
-            Outcome #${rank} most likely of 16 · Robots that ran: ${o.successLabels.join(', ')||'none'}
-            ${o.failLabels.length ? ' · Failed: '+o.failLabels.join(', ') : ''}
-          </div>
-        </div>
-        <div class="outcome-detail-prob">${(o.probability*100).toFixed(2)}% chance</div>
-      </div>
-
-      <div class="outcome-stat-grid">
-        <div class="outcome-stat">
-          <div class="outcome-stat-l" style="color:var(--red)">Red final score</div>
-          <div class="outcome-stat-v" style="color:var(--red)">${o.redScore}</div>
-        </div>
-        <div class="outcome-stat">
-          <div class="outcome-stat-l" style="color:var(--blue)">Blue final score</div>
-          <div class="outcome-stat-v" style="color:var(--blue)">${o.blueScore}</div>
-        </div>
-        <div class="outcome-stat">
-          <div class="outcome-stat-l">Red pins</div>
-          <div class="outcome-stat-v">${o.redPins}</div>
-        </div>
-        <div class="outcome-stat">
-          <div class="outcome-stat-l">Blue pins</div>
-          <div class="outcome-stat-v">${o.bluePins}</div>
-        </div>
-        <div class="outcome-stat">
-          <div class="outcome-stat-l">Red pin pts</div>
-          <div class="outcome-stat-v">${o.redRaw}</div>
-        </div>
-        <div class="outcome-stat">
-          <div class="outcome-stat-l">Blue pin pts</div>
-          <div class="outcome-stat-v">${o.blueRaw}</div>
-        </div>
-        <div class="outcome-stat">
-          <div class="outcome-stat-l">Red AWP prob</div>
-          <div class="outcome-stat-v" style="font-size:14px">${o.redAwpProb.toFixed(1)}%</div>
-        </div>
-        <div class="outcome-stat">
-          <div class="outcome-stat-l">Blue AWP prob</div>
-          <div class="outcome-stat-v" style="font-size:14px">${o.blueAwpProb.toFixed(1)}%</div>
-        </div>
-      </div>
-
-      <div style="font-size:11px;font-family:var(--mono);color:var(--ink3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">Robot states in this outcome</div>
-      <div class="outcome-robot-row">${robotCards}</div>
-
-      <div style="margin-top:12px;font-size:11px;color:var(--ink3);font-family:var(--mono);border-top:.5px solid var(--paper3);padding-top:8px">
-        Score breakdown: ${o.redPins} red pins × 5 = ${o.redRaw} pts${o.redScore>o.redRaw?' + 12 auto bonus':o.redScore===o.redRaw+6?' + 6 tie bonus':''} = <strong>${o.redScore}</strong> &nbsp;|&nbsp;
-        ${o.bluePins} blue pins × 5 = ${o.blueRaw} pts${o.blueScore>o.blueRaw?' + 12 auto bonus':o.blueScore===o.blueRaw+6?' + 6 tie bonus':''} = <strong>${o.blueScore}</strong>
+      <div style="font-size:10px;color:var(--ink3);font-family:var(--mono);margin-top:2px">
+        Fail rate: ${(r.fail*100).toFixed(0)}% · AWP: ${(r.awp*100).toFixed(0)}%
       </div>
     </div>`;
+  }
+
+  det.innerHTML = `
+    <div class="outcome-detail" style="position:relative">
+
+      <!-- NAV MODE TOGGLE -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:10px;font-size:11px;font-family:var(--mono);color:var(--ink3)">
+        <span>Navigate by:</span>
+        <button onclick="setOutcomeNavMode('prob')"
+          style="padding:3px 10px;border-radius:99px;border:1px solid var(--paper3);font-size:11px;font-family:var(--mono);cursor:pointer;transition:all .15s;
+            background:${mode==='prob'?'var(--ink)':'var(--paper2)'};color:${mode==='prob'?'var(--paper)':'var(--ink2)'}">
+          High→Low %
+        </button>
+        <button onclick="setOutcomeNavMode('bar')"
+          style="padding:3px 10px;border-radius:99px;border:1px solid var(--paper3);font-size:11px;font-family:var(--mono);cursor:pointer;transition:all .15s;
+            background:${mode==='bar'?'var(--ink)':'var(--paper2)'};color:${mode==='bar'?'var(--paper)':'var(--ink2)'}">
+          Bar order
+        </button>
+      </div>
+
+      <div style="display:flex;align-items:stretch;gap:0">
+        <!-- LEFT ARROW -->
+        <button onclick="navigateOutcome(-1)" title="Previous scenario"
+          style="flex-shrink:0;width:36px;background:var(--ink);color:var(--paper);border:none;border-radius:var(--radius) 0 0 var(--radius);cursor:pointer;font-size:18px;transition:background .15s;display:flex;align-items:center;justify-content:center;">&#8592;</button>
+
+        <!-- MAIN CONTENT -->
+        <div style="flex:1;min-width:0;padding:0 12px">
+
+          <!-- Header row -->
+          <div class="outcome-detail-head">
+            <div>
+              <div class="outcome-detail-title" style="color:${winColor}">${o.winner}</div>
+              <div style="font-size:12px;color:var(--ink3);font-family:var(--mono);margin-top:2px">
+                #${rank} of ${total} (${modeLabel}) · Ran: ${o.successLabels.join(', ')||'none'}${o.failLabels.length?' · Failed: '+o.failLabels.join(', '):''}
+              </div>
+            </div>
+            <div class="outcome-detail-prob">${(o.probability*100).toFixed(2)}% chance</div>
+          </div>
+
+          <!-- Two-column alliance stats -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+
+            <!-- RED column -->
+            <div style="background:rgba(200,65,10,.06);border:1.5px solid rgba(200,65,10,.25);border-radius:var(--radius-lg);padding:10px">
+              <div style="font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.6px;color:var(--red);font-weight:700;margin-bottom:8px">🔴 Red Alliance${o.winner==='Red wins'?' <span style="color:#FFD700;font-size:11px;letter-spacing:.3px">WIN 👑</span>':''}</div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:.5px solid rgba(200,65,10,.15)">
+                <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">Final score</span>
+                <span style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--red)">${o.redScore}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:.5px solid rgba(200,65,10,.15)">
+                <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">Pins scored</span>
+                <span style="font-size:13px;font-weight:600;font-family:var(--mono);color:var(--red)">${o.redPins}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:.5px solid rgba(200,65,10,.15)">
+                <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">Pin pts</span>
+                <span style="font-size:13px;font-weight:600;font-family:var(--mono)">${o.redRaw}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0">
+                <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">AWP prob</span>
+                <span style="font-size:13px;font-weight:600;font-family:var(--mono)">${o.redAwpProb.toFixed(1)}%</span>
+              </div>
+              <div style="margin-top:8px">${redRobots.map(robotRow).join('')}</div>
+            </div>
+
+            <!-- BLUE column -->
+            <div style="background:rgba(26,95,180,.06);border:1.5px solid rgba(26,95,180,.25);border-radius:var(--radius-lg);padding:10px">
+              <div style="font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.6px;color:var(--blue);font-weight:700;margin-bottom:8px">🔵 Blue Alliance${o.winner==='Blue wins'?' <span style="color:#FFD700;font-size:11px;letter-spacing:.3px">WIN 👑</span>':''}</div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:.5px solid rgba(26,95,180,.15)">
+                <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">Final score</span>
+                <span style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--blue)">${o.blueScore}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:.5px solid rgba(26,95,180,.15)">
+                <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">Pins scored</span>
+                <span style="font-size:13px;font-weight:600;font-family:var(--mono);color:var(--blue)">${o.bluePins}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:.5px solid rgba(26,95,180,.15)">
+                <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">Pin pts</span>
+                <span style="font-size:13px;font-weight:600;font-family:var(--mono)">${o.blueRaw}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0">
+                <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">AWP prob</span>
+                <span style="font-size:13px;font-weight:600;font-family:var(--mono)">${o.blueAwpProb.toFixed(1)}%</span>
+              </div>
+              <div style="margin-top:8px">${blueRobots.map(robotRow).join('')}</div>
+            </div>
+          </div>
+
+          <!-- Score breakdown footer -->
+          <div style="font-size:11px;color:var(--ink3);font-family:var(--mono);border-top:.5px solid var(--paper3);padding-top:8px">
+            <span style="color:var(--red)">${o.redPins} pins × 5 = ${o.redRaw}${o.redScore>o.redRaw?' + 12 bonus':o.redScore===o.redRaw+6?' + 6 tie':''} = <strong>${o.redScore}</strong></span>
+            &nbsp;vs&nbsp;
+            <span style="color:var(--blue)">${o.bluePins} pins × 5 = ${o.blueRaw}${o.blueScore>o.blueRaw?' + 12 bonus':o.blueScore===o.blueRaw+6?' + 6 tie':''} = <strong>${o.blueScore}</strong></span>
+          </div>
+        </div>
+
+        <!-- RIGHT ARROW -->
+        <button onclick="navigateOutcome(1)" title="Next scenario"
+          style="flex-shrink:0;width:36px;background:var(--ink);color:var(--paper);border:none;border-radius:0 var(--radius) var(--radius) 0;cursor:pointer;font-size:18px;transition:background .15s;display:flex;align-items:center;justify-content:center;">&#8594;</button>
+      </div>
+    </div>`;
+}
+
+function findSegByMask(mask) {
+  return document.getElementById('outcomeBar')?.querySelector('[data-mask="'+mask+'"]') || null;
+}
+
+function navigateOutcome(dir) {
+  const mode = window._outcomeNavMode || 'prob';
+  const list = mode === 'bar' ? window._outcomesBarOrder : window._outcomesProbOrder;
+  if (!list || !list.length) return;
+  const cur = window._currentOutcomeIdx || 0;
+  const newIdx = (cur + dir + list.length) % list.length;
+  const o = list[newIdx];
+  showOutcomeDetail(o, findSegByMask(o.mask), list);
+}
+
+function setOutcomeNavMode(mode) {
+  window._outcomeNavMode = mode;
+  const curList = mode === 'bar' ? window._outcomesBarOrder : window._outcomesProbOrder;
+  if (!curList || !curList.length) return;
+  const oldList = mode === 'bar' ? window._outcomesProbOrder : window._outcomesBarOrder;
+  const oldO = oldList ? oldList[window._currentOutcomeIdx || 0] : null;
+  const newIdx = oldO ? Math.max(0, curList.indexOf(oldO)) : 0;
+  window._currentOutcomeIdx = newIdx;
+  const o = curList[newIdx];
+  showOutcomeDetail(o, findSegByMask(o.mask), curList);
 }
 
 /* ═══════════════════════════════════════════════════════
