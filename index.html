@@ -337,20 +337,20 @@ tr:hover td{background:var(--paper2);cursor:pointer}
   <!-- Tabs -->
   <div class="tabs-wrap">
     <div class="tabs">
-      <button class="tab active" data-tab="search" onclick="switchTab('search',this)">Search</button>
-      <button class="tab" data-tab="leaderboard" onclick="switchTab('leaderboard',this)">Leaderboard</button>
+      <button class="tab active" data-tab="leaderboard" onclick="switchTab('leaderboard',this)">Leaderboard</button>
+      <button class="tab" data-tab="search" onclick="switchTab('search',this)">Search</button>
+      <button class="tab" data-tab="calendar" onclick="switchTab('calendar',this)">📅 Events</button>
       <button class="tab" data-tab="about" onclick="switchTab('about',this)">About</button>
       <button class="tab admin-only" data-tab="add" onclick="switchTab('add',this)">+ Add Entry</button>
       <button class="tab admin-only" data-tab="log" onclick="switchTab('log',this)">Scout Log</button>
       <button class="tab admin-only" data-tab="predict" onclick="switchTab('predict',this)">Win Probability</button>
       <button class="tab admin-only" data-tab="routes" onclick="switchTab('routes',this)">Routes</button>
       <button class="tab admin-only" data-tab="formulas" onclick="switchTab('formulas',this)">Formulas</button>
-      <button class="tab admin-only" data-tab="calendar" onclick="switchTab('calendar',this)">📅 Sig Calendar</button>
     </div>
   </div>
 
   <!-- ── SEARCH (public) ── -->
-  <div id="tab-search" class="panel active">
+  <div id="tab-search" class="panel">
     <div class="page">
       <div class="search-zone">
         <input class="si" id="pubSearch" type="text" placeholder="Search team number (e.g. 97230F)…"
@@ -364,7 +364,7 @@ tr:hover td{background:var(--paper2);cursor:pointer}
   </div>
 
   <!-- ── LEADERBOARD (public) ── -->
-  <div id="tab-leaderboard" class="panel">
+  <div id="tab-leaderboard" class="panel active">
     <div class="page">
       <div class="filters">
         <span class="fl">Filter:</span>
@@ -546,7 +546,7 @@ tr:hover td{background:var(--paper2);cursor:pointer}
             <input id="f-maxpins" placeholder="e.g. 6" type="number" min="0" max="20">
           </div>
         </div>
-        <div>
+        <div style="margin-bottom:12px">
             <label>Auton Failed? <span style="font-weight:400;color:var(--ink3)"></span></label>
             <select id="f-failed" style="font-size:14px">
               <option value="N">No — ran successfully</option>
@@ -769,11 +769,7 @@ tr:hover td{background:var(--paper2);cursor:pointer}
           </div>
         </div>
       </div>
-      <div style="margin: 1.5rem 0 1rem 0; text-align: center;">
-  <button type="button" class="btn btn-p" style="width: 100%; max-width: 280px; padding: 10px 18px; font-weight: 600;" onclick="calcProb()">
-    📊 Calculate Win Probability
-  </button>
-</div>
+
 
     </div>
 
@@ -858,38 +854,54 @@ tr:hover td{background:var(--paper2);cursor:pointer}
     <div class="page">
       <div class="card">
         <p class="sec">Points calculation</p>
-        <div class="formula-box">Alliance Score = (T1_G1 + T1_G2 + T2_G1 + T2_G2) × 5
-Consistency   = (1 - T1_FailRate + 1 - T2_FailRate) / 2
-ExpectedPts   = Alliance Score × Consistency
-AutoBonus     = +12 pts to higher-scoring alliance (SC7)
-               +6 to each alliance if tie</div>
+        <div class="formula-box">RawScore  = (R1_G1 + R1_G2 + R2_G1 + R2_G2) × 5
+
+AutoBonus = +12 pts to higher-scoring alliance (SC7)
+           +6 to each alliance if tied on raw score
+
+FinalScore = RawScore + AutoBonus</div>
+        <p class="sec" style="margin-top:1rem">Win probability (16-outcome model)</p>
+        <div class="formula-box">Each robot independently succeeds or fails each match.
+All 16 combinations (2⁴) are enumerated.
+
+For each outcome:
+  P(outcome) = ∏ P(robot_i succeeds or fails)
+  P(succeed) = 1 − FailRate
+  P(fail)    = FailRate
+
+Scores are computed per outcome, then the bar
+segments are sized proportionally to P(outcome).
+
+Red win %  = Σ P(outcomes where redScore > blueScore)
+Blue win % = Σ P(outcomes where blueScore > redScore)
+Tie %      = Σ P(outcomes where scores are equal)</div>
         <p class="sec" style="margin-top:1rem">AWP probability</p>
-        <div class="formula-box">AWP% = (R1_awp/100) × (R2_awp/100) × ConsFactor × 100
+        <div class="formula-box">AWP% = R1_awp × R2_awp   (per outcome, if both succeed)
 
-Both robots must succeed — joint probability.
-AWP earns WP (ranking pts), NOT match score.</div>
+Both robots must succeed AND individually earn AWP.
+AWP earns WP (ranking pts), NOT autonomous match score.</div>
         <p class="sec" style="margin-top:1rem">Worked example</p>
-        <div class="formula-box">Red: R1 → 4 pins, 80% AWP, cons 4/5 | R2 → 3 pins, 60% AWP, cons 3/5
-  RawPts = 7×5 = 35 | ConsFactor = 0.70 | ExpPts = 24.5
-  AWP%   = 0.80×0.60×0.70×100 = 33.6%
+        <div class="formula-box">Red: R1 → 4 pins total, 0% fail | R2 → 3 pins total, 0% fail
+  RawScore = 7 × 5 = 35
 
-Blue: R1 → 5 pins, 40% AWP, cons 5/5 | R2 → 5 pins, 70% AWP, cons 4/5
-  RawPts = 10×5 = 50 | ConsFactor = 0.90 | ExpPts = 45.0
-  AWP%   = 0.40×0.70×0.90×100 = 25.2%
+Blue: R1 → 5 pins total, 0% fail | R2 → 5 pins total, 0% fail
+  RawScore = 10 × 5 = 50
 
-Blue wins points (45 > 24.5) → Blue gets +12 auto bonus
-Final: Red 24.5 pts, Blue 57.0 pts
-Red still more likely to achieve AWP (33.6% vs 25.2%)</div>
+Blue wins raw (50 > 35) → Blue gets +12 auto bonus
+Final: Red 35 pts, Blue 62 pts
+
+With 0% fail rates → P(both succeed) = 100%
+→ Blue wins probability = 100% in this outcome</div>
       </div>
     </div>
   </div>
 
-  <!-- ── SIG CALENDAR (admin) ── -->
+  <!-- ── SIG CALENDAR (public, add/filter admin-only) ── -->
   <div id="tab-calendar" class="panel">
     <div class="page">
 
-      <!-- Add event form -->
-      <div class="card">
+      <!-- Add event form (admin only) -->
+      <div class="card admin-only" id="cal-add-card">
         <p class="sec">Add Sig Event</p>
         <div class="g3" style="margin-bottom:12px">
           <div><label>Event Name</label><input id="cal-name" placeholder="e.g. Mall of America"></div>
@@ -907,8 +919,8 @@ Red still more likely to achieve AWP (33.6% vs 25.2%)</div>
         <div id="cal-msg"></div>
       </div>
 
-      <!-- Filter leaderboard by event period -->
-      <div class="card">
+      <!-- Filter leaderboard by event period (admin only) -->
+      <div class="card admin-only" id="cal-filter-card">
         <p class="sec">Filter leaderboard by event period</p>
         <p class="hint" style="margin-bottom:12px">Select a Sig event below to see the leaderboard using only entries from that time window.</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
@@ -1385,7 +1397,6 @@ function lbRender() {
         <th onclick="lbSortBy('avg_pins')" id="lbth-avg_pins" class="sorted">Avg Pins ↕</th>
         <th onclick="lbSortBy('avg_bonuses')" id="lbth-avg_bonuses">Avg Bonus</th>
         <th onclick="lbSortBy('awp_pct')" id="lbth-awp_pct">AWP Rate</th>
-        <th onclick="lbSortBy('sig_count')" id="lbth-sig_count">Sig</th>
         <th>Robot Type</th>
       </tr></thead><tbody>
       ${sl.map((t,i)=>`<tr onclick='openDetail(${JSON.stringify(JSON.stringify(t))})'>
@@ -1398,7 +1409,6 @@ function lbRender() {
           <span style="font-family:var(--mono);min-width:34px">${parseFloat(t.awp_pct).toFixed(0)}%</span>
           <div class="awp-wrap"><div class="awp-fill" style="width:${Math.min(parseFloat(t.awp_pct),100)}%"></div></div>
         </div></td>
-        <td>${t.sig_count>0?'<span class="badge b-sig">'+t.sig_count+'</span>':'<span class="badge b-no">—</span>'}</td>
         <td style="font-size:12px;color:var(--ink2)">${t.types}</td>
       </tr>`).join('')}
       </tbody></table></div></div>`;
@@ -1847,16 +1857,33 @@ function onCustomTypeBlur() {
   if(val) saveRobotType(val);
 }
 
-// ── Colour palette for outcome segments (red-wins → tie → blue-wins) ──
-const OUTCOME_COLOURS = {
-  'Red wins':  ['#c8410a','#d4521e','#e06535','#c03000','#b82e00','#cc4415','#d85030','#c03818'],
-  'Tie':       ['#7a5c00','#8a6800'],
-  'Blue wins': ['#1a5fb4','#2468bf','#2e72ca','#1050a0','#1a4898','#204fa8','#245ab4','#1845a0']
-};
-
-function outcomeColour(winner, index) {
-  const arr = OUTCOME_COLOURS[winner] || OUTCOME_COLOURS['Tie'];
-  return arr[index % arr.length];
+// ── Colour by point margin: bigger win = deeper colour, tie = gray ──
+// margin: absolute point difference between alliances
+function outcomeColour(winner, index, margin) {
+  if (winner === 'Tie') {
+    // Gray for ties — slight variation so multiple tie segments are distinguishable
+    const lightness = 55 + (index % 3) * 6; // 55%, 61%, 67%
+    return `hsl(0,0%,${lightness}%)`;
+  }
+  // Map margin to colour intensity:
+  // 0–6 pts  → light/washed shade   (t=0.25)
+  // 12–18 pts → mid shade            (t=0.60)
+  // 30+ pts  → fully saturated shade (t=1.00)
+  const maxMargin = 62; // theoretical max: 10 pins × 5 = 50 + 12 bonus = 62
+  const t = Math.min(margin / maxMargin, 1); // 0..1, higher = bigger win
+  if (winner === 'Red wins') {
+    // Deep red (#9e2800) → bright red (#e8500a) based on t
+    const r = Math.round(158 + t * 74);  // 158..232
+    const g = Math.round(40  + t * 40);  // 40..80
+    const b = Math.round(0   + t * 10);  // 0..10
+    return `rgb(${r},${g},${b})`;
+  } else {
+    // Dark blue (#0d3a7a) → bright blue (#2879e0) based on t
+    const r = Math.round(13  + t * 27);  // 13..40
+    const g = Math.round(58  + t * 63);  // 58..121
+    const b = Math.round(122 + t * 102); // 122..224
+    return `rgb(${r},${g},${b})`;
+  }
 }
 
 function calcProb() {
@@ -1943,7 +1970,8 @@ function calcProb() {
   outcomes.forEach((o, idx) => {
     const pct = (o.probability / totalProb) * 100;
     if (pct < 0.1) return; // skip invisible slivers
-    const colour = outcomeColour(o.winner, colourCounters[o.winner]++);
+    const margin = Math.abs(o.redScore - o.blueScore);
+    const colour = outcomeColour(o.winner, colourCounters[o.winner]++, margin);
     const seg = document.createElement('div');
     seg.className = 'outcome-seg';
     seg.style.cssText = `flex:${pct};background:${colour};`;
@@ -1973,7 +2001,7 @@ function calcProb() {
   const blueTotal = outcomes.filter(o=>o.winner==='Blue wins').reduce((s,o)=>s+o.probability,0);
   legend.innerHTML = [
     { label:'Red wins', colour:'#c8410a', prob:redTotal },
-    { label:'Tie',      colour:'#7a5c00', prob:tieTotal },
+    { label:'Tie',      colour:'#888888', prob:tieTotal },
     { label:'Blue wins',colour:'#1a5fb4', prob:blueTotal },
   ].map(l=>`
     <div class="outcome-legend-item">
@@ -2027,7 +2055,7 @@ function showOutcomeDetail(o, clickedSeg, allOutcomes) {
   const rank  = idx + 1;
   const total = activeList.length;
 
-  const winColor = o.winner==='Red wins' ? 'var(--red)' : o.winner==='Blue wins' ? 'var(--blue)' : 'var(--amber)';
+  const winColor = o.winner==='Red wins' ? 'var(--red)' : o.winner==='Blue wins' ? 'var(--blue)' : '#777777';
   const modeLabel = mode === 'bar' ? 'bar order' : 'high→low probability';
 
   // ── Alliance stat columns (red | blue), each robot in its own row ──
@@ -2333,7 +2361,7 @@ function renderCalList() {
         </div>
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
-        <button class="btn btn-sm" onclick="filterByEvent('${e.id}')">Filter leaderboard</button>
+        ${isAdmin ? `<button class="btn btn-sm" onclick="filterByEvent('${e.id}')">Filter leaderboard</button>` : ''}
         ${isAdmin ? `<button class="btn btn-sm btn-d" onclick="deleteCalEvent('${e.id}')">✕</button>` : ''}
       </div>
     </div>`;
