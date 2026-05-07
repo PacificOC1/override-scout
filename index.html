@@ -265,7 +265,65 @@ tr:hover td{background:var(--paper2);cursor:pointer}
 .outcome-robot-name{font-weight:600;margin-bottom:4px;font-family:var(--mono);font-size:11px}
 .outcome-robot-pins{color:var(--ink2)}
 
-/* ── RESOURCE ROWS ── */
+/* ── SCHEDULE MODAL ── */
+.sched-modal-bg{
+  display:none;position:fixed;inset:0;background:rgba(15,15,13,.6);z-index:600;
+  align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px);
+}
+.sched-modal-bg.open{display:flex}
+.sched-modal{
+  background:var(--paper);border:1.5px solid var(--ink);border-radius:var(--radius-lg);
+  width:100%;max-width:900px;max-height:90vh;display:flex;flex-direction:column;
+  box-shadow:6px 6px 0 var(--ink);position:relative;overflow:hidden;
+}
+.sched-modal-head{
+  padding:1rem 1.25rem;border-bottom:1px solid var(--paper3);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;
+}
+.sched-modal-title{font-size:15px;font-weight:700;letter-spacing:-.3px}
+.sched-modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink3);padding:2px 6px;border-radius:var(--radius)}
+.sched-modal-close:hover{color:var(--red);background:var(--red-bg)}
+.sched-tabs{display:flex;gap:0;border-bottom:1px solid var(--paper3);flex-shrink:0;background:var(--paper2)}
+.sched-tab{
+  padding:9px 18px;font-size:12px;cursor:pointer;border:none;background:transparent;
+  color:var(--ink3);border-bottom:2px solid transparent;margin-bottom:-1px;font-family:var(--sans);
+}
+.sched-tab.active{color:var(--ink);font-weight:600;border-bottom-color:var(--ink);background:var(--paper)}
+.sched-tab:hover:not(.active){color:var(--ink2);background:var(--paper3)}
+.sched-body{flex:1;overflow-y:auto;padding:1rem 1.25rem}
+.sched-panel{display:none}.sched-panel.active{display:block}
+.match-row{
+  display:grid;grid-template-columns:60px 1fr 1fr 80px;gap:8px;
+  padding:8px 10px;border-radius:var(--radius);cursor:pointer;
+  align-items:center;border:.5px solid transparent;margin-bottom:4px;transition:all .12s;
+}
+.match-row:hover{background:var(--blue-bg);border-color:#c0d8f5}
+.match-row.selected{background:var(--blue-bg);border-color:var(--blue)}
+.match-row-hd{
+  display:grid;grid-template-columns:60px 1fr 1fr 80px;gap:8px;
+  padding:6px 10px;font-size:10px;font-family:var(--mono);text-transform:uppercase;
+  letter-spacing:.5px;color:var(--ink3);border-bottom:1px solid var(--paper3);margin-bottom:6px;
+}
+.match-num{font-family:var(--mono);font-weight:700;font-size:12px;color:var(--ink)}
+.alliance-cell{display:flex;flex-direction:column;gap:3px}
+.team-chip{
+  display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:12px;
+  font-weight:600;padding:2px 7px;border-radius:4px;
+}
+.team-chip.red{background:var(--red-bg);color:var(--red-text)}
+.team-chip.blue{background:var(--blue-bg);color:var(--blue)}
+.match-time{font-size:11px;font-family:var(--mono);color:var(--ink3);text-align:right}
+.sched-token-bar{
+  display:flex;gap:8px;align-items:flex-end;padding:10px 0 12px;
+  border-bottom:1px solid var(--paper3);margin-bottom:12px;flex-wrap:wrap;
+}
+.selected-match-pill{
+  display:inline-flex;align-items:center;gap:6px;padding:4px 12px;
+  background:var(--blue-bg);border:1px solid var(--blue);border-radius:99px;
+  font-size:12px;font-family:var(--mono);color:var(--blue);font-weight:600;
+}
+
+
 .resource-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:.5px solid var(--paper3);gap:12px}
 .resource-row:last-child{border-bottom:none}
 
@@ -919,7 +977,7 @@ With 0% fail rates → P(both succeed) = 100%
         <!-- Preview table shown before import -->
         <div id="re-preview" style="display:none">
           <div style="font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin-bottom:8px">Events found — select which to import:</div>
-          <div id="re-preview-list"></div>
+          <div id="re-preview-list" style="max-height:380px;overflow-y:auto;border:1px solid var(--paper3);border-radius:var(--radius);padding:0 10px"></div>
           <div style="display:flex;gap:8px;margin-top:10px">
             <button class="btn btn-p" onclick="importSelectedReEvents()">✓ Import selected</button>
             <button class="btn" onclick="document.getElementById('re-preview').style.display='none'">Cancel</button>
@@ -1079,6 +1137,150 @@ With 0% fail rates → P(both succeed) = 100%
   <div class="dcard">
     <button class="dc-close" onclick="closeDetail()">✕</button>
     <div id="dc"></div>
+  </div>
+</div>
+
+<!-- ── MATCH SCHEDULE MODAL ── -->
+<div class="sched-modal-bg" id="schedModal" onclick="if(event.target===this)closeSchedModal()">
+  <div class="sched-modal">
+    <div class="sched-modal-head">
+      <div>
+        <div class="sched-modal-title" id="schedModalTitle">Event Schedule</div>
+        <div style="font-size:11px;font-family:var(--mono);color:var(--ink3);margin-top:2px" id="schedModalSub"></div>
+      </div>
+      <button class="sched-modal-close" onclick="closeSchedModal()">✕</button>
+    </div>
+    <div class="sched-tabs">
+      <button class="sched-tab active" onclick="switchSchedTab('schedule',this)">📋 Match Schedule</button>
+      <button class="sched-tab" onclick="switchSchedTab('calc',this)">⚡ Auton Calculator</button>
+    </div>
+    <div class="sched-body">
+
+      <!-- SCHEDULE PANEL -->
+      <div class="sched-panel active" id="sched-panel-schedule">
+        <div class="sched-token-bar">
+          <div style="flex:1;min-width:180px">
+            <label style="font-size:11px">RobotEvents API Token <span style="color:var(--ink3);font-weight:400">(needed to fetch schedule)</span></label>
+            <input id="sched-re-token" placeholder="Paste your token…" type="password"
+              style="font-family:var(--mono);font-size:12px" oninput="saveSchedToken()">
+          </div>
+          <button class="btn btn-p" onclick="fetchSchedule()">Load Schedule</button>
+        </div>
+        <div id="sched-status" style="font-size:12px;font-family:var(--mono);color:var(--ink3);margin-bottom:8px"></div>
+        <div id="sched-filter-bar" style="display:none;margin-bottom:10px">
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+            <span style="font-size:11px;font-family:var(--mono);color:var(--ink3)">Show:</span>
+            <button class="chip on" onclick="schedFilter('qual',this)">Quals</button>
+            <button class="chip" onclick="schedFilter('elim',this)">Elims</button>
+            <button class="chip" onclick="schedFilter('all',this)">All</button>
+            <span style="flex:1"></span>
+            <span style="font-size:11px;font-family:var(--mono);color:var(--ink3)" id="sched-match-count"></span>
+          </div>
+        </div>
+        <div class="match-row-hd">
+          <div>Match</div><div>🔴 Red Alliance</div><div>🔵 Blue Alliance</div><div>Time</div>
+        </div>
+        <div id="sched-list"><div class="empty" style="padding:2rem">Load the schedule using your RobotEvents token above.</div></div>
+      </div>
+
+      <!-- AUTON CALCULATOR PANEL (embedded, separate IDs prefixed with "em-") -->
+      <div class="sched-panel" id="sched-panel-calc">
+        <div id="sched-match-from" style="display:none;margin-bottom:12px">
+          <div class="selected-match-pill" id="sched-match-pill">No match selected</div>
+          <span style="font-size:11px;color:var(--ink3);margin-left:8px">Teams auto-filled from schedule. Click any match to change.</span>
+        </div>
+        <div class="g2" style="margin-bottom:1rem;align-items:start">
+          <!-- Red -->
+          <div class="alliance-panel red-panel">
+            <p class="sec" style="color:var(--red)">🔴 Red Alliance</p>
+            <p style="font-size:11px;color:var(--ink3);font-family:var(--mono);margin-bottom:10px">Stats auto-fill from database</p>
+            <div style="background:var(--paper2);border-radius:var(--radius);padding:10px;margin-bottom:10px">
+              <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--red);margin-bottom:8px">Robot 1</div>
+              <div style="margin-bottom:8px"><label>Team #</label>
+                <input id="em-r1" placeholder="e.g. 97230F" oninput="emAutoFill('em-r1')"></div>
+              <div id="em-r1-pins-normal" style="margin-bottom:8px">
+                <div class="g2">
+                  <div><label>Avg G1 pins</label><input type="number" id="em-r1g1" min="0" max="10" value="2" oninput="emCalcProb()"></div>
+                  <div><label>Avg G2 pins</label><input type="number" id="em-r1g2" min="0" max="10" value="1" oninput="emCalcProb()"></div>
+                </div>
+              </div>
+              <div class="g2">
+                <div><label>Failure rate %</label><input type="number" id="em-r1fail" min="0" max="100" value="0" oninput="emCalcProb()"></div>
+                <div><label>AWP contrib. %</label><input type="number" id="em-r1awp" min="0" max="100" value="50" oninput="emCalcProb()"></div>
+              </div>
+            </div>
+            <div style="background:var(--paper2);border-radius:var(--radius);padding:10px">
+              <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--red);margin-bottom:8px">Robot 2</div>
+              <div style="margin-bottom:8px"><label>Team #</label>
+                <input id="em-r2" placeholder="e.g. 9123X" oninput="emAutoFill('em-r2')"></div>
+              <div id="em-r2-pins-normal" style="margin-bottom:8px">
+                <div class="g2">
+                  <div><label>Avg G1 pins</label><input type="number" id="em-r2g1" min="0" max="10" value="2" oninput="emCalcProb()"></div>
+                  <div><label>Avg G2 pins</label><input type="number" id="em-r2g2" min="0" max="10" value="1" oninput="emCalcProb()"></div>
+                </div>
+              </div>
+              <div class="g2">
+                <div><label>Failure rate %</label><input type="number" id="em-r2fail" min="0" max="100" value="0" oninput="emCalcProb()"></div>
+                <div><label>AWP contrib. %</label><input type="number" id="em-r2awp" min="0" max="100" value="50" oninput="emCalcProb()"></div>
+              </div>
+            </div>
+          </div>
+          <!-- Blue -->
+          <div class="alliance-panel blue-panel">
+            <p class="sec" style="color:var(--blue)">🔵 Blue Alliance</p>
+            <p style="font-size:11px;color:var(--ink3);font-family:var(--mono);margin-bottom:10px">Stats auto-fill from database</p>
+            <div style="background:var(--paper2);border-radius:var(--radius);padding:10px;margin-bottom:10px">
+              <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--blue);margin-bottom:8px">Robot 1</div>
+              <div style="margin-bottom:8px"><label>Team #</label>
+                <input id="em-b1" placeholder="e.g. 5678A" oninput="emAutoFill('em-b1')"></div>
+              <div id="em-b1-pins-normal" style="margin-bottom:8px">
+                <div class="g2">
+                  <div><label>Avg G1 pins</label><input type="number" id="em-b1g1" min="0" max="10" value="2" oninput="emCalcProb()"></div>
+                  <div><label>Avg G2 pins</label><input type="number" id="em-b1g2" min="0" max="10" value="1" oninput="emCalcProb()"></div>
+                </div>
+              </div>
+              <div class="g2">
+                <div><label>Failure rate %</label><input type="number" id="em-b1fail" min="0" max="100" value="0" oninput="emCalcProb()"></div>
+                <div><label>AWP contrib. %</label><input type="number" id="em-b1awp" min="0" max="100" value="50" oninput="emCalcProb()"></div>
+              </div>
+            </div>
+            <div style="background:var(--paper2);border-radius:var(--radius);padding:10px">
+              <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--blue);margin-bottom:8px">Robot 2</div>
+              <div style="margin-bottom:8px"><label>Team #</label>
+                <input id="em-b2" placeholder="e.g. 9999Z" oninput="emAutoFill('em-b2')"></div>
+              <div id="em-b2-pins-normal" style="margin-bottom:8px">
+                <div class="g2">
+                  <div><label>Avg G1 pins</label><input type="number" id="em-b2g1" min="0" max="10" value="2" oninput="emCalcProb()"></div>
+                  <div><label>Avg G2 pins</label><input type="number" id="em-b2g2" min="0" max="10" value="1" oninput="emCalcProb()"></div>
+                </div>
+              </div>
+              <div class="g2">
+                <div><label>Failure rate %</label><input type="number" id="em-b2fail" min="0" max="100" value="0" oninput="emCalcProb()"></div>
+                <div><label>AWP contrib. %</label><input type="number" id="em-b2awp" min="0" max="100" value="50" oninput="emCalcProb()"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Results -->
+        <div class="card" id="em-probResults">
+          <p class="sec" id="em-mostOutcome">Most probable outcome: —</p>
+          <p class="hint" style="margin-bottom:10px">All 16 possible robot success/failure combinations. Each segment width = probability. Click any segment to see stats.</p>
+          <div class="outcome-legend" id="em-outcomeLegend"></div>
+          <div class="outcome-bar-wrap" id="em-outcomeBar"></div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;font-family:var(--mono);color:var(--ink3);margin-bottom:1rem">
+            <span>← Red wins</span><span>Tie zone</span><span>Blue wins →</span>
+          </div>
+          <div id="em-outcomeDetail" style="display:none"></div>
+        </div>
+        <!-- Quick-fill Add Entry button -->
+        <div class="card" id="em-add-entry-bar" style="display:none">
+          <p class="sec" style="margin-bottom:6px">Log this match</p>
+          <p class="hint" style="margin-bottom:10px">Fill in the Add Entry form for one of these teams with the match number pre-set.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap" id="em-add-buttons"></div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>
 
@@ -2402,6 +2604,7 @@ function renderCalList() {
         </div>
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+        <button class="btn btn-sm" onclick="openSchedModal(${JSON.stringify(JSON.stringify(e))})">📋 Schedule</button>
         <button class="btn btn-sm" onclick="filterByEvent('${e.id}')">Filter leaderboard</button>
         ${isAdmin ? `<button class="btn btn-sm btn-d" onclick="deleteCalEvent('${e.id}')">✕</button>` : ''}
       </div>
@@ -2490,6 +2693,10 @@ loadCalEvents();
    Fetches VRC Signature events and imports them into
    the Supabase sig_events table.
    API key stored in localStorage (browser only).
+
+   ⚠ MIGRATION REQUIRED — run once in Supabase SQL editor:
+   alter table sig_events add column if not exists re_event_id bigint;
+
 ════════════════════════════════════════════════════════ */
 
 const RE_API = 'https://www.robotevents.com/api/v2';
@@ -2523,11 +2730,11 @@ async function syncFromRobotEvents() {
     return;
   }
 
-  setReMsg('Fetching Signature events from RobotEvents…', 'ok');
+  setReMsg('Fetching events from RobotEvents…', 'ok');
   document.getElementById('re-preview').style.display = 'none';
 
   try {
-    // Fetch all upcoming VRC Signature events
+    // Fetch all upcoming VRC events across all levels
     // We paginate until we have everything (RobotEvents returns max 250/page)
     const today = new Date().toISOString().slice(0, 10);
     let page = 1, allFetched = [], lastMeta;
@@ -2535,7 +2742,7 @@ async function syncFromRobotEvents() {
     do {
       const url = new URL(RE_API + '/events');
       url.searchParams.set('program[]', RE_VRC_PROGRAM);
-      url.searchParams.set('level[]', 'Signature');
+      // No level filter — fetch Regional, Signature, Tournament, etc.
       url.searchParams.set('start', today + 'T00:00:00.000Z');
       url.searchParams.set('per_page', '250');
       url.searchParams.set('page', page);
@@ -2558,7 +2765,7 @@ async function syncFromRobotEvents() {
     } while(lastMeta && lastMeta.current_page < lastMeta.last_page);
 
     if(!allFetched.length) {
-      setReMsg('No upcoming VRC Signature events found.', 'err');
+      setReMsg('No upcoming VRC events found.', 'err');
       return;
     }
 
@@ -2570,7 +2777,7 @@ async function syncFromRobotEvents() {
       return !existingKeys.has(re.name + '|' + start);
     });
 
-    setReMsg(`Found ${allFetched.length} Sig event${allFetched.length!==1?'s':''} total, ${newEvents.length} new.`, 'ok');
+    setReMsg(`Found ${allFetched.length} event${allFetched.length!==1?'s':''} total, ${newEvents.length} new.`, 'ok');
 
     // Show preview
     renderRePreview(allFetched, existingKeys);
@@ -2595,19 +2802,22 @@ function renderRePreview(events, existingKeys) {
     const isUpcoming = start >= now;
 
     return `
-    <label style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:.5px solid var(--paper3);cursor:${alreadyIn?'default':'pointer'};opacity:${alreadyIn?'0.5':'1'}">
-      <input type="checkbox" data-re-idx="${i}" ${alreadyIn?'disabled checked':''} ${isUpcoming&&!alreadyIn?'checked':''} style="margin-top:3px;flex-shrink:0">
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:600;font-size:13px;margin-bottom:2px">
-          ${re.name}
-          ${alreadyIn ? '<span class="badge b-no" style="margin-left:6px">Already imported</span>' : '<span class="badge b-sig" style="margin-left:6px">New</span>'}
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:.5px solid var(--paper3);">
+      <label style="display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0;cursor:${alreadyIn?'default':'pointer'};opacity:${alreadyIn?'0.55':'1'}">
+        <input type="checkbox" data-re-idx="${i}" ${alreadyIn?'disabled checked':''} ${isUpcoming&&!alreadyIn?'checked':''} style="margin-top:3px;flex-shrink:0">
+        <div style="flex:1;min-width:0;overflow:hidden">
+          <div style="font-weight:600;font-size:13px;margin-bottom:2px;white-space:normal;word-break:break-word;display:flex;flex-wrap:wrap;align-items:center;gap:4px">
+            <span style="flex:1;min-width:0">${re.name}</span>
+            ${alreadyIn ? '<span class="badge b-no">Already imported</span>' : '<span class="badge b-sig">New</span>'}
+            ${re.level && re.level !== 'Signature' ? `<span class="badge b-q">${re.level}</span>` : ''}
+          </div>
+          <div style="font-size:11px;font-family:var(--mono);color:var(--ink3);margin-top:2px">
+            ${start}${end!==start?' → '+end:''} ${location?'· '+location:''}
+          </div>
+          ${re.location?.venue ? `<div style="font-size:11px;color:var(--ink3)">${re.location.venue}</div>` : ''}
         </div>
-        <div style="font-size:11px;font-family:var(--mono);color:var(--ink3)">
-          ${start} → ${end}${location?' · '+location:''}
-        </div>
-        ${re.location?.venue ? `<div style="font-size:11px;color:var(--ink3)">${re.location.venue}</div>` : ''}
-      </div>
-    </label>`;
+      </label>
+    </div>`;
   }).join('');
 
   // Store the events array so importSelected can access it
@@ -2645,11 +2855,12 @@ async function importSelectedReEvents() {
         method: 'POST',
         headers: { ...adminHdrs(), 'Prefer': 'return=minimal' },
         body: JSON.stringify({
-          name:       re.name,
-          start_date: start,
-          end_date:   end,
-          location:   location || null,
-          notes:      notes || null
+          name:         re.name,
+          start_date:   start,
+          end_date:     end,
+          location:     location || null,
+          notes:        notes || null,
+          re_event_id:  re.id || null
         })
       });
       if(!r.ok) throw new Error('HTTP ' + r.status);
@@ -2674,8 +2885,405 @@ function setReMsg(msg, type) {
   el.style.color = type === 'err' ? 'var(--red-text)' : 'var(--green)';
 }
 
-// Restore saved token on load
+/* ═══════════════════════════════════════════════════════
+   MATCH SCHEDULE MODAL
+════════════════════════════════════════════════════════ */
+let _schedEvent = null;       // current event object
+let _schedMatches = [];       // all fetched matches
+let _schedFilter = 'qual';    // 'qual' | 'elim' | 'all'
+let _schedSelectedMatch = null;
+
+function saveSchedToken() {
+  const v = document.getElementById('sched-re-token').value.trim();
+  try { if(v) localStorage.setItem('override_sched_token', v); } catch(e){}
+}
+function loadSchedToken() {
+  try {
+    const v = localStorage.getItem('override_sched_token') || localStorage.getItem('override_re_token_v1') || '';
+    if(v) document.getElementById('sched-re-token').value = v;
+  } catch(e){}
+}
+
+function openSchedModal(ev) {
+  if(typeof ev === 'string') ev = JSON.parse(ev);
+  if(typeof ev === 'string') ev = JSON.parse(ev);
+  _schedEvent = ev;
+  _schedMatches = [];
+  _schedSelectedMatch = null;
+  _schedFilter = 'qual';
+
+  document.getElementById('schedModalTitle').textContent = ev.name;
+  document.getElementById('schedModalSub').textContent =
+    ev.start_date + (ev.end_date !== ev.start_date ? ' → ' + ev.end_date : '') +
+    (ev.location ? ' · ' + ev.location : '');
+  document.getElementById('sched-status').textContent = ev.re_event_id
+    ? 'RobotEvents ID: ' + ev.re_event_id + ' · Click "Load Schedule" to fetch matches.'
+    : 'No RobotEvents ID linked to this event. Import the event via RobotEvents sync to enable schedule loading.';
+  document.getElementById('sched-list').innerHTML = '<div class="empty" style="padding:2rem">Click "Load Schedule" to fetch matches from RobotEvents.</div>';
+  document.getElementById('sched-filter-bar').style.display = 'none';
+  document.getElementById('sched-match-from').style.display = 'none';
+  document.getElementById('em-add-entry-bar').style.display = 'none';
+
+  // Reset calc
+  ['em-r1','em-r2','em-b1','em-b2'].forEach(id => { document.getElementById(id).value = ''; });
+  ['em-r1g1','em-r1g2','em-r2g1','em-r2g2','em-b1g1','em-b1g2','em-b2g1','em-b2g2'].forEach(id => { document.getElementById(id).value = 2; });
+  ['em-r1fail','em-r2fail','em-b1fail','em-b2fail'].forEach(id => { document.getElementById(id).value = 0; });
+  ['em-r1awp','em-r2awp','em-b1awp','em-b2awp'].forEach(id => { document.getElementById(id).value = 50; });
+  emCalcProb();
+
+  // Restore token
+  loadSchedToken();
+
+  // Switch to schedule tab
+  switchSchedTab('schedule', document.querySelector('.sched-tab'));
+
+  document.getElementById('schedModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSchedModal() {
+  document.getElementById('schedModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function switchSchedTab(name, el) {
+  document.querySelectorAll('.sched-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.sched-panel').forEach(p => p.classList.remove('active'));
+  if(el) el.classList.add('active');
+  document.getElementById('sched-panel-' + name).classList.add('active');
+}
+
+/* ── Fetch match schedule from RobotEvents ── */
+async function fetchSchedule() {
+  if(!_schedEvent) return;
+  const token = document.getElementById('sched-re-token').value.trim();
+  if(!token) {
+    document.getElementById('sched-status').textContent = '⚠ Paste your RobotEvents API token first.';
+    document.getElementById('sched-status').style.color = 'var(--red-text)';
+    return;
+  }
+  if(!_schedEvent.re_event_id) {
+    document.getElementById('sched-status').textContent = '⚠ This event has no RobotEvents ID. Re-import it via the RobotEvents sync tool.';
+    document.getElementById('sched-status').style.color = 'var(--red-text)';
+    return;
+  }
+
+  document.getElementById('sched-status').textContent = 'Fetching schedule…';
+  document.getElementById('sched-status').style.color = 'var(--green)';
+  document.getElementById('sched-list').innerHTML = '<div class="empty"><span class="spin"></span><br><br>Loading…</div>';
+
+  try {
+    // Fetch qual + elim divisions
+    const headers = { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' };
+    const eid = _schedEvent.re_event_id;
+
+    // Get divisions for this event
+    const divRes = await fetch(`${RE_API}/events/${eid}/divisions`, { headers });
+    if(!divRes.ok) throw new Error('HTTP ' + divRes.status + ' fetching divisions');
+    const divData = await divRes.json();
+    const divisions = divData.data || [];
+
+    let allMatches = [];
+    for(const div of divisions) {
+      // Fetch all pages of matches for this division
+      let page = 1, lastMeta;
+      do {
+        const url = new URL(`${RE_API}/events/${eid}/divisions/${div.id}/matches`);
+        url.searchParams.set('per_page', '250');
+        url.searchParams.set('page', page);
+        const mRes = await fetch(url.toString(), { headers });
+        if(!mRes.ok) throw new Error('HTTP ' + mRes.status + ' fetching matches');
+        const mData = await mRes.json();
+        const matches = (mData.data || []).map(m => ({ ...m, _divName: div.name }));
+        allMatches = allMatches.concat(matches);
+        lastMeta = mData.meta;
+        page++;
+      } while(lastMeta && lastMeta.current_page < lastMeta.last_page);
+    }
+
+    if(!allMatches.length) {
+      document.getElementById('sched-status').textContent = 'No matches found for this event yet.';
+      document.getElementById('sched-status').style.color = 'var(--ink3)';
+      document.getElementById('sched-list').innerHTML = '<div class="empty" style="padding:2rem">Schedule not posted yet. Check back closer to the event.</div>';
+      return;
+    }
+
+    // Sort by round type then match number
+    allMatches.sort((a, b) => {
+      const roundOrder = { 'qual': 0, 'qf': 1, 'sf': 2, 'f': 3 };
+      const ra = roundOrder[(a.round||'').toLowerCase()] ?? 9;
+      const rb = roundOrder[(b.round||'').toLowerCase()] ?? 9;
+      if(ra !== rb) return ra - rb;
+      return (a.matchnum || 0) - (b.matchnum || 0);
+    });
+
+    _schedMatches = allMatches;
+    document.getElementById('sched-status').textContent =
+      `✓ Loaded ${allMatches.length} match${allMatches.length!==1?'es':''} · Click any row to analyse in the Auton Calculator.`;
+    document.getElementById('sched-status').style.color = 'var(--green)';
+    document.getElementById('sched-filter-bar').style.display = 'block';
+
+    // Reset filter chips
+    document.querySelectorAll('#sched-filter-bar .chip').forEach(c => c.classList.remove('on'));
+    document.querySelector('#sched-filter-bar .chip').classList.add('on');
+    _schedFilter = 'qual';
+    renderSchedule();
+  } catch(e) {
+    document.getElementById('sched-status').textContent = 'Error: ' + e.message;
+    document.getElementById('sched-status').style.color = 'var(--red-text)';
+    document.getElementById('sched-list').innerHTML = '<div class="empty" style="padding:2rem;color:var(--red-text)">' + e.message + '</div>';
+    console.error(e);
+  }
+}
+
+function schedFilter(f, el) {
+  document.querySelectorAll('#sched-filter-bar .chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  _schedFilter = f;
+  renderSchedule();
+}
+
+function renderSchedule() {
+  const isQual = m => (m.round||'').toLowerCase() === 'qual' || (m.round||'').toLowerCase() === 'practice';
+  let shown = _schedMatches;
+  if(_schedFilter === 'qual') shown = _schedMatches.filter(isQual);
+  if(_schedFilter === 'elim') shown = _schedMatches.filter(m => !isQual(m));
+
+  document.getElementById('sched-match-count').textContent = shown.length + ' match' + (shown.length !== 1 ? 'es' : '');
+
+  if(!shown.length) {
+    document.getElementById('sched-list').innerHTML = '<div class="empty" style="padding:1.5rem">No matches in this category.</div>';
+    return;
+  }
+
+  document.getElementById('sched-list').innerHTML = shown.map(m => {
+    const red  = (m.alliances||[]).find(a=>(a.color||'').toLowerCase()==='red');
+    const blue = (m.alliances||[]).find(a=>(a.color||'').toLowerCase()==='blue');
+    const redTeams  = (red?.teams  || []).map(t => t.team?.name || t.teamName || '?');
+    const blueTeams = (blue?.teams || []).map(t => t.team?.name || t.teamName || '?');
+    const label = formatMatchLabel(m);
+    const time  = m.scheduled ? new Date(m.scheduled).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+    const isSelected = _schedSelectedMatch && _schedSelectedMatch.id === m.id;
+    return `<div class="match-row${isSelected?' selected':''}" onclick="selectMatch(${JSON.stringify(JSON.stringify(m))})">
+      <div class="match-num">${label}</div>
+      <div class="alliance-cell">
+        ${redTeams.map(t=>`<span class="team-chip red">${t}</span>`).join('')}
+      </div>
+      <div class="alliance-cell">
+        ${blueTeams.map(t=>`<span class="team-chip blue">${t}</span>`).join('')}
+      </div>
+      <div class="match-time">${time}</div>
+    </div>`;
+  }).join('');
+}
+
+function formatMatchLabel(m) {
+  const r = (m.round||'').toLowerCase();
+  const n = m.matchnum || m.instance || '';
+  if(r === 'qual') return 'Q' + n;
+  if(r === 'practice') return 'P' + n;
+  if(r === 'qf') return 'QF' + (m.instance||'') + '-' + n;
+  if(r === 'sf') return 'SF' + (m.instance||'') + '-' + n;
+  if(r === 'f')  return 'F' + n;
+  return (m.round||'') + n;
+}
+
+function selectMatch(m) {
+  if(typeof m === 'string') m = JSON.parse(m);
+  _schedSelectedMatch = m;
+
+  const red  = (m.alliances||[]).find(a=>(a.color||'').toLowerCase()==='red');
+  const blue = (m.alliances||[]).find(a=>(a.color||'').toLowerCase()==='blue');
+  const redTeams  = (red?.teams  || []).map(t => (t.team?.name || t.teamName || '').toUpperCase());
+  const blueTeams = (blue?.teams || []).map(t => (t.team?.name || t.teamName || '').toUpperCase());
+
+  // Re-render schedule to show selection highlight
+  renderSchedule();
+
+  // Switch to calculator tab
+  const calcTab = document.querySelectorAll('.sched-tab')[1];
+  switchSchedTab('calc', calcTab);
+
+  // Fill team inputs
+  const label = formatMatchLabel(m);
+  document.getElementById('sched-match-pill').textContent = label + ' — ' +
+    redTeams.join(' & ') + ' vs ' + blueTeams.join(' & ');
+  document.getElementById('sched-match-from').style.display = 'block';
+
+  const slots = ['em-r1','em-r2','em-b1','em-b2'];
+  const teams = [redTeams[0]||'', redTeams[1]||'', blueTeams[0]||'', blueTeams[1]||''];
+  slots.forEach((id, i) => {
+    document.getElementById(id).value = teams[i];
+    if(teams[i]) emAutoFill(id);
+  });
+
+  // Show "Add Entry" quick-fill buttons
+  const allTeamsInMatch = [...redTeams, ...blueTeams].filter(Boolean);
+  const r = (m.round||'').toLowerCase();
+  const roundStr = r === 'qual' ? 'Q' + (m.matchnum||m.instance||'') :
+                   r === 'sf'   ? 'SF' + (m.instance||'') + '-' + (m.matchnum||'') :
+                   r === 'qf'   ? 'QF' + (m.instance||'') + '-' + (m.matchnum||'') :
+                   r === 'f'    ? 'F' + (m.matchnum||'') : label;
+
+  document.getElementById('em-add-buttons').innerHTML = allTeamsInMatch.map((team, i) => {
+    const side = i < 2 ? 'R' : 'B';
+    return `<button class="btn ${side==='R'?'':'btn-p'}" style="${side==='R'?'color:var(--red-text);border-color:var(--red-bg)':''}"
+      onclick="prefillAddEntry('${team}','${roundStr}','${side}');closeSchedModal()">
+      Log ${team} (${side==='R'?'Red':'Blue'})
+    </button>`;
+  }).join('');
+  document.getElementById('em-add-entry-bar').style.display = 'block';
+}
+
+/* prefill the main Add Entry form and switch to it */
+function prefillAddEntry(team, round, side) {
+  if(!isAdmin) return;
+  document.getElementById('f-team').value  = team;
+  document.getElementById('f-round').value = round;
+  document.getElementById('f-side').value  = side;
+  // Switch to add tab
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelector('[data-tab="add"]').classList.add('active');
+  document.getElementById('tab-add').classList.add('active');
+}
+
+/* ═══════════════════════════════════════════════════════
+   EMBEDDED AUTON CALCULATOR (em- prefix)
+════════════════════════════════════════════════════════ */
+function emAutoFill(id) {
+  const team = document.getElementById(id).value.trim().toUpperCase();
+  const suffix = id.replace('em-', ''); // r1, r2, b1, b2
+  if(!team) return;
+  const ms = allEntries.filter(e => (e.team||'').toUpperCase() === team);
+  if(!ms.length) return;
+
+  const normalEntries = ms.filter(e => (e.route||'').toUpperCase() !== 'SAWP');
+  const src = normalEntries.length ? normalEntries : ms;
+
+  const avgG1 = src.reduce((s,e)=>{const p=(e.pins||'0').split('+');return s+(parseInt(p[0])||0);},0)/src.length;
+  const avgG2 = src.reduce((s,e)=>{const p=(e.pins||'0').split('+');return s+(parseInt(p[1])||0);},0)/src.length;
+  const awpRate = Math.round(src.filter(e=>e.awp==='Y').length/src.length*100);
+  const knownEntries = src.filter(e=>e.failed==='Y'||e.failed==='N');
+  const failRate = knownEntries.length ? Math.round(knownEntries.filter(e=>e.failed==='Y').length/knownEntries.length*100) : 0;
+
+  const g1el = document.getElementById('em-'+suffix+'g1');
+  const g2el = document.getElementById('em-'+suffix+'g2');
+  const awpEl = document.getElementById('em-'+suffix+'awp');
+  const failEl = document.getElementById('em-'+suffix+'fail');
+
+  if(g1el) g1el.value = avgG1.toFixed(1);
+  if(g2el) g2el.value = avgG2.toFixed(1);
+  if(awpEl) awpEl.value = awpRate;
+  if(failEl) failEl.value = failRate;
+  emCalcProb();
+}
+
+function emCalcProb() {
+  const robots = [
+    { id:'em-r1', g1:+document.getElementById('em-r1g1').value||0, g2:+document.getElementById('em-r1g2').value||0, fail:(+document.getElementById('em-r1fail').value||0)/100, awp:(+document.getElementById('em-r1awp').value||0)/100, alliance:'red' },
+    { id:'em-r2', g1:+document.getElementById('em-r2g1').value||0, g2:+document.getElementById('em-r2g2').value||0, fail:(+document.getElementById('em-r2fail').value||0)/100, awp:(+document.getElementById('em-r2awp').value||0)/100, alliance:'red' },
+    { id:'em-b1', g1:+document.getElementById('em-b1g1').value||0, g2:+document.getElementById('em-b1g2').value||0, fail:(+document.getElementById('em-b1fail').value||0)/100, awp:(+document.getElementById('em-b1awp').value||0)/100, alliance:'blue' },
+    { id:'em-b2', g1:+document.getElementById('em-b2g1').value||0, g2:+document.getElementById('em-b2g2').value||0, fail:(+document.getElementById('em-b2fail').value||0)/100, awp:(+document.getElementById('em-b2awp').value||0)/100, alliance:'blue' },
+  ];
+
+  const outcomes = [];
+  for(let mask=0;mask<16;mask++){
+    const robotStates = robots.map((r,i)=>{
+      const success = !((mask>>i)&1);
+      return { ...r, success, prob: success?(1-r.fail):r.fail,
+        pinsG1: success?r.g1:0, pinsG2: success?r.g2:0 };
+    });
+    const redPins  = robotStates.filter(r=>r.alliance==='red').reduce((s,r)=>s+r.pinsG1+r.pinsG2,0);
+    const bluePins = robotStates.filter(r=>r.alliance==='blue').reduce((s,r)=>s+r.pinsG1+r.pinsG2,0);
+    const redRaw = redPins*5, blueRaw = bluePins*5;
+    let redFinal=redRaw, blueFinal=blueRaw;
+    if(redRaw>blueRaw){redFinal+=12;}else if(blueRaw>redRaw){blueFinal+=12;}else{redFinal+=6;blueFinal+=6;}
+    const winner = redFinal>blueFinal?'Red wins':blueFinal>redFinal?'Blue wins':'Tie';
+    const prob = robotStates.reduce((p,r)=>p*r.prob,1);
+    const redSucc = robotStates.filter(r=>r.alliance==='red'&&r.success);
+    const blueSucc = robotStates.filter(r=>r.alliance==='blue'&&r.success);
+    const awpProb = redSucc.length===2&&blueSucc.length===2
+      ? robotStates[0].awp*robotStates[1].awp : 0;
+    outcomes.push({mask,prob,robotStates,redRaw,blueRaw,redFinal,blueFinal,winner,awpProb,
+      redPins,bluePins,margin:Math.abs(redFinal-blueFinal)});
+  }
+
+  const totalProb = outcomes.reduce((s,o)=>s+o.prob,0)||1;
+  const mostLikely = [...outcomes].sort((a,b)=>b.prob-a.prob)[0];
+  document.getElementById('em-mostOutcome').textContent = 'Most probable: ' +
+    mostLikely.winner + ' (' + (mostLikely.prob*100).toFixed(1) + '%) — ' +
+    mostLikely.redFinal + ' vs ' + mostLikely.blueFinal;
+
+  // Colour helpers (same as main)
+  const emOutcomeColour = (winner, idx, margin) => {
+    if(winner==='Tie'){const l=55+(idx%3)*6;return `hsl(0,0%,${l}%)`;}
+    const t=Math.min(margin/62,1);
+    if(winner==='Red wins') return `hsl(12,${40+Math.round(t*55)}%,${58-Math.round(t*18)}%)`;
+    return `hsl(213,${40+Math.round(t*55)}%,${58-Math.round(t*18)}%)`;
+  };
+
+  const sorted = [...outcomes].sort((a,b)=>{
+    const wmap={'Red wins':0,'Tie':1,'Blue wins':2};
+    const d=(wmap[a.winner]??1)-(wmap[b.winner]??1);
+    return d!==0?d:b.prob-a.prob;
+  });
+  const bar = document.getElementById('em-outcomeBar');
+  bar.innerHTML = '';
+  sorted.forEach((o,i)=>{
+    const pct=(o.prob/totalProb)*100;
+    if(pct<0.05) return;
+    const seg=document.createElement('div');
+    seg.className='outcome-seg';
+    seg.style.cssText=`flex:${pct};background:${emOutcomeColour(o.winner,i,o.margin)};`;
+    if(pct>5){const lbl=document.createElement('div');lbl.className='outcome-seg-label';lbl.textContent=pct.toFixed(0)+'%';seg.appendChild(lbl);}
+    seg.onclick=()=>showEmOutcomeDetail(o,pct,totalProb,outcomes);
+    bar.appendChild(seg);
+  });
+
+  // Legend
+  const redPct   = outcomes.filter(o=>o.winner==='Red wins').reduce((s,o)=>s+o.prob,0)/totalProb*100;
+  const tiePct   = outcomes.filter(o=>o.winner==='Tie').reduce((s,o)=>s+o.prob,0)/totalProb*100;
+  const bluePct  = outcomes.filter(o=>o.winner==='Blue wins').reduce((s,o)=>s+o.prob,0)/totalProb*100;
+  const awpTotal = outcomes.reduce((s,o)=>s+o.prob*o.awpProb,0)/totalProb*100;
+  document.getElementById('em-outcomeLegend').innerHTML =
+    `<span class="outcome-legend-item"><span class="outcome-legend-swatch" style="background:var(--red)"></span>Red ${redPct.toFixed(1)}%</span>
+     <span class="outcome-legend-item"><span class="outcome-legend-swatch" style="background:#aaa"></span>Tie ${tiePct.toFixed(1)}%</span>
+     <span class="outcome-legend-item"><span class="outcome-legend-swatch" style="background:var(--blue)"></span>Blue ${bluePct.toFixed(1)}%</span>
+     <span class="outcome-legend-item"><span class="outcome-legend-swatch" style="background:var(--green)"></span>AWP ${awpTotal.toFixed(1)}%</span>`;
+}
+
+function showEmOutcomeDetail(o, pct, totalProb, allOutcomes) {
+  const detail = document.getElementById('em-outcomeDetail');
+  detail.style.display = 'block';
+  const stateIcon = s => s ? '✅' : '❌';
+  detail.innerHTML = `
+    <div class="outcome-detail">
+      <div class="outcome-detail-head">
+        <div class="outcome-detail-title">${o.winner}</div>
+        <div class="outcome-detail-prob">${pct.toFixed(2)}% chance</div>
+      </div>
+      <div class="outcome-stat-grid">
+        <div class="outcome-stat"><div class="outcome-stat-l">Red score</div><div class="outcome-stat-v" style="color:var(--red)">${o.redFinal}</div></div>
+        <div class="outcome-stat"><div class="outcome-stat-l">Blue score</div><div class="outcome-stat-v" style="color:var(--blue)">${o.blueFinal}</div></div>
+        <div class="outcome-stat"><div class="outcome-stat-l">Margin</div><div class="outcome-stat-v">${o.margin} pts</div></div>
+        <div class="outcome-stat"><div class="outcome-stat-l">AWP prob</div><div class="outcome-stat-v" style="color:var(--green)">${(o.awpProb*100).toFixed(0)}%</div></div>
+      </div>
+      <div class="outcome-robot-row">
+        ${o.robotStates.map(r=>`<div class="outcome-robot-card ${r.success?'success':'fail'}">
+          <div class="outcome-robot-name">${r.alliance==='red'?'🔴':'🔵'} ${document.getElementById('em-'+r.id.replace('em-',''))?.value||r.id}</div>
+          <div class="outcome-robot-pins">${stateIcon(r.success)} ${r.success?`G1:${r.pinsG1} G2:${r.pinsG2}`:'Failed'}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// Init embedded calc on page load
+emCalcProb();
+
+// Restore saved tokens on load
 loadReToken();
+
 </script>
 </body>
 </html>
