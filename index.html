@@ -406,7 +406,7 @@ tr:hover td{background:var(--paper2);cursor:pointer}
           <div>
             <label>Robot Type</label>
             <select id="f-type" onchange="toggleCustomType(this.value)" style="margin-bottom:4px">
-              <option>Claw Bot</option>
+              <option value="Claw Bot">Claw Bot</option>
               <option value="Other">Other (type below)</option>
             </select>
             <input id="f-type-custom" placeholder="Enter robot type…"
@@ -1579,6 +1579,9 @@ function clearForm() {
   document.getElementById('f-awp').value = 'N';
   document.getElementById('f-failed').value = 'N';
   document.getElementById('f-auto-mode').value = 'Normal';
+  document.getElementById('f-type').selectedIndex = 0;
+  document.getElementById('f-type-custom').value = '';
+  document.getElementById('f-type-custom').style.display = 'none';
   document.getElementById('f-pin-g1').value = '0';
   document.getElementById('f-pin-g2').value = '0';
   document.getElementById('f-sawp-own-g1').value = '0';
