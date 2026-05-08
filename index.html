@@ -976,7 +976,16 @@ With 0% fail rates → P(both succeed) = 100%
         <div id="re-msg" style="font-size:12px;font-family:var(--mono);color:var(--ink3);margin-bottom:8px"></div>
         <!-- Preview table shown before import -->
         <div id="re-preview" style="display:none">
-          <div style="font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin-bottom:8px">Events found — select which to import:</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+            <span style="font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--ink3)">Filter by country:</span>
+            <select id="re-country-filter" onchange="reApplyFilters()" style="font-size:12px;padding:4px 8px;width:auto;font-family:var(--mono)">
+              <option value="">All countries</option>
+            </select>
+            <span style="flex:1"></span>
+            <button class="btn btn-sm" onclick="reSelectAll(true)">Select all</button>
+            <button class="btn btn-sm" onclick="reSelectAll(false)">Deselect all</button>
+            <span id="re-visible-count" style="font-size:11px;font-family:var(--mono);color:var(--ink3)"></span>
+          </div>
           <div id="re-preview-list" style="max-height:380px;overflow-y:auto;border:1px solid var(--paper3);border-radius:var(--radius);padding:0 10px"></div>
           <div style="display:flex;gap:8px;margin-top:10px">
             <button class="btn btn-p" onclick="importSelectedReEvents()">✓ Import selected</button>
@@ -996,6 +1005,47 @@ With 0% fail rates → P(both succeed) = 100%
         <div class="g2" style="margin-bottom:12px">
           <div><label>Location (optional)</label><input id="cal-loc" placeholder="e.g. Minneapolis, MN"></div>
           <div><label>Notes (optional)</label><input id="cal-notes" placeholder="e.g. Worlds qualifying event"></div>
+        </div>
+        <div class="g2" style="margin-bottom:12px">
+          <div>
+            <label>Country</label>
+            <input id="cal-country" list="cal-country-list" placeholder="e.g. Australia" autocomplete="off" oninput="toggleCalRegion(this.value)">
+            <datalist id="cal-country-list">
+              <option value="Australia">
+              <option value="Brazil">
+              <option value="Canada">
+              <option value="China">
+              <option value="Colombia">
+              <option value="Egypt">
+              <option value="Germany">
+              <option value="India">
+              <option value="Indonesia">
+              <option value="Israel">
+              <option value="Japan">
+              <option value="Jordan">
+              <option value="Kazakhstan">
+              <option value="Malaysia">
+              <option value="Mexico">
+              <option value="New Zealand">
+              <option value="Peru">
+              <option value="Philippines">
+              <option value="Qatar">
+              <option value="Saudi Arabia">
+              <option value="Singapore">
+              <option value="South Korea">
+              <option value="Taiwan">
+              <option value="Thailand">
+              <option value="Turkey">
+              <option value="UAE">
+              <option value="UK">
+              <option value="USA">
+            </datalist>
+          </div>
+          <div id="cal-region-wrap" style="display:none">
+            <label>State / Province</label>
+            <input id="cal-region" list="cal-region-list" placeholder="e.g. Victoria" autocomplete="off">
+            <datalist id="cal-region-list"></datalist>
+          </div>
         </div>
         <div style="margin-bottom:12px">
           <label>Google Maps Link <span style="font-weight:400;color:var(--ink3)">(optional)</span></label>
@@ -1023,7 +1073,19 @@ With 0% fail rates → P(both succeed) = 100%
 
       <!-- Event list -->
       <div class="card">
-        <p class="sec">Scheduled Sig events</p>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+          <p class="sec" style="margin-bottom:0">Scheduled Sig events</p>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span style="font-size:11px;font-family:var(--mono);color:var(--ink3)">Country:</span>
+            <input id="cal-country-filter" list="cal-country-filter-list" placeholder="All countries" autocomplete="off" oninput="calCountryFilterChange()" style="font-size:12px;padding:4px 8px;width:140px;font-family:var(--mono)">
+            <datalist id="cal-country-filter-list"></datalist>
+            <button class="btn btn-sm" onclick="document.getElementById('cal-country-filter').value='';calCountryFilterChange()" style="padding:3px 8px;font-size:11px" title="Clear filter">✕</button>
+            <select id="cal-state-filter" onchange="renderCalList()" style="display:none;font-size:12px;padding:4px 8px;width:auto;font-family:var(--mono)">
+              <option value="">All states</option>
+            </select>
+            <span style="font-size:11px;font-family:var(--mono);color:var(--ink3)" id="cal-event-count"></span>
+          </div>
+        </div>
         <div id="calList"><div class="empty" style="padding:1.5rem">No events added yet.</div></div>
       </div>
 
@@ -2521,6 +2583,28 @@ async function loadCalEvents() {
 }
 
 /* ── Add event → Supabase (admin only) ── */
+function toggleCalRegion(country) {
+  const wrap = document.getElementById('cal-region-wrap');
+  const dl   = document.getElementById('cal-region-list');
+  const regionMap = {
+    'USA': ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'],
+    'Canada': ['Alberta','British Columbia','Manitoba','New Brunswick','Newfoundland','Nova Scotia','Ontario','Prince Edward Island','Quebec','Saskatchewan'],
+    'Australia': ['ACT','New South Wales','Northern Territory','Queensland','South Australia','Tasmania','Victoria','Western Australia'],
+    'China': ['Beijing','Chongqing','Fujian','Guangdong','Guangxi','Guizhou','Hainan','Hebei','Heilongjiang','Henan','Hubei','Hunan','Inner Mongolia','Jiangsu','Jiangxi','Jilin','Liaoning','Ningxia','Qinghai','Shaanxi','Shandong','Shanghai','Shanxi','Sichuan','Tianjin','Tibet','Xinjiang','Yunnan','Zhejiang'],
+  };
+  if(country && regionMap[country]) {
+    dl.innerHTML = regionMap[country].map(r=>`<option value="${r}">`).join('');
+    wrap.style.display = 'block';
+  } else if(country) {
+    // Unknown country — still show region field for free-text entry
+    dl.innerHTML = '';
+    wrap.style.display = 'block';
+  } else {
+    wrap.style.display = 'none';
+    document.getElementById('cal-region').value = '';
+  }
+}
+
 async function addCalEvent() {
   if(!isAdmin) return;
   const name  = document.getElementById('cal-name').value.trim();
@@ -2529,6 +2613,8 @@ async function addCalEvent() {
   const loc   = document.getElementById('cal-loc').value.trim();
   const notes = document.getElementById('cal-notes').value.trim();
   const maps  = document.getElementById('cal-maps').value.trim();
+  const country = document.getElementById('cal-country').value.trim();
+  const region  = document.getElementById('cal-region').value.trim();
   if(!name || !start || !end) { showMsg('cal-msg','Name, start and end date are required.','err'); return; }
   if(start > end)             { showMsg('cal-msg','Start date must be before end date.','err'); return; }
 
@@ -2537,7 +2623,7 @@ async function addCalEvent() {
     const r = await fetch(SB_URL + '/rest/v1/sig_events', {
       method: 'POST',
       headers: { ...adminHdrs(), 'Prefer': 'return=representation' },
-      body: JSON.stringify({ name, start_date: start, end_date: end, location: loc, notes, maps_url: maps||null })
+      body: JSON.stringify({ name, start_date: start, end_date: end, location: loc, notes, maps_url: maps||null, country: country||null, region: region||null })
     });
     if(!r.ok) { const t=await r.text(); throw new Error(t); }
     clearCalForm();
@@ -2551,6 +2637,9 @@ async function addCalEvent() {
 
 function clearCalForm() {
   ['cal-name','cal-start','cal-end','cal-loc','cal-notes','cal-maps'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('cal-country').value = '';
+  document.getElementById('cal-region').value = '';
+  document.getElementById('cal-region-wrap').style.display = 'none';
 }
 
 /* ── Delete event (admin only) ── */
@@ -2571,14 +2660,78 @@ async function deleteCalEvent(id) {
 }
 
 /* ── Render calendar list ── */
+function calCountryFilterChange() {
+  const country = document.getElementById('cal-country-filter').value.trim();
+  const stateEl = document.getElementById('cal-state-filter');
+  // Only show states present in actual events for this country
+  const statesInData = [...new Set(
+    calEvents.filter(e => e.country === country && e.region).map(e => e.region)
+  )].sort();
+  if(country && statesInData.length) {
+    stateEl.innerHTML = '<option value="">All states</option>' +
+      statesInData.map(s=>`<option value="${s}">${s}</option>`).join('');
+    stateEl.style.display = '';
+  } else {
+    stateEl.style.display = 'none';
+    stateEl.value = '';
+  }
+  renderCalList();
+}
+
+function populateCalCountryFilter() {
+  const filterInput = document.getElementById('cal-country-filter');
+  const datalist = document.getElementById('cal-country-filter-list');
+  const countriesInData = [...new Set(calEvents.map(e=>e.country).filter(Boolean))].sort();
+  datalist.innerHTML = countriesInData.map(c=>`<option value="${c}">`).join('');
+  // If the current typed value no longer matches any country in data, clear it
+  const cur = filterInput.value.trim();
+  if(cur && !countriesInData.includes(cur)) {
+    filterInput.value = '';
+  }
+}
+
 function renderCalList() {
   const el = document.getElementById('calList');
   if(!calEvents.length) {
     el.innerHTML = '<div class="empty" style="padding:1.5rem">No Sig events added yet.</div>';
+    document.getElementById('cal-event-count').textContent = '';
     return;
   }
+
+  // Rebuild country dropdown from live data
+  populateCalCountryFilter();
+
+  // Apply country + state filters
+  const selectedCountry = document.getElementById('cal-country-filter').value.trim();
+  const selectedState   = document.getElementById('cal-state-filter')?.value || '';
+  const filtered = calEvents.filter(e => {
+    if(selectedCountry && (e.country||'') !== selectedCountry) return false;
+    if(selectedState   && (e.region||'')  !== selectedState)   return false;
+    return true;
+  });
+
+  document.getElementById('cal-event-count').textContent =
+    filtered.length + ' event' + (filtered.length!==1?'s':'');
+
+  if(!filtered.length) {
+    el.innerHTML = '<div class="empty" style="padding:1.5rem">No events match this filter.</div>';
+    return;
+  }
+
   const now = new Date().toISOString().slice(0,10);
-  el.innerHTML = calEvents.map(e => {
+
+  // Mass-delete toolbar (admin only) — hidden until a checkbox is ticked
+  const massToolbar = isAdmin ? `
+    <div id="cal-mass-bar" style="display:none;align-items:center;gap:8px;margin-bottom:10px;padding:8px 10px;background:var(--paper2);border-radius:var(--radius);border:.5px solid var(--paper3);flex-wrap:wrap">
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-family:var(--mono);color:var(--ink2);cursor:pointer;margin:0">
+        <input type="checkbox" id="cal-select-all" onchange="calToggleAll(this.checked)" style="width:auto;margin:0">
+        Select all
+      </label>
+      <span id="cal-selected-count" style="font-size:11px;font-family:var(--mono);color:var(--ink3)">0 selected</span>
+      <button class="btn btn-sm danger" onclick="calDeleteSelected()" style="margin-left:auto">\uD83D\uDDD1 Delete selected</button>
+    </div>` : '';
+
+  el.innerHTML = massToolbar + filtered.map(e => {
     const isPast    = e.end_date < now;
     const isCurrent = e.start_date <= now && e.end_date >= now;
     const status    = isCurrent
@@ -2590,26 +2743,84 @@ function renderCalList() {
       const d = (en.created_at||en.ts||'').slice(0,10);
       return d >= e.start_date && d <= e.end_date;
     }).length;
+
+    let mapsUrl = e.maps_url || '';
+    if(!mapsUrl && e.location) {
+      mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(e.location);
+    }
+
+    const checkbox = isAdmin
+      ? `<input type="checkbox" class="cal-evt-cb" data-id="${e.id}" onchange="calUpdateSelectedCount()" style="width:auto;margin:0;flex-shrink:0;margin-top:2px">`
+      : '';
+
     return `
     <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:14px 0;border-bottom:.5px solid var(--paper3);gap:12px;flex-wrap:wrap">
+      ${checkbox}
       <div style="flex:1;min-width:200px">
-        <div style="font-weight:600;font-size:14px;margin-bottom:5px">${e.name} ${status}</div>
-        <div style="font-size:12px;font-family:var(--mono);color:var(--ink3)">
-          ${e.start_date} → ${e.end_date}${e.location?' · '+e.location:''}
+        <div style="font-weight:600;font-size:14px;margin-bottom:4px;display:flex;flex-wrap:wrap;align-items:center;gap:6px">
+          ${e.name} ${status}
+          ${e.country ? `<span style="font-size:11px;font-family:var(--mono);color:var(--ink3);font-weight:400">${e.country}${e.region ? ' \u00B7 '+e.region : ''}</span>` : ''}
         </div>
-        ${e.maps_url ? `<a href="${e.maps_url}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-family:var(--mono);color:var(--blue);text-decoration:none;margin-top:3px">📍 View on Google Maps</a>` : ''}
-        ${e.notes ? `<div style="font-size:12px;color:var(--ink2);margin-top:3px">${e.notes}</div>` : ''}
-        <div style="font-size:11px;font-family:var(--mono);color:var(--ink3);margin-top:5px">
+        <div style="font-size:12px;font-family:var(--mono);color:var(--ink3);margin-bottom:3px">
+          ${e.start_date}${e.end_date!==e.start_date?' \u2192 '+e.end_date:''}
+        </div>
+        ${e.location ? `
+        <div style="font-size:12px;color:var(--ink2);display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px">
+          <span>\uD83D\uDCCD ${e.location}</span>
+          ${mapsUrl ? `<a href="${mapsUrl}" target="_blank" rel="noopener"
+            style="color:var(--blue);text-decoration:none;font-family:var(--mono);font-size:11px;white-space:nowrap">
+            View on Maps \u2197</a>` : ''}
+        </div>` : mapsUrl ? `<a href="${mapsUrl}" target="_blank" rel="noopener"
+            style="display:inline-block;margin-bottom:3px;color:var(--blue);text-decoration:none;font-family:var(--mono);font-size:11px">
+            \uD83D\uDCCD View on Maps \u2197</a>` : ''}
+        ${e.notes ? `<div style="font-size:12px;color:var(--ink2);margin-bottom:3px">${e.notes}</div>` : ''}
+        <div style="font-size:11px;font-family:var(--mono);color:var(--ink3)">
           ${entryCount} scouting entr${entryCount!==1?'ies':'y'} in this window
         </div>
       </div>
-      <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
-        <button class="btn btn-sm" onclick="openSchedModal(${JSON.stringify(JSON.stringify(e))})">📋 Schedule</button>
+      <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap">
+        <button class="btn btn-sm" onclick="openSchedModal(${JSON.stringify(JSON.stringify(e))})">\uD83D\uDCCB Schedule</button>
         <button class="btn btn-sm" onclick="filterByEvent('${e.id}')">Filter leaderboard</button>
-        ${isAdmin ? `<button class="btn btn-sm btn-d" onclick="deleteCalEvent('${e.id}')">✕</button>` : ''}
+        ${isAdmin ? `<button class="btn btn-sm btn-d" onclick="deleteCalEvent('${e.id}')">\u2715</button>` : ''}
       </div>
     </div>`;
   }).join('');
+}
+
+function calToggleAll(checked) {
+  document.querySelectorAll('.cal-evt-cb').forEach(cb => cb.checked = checked);
+  calUpdateSelectedCount();
+}
+
+function calUpdateSelectedCount() {
+  const n = document.querySelectorAll('.cal-evt-cb:checked').length;
+  const total = document.querySelectorAll('.cal-evt-cb').length;
+  const countEl = document.getElementById('cal-selected-count');
+  if(countEl) countEl.textContent = n + ' of ' + total + ' selected';
+  const allCb = document.getElementById('cal-select-all');
+  if(allCb) allCb.checked = n > 0 && n === total;
+  const massBar = document.getElementById('cal-mass-bar');
+  if(massBar) massBar.style.display = n > 0 ? 'flex' : 'none';
+}
+
+async function calDeleteSelected() {
+  if(!isAdmin) return;
+  const checked = [...document.querySelectorAll('.cal-evt-cb:checked')];
+  if(!checked.length) { alert('No events selected.'); return; }
+  if(!confirm(`Delete ${checked.length} event${checked.length!==1?'s':''}? This cannot be undone.`)) return;
+  const ids = checked.map(cb => cb.dataset.id);
+  let failed = 0;
+  for(const id of ids) {
+    try {
+      const r = await fetch(SB_URL + '/rest/v1/sig_events?id=eq.' + id, {
+        method: 'DELETE', headers: adminHdrs()
+      });
+      if(!r.ok) failed++;
+    } catch(e) { failed++; }
+  }
+  if(failed) alert(failed + ' deletion(s) failed.');
+  if(activeCalFilter && ids.includes(String(activeCalFilter.id))) clearCalFilter();
+  await loadCalEvents();
 }
 
 /* ── Update the filter dropdown ── */
@@ -2791,40 +3002,100 @@ async function syncFromRobotEvents() {
 /* ── Render the preview list with checkboxes ── */
 function renderRePreview(events, existingKeys) {
   const now = new Date().toISOString().slice(0, 10);
-  const list = document.getElementById('re-preview-list');
 
-  list.innerHTML = events.map((re, i) => {
-    const start    = (re.start || '').slice(0, 10);
-    const end      = (re.end   || '').slice(0, 10);
-    const location = [re.location?.city, re.location?.region, re.location?.country]
-                       .filter(Boolean).join(', ');
+  // ── Deduplicate by RobotEvents ID, then fallback to name+date ──
+  const seen = new Set();
+  const deduped = events.filter(re => {
+    const key = re.id ? String(re.id) : (re.name + '|' + (re.start||'').slice(0,10));
+    if(seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  // ── Populate country filter dropdown ──
+  const countries = [...new Set(
+    deduped.map(re => re.location?.country).filter(Boolean).sort()
+  )];
+  const sel = document.getElementById('re-country-filter');
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">All countries</option>' +
+    countries.map(c => `<option value="${c}"${c===prev?' selected':''}>${c}</option>`).join('');
+
+  // Store for filtering
+  window._reEventsFetched = deduped;
+  window._reExistingKeys  = existingKeys;
+
+  reApplyFilters();
+}
+
+function reApplyFilters() {
+  const now      = new Date().toISOString().slice(0, 10);
+  const country  = document.getElementById('re-country-filter').value;
+  const events   = window._reEventsFetched || [];
+  const existingKeys = window._reExistingKeys || new Set();
+  const list     = document.getElementById('re-preview-list');
+
+  const filtered = country ? events.filter(re => re.location?.country === country) : events;
+
+  document.getElementById('re-visible-count').textContent =
+    filtered.length + ' event' + (filtered.length !== 1 ? 's' : '');
+
+  if(!filtered.length) {
+    list.innerHTML = '<div class="empty" style="padding:1rem">No events for this country.</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map((re, i) => {
+    const origIdx   = events.indexOf(re);
+    const start     = (re.start || '').slice(0, 10);
+    const end       = (re.end   || '').slice(0, 10);
     const alreadyIn = existingKeys.has(re.name + '|' + start);
     const isUpcoming = start >= now;
 
+    // Location parts
+    const locParts = [re.location?.venue, re.location?.city, re.location?.region, re.location?.country].filter(Boolean);
+    const locText  = locParts.join(', ');
+
+    // Google Maps link — use venue + city if available, else event name + city
+    const mapsQuery = encodeURIComponent(
+      [re.location?.venue || re.name, re.location?.city, re.location?.region, re.location?.country]
+        .filter(Boolean).join(', ')
+    );
+    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
+
     return `
-    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:.5px solid var(--paper3);">
+    <div data-re-country="${(re.location?.country||'').replace(/"/g,'')}" style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:.5px solid var(--paper3);">
       <label style="display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0;cursor:${alreadyIn?'default':'pointer'};opacity:${alreadyIn?'0.55':'1'}">
-        <input type="checkbox" data-re-idx="${i}" ${alreadyIn?'disabled checked':''} ${isUpcoming&&!alreadyIn?'checked':''} style="margin-top:3px;flex-shrink:0">
-        <div style="flex:1;min-width:0;overflow:hidden">
-          <div style="font-weight:600;font-size:13px;margin-bottom:2px;white-space:normal;word-break:break-word;display:flex;flex-wrap:wrap;align-items:center;gap:4px">
-            <span style="flex:1;min-width:0">${re.name}</span>
+        <input type="checkbox" data-re-idx="${origIdx}" ${alreadyIn?'disabled checked':''} ${isUpcoming&&!alreadyIn?'checked':''} style="margin-top:3px;flex-shrink:0">
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:600;font-size:13px;margin-bottom:3px;display:flex;flex-wrap:wrap;align-items:center;gap:4px">
+            <span style="flex:1;min-width:120px;word-break:break-word">${re.name}</span>
             ${alreadyIn ? '<span class="badge b-no">Already imported</span>' : '<span class="badge b-sig">New</span>'}
             ${re.level && re.level !== 'Signature' ? `<span class="badge b-q">${re.level}</span>` : ''}
           </div>
-          <div style="font-size:11px;font-family:var(--mono);color:var(--ink3);margin-top:2px">
-            ${start}${end!==start?' → '+end:''} ${location?'· '+location:''}
+          <div style="font-size:11px;font-family:var(--mono);color:var(--ink3);margin-bottom:2px">
+            ${start}${end!==start?' → '+end:''}&nbsp;
           </div>
-          ${re.location?.venue ? `<div style="font-size:11px;color:var(--ink3)">${re.location.venue}</div>` : ''}
+          ${locText ? `<div style="font-size:11px;color:var(--ink2);display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span>${locText}</span>
+            <a href="${mapsUrl}" target="_blank" rel="noopener"
+              style="display:inline-flex;align-items:center;gap:3px;color:var(--blue);text-decoration:none;font-family:var(--mono);font-size:10px;white-space:nowrap"
+              onclick="event.stopPropagation()">📍 Maps</a>
+          </div>` : ''}
         </div>
       </label>
     </div>`;
   }).join('');
 
-  // Store the events array so importSelected can access it
-  window._reEventsFetched = events;
-
   document.getElementById('re-preview').style.display = 'block';
 }
+
+function reSelectAll(checked) {
+  document.querySelectorAll('#re-preview-list input[type=checkbox]:not(:disabled)').forEach(cb => {
+    cb.checked = checked;
+  });
+}
+
 
 /* ── Import checked events into Supabase ── */
 async function importSelectedReEvents() {
@@ -2849,6 +3120,11 @@ async function importSelectedReEvents() {
     const notes = re.location?.country && re.location.country !== 'United States'
       ? re.location.country
       : '';
+    const mapsQuery = encodeURIComponent(
+      [re.location?.venue || re.name, re.location?.city, re.location?.region, re.location?.country]
+        .filter(Boolean).join(', ')
+    );
+    const maps_url = mapsQuery ? `https://www.google.com/maps/search/?api=1&query=${mapsQuery}` : null;
 
     try {
       const r = await fetch(SB_URL + '/rest/v1/sig_events', {
@@ -2860,7 +3136,8 @@ async function importSelectedReEvents() {
           end_date:     end,
           location:     location || null,
           notes:        notes || null,
-          re_event_id:  re.id || null
+          re_event_id:  re.id || null,
+          maps_url:     maps_url || null
         })
       });
       if(!r.ok) throw new Error('HTTP ' + r.status);
