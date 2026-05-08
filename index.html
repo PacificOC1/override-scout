@@ -3907,6 +3907,7 @@ function emAutoFill(id) {
 
   const avgG1 = src.reduce((s,e)=>{const p=(e.pins||'0').split('+');return s+(parseInt(p[0])||0);},0)/src.length;
   const avgG2 = src.reduce((s,e)=>{const p=(e.pins||'0').split('+');return s+(parseInt(p[1])||0);},0)/src.length;
+  // AWP and fail rates use the same SAWP-filtered src so SAWP runs don't skew them
   const awpRate = Math.round(src.filter(e=>e.awp==='Y').length/src.length*100);
   const knownEntries = src.filter(e=>e.failed==='Y'||e.failed==='N');
   const failRate = knownEntries.length ? Math.round(knownEntries.filter(e=>e.failed==='Y').length/knownEntries.length*100) : 0;
@@ -3945,10 +3946,13 @@ function emCalcProb() {
     if(redRaw>blueRaw){redFinal+=12;}else if(blueRaw>redRaw){blueFinal+=12;}else{redFinal+=6;blueFinal+=6;}
     const winner = redFinal>blueFinal?'Red wins':blueFinal>redFinal?'Blue wins':'Tie';
     const prob = robotStates.reduce((p,r)=>p*r.prob,1);
-    const redSucc = robotStates.filter(r=>r.alliance==='red'&&r.success);
-    const blueSucc = robotStates.filter(r=>r.alliance==='blue'&&r.success);
-    const awpProb = redSucc.length===2&&blueSucc.length===2
-      ? robotStates[0].awp*robotStates[1].awp : 0;
+    const redRobots  = robotStates.filter(r=>r.alliance==='red');
+    const blueRobots = robotStates.filter(r=>r.alliance==='blue');
+    // AWP per alliance: both robots on that alliance must succeed, then multiply their AWP rates
+    const redAwpProb  = redRobots.every(r=>r.success)  ? redRobots.reduce((p,r)=>p*r.awp,1)  : 0;
+    const blueAwpProb = blueRobots.every(r=>r.success) ? blueRobots.reduce((p,r)=>p*r.awp,1) : 0;
+    // Combined AWP: both alliances earn their AWP (treated as independent)
+    const awpProb = redAwpProb * blueAwpProb;
     outcomes.push({mask,prob,robotStates,redRaw,blueRaw,redFinal,blueFinal,winner,awpProb,
       redPins,bluePins,margin:Math.abs(redFinal-blueFinal)});
   }
