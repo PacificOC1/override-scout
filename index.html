@@ -1310,6 +1310,7 @@ With 0% fail rates → P(both succeed) = 100%
 
 </div>
 
+
 <!-- Detail overlay (shared) -->
 <div class="overlay" id="overlay" onclick="if(event.target===this)closeDetail()">
   <div class="dcard">
@@ -1459,6 +1460,63 @@ With 0% fail rates → P(both succeed) = 100%
       </div>
 
     </div>
+  </div>
+</div>
+
+<!-- ── EDIT EVENT MODAL ── -->
+<div class="login-modal-bg" id="editCalModal" onclick="if(event.target===this)closeEditCalModal()">
+  <div class="login-modal" style="max-width:480px">
+    <button class="login-modal-close" onclick="closeEditCalModal()">✕</button>
+    <div class="login-logo">Override <span>Scout</span></div>
+    <div class="login-sub">Edit Sig Event</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div style="grid-column:1/-1">
+        <label>Event Name</label>
+        <input id="edit-cal-name" placeholder="e.g. Mall of America">
+      </div>
+      <div>
+        <label>Start Date</label>
+        <input type="date" id="edit-cal-start">
+      </div>
+      <div>
+        <label>End Date</label>
+        <input type="date" id="edit-cal-end">
+      </div>
+      <div>
+        <label>Location</label>
+        <input id="edit-cal-loc" placeholder="e.g. Minneapolis, MN">
+      </div>
+      <div>
+        <label>Country</label>
+        <input id="edit-cal-country" list="edit-cal-country-list" placeholder="e.g. Australia" autocomplete="off" oninput="toggleEditCalRegion(this.value)">
+        <datalist id="edit-cal-country-list">
+          <option value="Australia"><option value="Brazil"><option value="Canada">
+          <option value="China"><option value="Colombia"><option value="Egypt">
+          <option value="Germany"><option value="India"><option value="Indonesia">
+          <option value="Israel"><option value="Japan"><option value="Jordan">
+          <option value="Kazakhstan"><option value="Malaysia"><option value="Mexico">
+          <option value="New Zealand"><option value="Peru"><option value="Philippines">
+          <option value="Qatar"><option value="Saudi Arabia"><option value="Singapore">
+          <option value="South Korea"><option value="Taiwan"><option value="Thailand">
+          <option value="Turkey"><option value="UAE"><option value="UK"><option value="USA">
+        </datalist>
+      </div>
+      <div id="edit-cal-region-wrap" style="display:none">
+        <label>State / Province</label>
+        <input id="edit-cal-region" list="edit-cal-region-list" placeholder="e.g. Victoria" autocomplete="off">
+        <datalist id="edit-cal-region-list"></datalist>
+      </div>
+      <div style="grid-column:1/-1">
+        <label>Notes</label>
+        <input id="edit-cal-notes" placeholder="e.g. Worlds qualifying event">
+      </div>
+      <div style="grid-column:1/-1">
+        <label>Google Maps Link <span style="font-weight:400;color:var(--ink3)">(optional)</span></label>
+        <input id="edit-cal-maps" placeholder="https://maps.google.com/…" type="url">
+      </div>
+    </div>
+    <button class="btn-login" onclick="saveEditCalEvent()">Save Changes</button>
+    <div class="login-err" id="edit-cal-err"></div>
   </div>
 </div>
 
@@ -3126,6 +3184,92 @@ async function deleteCalEvent(id) {
   }
 }
 
+/* ── Edit event modal ── */
+let _editCalId = null;
+
+function openEditCalById(id) {
+  const ev = calEvents.find(e => String(e.id) === String(id));
+  if(ev) openEditCalModal(ev);
+}
+
+function openEditCalModal(ev) {
+  if(typeof ev === 'string') ev = JSON.parse(ev);
+  if(typeof ev === 'string') ev = JSON.parse(ev);
+  _editCalId = ev.id;
+  document.getElementById('edit-cal-name').value    = ev.name || '';
+  document.getElementById('edit-cal-start').value   = ev.start_date || '';
+  document.getElementById('edit-cal-end').value     = ev.end_date || '';
+  document.getElementById('edit-cal-loc').value     = ev.location || '';
+  document.getElementById('edit-cal-notes').value   = ev.notes || '';
+  document.getElementById('edit-cal-maps').value    = ev.maps_url || '';
+  document.getElementById('edit-cal-country').value = ev.country || '';
+  document.getElementById('edit-cal-region').value  = ev.region || '';
+  toggleEditCalRegion(ev.country || '');
+  document.getElementById('edit-cal-err').textContent = '';
+  document.getElementById('editCalModal').classList.add('open');
+}
+
+function closeEditCalModal() {
+  document.getElementById('editCalModal').classList.remove('open');
+  _editCalId = null;
+}
+
+function toggleEditCalRegion(country) {
+  const wrap = document.getElementById('edit-cal-region-wrap');
+  const dl   = document.getElementById('edit-cal-region-list');
+  const regionMap = {
+    'USA': ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'],
+    'Canada': ['Alberta','British Columbia','Manitoba','New Brunswick','Newfoundland','Nova Scotia','Ontario','Prince Edward Island','Quebec','Saskatchewan'],
+    'Australia': ['ACT','New South Wales','Northern Territory','Queensland','South Australia','Tasmania','Victoria','Western Australia'],
+    'China': ['Beijing','Chongqing','Fujian','Guangdong','Guangxi','Guizhou','Hainan','Hebei','Heilongjiang','Henan','Hubei','Hunan','Inner Mongolia','Jiangsu','Jiangxi','Jilin','Liaoning','Ningxia','Qinghai','Shaanxi','Shandong','Shanghai','Shanxi','Sichuan','Tianjin','Tibet','Xinjiang','Yunnan','Zhejiang'],
+  };
+  if(country && regionMap[country]) {
+    dl.innerHTML = regionMap[country].map(r=>`<option value="${r}">`).join('');
+    wrap.style.display = 'block';
+  } else if(country) {
+    dl.innerHTML = '';
+    wrap.style.display = 'block';
+  } else {
+    wrap.style.display = 'none';
+    document.getElementById('edit-cal-region').value = '';
+  }
+}
+
+async function saveEditCalEvent() {
+  if(!isAdmin || !_editCalId) return;
+  const name    = document.getElementById('edit-cal-name').value.trim();
+  const start   = document.getElementById('edit-cal-start').value;
+  const end     = document.getElementById('edit-cal-end').value;
+  const loc     = document.getElementById('edit-cal-loc').value.trim();
+  const notes   = document.getElementById('edit-cal-notes').value.trim();
+  const maps    = document.getElementById('edit-cal-maps').value.trim();
+  const country = document.getElementById('edit-cal-country').value.trim();
+  const region  = document.getElementById('edit-cal-region').value.trim();
+  const errEl   = document.getElementById('edit-cal-err');
+  if(!name || !start || !end) { errEl.textContent = 'Name, start and end date are required.'; return; }
+  if(start > end)             { errEl.textContent = 'Start date must be before end date.';    return; }
+  errEl.textContent = 'Saving…';
+  try {
+    const r = await fetch(SB_URL + '/rest/v1/sig_events?id=eq.' + _editCalId, {
+      method: 'PATCH',
+      headers: { ...adminHdrs(), 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        name, start_date: start, end_date: end,
+        location: loc || null, notes: notes || null,
+        maps_url: maps || null, country: country || null, region: region || null
+      })
+    });
+    if(!r.ok) { const t = await r.text(); throw new Error(t); }
+    errEl.style.color = 'var(--green)';
+    errEl.textContent = '✓ Saved!';
+    setTimeout(closeEditCalModal, 700);
+    await loadCalEvents();
+  } catch(e) {
+    errEl.style.color = 'var(--red)';
+    errEl.textContent = 'Failed: ' + e.message;
+  }
+}
+
 /* ── Render calendar list ── */
 function calCountryFilterChange() {
   const country = document.getElementById('cal-country-filter').value.trim();
@@ -3248,6 +3392,7 @@ function renderCalList() {
       <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap">
         <button class="btn btn-sm" onclick="openSchedModal(${JSON.stringify(JSON.stringify(e))})">\uD83D\uDCCB Schedule</button>
         <button class="btn btn-sm" onclick="filterByEvent('${e.id}')">Filter leaderboard</button>
+        ${isAdmin ? `<button class="btn btn-sm" onclick="openEditCalById('${e.id}')">✏ Edit</button>` : ''}
         ${isAdmin ? `<button class="btn btn-sm btn-d" onclick="deleteCalEvent('${e.id}')">\u2715</button>` : ''}
       </div>
     </div>`;
