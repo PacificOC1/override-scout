@@ -205,6 +205,8 @@ code{font-family:var(--mono);font-size:11px;background:var(--paper2);padding:1px
 .badge{display:inline-block;padding:2px 7px;border-radius:99px;font-size:11px;font-weight:500}
 .b-awp{background:var(--green-bg);color:var(--green);border:1px solid #b8ddb8}
 .b-sig{background:var(--amber-bg);color:var(--amber);border:1px solid #f0d070}
+.cal-event-sig{border:.5px solid #d4a017!important;box-shadow:0 0 0 1.5px #f0d07066,0 2px 8px rgba(212,160,23,.13)!important;background:linear-gradient(135deg,#fffdf0 0%,var(--paper) 60%)!important}
+.cal-sig-crown{font-size:13px;line-height:1;filter:drop-shadow(0 1px 2px rgba(180,130,0,.3))}
 .b-q{background:var(--blue-bg);color:var(--blue)}
 .b-no{background:var(--paper2);color:var(--ink3);border:1px solid var(--paper3)}
 .tw{overflow-x:auto}
@@ -1174,6 +1176,10 @@ With 0% fail rates → P(both succeed) = 100%
         <div style="display:flex;gap:8px">
           <button class="btn btn-p" onclick="addCalEvent()">Add Event</button>
           <button class="btn" onclick="clearCalForm()">Clear</button>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink2);cursor:pointer;margin:0;font-weight:500">
+            <input type="checkbox" id="cal-is-sig" style="width:auto;margin:0;accent-color:#d4a017">
+            ⭐ Worlds qualifier
+          </label>
         </div>
         <div id="cal-msg"></div>
       </div>
@@ -1524,9 +1530,88 @@ With 0% fail rates → P(both succeed) = 100%
         <label>Google Maps Link <span style="font-weight:400;color:var(--ink3)">(optional)</span></label>
         <input id="edit-cal-maps" placeholder="https://maps.google.com/…" type="url">
       </div>
+      <div style="grid-column:1/-1">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--ink2);margin:0;font-weight:500">
+          <input type="checkbox" id="edit-cal-is-sig" style="width:auto;margin:0;accent-color:#d4a017">
+          ⭐ Worlds qualifier (golden outline)
+        </label>
+      </div>
     </div>
     <button class="btn-login" onclick="saveEditCalEvent()">Save Changes</button>
     <div class="login-err" id="edit-cal-err"></div>
+  </div>
+</div>
+
+<!-- ── EDIT ENTRY MODAL ── -->
+<div class="login-modal-bg" id="editEntryModal" onclick="if(event.target===this)closeEditEntryModal()">
+  <div class="login-modal" style="max-width:540px;max-height:90vh;overflow-y:auto">
+    <button class="login-modal-close" onclick="closeEditEntryModal()">✕</button>
+    <div class="login-logo">Override <span>Scout</span></div>
+    <div class="login-sub">Edit Scouting Entry</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div>
+        <label>Team #</label>
+        <input id="ee-team" placeholder="e.g. 97230F">
+      </div>
+      <div>
+        <label>Event Name</label>
+        <input id="ee-event" placeholder="e.g. Mall of America">
+      </div>
+      <div>
+        <label>Round</label>
+        <input id="ee-round" placeholder="e.g. R16 1-1">
+      </div>
+      <div>
+        <label>Side</label>
+        <select id="ee-side">
+          <option value="L">Left (L)</option>
+          <option value="R">Right (R)</option>
+        </select>
+      </div>
+      <div>
+        <label>Robot Type</label>
+        <input id="ee-type" placeholder="e.g. Claw Bot">
+      </div>
+      <div>
+        <label>Sig Event?</label>
+        <select id="ee-sig">
+          <option value="no">No</option>
+          <option value="yes">Yes — Worlds qualifier</option>
+        </select>
+      </div>
+      <div style="grid-column:1/-1">
+        <label>Route / Auto Mode</label>
+        <input id="ee-route" placeholder="e.g. SAWP or Normal">
+      </div>
+      <div>
+        <label>Pins (e.g. 2+1)</label>
+        <input id="ee-pins" placeholder="e.g. 2+1">
+      </div>
+      <div>
+        <label>Max Pins (optional)</label>
+        <input id="ee-maxpins" placeholder="e.g. 3+2">
+      </div>
+      <div>
+        <label>Bonuses</label>
+        <input type="number" id="ee-bonuses" min="0" value="0">
+      </div>
+      <div>
+        <label>AWP</label>
+        <select id="ee-awp">
+          <option value="N">N — No</option>
+          <option value="Y">Y — Yes</option>
+          <option value="?">? — Unknown</option>
+        </select>
+      </div>
+      <div style="grid-column:1/-1">
+        <label>Notes</label>
+        <textarea id="ee-notes" rows="2" placeholder="Any additional notes…" style="font-size:13px;resize:vertical"></textarea>
+      </div>
+    </div>
+
+    <button class="btn-login" onclick="saveEditEntry()">Save Changes</button>
+    <div class="login-err" id="edit-entry-err"></div>
   </div>
 </div>
 
@@ -2448,7 +2533,10 @@ function renderLog() {
     <td>${e.bonuses||0}</td>
     <td><span class="badge ${e.awp==='Y'?'b-awp':e.awp==='?'?'b-q':'b-no'}">${e.awp||'N'}</span></td>
     <td style="max-width:160px;font-size:12px;color:var(--ink2)">${e.notes||''}</td>
-    <td><button class="btn btn-sm btn-d" onclick="deleteEntry('${e.id}')">✕</button></td>
+    <td style="display:flex;gap:4px;align-items:center">
+      <button class="btn btn-sm" onclick="openEditEntryModal('${e.id}')" title="Edit entry">✏</button>
+      <button class="btn btn-sm btn-d" onclick="deleteEntry('${e.id}')" title="Delete entry">✕</button>
+    </td>
   </tr>`).join('');
 }
 
@@ -2468,6 +2556,81 @@ async function deleteEntry(id) {
   allTeams = buildStats(allEntries);
   renderLog(); lbApplyFilter(lbActiveF);
   setSyncStatus('ok', allTeams.length+' teams · '+allEntries.length+' entries');
+}
+
+/* ── Edit entry modal ── */
+let _editEntryId = null;
+
+function openEditEntryModal(id) {
+  if(!isAdmin) return;
+  const e = allEntries.find(en => String(en.id) === String(id));
+  if(!e) return;
+  _editEntryId = id;
+  document.getElementById('ee-team').value    = e.team    || '';
+  document.getElementById('ee-event').value   = e.event   || '';
+  document.getElementById('ee-round').value   = e.round   || '';
+  document.getElementById('ee-side').value    = e.side    || 'L';
+  document.getElementById('ee-type').value    = e.type    || '';
+  document.getElementById('ee-sig').value     = e.sig     || 'no';
+  document.getElementById('ee-route').value   = e.route   || '';
+  document.getElementById('ee-pins').value    = e.pins    || '0';
+  document.getElementById('ee-maxpins').value = e.maxpins || '';
+  document.getElementById('ee-bonuses').value = e.bonuses || 0;
+  document.getElementById('ee-awp').value     = e.awp     || 'N';
+  document.getElementById('ee-notes').value   = e.notes   || '';
+  document.getElementById('edit-entry-err').textContent = '';
+  document.getElementById('editEntryModal').classList.add('open');
+}
+
+function closeEditEntryModal() {
+  document.getElementById('editEntryModal').classList.remove('open');
+  _editEntryId = null;
+}
+
+async function saveEditEntry() {
+  if(!isAdmin || !_editEntryId) return;
+  const errEl = document.getElementById('edit-entry-err');
+  const team  = document.getElementById('ee-team').value.trim().toUpperCase();
+  if(!team) { errEl.style.color='var(--red)'; errEl.textContent = 'Team # is required.'; return; }
+  errEl.style.color = 'var(--ink3)';
+  errEl.textContent = 'Saving…';
+  const updates = {
+    team,
+    event:    document.getElementById('ee-event').value.trim(),
+    round:    document.getElementById('ee-round').value.trim(),
+    side:     document.getElementById('ee-side').value,
+    type:     document.getElementById('ee-type').value.trim(),
+    sig:      document.getElementById('ee-sig').value,
+    route:    document.getElementById('ee-route').value.trim(),
+    pins:     document.getElementById('ee-pins').value.trim() || '0',
+    maxpins:  document.getElementById('ee-maxpins').value.trim() || null,
+    bonuses:  parseInt(document.getElementById('ee-bonuses').value) || 0,
+    awp:      document.getElementById('ee-awp').value,
+    notes:    document.getElementById('ee-notes').value.trim() || null,
+  };
+  try {
+    const r = await fetch(SB_URL + '/rest/v1/entries?id=eq.' + _editEntryId, {
+      method: 'PATCH',
+      headers: { ...adminHdrs(), 'Prefer': 'return=minimal' },
+      body: JSON.stringify(updates)
+    });
+    if(!r.ok) { const t = await r.text(); throw new Error(t); }
+    // Update in local state
+    const idx = allEntries.findIndex(en => String(en.id) === String(_editEntryId));
+    if(idx !== -1) allEntries[idx] = { ...allEntries[idx], ...updates };
+    const lidx = localDb.findIndex(en => String(en.id) === String(_editEntryId));
+    if(lidx !== -1) localDb[lidx] = { ...localDb[lidx], ...updates };
+    try { localStorage.setItem('override_scout_v3', JSON.stringify(localDb)); } catch(e) {}
+    allTeams = buildStats(allEntries);
+    errEl.style.color = 'var(--green)';
+    errEl.textContent = '✓ Saved!';
+    setTimeout(closeEditEntryModal, 700);
+    renderLog(); lbApplyFilter(lbActiveF);
+    setSyncStatus('ok', allTeams.length+' teams · '+allEntries.length+' entries');
+  } catch(e) {
+    errEl.style.color = 'var(--red)';
+    errEl.textContent = 'Failed: ' + e.message;
+  }
 }
 
 function exportCSV() {
@@ -3189,7 +3352,7 @@ async function addCalEvent() {
     const r = await fetch(SB_URL + '/rest/v1/sig_events', {
       method: 'POST',
       headers: { ...adminHdrs(), 'Prefer': 'return=representation' },
-      body: JSON.stringify({ name, start_date: start, end_date: end, location: loc, notes, maps_url: maps||null, country: country||null, region: region||null })
+      body: JSON.stringify({ name, start_date: start, end_date: end, location: loc, notes, maps_url: maps||null, country: country||null, region: region||null, is_sig: document.getElementById('cal-is-sig').checked })
     });
     if(!r.ok) { const t=await r.text(); throw new Error(t); }
     clearCalForm();
@@ -3206,6 +3369,7 @@ function clearCalForm() {
   document.getElementById('cal-country').value = '';
   document.getElementById('cal-region').value = '';
   document.getElementById('cal-region-wrap').style.display = 'none';
+  document.getElementById('cal-is-sig').checked = false;
 }
 
 /* ── Delete event (admin only) ── */
@@ -3245,6 +3409,7 @@ function openEditCalModal(ev) {
   document.getElementById('edit-cal-maps').value    = ev.maps_url || '';
   document.getElementById('edit-cal-country').value = ev.country || '';
   document.getElementById('edit-cal-region').value  = ev.region || '';
+  document.getElementById('edit-cal-is-sig').checked = !!ev.is_sig;
   toggleEditCalRegion(ev.country || '');
   document.getElementById('edit-cal-err').textContent = '';
   document.getElementById('editCalModal').classList.add('open');
@@ -3297,7 +3462,8 @@ async function saveEditCalEvent() {
       body: JSON.stringify({
         name, start_date: start, end_date: end,
         location: loc || null, notes: notes || null,
-        maps_url: maps || null, country: country || null, region: region || null
+        maps_url: maps || null, country: country || null, region: region || null,
+        is_sig: document.getElementById('edit-cal-is-sig').checked
       })
     });
     if(!r.ok) { const t = await r.text(); throw new Error(t); }
@@ -3406,11 +3572,11 @@ function renderCalList() {
       : '';
 
     return `
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:14px 0;border-bottom:.5px solid var(--paper3);gap:12px;flex-wrap:wrap">
+    <div class="${e.is_sig ? 'cal-event-sig' : ''}" style="display:flex;justify-content:space-between;align-items:flex-start;padding:14px;border-bottom:.5px solid var(--paper3);gap:12px;flex-wrap:wrap;border-radius:var(--radius);margin-bottom:6px">
       ${checkbox}
       <div style="flex:1;min-width:200px">
         <div style="font-weight:600;font-size:14px;margin-bottom:4px;display:flex;flex-wrap:wrap;align-items:center;gap:6px">
-          ${e.name} ${status}
+          ${e.is_sig ? '<span class="cal-sig-crown">⭐</span>' : ''}${e.name} ${status}
           ${e.country ? `<span style="font-size:11px;font-family:var(--mono);color:var(--ink3);font-weight:400">${e.country}${e.region ? ' \u00B7 '+e.region : ''}</span>` : ''}
         </div>
         <div style="font-size:12px;font-family:var(--mono);color:var(--ink3);margin-bottom:3px">
