@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Override Scout — autonomous scouting database for VEX V5RC 2026-27 by team 97230F Bot Go Brrr.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
 <title>Override Scout — V5RC 2026-27</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -127,12 +129,53 @@ body{font-family:var(--sans);background:var(--paper2);color:var(--ink);min-heigh
 }
 .tab.active{color:var(--ink);font-weight:500;border-bottom-color:var(--ink)}
 .tab:hover:not(.active){color:var(--ink2);background:var(--paper2)}
-.tab.admin-only{display:none}.tab.admin-visible{display:block!important}
-.admin-only:not(.tab){display:none!important}.admin-visible.admin-only:not(.tab){display:block!important}
+/* Admin tabs: hidden by default, shown when .admin-visible is added by JS */
+.tab.admin-only{display:none}
+.tab.admin-visible{display:block!important}
+/* Admin non-tab elements (cards, sections, buttons) */
+.admin-only:not(.tab){display:none!important}
+.admin-visible.admin-only:not(.tab){display:block!important}
 
 /* ── PANELS ── */
-.panel{display:none}.panel.active{display:block}
+.panel{display:none}.panel.active{display:block;animation:panelIn .15s ease}
+@keyframes panelIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 .page{max-width:1100px;margin:0 auto;padding:1.5rem 1.25rem}
+
+/* ── TOAST NOTIFICATION ── */
+#toast{
+  position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;
+  display:flex;align-items:center;gap:10px;
+  padding:10px 16px;border-radius:var(--radius);
+  font-size:13px;font-family:var(--mono);font-weight:500;
+  box-shadow:3px 3px 0 rgba(0,0,0,.15);
+  transform:translateY(120%);opacity:0;
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1),opacity .2s;
+  pointer-events:none;max-width:320px;
+}
+#toast.show{transform:translateY(0);opacity:1;pointer-events:auto}
+#toast.ok{background:var(--green-bg);color:var(--green);border:1px solid #b8ddb8}
+#toast.err{background:var(--red-bg);color:var(--red-text);border:1px solid #f8c5b5}
+#toast.info{background:var(--paper);color:var(--ink);border:1.5px solid var(--ink)}
+
+/* ── MOBILE SIDEBAR TOGGLE ── */
+.sb-toggle-bar{
+  display:none;align-items:center;justify-content:space-between;
+  padding:.75rem 1rem;border-bottom:1px solid var(--paper3);
+  background:var(--paper);cursor:pointer;user-select:none;
+}
+.sb-toggle-label{font-size:13px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:8px}
+.sb-toggle-chevron{font-size:12px;color:var(--ink3);transition:transform .2s}
+.sb-toggle-chevron.open{transform:rotate(180deg)}
+.sb-collapsible{overflow:hidden;transition:max-height .28s ease;max-height:800px}
+.sb-collapsible.collapsed{max-height:0}
+@media(max-width:768px){
+  .sb-toggle-bar{display:flex}
+}
+
+/* ── FOCUS RINGS ── */
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+button:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.tab:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
 
 /* ── SHARED COMPONENTS ── */
 .card{background:var(--paper);border:.5px solid var(--paper3);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.04)}
@@ -140,7 +183,7 @@ body{font-family:var(--sans);background:var(--paper2);color:var(--ink);min-heigh
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-@media(max-width:640px){.g2,.g3,.g4{grid-template-columns:1fr}}
+@media(max-width:768px){.g2,.g3,.g4{grid-template-columns:1fr}}
 label{font-size:12px;color:var(--ink2);display:block;margin-bottom:4px}
 input,select,textarea{
   width:100%;padding:7px 10px;border:.5px solid var(--paper3);border-radius:var(--radius);
@@ -229,10 +272,11 @@ tr:hover td{background:var(--paper2);cursor:pointer}
 .red-panel{border-left:3px solid var(--red)}.blue-panel{border-left:3px solid var(--blue)}
 .prob-title{font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin-bottom:6px}
 .win-wrap{display:flex;height:26px;border-radius:var(--radius);overflow:hidden;margin:8px 0}
-.bar-red{background:var(--red);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600;transition:width .5s;min-width:28px}
-.bar-blue{background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600;transition:width .5s;min-width:28px}
-.bar-green{background:#3B6D11;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600;transition:width .5s;min-width:28px}
-.bar-green2{background:#5a9e24;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600;transition:width .5s;min-width:28px}
+.bar-red,.bar-blue,.bar-green,.bar-green2{display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600;transition:width .5s;min-width:28px}
+.bar-red{background:var(--red)}
+.bar-blue{background:var(--blue)}
+.bar-green{background:#3B6D11}
+.bar-green2{background:#5a9e24}
 .bk-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:.5px solid var(--paper3);font-size:13px}
 .bk-row:last-child{border-bottom:none}
 .pdot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:6px}
@@ -405,6 +449,8 @@ tr:hover td{background:var(--paper2);cursor:pointer}
 </head>
 <body>
 
+<div id="toast"></div>
+
 <!-- ═══════════════════════════════════════════
      LOGIN MODAL
 ════════════════════════════════════════════ -->
@@ -549,26 +595,12 @@ tr:hover td{background:var(--paper2);cursor:pointer}
             <!-- Goal 1: the alliance-specific goal (only your team's colour counts) -->
             <div>
               <label>Goal 1 — Alliance pins placed</label>
-              <select id="f-pin-g1" style="font-size:14px">
-                <option value="0">0 pins</option>
-                <option value="1">1 pin</option>
-                <option value="2">2 pins</option>
-                <option value="3">3 pins</option>
-                <option value="4">4 pins</option>
-                <option value="5">5 pins</option>
-              </select>
+              <select id="f-pin-g1" style="font-size:14px"></select>
             </div>
             <!-- Goal 2: second goal scored in this auto run -->
             <div>
               <label>Goal 2 — Alliance pins placed</label>
-              <select id="f-pin-g2" style="font-size:14px">
-                <option value="0">0 pins</option>
-                <option value="1">1 pin</option>
-                <option value="2">2 pins</option>
-                <option value="3">3 pins</option>
-                <option value="4">4 pins</option>
-                <option value="5">5 pins</option>
-              </select>
+              <select id="f-pin-g2" style="font-size:14px"></select>
             </div>
           </div>
         </div>
@@ -585,25 +617,11 @@ tr:hover td{background:var(--paper2);cursor:pointer}
           <div class="g2" style="margin-bottom:14px">
             <div>
               <label>Goal 1 — Alliance pins placed</label>
-              <select id="f-sawp-own-g1" style="font-size:14px">
-                <option value="0">0 pins</option>
-                <option value="1">1 pin</option>
-                <option value="2">2 pins</option>
-                <option value="3">3 pins</option>
-                <option value="4">4 pins</option>
-                <option value="5">5 pins</option>
-              </select>
+              <select id="f-sawp-own-g1" style="font-size:14px"></select>
             </div>
             <div>
               <label>Goal 2 — Alliance pins placed</label>
-              <select id="f-sawp-own-g2" style="font-size:14px">
-                <option value="0">0 pins</option>
-                <option value="1">1 pin</option>
-                <option value="2">2 pins</option>
-                <option value="3">3 pins</option>
-                <option value="4">4 pins</option>
-                <option value="5">5 pins</option>
-              </select>
+              <select id="f-sawp-own-g2" style="font-size:14px"></select>
             </div>
           </div>
           <!-- Teammate quadrant — the other side the robot crosses into -->
@@ -613,25 +631,11 @@ tr:hover td{background:var(--paper2);cursor:pointer}
           <div class="g2">
             <div>
               <label>Goal 1 — Alliance pins placed</label>
-              <select id="f-sawp-team-g1" style="font-size:14px">
-                <option value="0">0 pins</option>
-                <option value="1">1 pin</option>
-                <option value="2">2 pins</option>
-                <option value="3">3 pins</option>
-                <option value="4">4 pins</option>
-                <option value="5">5 pins</option>
-              </select>
+              <select id="f-sawp-team-g1" style="font-size:14px"></select>
             </div>
             <div>
               <label>Goal 2 — Alliance pins placed</label>
-              <select id="f-sawp-team-g2" style="font-size:14px">
-                <option value="0">0 pins</option>
-                <option value="1">1 pin</option>
-                <option value="2">2 pins</option>
-                <option value="3">3 pins</option>
-                <option value="4">4 pins</option>
-                <option value="5">5 pins</option>
-              </select>
+              <select id="f-sawp-team-g2" style="font-size:14px"></select>
             </div>
           </div>
         </div>
@@ -1269,6 +1273,14 @@ With 0% fail rates → P(both succeed) = 100%
      2. Quick nav links (tabs + external links) ── -->
 <div id="sidebar">
 
+  <!-- Mobile collapse toggle (only visible on mobile) -->
+  <div class="sb-toggle-bar" onclick="toggleSidebar()" id="sbToggleBar">
+    <span class="sb-toggle-label">⚡ Bot Go Brrr <span style="font-weight:400;color:var(--ink3);font-size:11px;font-family:var(--mono)">97230F</span></span>
+    <span class="sb-toggle-chevron open" id="sbChevron">▼</span>
+  </div>
+
+  <div class="sb-collapsible" id="sbCollapsible">
+
   <!-- Branding block -->
   <div class="sb-block">
     <div class="sb-logo-wrap">
@@ -1307,11 +1319,9 @@ With 0% fail rates → P(both succeed) = 100%
       <span class="sb-link-ext">↗</span>
     </a>
   </div>
+  </div><!-- /.sb-collapsible -->
 
-</div>
-
-
-<!-- Detail overlay (shared) -->
+</div><!-- /#sidebar -->
 <div class="overlay" id="overlay" onclick="if(event.target===this)closeDetail()">
   <div class="dcard">
     <button class="dc-close" onclick="closeDetail()">✕</button>
@@ -1825,9 +1835,11 @@ async function saveUpdates() {
     status.textContent = '✓ Saved';
     status.style.color = 'var(--green)';
     setTimeout(() => status.textContent = '', 3000);
+    showToast('Updates saved successfully', 'ok');
   } catch(e) {
     status.textContent = '⚠ Save failed: ' + e.message;
     status.style.color = 'var(--red)';
+    showToast('Save failed: ' + e.message, 'err', 5000);
   }
 }
 
@@ -2401,8 +2413,9 @@ function toggleAutoMode(mode) {
 
 function showMsg(id, txt, type) {
   const el=document.getElementById(id);
-  el.textContent=txt; el.className=type==='ok'?'msg-ok':'msg-err';
-  setTimeout(()=>el.textContent='',3000);
+  if(el){ el.textContent=txt; el.className=type==='ok'?'msg-ok':'msg-err'; setTimeout(()=>el.textContent='',3500); }
+  // Also show as a toast for better visibility
+  showToast(txt, type==='ok'?'ok':'err', 3500);
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -2462,6 +2475,7 @@ function exportCSV() {
   const rows=allEntries.map(e=>[e.team,e.event,e.round,e.side,e.sig,e.type,e.route,e.pins,e.maxpins||'',e.bonuses,e.awp,'"'+(e.notes||'').replace(/"/g,"'")+'"',e.ts||e.created_at||''].join(','));
   const blob=new Blob([hdr+'\n'+rows.join('\n')],{type:'text/csv'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='override_scout_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+  showToast('CSV exported — '+allEntries.length+' entries', 'ok');
 }
 
 function importClick(){ document.getElementById('importFile').click(); }
@@ -2480,7 +2494,7 @@ function importCSV(ev) {
     }
     allTeams=buildStats(allEntries);
     renderLog(); lbApplyFilter(lbActiveF);
-    alert('Imported '+added+' entries.');
+    showToast('Imported '+added+' entr'+(added===1?'y':'ies')+'.', 'ok', 3500);
   };
   reader.readAsText(file); ev.target.value='';
 }
@@ -3044,6 +3058,33 @@ function sidebarNav(tab) {
     btn.classList.add('active');
     document.getElementById('tab-'+tab).classList.add('active');
   }
+  // On mobile, collapse sidebar after navigating
+  if(window.innerWidth <= 768) {
+    const col = document.getElementById('sbCollapsible');
+    const chev = document.getElementById('sbChevron');
+    if(col && !col.classList.contains('collapsed')) {
+      col.classList.add('collapsed');
+      if(chev) chev.classList.remove('open');
+    }
+  }
+}
+
+function toggleSidebar() {
+  const col = document.getElementById('sbCollapsible');
+  const chev = document.getElementById('sbChevron');
+  if(!col) return;
+  col.classList.toggle('collapsed');
+  if(chev) chev.classList.toggle('open');
+}
+
+let _toastTimer;
+function showToast(msg, type='info', dur=3000) {
+  const t = document.getElementById('toast');
+  if(!t) return;
+  clearTimeout(_toastTimer);
+  t.textContent = msg;
+  t.className = 'show ' + type;
+  _toastTimer = setTimeout(() => { t.classList.remove('show'); }, dur);
 }
 
 const ROUTES=[
@@ -4149,45 +4190,84 @@ function emCalcProb() {
 function showEmOutcomeDetail(o, pct, totalProb, allOutcomes) {
   const detail = document.getElementById('em-outcomeDetail');
   detail.style.display = 'block';
-  const stateIcon = s => s ? '✅' : '❌';
-  detail.innerHTML = `
-    <div class="outcome-detail">
-      <div class="outcome-detail-head">
-        <div class="outcome-detail-title">${o.winner}</div>
-        <div class="outcome-detail-prob">${pct.toFixed(2)}% chance</div>
-      </div>
-      <div class="outcome-stat-grid">
-        <div class="outcome-stat"><div class="outcome-stat-l">Red score</div><div class="outcome-stat-v" style="color:var(--red)">${o.redFinal}</div></div>
-        <div class="outcome-stat"><div class="outcome-stat-l">Blue score</div><div class="outcome-stat-v" style="color:var(--blue)">${o.blueFinal}</div></div>
-        <div class="outcome-stat"><div class="outcome-stat-l">Margin</div><div class="outcome-stat-v">${o.margin} pts</div></div>
-        <div class="outcome-stat"><div class="outcome-stat-l">AWP prob</div><div class="outcome-stat-v" style="color:var(--green)">${(o.awpProb*100).toFixed(0)}%</div></div>
-      </div>
-      <div class="outcome-robot-row">
-        ${o.robotStates.map(r=>`<div class="outcome-robot-card ${r.success?'success':'fail'}">
-          <div class="outcome-robot-name">${r.alliance==='red'?'🔴':'🔵'} ${document.getElementById('em-'+r.id.replace('em-',''))?.value||r.id}</div>
-          <div class="outcome-robot-pins">${stateIcon(r.success)} ${r.success?`G1:${r.pinsG1} G2:${r.pinsG2}`:'Failed'}</div>
-        </div>`).join('')}
-      </div>
-    </div>`;
+
+  // Helper: safely set text on a newly created element
+  const el = (tag, cls, txt) => { const e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; };
+
+  // Static score/stats section is safe to build with innerHTML (no user input)
+  const wrapper = el('div','outcome-detail');
+
+  const head = el('div','outcome-detail-head');
+  head.appendChild(el('div','outcome-detail-title', o.winner));
+  head.appendChild(el('div','outcome-detail-prob', pct.toFixed(2)+'% chance'));
+  wrapper.appendChild(head);
+
+  const statGrid = el('div','outcome-stat-grid');
+  const stats = [
+    ['Red score',  o.redFinal,                        'color:var(--red)'],
+    ['Blue score', o.blueFinal,                        'color:var(--blue)'],
+    ['Margin',     o.margin+' pts',                    ''],
+    ['AWP prob',   (o.awpProb*100).toFixed(0)+'%',    'color:var(--green)'],
+  ];
+  stats.forEach(([label, value, style])=>{
+    const box = el('div','outcome-stat');
+    box.appendChild(el('div','outcome-stat-l', label));
+    const v = el('div','outcome-stat-v', String(value));
+    if(style) v.style.cssText = style;
+    box.appendChild(v);
+    statGrid.appendChild(box);
+  });
+  wrapper.appendChild(statGrid);
+
+  // Robot cards — user-supplied team names set via textContent to prevent XSS
+  const robotRow = el('div','outcome-robot-row');
+  o.robotStates.forEach(r => {
+    const card = el('div', 'outcome-robot-card '+(r.success?'success':'fail'));
+
+    const nameDiv = el('div','outcome-robot-name');
+    nameDiv.textContent = (r.alliance==='red'?'🔴':'🔵')+' ';
+    const rawName = document.getElementById('em-'+r.id.replace('em-',''))?.value || r.id;
+    nameDiv.appendChild(document.createTextNode(rawName)); // safe: textNode, not innerHTML
+    card.appendChild(nameDiv);
+
+    const pinsDiv = el('div','outcome-robot-pins');
+    pinsDiv.textContent = (r.success ? '✅' : '❌') + ' ' +
+      (r.success ? 'G1:'+r.pinsG1+' G2:'+r.pinsG2 : 'Failed');
+    card.appendChild(pinsDiv);
+
+    robotRow.appendChild(card);
+  });
+  wrapper.appendChild(robotRow);
+
+  detail.innerHTML = '';
+  detail.appendChild(wrapper);
 }
 
 // Init embedded calc on page load
 emCalcProb();
 
+// Populate all pin dropdowns from a single source
+fillPinSelects();
+
 // Restore saved tokens on load
 loadReToken();
 
-// Pre-seed RobotEvents token if not already saved
-(function(){
-  try {
-    if(!localStorage.getItem('override_scout_re_token')) {
-      const presetToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIzIiwianRpIjoiODNlMGE4ZGQ4ZDM4NDAwMWYzZGIwNjc0ZTE5OTEzNzQ5YTBjNTcyNTRmZDZmMzBkOTc4MTlkYjlhZmFjNjRmZGE2ODVkNzVhMWUxNGQ3ZTAiLCJpYXQiOjE3NzgyMDM4ODMuOTIyNjIwMSwibmJmIjoxNzc4MjAzODgzLjkyMjYyMiwiZXhwIjoyNzI0OTc1MDgzLjkwMzM0MDgsInN1YiI6IjE1OTk3NSIsInNjb3BlcyI6W119.neJxLsd2ZZp82aXghUCv6cAttXtwaipQZg8X3I4BB27JfQ6uZQQUEbsX7iPhfghkWEhigcPEFoCNeW0ioHnkmv0hhEZrX6faxb0zd7W73xwvQd6SMxLqHHjPPCbVAorva7hYRprIpv_GC6vWO5KLEWgaitmdV2xTkEI6s_eU-A-m13UQFVzBD8MPgUybd_ZHo-AYmpqPk0VdwQhMfiMMnvxa70miBtMBYPMBWwHEmhGEOP5WCD5GmTrXQmW7gXvLOJvd2U81IObWt0pF1Rzf3-H2cvOsnwaG35uhG0R7LXt6J5qkcPitpFtNO2NlK-v1Ze6twWr6z03gOHxZxIDnpcziu64ejW9qAvZO2zg6D2Kp5hlBE2fwVZM2lRLUROEkqMxwiSRSzJFE5fCpmHWvj84DtOyYDEaUYB1trTmUL_OJb9WbZuSvkExr-N5Rwd4E54VDdfvlgjWP9EhcdSjHamzEZ2OzXAxSbFAb6ym5jaw096Anz6zspHNG9UZrGlD__g6iQ_vHY9tNdqJmDDBw6cVSCWfCAktLaLyCLWQ1y2M2KwAFLV638LUoCN5grNg_HjHcp4An8PfeTqQYuU836IqEgqf9ltWXxzAGc3wc6pHSb3eFgTDfasGK2QpUMBbEdkde0915TqoTTLtRt5EmNdftrFT1uvDwSJJzlq1ctuw';
-      localStorage.setItem('override_scout_re_token', presetToken);
-      const inputEl = document.getElementById('re-token');
-      if(inputEl) inputEl.value = presetToken;
-    }
-  } catch(e) {}
-})();
+// RobotEvents token is entered by the user via the UI — no preset token is embedded here.
+
+/* ── Pin-select helper ────────────────────────────────────────────────
+   Builds the 0-5 pin options for every goal select in the Add Entry form.
+   Call once on init; if the max pin count ever changes, update MAX_PINS. ── */
+const MAX_PINS = 5;
+function fillPinSelects() {
+  const ids = ['f-pin-g1','f-pin-g2','f-sawp-own-g1','f-sawp-own-g2','f-sawp-team-g1','f-sawp-team-g2'];
+  const opts = Array.from({length: MAX_PINS + 1}, (_,i) =>
+    `<option value="${i}">${i} ${i === 1 ? 'pin' : 'pins'}</option>`
+  ).join('');
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = opts;
+  });
+}
 
 </script>
 </body>
