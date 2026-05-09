@@ -94,7 +94,7 @@ body{font-family:var(--sans);background:var(--paper2);color:var(--ink);min-heigh
 .btn-admin-trigger:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 
 /* ── MAIN APP SHELL ── */
-#appShell{display:none}
+#appShell{display:block}
 .topbar{
   background:var(--paper);border-bottom:1.5px solid var(--ink);
   display:flex;align-items:center;justify-content:space-between;
@@ -1730,6 +1730,7 @@ async function tryLogin() {
     document.getElementById('logoutBtn').style.display = '';
     document.getElementById('adminLoginBtn').style.display = 'none';
     renderLog();
+    renderCalList();
     applyUpdatesAdminState();
 
   } catch(e) {
@@ -1764,6 +1765,7 @@ async function logout() {
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelector('[data-tab="leaderboard"]').classList.add('active');
   document.getElementById('tab-leaderboard').classList.add('active');
+  renderCalList();
   applyUpdatesAdminState();
 }
 
