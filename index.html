@@ -65,28 +65,28 @@ html.light select option{background:var(--surface);color:var(--ink)}
 }
 #il-donate.il-donate-show{opacity:1;transform:translateY(0);pointer-events:auto}
 #il-donate-inner{
-  background:#fff;border:2px solid #0038b8;border-radius:12px;
+  background:var(--paper2);border:1.5px solid var(--border2);border-radius:var(--radius-lg);
   padding:14px 16px;width:230px;
-  box-shadow:0 8px 28px rgba(0,56,184,.22),0 2px 8px rgba(0,0,0,.12);
+  box-shadow:0 8px 28px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2);
   position:relative;
 }
 #il-donate-inner::before{
   content:'';position:absolute;top:0;left:0;right:0;height:5px;
-  background:linear-gradient(90deg,#0038b8,#4477e8,#0038b8);
+  background:linear-gradient(90deg,var(--red),var(--blue),var(--red));
   border-radius:10px 10px 0 0;
 }
 #il-donate-close{
   position:absolute;top:10px;right:10px;
   background:none;border:none;cursor:pointer;
-  font-size:13px;color:#6680aa;line-height:1;padding:2px 5px;
+  font-size:13px;color:var(--ink3);line-height:1;padding:2px 5px;
   border-radius:4px;transition:background .12s,color .12s;
 }
-#il-donate-close:hover{background:#eaf0ff;color:#0038b8}
+#il-donate-close:hover{background:var(--surface2);color:var(--ink)}
 #il-donate-emoji{font-size:28px;margin-bottom:6px;line-height:1}
-#il-donate-text{font-family:'Exo 2',sans-serif;font-weight:700;font-size:13px;color:#0d1a3a;margin-bottom:4px}
-#il-donate-sub{font-size:11px;color:#6680aa;font-family:'JetBrains Mono',monospace;line-height:1.5;margin-bottom:10px}
+#il-donate-text{font-family:'Exo 2',sans-serif;font-weight:700;font-size:13px;color:var(--ink);margin-bottom:4px}
+#il-donate-sub{font-size:11px;color:var(--ink2);font-family:'JetBrains Mono',monospace;line-height:1.5;margin-bottom:10px}
 #il-donate-btn{
-  display:inline-block;background:#0038b8;color:#fff;
+  display:inline-block;background:var(--red);color:#fff;
   font-size:11px;font-weight:700;font-family:'Exo 2',sans-serif;
   padding:6px 14px;border-radius:6px;text-decoration:none;
   letter-spacing:.5px;text-transform:uppercase;
@@ -1509,7 +1509,7 @@ With 0% fail rates → P(both succeed) = 100%
   <div id="tab-about" class="panel">
     <div class="page" style="max-width:700px">
       <div class="about-hero">
-        <img class="about-logo" src="about_logo.png" alt="97230F Bot Go Brrr logo">
+        <img class="about-logo" src="about_logo.png" onerror="this.src='logo.png'" alt="97230F Bot Go Brrr logo">
         <div>
           <div class="about-title">Bot Go <span>Brrr</span></div>
           <div class="about-sub">Team 97230F · VEX V5RC 2026–27 Override</div>
@@ -1526,6 +1526,30 @@ With 0% fail rates → P(both succeed) = 100%
           The database tracks per-team autonomous stats including pin counts, AWP achievement rates,
           robot types, and auto mode — all updated live throughout the season.
         </p>
+      </div>
+      <div class="card" style="border:1.5px solid var(--green);background:var(--green-bg)">
+        <p class="sec" style="color:var(--green);margin-bottom:8px">💚 Support Our Team</p>
+        <p style="font-size:14px;color:var(--ink2);line-height:1.8;margin-bottom:12px">
+          Highvale Secondary College is a public school in Melbourne's south eastern suburbs.
+          We recently qualified to represent <strong>Australia at the VEX World Championship</strong> in St Louis, USA —
+          and we need community support to make it happen.
+        </p>
+        <div style="font-size:13px;color:var(--ink2);margin-bottom:12px;line-height:1.7">
+          Your donation helps cover:
+          <span style="display:inline-flex;gap:10px;flex-wrap:wrap;margin-top:4px">
+            <span>🤖 Robot parts</span>
+            <span>✈️ Flights &amp; accommodation</span>
+            <span>🏆 Competition entry fees</span>
+          </span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+          <a href="https://www.gofundme.com/f/help-highvale-go-to-vex-worlds" target="_blank" rel="noopener"
+            style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:var(--radius);background:var(--green);color:#fff;text-decoration:none;font-weight:700;font-size:14px;font-family:var(--sans)">
+            💚 Donate on GoFundMe ↗
+          </a>
+          <span style="font-size:12px;color:var(--ink3);font-family:var(--mono)">$349 AUD raised of $1,600 goal · 11 donors</span>
+        </div>
+        <p style="font-size:11px;color:var(--ink3);font-family:var(--mono)">Even sharing the link helps. Thank you 🙏</p>
       </div>
       <div class="card">
         <p class="sec">Find us</p>
@@ -1993,20 +2017,20 @@ function pins(e){ return sumPins(e.pins); }
    AUTH
 ════════════════════════════════════════════════════════ */
 function openLoginModal() {
-  document.getElementById('loginModal').classList.add('open');
+  document.getElementById('loginModal')?.classList.add('open');
   document.getElementById('unInput').focus();
   document.getElementById('loginErr').textContent = '';
 }
 function closeLoginModal() {
-  document.getElementById('loginModal').classList.remove('open');
+  document.getElementById('loginModal')?.classList.remove('open');
   document.getElementById('pwInput').value = '';
   document.getElementById('unInput').value = '';
   document.getElementById('loginErr').textContent = '';
 }
 
 async function tryLogin() {
-  const email = document.getElementById('unInput').value.trim();
-  const pw    = document.getElementById('pwInput').value;
+  const email = document.getElementById('unInput')?.value.trim();
+  const pw    = document.getElementById('pwInput')?.value;
   const errEl = document.getElementById('loginErr');
   const btn   = document.getElementById('loginBtn');
 
@@ -2088,7 +2112,7 @@ async function logout() {
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelector('[data-tab="leaderboard"]').classList.add('active');
-  document.getElementById('tab-leaderboard').classList.add('active');
+  document.getElementById('tab-leaderboard')?.classList.add('active');
   renderCalList();
   applyUpdatesAdminState();
 }
@@ -2101,6 +2125,8 @@ function launchApp(admin) {
     else el.classList.remove('admin-visible');
   });
   document.getElementById('modeBadge').textContent = admin ? 'Admin' : 'Viewer';
+  // Start donation popup now that user is in the app (viewers only - team members know the app)
+  if (!admin && window._startDonation) window._startDonation();
   document.getElementById('modeBadge').className = 'mode-badge ' + (admin ? 'mode-admin' : 'mode-pub');
   document.getElementById('logoutBtn').style.display = admin ? '' : 'none';
   document.getElementById('adminLoginBtn').style.display = admin ? 'none' : '';
@@ -2243,8 +2269,8 @@ function applyUpdatesAdminState() {
 
 async function saveUpdates() {
   if(!isAdmin) return;
-  const future = document.getElementById('updates-future-edit').value.trim();
-  const fixes  = document.getElementById('updates-fixes-edit').value.trim();
+  const future = document.getElementById('updates-future-edit')?.value.trim();
+  const fixes  = document.getElementById('updates-fixes-edit')?.value.trim();
   const status = document.getElementById('updates-save-status');
   status.textContent = 'Saving…';
   status.style.color = 'var(--ink3)';
@@ -2327,7 +2353,7 @@ function pubRenderAll() {
 }
 
 function pubDoSearch() {
-  const q = document.getElementById('pubSearch').value.trim().toUpperCase();
+  const q = document.getElementById('pubSearch')?.value.trim().toUpperCase();
   if(!q) { pubRenderAll(); return; }
   const res = allTeams.filter(t => t.team.includes(q));
   if(!res.length) {
@@ -2529,11 +2555,11 @@ function openDetail(t) {
     </button>
     <div id="re-profile-panel"></div>
   `;
-  document.getElementById('overlay').classList.add('open');
+  document.getElementById('overlay')?.classList.add('open');
   document.body.style.overflow='hidden';
 }
 function closeDetail() {
-  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('overlay')?.classList.remove('open');
   document.body.style.overflow='';
   _reProfileOpen = false;
 }
@@ -2817,43 +2843,43 @@ async function reLoadSkillsSeason(tid) {
 ════════════════════════════════════════════════════════ */
 async function addEntry() {
   if(!isAdmin) return;
-  const team = document.getElementById('f-team').value.trim();
+  const team = document.getElementById('f-team')?.value.trim();
   if(!team){ showMsg('add-msg','Team # required','err'); return; }
-  const maxpinsRaw = document.getElementById('f-maxpins').value.trim();
+  const maxpinsRaw = document.getElementById('f-maxpins')?.value.trim();
   if(maxpinsRaw !== '' && (isNaN(Number(maxpinsRaw)) || Number(maxpinsRaw) > MAX_PINS * 4 || Number(maxpinsRaw) < 0)) {
     showMsg('add-msg', `Max Possible Pins must be between 0 and ${MAX_PINS * 4}.`, 'err'); return;
   }
   const entry = {
     id: crypto.randomUUID(),
-    team, event:document.getElementById('f-event').value.trim(),
-    round:document.getElementById('f-round').value.trim(),
-    side:document.getElementById('f-side').value,
-    sig:document.getElementById('f-sig').value,
-    type:(()=>{ const sel=document.getElementById('f-type').value; return sel==='Other'?(document.getElementById('f-type-custom').value.trim()||'Other'):sel; })(),
+    team, event:document.getElementById('f-event')?.value.trim(),
+    round:document.getElementById('f-round')?.value.trim(),
+    side:document.getElementById('f-side')?.value,
+    sig:document.getElementById('f-sig')?.value,
+    type:(()=>{ const sel=document.getElementById('f-type')?.value; return sel==='Other'?(document.getElementById('f-type-custom')?.value.trim()||'Other'):sel; })(),
     // Calculate pins string from dropdowns based on auto mode
     // Normal: Goal1+Goal2  |  SAWP: OwnG1+OwnG2+TeamG1+TeamG2
-    route: document.getElementById('f-auto-mode').value,
+    route: document.getElementById('f-auto-mode')?.value,
     pins: (()=>{
-      const mode = document.getElementById('f-auto-mode').value;
+      const mode = document.getElementById('f-auto-mode')?.value;
       if(mode === 'SAWP') {
         // SAWP stores 4 values: own quadrant G1+G2 and teammate G1+G2
-        const og1 = document.getElementById('f-sawp-own-g1').value;
-        const og2 = document.getElementById('f-sawp-own-g2').value;
-        const tg1 = document.getElementById('f-sawp-team-g1').value;
-        const tg2 = document.getElementById('f-sawp-team-g2').value;
+        const og1 = document.getElementById('f-sawp-own-g1')?.value;
+        const og2 = document.getElementById('f-sawp-own-g2')?.value;
+        const tg1 = document.getElementById('f-sawp-team-g1')?.value;
+        const tg2 = document.getElementById('f-sawp-team-g2')?.value;
         return og1+'+'+og2+'+'+tg1+'+'+tg2;
       } else {
         // Normal stores 2 values: G1+G2
-        const g1 = document.getElementById('f-pin-g1').value;
-        const g2 = document.getElementById('f-pin-g2').value;
+        const g1 = document.getElementById('f-pin-g1')?.value;
+        const g2 = document.getElementById('f-pin-g2')?.value;
         return g1+'+'+g2;
       }
     })(),
-    maxpins:document.getElementById('f-maxpins').value.trim(),
+    maxpins:document.getElementById('f-maxpins')?.value.trim(),
     bonuses: 0,
-    awp:document.getElementById('f-awp').value,
-    failed:document.getElementById('f-failed').value,
-    notes:document.getElementById('f-notes').value.trim(),
+    awp:document.getElementById('f-awp')?.value,
+    failed:document.getElementById('f-failed')?.value,
+    notes:document.getElementById('f-notes')?.value.trim(),
     ts:new Date().toISOString()
   };
   localDb.unshift(entry);
@@ -3054,10 +3080,11 @@ async function deleteEntry(id) {
   if(!confirm('Delete this entry?')) return;
   // Remove from Supabase
   try {
-    await fetch(SB_URL+'/rest/v1/entries?id=eq.'+id, {
+    const dr = await fetch(SB_URL+'/rest/v1/entries?id=eq.'+id, {
       method:'DELETE', headers: adminHdrs()
     });
-  } catch(e){ console.error(e); }
+    if (!dr.ok) throw new Error('Delete failed: HTTP ' + dr.status);
+  } catch(e){ console.error(e); showToast('Failed to delete entry: ' + e.message, 'err'); return; }
   // Remove locally
   allEntries = allEntries.filter(e=>String(e.id)!==String(id));
   localDb    = localDb.filter(e=>String(e.id)!==String(id));
@@ -3088,34 +3115,34 @@ function openEditEntryModal(id) {
   document.getElementById('ee-awp').value     = e.awp     || 'N';
   document.getElementById('ee-notes').value   = e.notes   || '';
   document.getElementById('edit-entry-err').textContent = '';
-  document.getElementById('editEntryModal').classList.add('open');
+  document.getElementById('editEntryModal')?.classList.add('open');
 }
 
 function closeEditEntryModal() {
-  document.getElementById('editEntryModal').classList.remove('open');
+  document.getElementById('editEntryModal')?.classList.remove('open');
   _editEntryId = null;
 }
 
 async function saveEditEntry() {
   if(!isAdmin || !_editEntryId) return;
   const errEl = document.getElementById('edit-entry-err');
-  const team  = document.getElementById('ee-team').value.trim().toUpperCase();
+  const team  = document.getElementById('ee-team')?.value.trim().toUpperCase();
   if(!team) { errEl.style.color='var(--red)'; errEl.textContent = 'Team # is required.'; return; }
   errEl.style.color = 'var(--ink3)';
   errEl.textContent = 'Saving…';
   const updates = {
     team,
-    event:    document.getElementById('ee-event').value.trim(),
-    round:    document.getElementById('ee-round').value.trim(),
-    side:     document.getElementById('ee-side').value,
-    type:     document.getElementById('ee-type').value.trim(),
-    sig:      document.getElementById('ee-sig').value,
-    route:    document.getElementById('ee-route').value.trim(),
-    pins:     document.getElementById('ee-pins').value.trim() || '0',
-    maxpins:  document.getElementById('ee-maxpins').value.trim() || null,
-    bonuses:  parseInt(document.getElementById('ee-bonuses').value) || 0,
-    awp:      document.getElementById('ee-awp').value,
-    notes:    document.getElementById('ee-notes').value.trim() || null,
+    event:    document.getElementById('ee-event')?.value.trim(),
+    round:    document.getElementById('ee-round')?.value.trim(),
+    side:     document.getElementById('ee-side')?.value,
+    type:     document.getElementById('ee-type')?.value.trim(),
+    sig:      document.getElementById('ee-sig')?.value,
+    route:    document.getElementById('ee-route')?.value.trim(),
+    pins:     document.getElementById('ee-pins')?.value.trim() || '0',
+    maxpins:  document.getElementById('ee-maxpins')?.value.trim() || null,
+    bonuses:  parseInt(document.getElementById('ee-bonuses')?.value) || 0,
+    awp:      document.getElementById('ee-awp')?.value,
+    notes:    document.getElementById('ee-notes')?.value.trim() || null,
   };
   try {
     const r = await fetch(SB_URL + '/rest/v1/entries?id=eq.' + _editEntryId, {
@@ -3203,7 +3230,7 @@ function importCSV(ev) {
    ADMIN — WIN PROBABILITY
 ════════════════════════════════════════════════════════ */
 function autoFill(id) {
-  const team=document.getElementById(id).value.trim().toUpperCase();
+  const team=document.getElementById(id)?.value.trim().toUpperCase();
   if(!team) return;
   const ms=allEntries.filter(e=>(e.team||'').toUpperCase()===team);
   if(!ms.length) return;
@@ -3394,7 +3421,7 @@ function rebuildTypeSelect() {
 
 // Hook: when admin blurs the custom type input, persist it
 function onCustomTypeBlur() {
-  const val = document.getElementById('f-type-custom').value.trim();
+  const val = document.getElementById('f-type-custom')?.value.trim();
   if(val) saveRobotType(val);
 }
 
@@ -3913,14 +3940,14 @@ function toggleCalRegion(country) {
 
 async function addCalEvent() {
   if(!isAdmin) return;
-  const name  = document.getElementById('cal-name').value.trim();
-  const start = document.getElementById('cal-start').value;
-  const end   = document.getElementById('cal-end').value;
-  const loc   = document.getElementById('cal-loc').value.trim();
-  const notes = document.getElementById('cal-notes').value.trim();
-  const maps  = document.getElementById('cal-maps').value.trim();
-  const country = document.getElementById('cal-country').value.trim();
-  const region  = document.getElementById('cal-region').value.trim();
+  const name  = document.getElementById('cal-name')?.value.trim();
+  const start = document.getElementById('cal-start')?.value;
+  const end   = document.getElementById('cal-end')?.value;
+  const loc   = document.getElementById('cal-loc')?.value.trim();
+  const notes = document.getElementById('cal-notes')?.value.trim();
+  const maps  = document.getElementById('cal-maps')?.value.trim();
+  const country = document.getElementById('cal-country')?.value.trim();
+  const region  = document.getElementById('cal-region')?.value.trim();
   if(!name || !start || !end) { showMsg('cal-msg','Name, start and end date are required.','err'); return; }
   if(start > end)             { showMsg('cal-msg','Start date must be before end date.','err'); return; }
 
@@ -3933,7 +3960,7 @@ async function addCalEvent() {
     const r = await fetch(SB_URL + '/rest/v1/sig_events', {
       method: 'POST',
       headers: { ...adminHdrs(), 'Prefer': 'return=representation' },
-      body: JSON.stringify({ name, start_date: start, end_date: end, location: loc, notes, maps_url: maps||null, country: country||null, region: region||null, is_sig: document.getElementById('cal-is-sig').checked })
+      body: JSON.stringify({ name, start_date: start, end_date: end, location: loc, notes, maps_url: maps||null, country: country||null, region: region||null, is_sig: document.getElementById('cal-is-sig')?.checked })
     });
     if(!r.ok) { const t=await r.text(); throw new Error(t); }
     clearCalForm();
@@ -3991,11 +4018,11 @@ function openEditCalModal(ev) {
   document.getElementById('edit-cal-is-sig').checked = !!ev.is_sig;
   toggleEditCalRegion(ev.country || '');
   document.getElementById('edit-cal-err').textContent = '';
-  document.getElementById('editCalModal').classList.add('open');
+  document.getElementById('editCalModal')?.classList.add('open');
 }
 
 function closeEditCalModal() {
-  document.getElementById('editCalModal').classList.remove('open');
+  document.getElementById('editCalModal')?.classList.remove('open');
   _editCalId = null;
 }
 
@@ -4016,27 +4043,27 @@ function toggleEditCalRegion(country) {
 
 async function saveEditCalEvent() {
   if(!isAdmin || !_editCalId) return;
-  const name    = document.getElementById('edit-cal-name').value.trim();
-  const start   = document.getElementById('edit-cal-start').value;
-  const end     = document.getElementById('edit-cal-end').value;
-  const loc     = document.getElementById('edit-cal-loc').value.trim();
-  const notes   = document.getElementById('edit-cal-notes').value.trim();
-  const maps    = document.getElementById('edit-cal-maps').value.trim();
-  const country = document.getElementById('edit-cal-country').value.trim();
-  const region  = document.getElementById('edit-cal-region').value.trim();
+  const name    = document.getElementById('edit-cal-name')?.value.trim();
+  const start   = document.getElementById('edit-cal-start')?.value;
+  const end     = document.getElementById('edit-cal-end')?.value;
+  const loc     = document.getElementById('edit-cal-loc')?.value.trim();
+  const notes   = document.getElementById('edit-cal-notes')?.value.trim();
+  const maps    = document.getElementById('edit-cal-maps')?.value.trim();
+  const country = document.getElementById('edit-cal-country')?.value.trim();
+  const region  = document.getElementById('edit-cal-region')?.value.trim();
   const errEl   = document.getElementById('edit-cal-err');
   if(!name || !start || !end) { errEl.textContent = 'Name, start and end date are required.'; return; }
   if(start > end)             { errEl.textContent = 'Start date must be before end date.';    return; }
   errEl.textContent = 'Saving…';
   try {
-    const r = await fetch(SB_URL + '/rest/v1/sig_events?id=eq.' + _editCalId, {
+    const calPatch = await fetch(SB_URL + '/rest/v1/sig_events?id=eq.' + _editCalId, {
       method: 'PATCH',
       headers: { ...adminHdrs(), 'Prefer': 'return=minimal' },
       body: JSON.stringify({
         name, start_date: start, end_date: end,
         location: loc || null, notes: notes || null,
         maps_url: maps || null, country: country || null, region: region || null,
-        is_sig: document.getElementById('edit-cal-is-sig').checked
+        is_sig: document.getElementById('edit-cal-is-sig')?.checked
       })
     });
     if(!r.ok) { const t = await r.text(); throw new Error(t); }
@@ -4058,7 +4085,7 @@ function calTogglePast() {
 }
 
 function calCountryFilterChange() {
-  const country = document.getElementById('cal-country-filter').value;
+  const country = document.getElementById('cal-country-filter')?.value;
   const stateEl = document.getElementById('cal-state-filter');
   // Only show states present in actual events for this country
   const statesInData = [...new Set(
@@ -4100,7 +4127,7 @@ function renderCalList() {
   populateCalCountryFilter();
 
   // Apply country + state filters
-  const selectedCountry = document.getElementById('cal-country-filter').value;
+  const selectedCountry = document.getElementById('cal-country-filter')?.value;
   const selectedState   = document.getElementById('cal-state-filter')?.value || '';
   const filtered = calEvents.filter(e => {
     if(selectedCountry && (e.country||'') !== selectedCountry) return false;
@@ -4247,7 +4274,7 @@ function filterByEvent(id) {
 }
 
 function applyCalFilter() {
-  const id = document.getElementById('cal-filter-select').value;
+  const id = document.getElementById('cal-filter-select')?.value;
   if(!id) { clearCalFilter(); return; }
   const ev = calEvents.find(e => String(e.id) === String(id));
   if(ev) { activeCalFilter = ev; applyCalFilterToLeaderboard(ev); }
@@ -4278,7 +4305,7 @@ function applyCalFilterToLeaderboard(ev) {
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelector('[data-tab="leaderboard"]').classList.add('active');
-  document.getElementById('tab-leaderboard').classList.add('active');
+  document.getElementById('tab-leaderboard')?.classList.add('active');
   setSyncStatus('ok', 'Filtered: ' + ev.name);
 }
 
@@ -4322,7 +4349,7 @@ const RE_VRC_PROGRAM = 1;
 
 /* ── Token persistence ── */
 function saveReToken() {
-  const val = document.getElementById('re-token').value.trim();
+  const val = document.getElementById('re-token')?.value.trim();
   try { localStorage.setItem(RE_TOKEN_KEY, val); } catch(e) {}
 }
 function clearReToken() {
@@ -4339,7 +4366,7 @@ function loadReToken() {
 
 /* ── Main sync function ── */
 async function syncFromRobotEvents() {
-  const token = document.getElementById('re-token').value.trim();
+  const token = document.getElementById('re-token')?.value.trim();
   if(!token) {
     setReMsg('⚠ Paste your RobotEvents API token first.', 'err');
     return;
@@ -4434,7 +4461,7 @@ function renderRePreview(events, existingKeys) {
 
 function reApplyFilters() {
   const now      = new Date().toISOString().slice(0, 10);
-  const country  = document.getElementById('re-country-filter').value;
+  const country  = document.getElementById('re-country-filter')?.value;
   const events   = window._reEventsFetched || [];
   const existingKeys = window._reExistingKeys || new Set();
   const list     = document.getElementById('re-preview-list');
@@ -4538,7 +4565,7 @@ async function importSelectedReEvents() {
     if(alreadyExists) { saved++; continue; }
 
     try {
-      const r = await fetch(SB_URL + '/rest/v1/sig_events', {
+      const evRes = await fetch(SB_URL + '/rest/v1/sig_events', {
         method: 'POST',
         headers: { ...adminHdrs(), 'Prefer': 'return=minimal,resolution=ignore-duplicates' },
         body: JSON.stringify({
@@ -4582,7 +4609,7 @@ let _schedFilter = 'qual';    // 'qual' | 'elim' | 'all'
 let _schedSelectedMatch = null;
 
 function saveSchedToken() {
-  const v = document.getElementById('sched-re-token').value.trim();
+  const v = document.getElementById('sched-re-token')?.value.trim();
   try { if(v) localStorage.setItem(RE_TOKEN_KEY, v); } catch(e){}
 }
 function loadSchedToken() {
@@ -4631,12 +4658,12 @@ function openSchedModal(evOrId) {
   // Switch to schedule tab
   switchSchedTab('schedule', document.querySelector('.sched-tab'));
 
-  document.getElementById('schedModal').classList.add('open');
+  document.getElementById('schedModal')?.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
 function closeSchedModal() {
-  document.getElementById('schedModal').classList.remove('open');
+  document.getElementById('schedModal')?.classList.remove('open');
   document.body.style.overflow = '';
 }
 
@@ -4644,13 +4671,13 @@ function switchSchedTab(name, el) {
   document.querySelectorAll('.sched-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.sched-panel').forEach(p => p.classList.remove('active'));
   if(el) el.classList.add('active');
-  document.getElementById('sched-panel-' + name).classList.add('active');
+  document.getElementById('sched-panel-' + name)?.classList.add('active');
 }
 
 /* ── Fetch match schedule from RobotEvents ── */
 async function fetchSchedule() {
   if(!_schedEvent) return;
-  const token = document.getElementById('sched-re-token').value.trim();
+  const token = document.getElementById('sched-re-token')?.value.trim();
   if(!token) {
     document.getElementById('sched-status').textContent = '⚠ Paste your RobotEvents API token first.';
     document.getElementById('sched-status').style.color = 'var(--red-text)';
@@ -4846,14 +4873,14 @@ function prefillAddEntry(team, round, side) {
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelector('[data-tab="add"]').classList.add('active');
-  document.getElementById('tab-add').classList.add('active');
+  document.getElementById('tab-add')?.classList.add('active');
 }
 
 /* ═══════════════════════════════════════════════════════
    EMBEDDED AUTON CALCULATOR (em- prefix)
 ════════════════════════════════════════════════════════ */
 function emAutoFill(id) {
-  const team = document.getElementById(id).value.trim().toUpperCase();
+  const team = document.getElementById(id)?.value.trim().toUpperCase();
   const suffix = id.replace('em-', ''); // r1, r2, b1, b2
   if(!team) return;
   const ms = allEntries.filter(e => (e.team||'').toUpperCase() === team);
@@ -4883,10 +4910,10 @@ function emAutoFill(id) {
 
 function emCalcProb() {
   const robots = [
-    { id:'em-r1', g1:+document.getElementById('em-r1g1').value||0, g2:+document.getElementById('em-r1g2').value||0, fail:(+document.getElementById('em-r1fail').value||0)/100, awp:(+document.getElementById('em-r1awp').value||0)/100, alliance:'red' },
-    { id:'em-r2', g1:+document.getElementById('em-r2g1').value||0, g2:+document.getElementById('em-r2g2').value||0, fail:(+document.getElementById('em-r2fail').value||0)/100, awp:(+document.getElementById('em-r2awp').value||0)/100, alliance:'red' },
-    { id:'em-b1', g1:+document.getElementById('em-b1g1').value||0, g2:+document.getElementById('em-b1g2').value||0, fail:(+document.getElementById('em-b1fail').value||0)/100, awp:(+document.getElementById('em-b1awp').value||0)/100, alliance:'blue' },
-    { id:'em-b2', g1:+document.getElementById('em-b2g1').value||0, g2:+document.getElementById('em-b2g2').value||0, fail:(+document.getElementById('em-b2fail').value||0)/100, awp:(+document.getElementById('em-b2awp').value||0)/100, alliance:'blue' },
+    { id:'em-r1', g1:+document.getElementById('em-r1g1')?.value||0, g2:+document.getElementById('em-r1g2')?.value||0, fail:(+document.getElementById('em-r1fail')?.value||0)/100, awp:(+document.getElementById('em-r1awp')?.value||0)/100, alliance:'red' },
+    { id:'em-r2', g1:+document.getElementById('em-r2g1')?.value||0, g2:+document.getElementById('em-r2g2')?.value||0, fail:(+document.getElementById('em-r2fail')?.value||0)/100, awp:(+document.getElementById('em-r2awp')?.value||0)/100, alliance:'red' },
+    { id:'em-b1', g1:+document.getElementById('em-b1g1')?.value||0, g2:+document.getElementById('em-b1g2')?.value||0, fail:(+document.getElementById('em-b1fail')?.value||0)/100, awp:(+document.getElementById('em-b1awp')?.value||0)/100, alliance:'blue' },
+    { id:'em-b2', g1:+document.getElementById('em-b2g1')?.value||0, g2:+document.getElementById('em-b2g2')?.value||0, fail:(+document.getElementById('em-b2fail')?.value||0)/100, awp:(+document.getElementById('em-b2awp')?.value||0)/100, alliance:'blue' },
   ];
 
   const outcomes = [];
@@ -5346,21 +5373,40 @@ function updateTsBadges() {
 let TS_ROWS =[]; // loaded from Supabase
 
 (async function loadTeamData() {
-  const SUPABASE_URL  = 'https://ajymmthxmdyhkiynwhuf.supabase.co';
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqeW1tdGh4bWR5aGtpeW53aHVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTcwNjcsImV4cCI6MjA5MzQ5MzA2N30.AJO6Espsp9ceY3gbnjwAf2k4G3pygwkDejIZxMktZso';
   try {
     const res = await fetch(
-      SUPABASE_URL + '/rest/v1/teams?select=*&order=rank.asc',
-      { headers: { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON } }
+      SB_URL + '/rest/v1/teams?select=*&order=rank.asc',
+      { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } }
     );
     if (!res.ok) throw new Error('HTTP ' + res.status);
     TS_ROWS = await res.json();
     _buildTsDb();
     console.log('Loaded ' + TS_ROWS.length + ' teams from Supabase');
-    // trigger re-render only if ts tab is active
-if (document.getElementById('ts-tb')) { try { tsSetFilter(tsFilterMode, null); } catch(e) {} }
+    // Cache for offline fallback
+    try { localStorage.setItem('ts_cache', JSON.stringify(TS_ROWS)); } catch(e) {}
+    // Remove cache warning if present
+    const cacheWarn = document.getElementById('ts-cache-warn');
+    if (cacheWarn) cacheWarn.remove();
+    if (document.getElementById('ts-tb')) { try { tsSetFilter(tsFilterMode, null); } catch(e) {} }
   } catch(e) {
     console.error('Failed to load team data:', e);
+    // Fallback: try localStorage cache
+    try {
+      const cached = localStorage.getItem('ts_cache');
+      if (cached) {
+        TS_ROWS = JSON.parse(cached);
+        _buildTsDb();
+        tsSetFilter && tsSetFilter(tsFilterMode, null);
+        // Show cache warning banner
+        const warn = document.createElement('div');
+        warn.id = 'ts-cache-warn';
+        warn.style.cssText = 'background:var(--amber-bg);border:1px solid var(--amber);color:var(--amber);font-family:var(--mono);font-size:11px;padding:6px 12px;border-radius:var(--radius);margin-bottom:8px;display:flex;align-items:center;gap:8px;';
+        warn.innerHTML = '⚠️ <span>Offline mode — showing cached rankings from last successful load. Data may be outdated.</span>';
+        const table = document.getElementById('ts-table');
+        if (table) table.parentNode.insertBefore(warn, table);
+        console.warn('TS: loaded from cache', TS_ROWS.length, 'teams');
+      }
+    } catch(cacheErr) { console.error('Cache load failed:', cacheErr); }
   }
 })();
 
@@ -5432,9 +5478,11 @@ function tsRender() {
   } else {
     tbody.innerHTML = slice.map(d => {
       const rankN = Math.round(d.rank);
-      const tnStyle = rankN === 1 ? 'color:#b8860b;font-weight:700' :
-                      rankN === 2 ? 'color:#888;font-weight:700' :
-                      rankN === 3 ? 'color:#a05a2c;font-weight:700' : '';
+      const isDark = !document.documentElement.classList.contains('light');
+      const tnStyle = rankN === 1 ? 'color:#FFD700;font-weight:800' :
+                      rankN === 2 ? 'color:#C0C0C0;font-weight:800' :
+                      rankN === 3 ? 'color:#CD7F32;font-weight:800' :
+                      isDark ? 'color:#0a1f4a;font-weight:700' : 'color:var(--ink);font-weight:700';
       const wpBar = Math.min(100, d.wp_pct).toFixed(0);
       const tsColor = d.ts >= 28 ? 'var(--green)' : d.ts >= 25 ? 'var(--blue)' : 'var(--ink2)';
       const re_url = 'https://www.robotevents.com/teams/V5RC/' + d.team;
@@ -5487,77 +5535,12 @@ function applyTheme(isLight) {
   if (toggle) toggle.checked = isLight;
 }
 
-function applyIsraelTheme(on) {
-  document.documentElement.classList.toggle('israel', on);
-  if (on) applyTheme(false);
-  localStorage.setItem('os_israel', on ? '1' : '0');
-  const toggle = document.getElementById('israelThemeToggle');
-  if (toggle) toggle.checked = on;
 
-  // ── Swap logo ──
-  const sbLogo = document.querySelector('.sb-logo');
-  if (sbLogo) {
-    if (on) {
-      sbLogo.dataset.origSrc = sbLogo.dataset.origSrc || sbLogo.src;
-      sbLogo.src = 'israel_logo.png';
-    } else if (sbLogo.dataset.origSrc) {
-      sbLogo.src = sbLogo.dataset.origSrc;
-    }
-  }
-
-  // ── Audio ──
-  let audio = document.getElementById('il-audio');
-  if (on) {
-    if (!audio) {
-      audio = document.createElement('audio');
-      audio.id = 'il-audio';
-      audio.src = 'music.mp3';
-      audio.loop = true;
-      audio.volume = 0.5;
-      document.body.appendChild(audio);
-    }
-    audio.currentTime = 0;
-    audio.play();
-  } else {
-    if (audio) { audio.pause(); audio.currentTime = 0; }
-  }
-
-  // ── Floating flag ──
-  const existing = document.getElementById('il-flag');
-  if (on && !existing) {
-    const flag = document.createElement('div');
-    flag.id = 'il-flag';
-    flag.title = '🇮🇱';
-    flag.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 160" width="72" height="52">
-      <rect width="220" height="160" fill="#fff"/>
-      <rect y="0"   width="220" height="30" fill="#0038b8"/>
-      <rect y="130" width="220" height="30" fill="#0038b8"/>
-      <g transform="translate(110,80)" fill="none" stroke="#0038b8" stroke-width="5">
-        <polygon points="0,-32 27.7,16 -27.7,16"/>
-        <polygon points="0,32 27.7,-16 -27.7,-16"/>
-      </g>
-    </svg>`;
-    Object.assign(flag.style, {
-      position:'fixed', bottom:'18px', right:'18px',
-      zIndex:'9998', pointerEvents:'none',
-      borderRadius:'4px', overflow:'hidden',
-      boxShadow:'0 2px 10px rgba(0,0,0,.22)',
-      opacity:'.7', lineHeight:'0'
-    });
-    document.body.appendChild(flag);
-  } else if (!on && existing) {
-    existing.remove();
-  }
-  // ── Donation popup ──
-  if (on) { if (window._israelDonationStart) window._israelDonationStart(); }
-  else     { if (window._israelDonationStop)  window._israelDonationStop();  }
-}
 
 // Restore saved theme on load
 (function() {
   const saved = localStorage.getItem('os_theme');
   if (saved === 'light') applyTheme(true);
-  if (localStorage.getItem('os_israel') === '1') applyIsraelTheme(true);
 })();
 
 /* ═══════════════════════════════════════════════════════
@@ -5565,11 +5548,11 @@ function applyIsraelTheme(on) {
 ════════════════════════════════════════════════════════ */
 (function() {
   const messages = [
-    { emoji:'🇮🇱', text:'Shalom! Enjoying the app?', sub:'Consider supporting team 97230F with a small donation!' },
-    { emoji:'✡️',  text:'Every shekel counts!',       sub:'Help us keep scouting the competition.' },
-    { emoji:'🤖', text:'The robot needs fuel!',       sub:'Donate to keep Bot Go Brrr going brrr.' },
-    { emoji:'💙', text:'Am Yisrael Chai!',            sub:'Support our team and help us reach Worlds.' },
-    { emoji:'🏆', text:'Want us to win?',             sub:'Donations help cover registration & parts.' },
+    { emoji:'🤖', text:'Bot Go Brrr needs fuel!',        sub:'Donate to keep Bot Go Brrr going brrr.' },
+    { emoji:'🏆', text:'Want us to win?',                sub:'Donations help cover registration & parts.' },
+    { emoji:'⚙️', text:'Enjoying Override Scout?',       sub:'Consider supporting team 97230F with a small donation!' },
+    { emoji:'🚀', text:'Help us reach Worlds!',          sub:'Every dollar keeps the robot spinning.' },
+    { emoji:'🔧', text:"Parts don't pay for themselves!", sub:'Support 97230F and help us go brrr.' },
   ];
   let msgIdx = 0;
   let donationInterval = null;
@@ -5581,17 +5564,16 @@ function applyIsraelTheme(on) {
     el.id = 'il-donate';
     el.innerHTML = `
       <div id="il-donate-inner">
-        <button id="il-donate-close" onclick="document.getElementById('il-donate').classList.remove('il-donate-show')" title="Close">✕</button>
+        <button id="il-donate-close" onclick="document.getElementById('il-donate')?.classList.remove('il-donate-show')" title="Close">✕</button>
         <div id="il-donate-emoji"></div>
         <div id="il-donate-text"></div>
         <div id="il-donate-sub"></div>
-        <a id="il-donate-btn" href="https://www.paypal.com/donate" target="_blank" rel="noopener">💳 Donate</a>
+        <a id="il-donate-btn" href="https://www.gofundme.com/f/help-highvale-go-to-vex-worlds" target="_blank" rel="noopener">💚 Donate on GoFundMe</a>
       </div>`;
     document.body.appendChild(el);
   }
 
   function showDonation() {
-    if (!document.documentElement.classList.contains('israel')) return;
     createPopup();
     const m = messages[msgIdx % messages.length];
     msgIdx++;
@@ -5607,15 +5589,13 @@ function applyIsraelTheme(on) {
     el._hideTimer = setTimeout(() => el.classList.remove('il-donate-show'), 8000);
   }
 
-  window._israelDonationStart = function() {
-    showDonation(); // show immediately on enable
-    donationInterval = setInterval(showDonation, 30000);
-  };
-  window._israelDonationStop = function() {
-    clearInterval(donationInterval);
-    donationInterval = null;
-    const el = document.getElementById('il-donate');
-    if (el) el.classList.remove('il-donate-show');
+  // Donation popup is triggered after launchApp via window._startDonation()
+  window._startDonation = function() {
+    if (donationInterval) return; // already running
+    setTimeout(() => {
+      showDonation();
+      donationInterval = setInterval(showDonation, 30000);
+    }, 5000);
   };
 })();
 
