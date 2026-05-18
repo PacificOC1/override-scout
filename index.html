@@ -5357,7 +5357,8 @@ let TS_ROWS =[]; // loaded from Supabase
     TS_ROWS = await res.json();
     _buildTsDb();
     console.log('Loaded ' + TS_ROWS.length + ' teams from Supabase');
-    tsSetFilter(tsFilterMode, null);
+    // trigger re-render only if ts tab is active
+if (document.getElementById('ts-tb')) { try { tsSetFilter(tsFilterMode, null); } catch(e) {} }
   } catch(e) {
     console.error('Failed to load team data:', e);
   }
