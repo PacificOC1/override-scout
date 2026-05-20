@@ -127,10 +127,19 @@ html.light select option{background:var(--surface);color:var(--ink)}
 .settings-row-hint{font-size:11px;color:var(--ink3);font-family:var(--mono)}
 
 /* ── SCROLLBAR ── */
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:var(--paper)}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--ink3)}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:var(--paper2);border-radius:0}
+::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,#e84020 0%,#8b1a0a 100%);
+  border-radius:2px;
+  border:1px solid #6b1208;
+  transition:background .15s;
+}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#ff5533 0%,#aa2510 100%)}
+::-webkit-scrollbar-thumb:active{background:linear-gradient(180deg,#ff6644 0%,#cc3311 100%)}
+::-webkit-scrollbar-corner{background:var(--paper2)}
+/* Firefox */
+*{scrollbar-width:thin;scrollbar-color:#5c0000 var(--paper2)}
 
 body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height:100vh;display:flex;flex-direction:row;
   background-image:radial-gradient(ellipse at 0% 0%,rgba(255,77,26,.04) 0%,transparent 50%),
@@ -251,7 +260,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 /* ── TABS ── */
 .tabs-wrap{
   background:var(--paper2);border-bottom:1px solid var(--border);
-  padding:0 1.5rem;overflow-x:auto;position:relative;
+  padding:0 1.5rem;overflow-x:auto;overflow-y:hidden;position:relative;
 }
 .tabs-wrap::after{
   content:'';pointer-events:none;position:absolute;top:0;right:0;bottom:0;width:40px;
@@ -436,6 +445,39 @@ html.light .tn{color:var(--blue)}
 .mh-hd{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.6px;color:var(--ink3);margin:1rem 0 6px}
 .mh-row{display:grid;grid-template-columns:1fr 70px 60px 36px 28px;gap:6px;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px;align-items:center}
 .mh-row:last-child{border-bottom:none}
+
+/* ── COMPACT MODE ── */
+body.compact-mode #tab-leaderboard table td,
+body.compact-mode #tab-leaderboard table th { padding:4px 8px; }
+body.compact-mode #tab-leaderboard table { font-size:12px; }
+body.compact-mode .awp-wrap { display:none; }
+
+/* ── MOBILE LEADERBOARD CARDS ── */
+.lb-card-list { display:none; flex-direction:column; gap:8px; }
+.lb-card {
+  background:var(--paper2);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:12px 14px;cursor:pointer;transition:border-color .12s,background .12s;
+  display:flex;align-items:center;gap:12px;
+}
+.lb-card:hover { border-color:var(--border2);background:var(--paper3); }
+.lb-card.lb-card-me { border-color:rgba(255,210,0,.4);background:rgba(255,210,0,.06); }
+.lb-card.lb-card-rival { border-color:rgba(255,77,26,.35);background:rgba(255,77,26,.05); }
+.lb-card-rank { font-family:var(--mono);font-size:11px;color:var(--ink3);width:24px;flex-shrink:0;text-align:right; }
+.lb-card-body { flex:1;min-width:0; }
+.lb-card-team { font-family:var(--mono);font-size:15px;font-weight:700;color:var(--ink);margin-bottom:3px; }
+.lb-card-meta { font-size:11px;color:var(--ink3);font-family:var(--mono); }
+.lb-card-stats { display:flex;gap:12px;margin-top:6px;flex-wrap:wrap; }
+.lb-card-stat { display:flex;flex-direction:column;align-items:center;gap:1px; }
+.lb-card-stat-v { font-family:var(--mono);font-size:13px;font-weight:700;color:var(--ink); }
+.lb-card-stat-l { font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);font-family:var(--mono); }
+.lb-card-awp { display:flex;align-items:center;gap:5px; }
+.lb-card-awp-bar { height:4px;border-radius:2px;background:var(--border2);width:50px;overflow:hidden;flex-shrink:0; }
+.lb-card-awp-fill { height:100%;background:var(--green);border-radius:2px; }
+
+@media(max-width:640px) {
+  #tab-leaderboard .tw { display:none; }
+  #tab-leaderboard .lb-card-list { display:flex; }
+}
 
 /* ── PAGER ── */
 .pager{display:flex;gap:6px;justify-content:center;align-items:center;margin-top:.75rem;font-size:11px;font-family:var(--mono)}
@@ -712,6 +754,119 @@ html.light .tn{color:var(--blue)}
 }
 
 /* ── TS BADGE (win probability panel) ── */
+
+/* ═══════════════════════════════════════════════
+   UPDATE LOG TAB — styles ported from logbooks.html
+════════════════════════════════════════════════ */
+#tab-updates .ul-wrap{max-width:860px;margin:0 auto;padding:0 0 80px;position:relative}
+#ul-dynamic-wrap{position:relative}
+#tab-updates .ul-version-block{position:relative}
+#tab-updates .ul-version-block > .ul-drag-handle{position:absolute;left:-26px;top:10px}
+#tab-updates .ul-page-header{
+  padding:40px 0 28px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:40px;
+  display:flex;align-items:flex-end;gap:24px;
+}
+#tab-updates .ul-header-text{flex:1}
+#tab-updates .ul-kicker{
+  font-family:var(--mono);font-size:10px;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--red-text);margin-bottom:10px;
+}
+#tab-updates .ul-h1{
+  font-family:var(--barlow);
+  font-size:clamp(36px,6vw,64px);
+  font-weight:800;letter-spacing:.04em;
+  color:var(--ink);line-height:.95;
+  text-transform:uppercase;
+}
+#tab-updates .ul-h1 span{color:var(--red)}
+#tab-updates .ul-subtitle{
+  margin-top:10px;color:var(--ink3);font-size:12px;
+  font-family:var(--mono);letter-spacing:.04em;
+}
+#tab-updates .ul-badge-pill{
+  background:var(--red-bg);color:var(--red-text);
+  font-family:var(--mono);font-size:10px;
+  letter-spacing:.1em;text-transform:uppercase;
+  padding:5px 12px;border-radius:var(--radius);
+  border:1px solid var(--red);white-space:nowrap;
+  align-self:flex-start;margin-top:12px;font-weight:600;
+}
+#tab-updates .ul-date-divider{
+  display:flex;align-items:center;gap:12px;
+  margin:36px 0 18px;
+}
+#tab-updates .ul-date-divider span{
+  font-family:var(--mono);font-size:10px;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink3);white-space:nowrap;
+}
+#tab-updates .ul-date-divider::before,
+#tab-updates .ul-date-divider::after{
+  content:'';height:1px;background:var(--border);flex:1;
+}
+#tab-updates .ul-version-block{
+  margin-bottom:14px;
+  background:var(--paper2);border:1px solid var(--border);
+  border-radius:var(--radius-lg);overflow:hidden;
+  transition:border-color .2s;
+}
+#tab-updates .ul-version-block:hover{border-color:var(--border2)}
+#tab-updates .ul-version-header{
+  display:flex;align-items:baseline;gap:14px;
+  padding:14px 18px 12px;border-bottom:1px solid var(--border);
+  background:var(--surface);flex-wrap:wrap;
+}
+#tab-updates .ul-v-number{
+  font-family:var(--barlow);font-size:20px;font-weight:700;
+  color:var(--ink);letter-spacing:.06em;white-space:nowrap;
+}
+#tab-updates .ul-v-name{
+  font-family:var(--sans);font-weight:700;font-size:13px;color:var(--ink);flex:1;
+}
+#tab-updates .ul-v-date{
+  font-family:var(--mono);font-size:10px;color:var(--ink3);white-space:nowrap;
+}
+#tab-updates .ul-entries{display:flex;flex-direction:column;gap:1px;padding:0}
+#tab-updates .ul-entry{
+  display:flex;gap:12px;padding:10px 18px;
+  border-bottom:1px solid var(--border);transition:background .15s;
+}
+#tab-updates .ul-entry:last-child{border-bottom:none}
+#tab-updates .ul-entry:hover{background:var(--surface2)}
+#tab-updates .ul-entry-tag{
+  flex-shrink:0;font-family:var(--mono);font-size:9px;
+  letter-spacing:.08em;text-transform:uppercase;
+  padding:3px 7px;border-radius:3px;
+  margin-top:3px;height:fit-content;font-weight:600;
+}
+#tab-updates .ul-tag-feat{background:var(--green-bg);color:var(--green);border:1px solid rgba(61,189,110,.2)}
+#tab-updates .ul-tag-fix {background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,192,48,.2)}
+#tab-updates .ul-tag-sec {background:var(--red-bg);color:var(--red-text);border:1px solid rgba(204,61,20,.2)}
+#tab-updates .ul-tag-ux  {background:var(--blue-bg);color:var(--blue);border:1px solid rgba(61,142,240,.2)}
+#tab-updates .ul-tag-arch{background:rgba(200,255,0,.06);color:#a8c800;border:1px solid rgba(200,255,0,.15)}
+#tab-updates .ul-entry-text{font-size:13px;color:var(--ink2);line-height:1.65;font-family:var(--sans)}
+#tab-updates .ul-entry-text strong{color:var(--ink);font-weight:700}
+#tab-updates .ul-entry-text code{
+  font-family:var(--mono);font-size:11px;
+  background:var(--surface2);color:var(--amber);
+  padding:1px 5px;border-radius:3px;border:1px solid var(--border2);
+}
+#tab-updates .ul-footer{
+  margin-top:48px;padding-top:16px;border-top:1px solid var(--border);
+  font-family:var(--mono);font-size:10px;color:var(--ink3);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  letter-spacing:.04em;text-transform:uppercase;
+}
+#tab-updates .ul-footer a{color:var(--red-text);text-decoration:none}
+#tab-updates .ul-footer a:hover{text-decoration:underline}
+@media(max-width:600px){
+  #tab-updates .ul-page-header{flex-direction:column;align-items:flex-start;gap:10px}
+  #tab-updates .ul-entry{flex-direction:column;gap:6px}
+  #tab-updates .ul-entry-tag{align-self:flex-start}
+}
 .ts-badge {
   background: var(--surface2); border: 1px solid var(--border2);
   border-radius: var(--radius); padding: 8px 10px; margin-top: 6px;
@@ -722,11 +877,192 @@ html.light .tn{color:var(--blue)}
 .ts-badge-val { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--blue); line-height: 1; }
 .ts-badge-sub { font-size: 10px; font-family: var(--mono); color: var(--ink3); }
 
+/* ── UPDATE EDITOR ── */
+#ul-editor-modal-bg{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:600;
+  align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(6px);
+}
+#ul-editor-modal-bg.open{display:flex}
+#ul-editor-modal{
+  background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);
+  padding:1.75rem;max-width:560px;width:100%;
+  box-shadow:0 0 0 1px var(--border),0 24px 48px rgba(0,0,0,.6);
+  position:relative;animation:modalIn .2s cubic-bezier(.34,1.56,.64,1);
+  max-height:90vh;overflow-y:auto;
+}
+#ul-editor-modal::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--red),var(--blue));
+  border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+}
+.ul-editor-title{font-family:var(--barlow);font-size:18px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.5px;margin-bottom:1.25rem;padding-top:4px}
+.ul-editor-title span{color:var(--red)}
+.ul-editor-close{position:absolute;top:12px;right:12px;background:var(--paper3);border:1px solid var(--border);
+  width:26px;height:26px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;
+  font-size:14px;cursor:pointer;color:var(--ink2);transition:all .12s;line-height:1;border:none}
+.ul-editor-close:hover{background:var(--red-bg);color:var(--red-text)}
+.ul-tag-picker{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
+.ul-tag-opt{
+  padding:4px 12px;border-radius:3px;font-size:10px;font-family:var(--mono);
+  font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;
+  border:1px solid var(--border2);background:var(--paper3);color:var(--ink3);
+  transition:all .12s;
+}
+.ul-tag-opt[data-tag="feat"].selected{background:var(--green-bg);color:var(--green);border-color:rgba(61,189,110,.4)}
+.ul-tag-opt[data-tag="ux"].selected{background:var(--blue-bg);color:var(--blue);border-color:rgba(61,142,240,.4)}
+.ul-tag-opt[data-tag="sec"].selected{background:var(--red-bg);color:var(--red-text);border-color:rgba(204,61,20,.4)}
+.ul-tag-opt[data-tag="fix"].selected{background:var(--amber-bg);color:var(--amber);border-color:rgba(240,192,48,.4)}
+.ul-tag-opt[data-tag="arch"].selected{background:rgba(200,255,0,.06);color:#a8c800;border-color:rgba(200,255,0,.3)}
+.ul-editor-row{margin-bottom:1rem}
+.ul-editor-row label{font-size:10px;font-family:var(--mono);color:var(--ink3);
+  text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px}
+.ul-editor-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem;flex-wrap:wrap}
+/* inline edit/delete buttons on each entry */
+.ul-entry-actions{display:none;gap:4px;margin-left:auto;flex-shrink:0}
+.ul-entry:hover .ul-entry-actions{display:flex}
+.ul-entry-btn{
+  padding:2px 7px;border-radius:3px;font-size:9px;font-family:var(--mono);
+  cursor:pointer;border:1px solid var(--border2);background:var(--paper3);
+  color:var(--ink3);text-transform:uppercase;letter-spacing:.3px;transition:all .12s;
+}
+.ul-entry-btn:hover{background:var(--surface2);color:var(--ink);border-color:var(--border2)}
+.ul-entry-btn.del:hover{background:var(--red-bg);color:var(--red-text);border-color:rgba(204,61,20,.3)}
+/* add-update toolbar */
+.ul-admin-bar{display:none;margin-bottom:1.25rem;justify-content:flex-end}
+.ul-admin-bar.visible{display:flex}
+/* add-version toolbar */
+.ul-version-actions{display:none;gap:4px;margin-left:auto;align-items:center}
+.ul-version-block:hover .ul-version-actions{display:flex}
+.ul-version-header{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* ── DRAG & DROP ── */
+.ul-draggable{position:relative;transition:opacity .15s}
+.ul-drag-handle{
+  display:none;align-items:center;justify-content:center;
+  width:22px;height:22px;color:var(--ink3);font-size:12px;
+  cursor:grab;flex-shrink:0;opacity:.45;transition:opacity .12s;
+  user-select:none;border-radius:3px;letter-spacing:-2px;
+}
+.ul-drag-handle:hover{opacity:1;background:var(--surface2)}
+.ul-drag-handle:active{cursor:grabbing}
+body.ul-admin-drag .ul-drag-handle{display:flex}
+.ul-version-header .ul-drag-handle.admin-visible{display:inline-flex!important;align-items:center;gap:4px;padding:2px 7px;border-radius:3px;font-size:11px;background:var(--paper3);border:1px solid var(--border2);color:var(--ink3);cursor:grab;font-family:var(--mono);letter-spacing:0;user-select:none}
+.ul-version-header .ul-drag-handle.admin-visible:hover{background:var(--surface2);color:var(--ink);border-color:var(--border2)}
+.ul-entry .ul-drag-handle.admin-visible{display:inline-flex!important;align-items:center;padding:2px 5px;border-radius:3px;font-size:12px;color:var(--ink3);cursor:grab;opacity:.5;transition:opacity .12s;margin-right:2px;flex-shrink:0}
+.ul-entry .ul-drag-handle.admin-visible:hover{opacity:1;background:var(--surface2)}
+.ul-date-divider .ul-drag-handle.admin-visible{display:inline-flex!important;align-items:center;gap:4px;padding:2px 7px;border-radius:3px;font-size:11px;background:var(--paper3);border:1px solid var(--border2);color:var(--ink3);cursor:grab;font-family:var(--mono);letter-spacing:0;user-select:none}
+.ul-date-divider .ul-drag-handle.admin-visible:hover{background:var(--surface2);color:var(--ink);border-color:var(--border2)}
+
+/* ── SUBHEADING (date-divider) admin controls ── */
+#tab-updates .ul-date-divider{
+  display:flex;align-items:center;gap:8px;cursor:default;
+}
+#tab-updates .ul-date-divider::before,
+#tab-updates .ul-date-divider::after{display:none!important}
+.ul-div-label{
+  flex:1;font-family:var(--mono);font-size:10px;text-transform:uppercase;
+  letter-spacing:1px;color:var(--ink3);position:relative;
+}
+.ul-div-label::before,
+.ul-div-label::after{
+  content:'';position:absolute;top:50%;height:1px;
+  background:var(--border);width:20px;
+}
+.ul-div-label::before{right:calc(100% + 8px)}
+.ul-div-label::after{left:calc(100% + 8px)}
+.ul-divider-actions{display:none;gap:4px;align-items:center;flex-shrink:0}
+#tab-updates .ul-date-divider:hover .ul-divider-actions{display:flex}
+
 </style>
 </head>
 <body>
 
 <div id="toast"></div>
+
+<!-- ═══════════════════════════════════════════
+     UPDATE ENTRY EDITOR MODAL
+════════════════════════════════════════════ -->
+<div id="ul-editor-modal-bg" onclick="if(event.target===this)closeUlEditor()">
+  <div id="ul-editor-modal">
+    <button class="ul-editor-close" onclick="closeUlEditor()">✕</button>
+    <div class="ul-editor-title" id="ul-editor-heading">Add <span>Entry</span></div>
+
+    <div class="ul-editor-row">
+      <label>Tag / Type</label>
+      <div class="ul-tag-picker">
+        <div class="ul-tag-opt selected" data-tag="feat" onclick="ulPickTag(this)">⚡ feat</div>
+        <div class="ul-tag-opt" data-tag="ux" onclick="ulPickTag(this)">🎨 ux</div>
+        <div class="ul-tag-opt" data-tag="sec" onclick="ulPickTag(this)">🔒 sec</div>
+        <div class="ul-tag-opt" data-tag="fix" onclick="ulPickTag(this)">🔧 fix</div>
+        <div class="ul-tag-opt" data-tag="arch" onclick="ulPickTag(this)">🏗 arch</div>
+      </div>
+    </div>
+
+    <div class="ul-editor-row">
+      <label>Entry Text</label>
+      <textarea id="ul-editor-text" rows="4" placeholder="Describe the change…" style="resize:vertical" onkeydown="if(event.key==='Enter'&&(event.ctrlKey||event.metaKey)){event.preventDefault();saveUlEntry()}"></textarea>
+    </div>
+
+    <div class="ul-editor-row" id="ul-editor-version-row">
+      <label>Version Block — paste version number (e.g. v3.1.0) and name, or pick existing</label>
+      <select id="ul-editor-version-pick" onchange="ulVersionPickChange(this.value)" style="margin-bottom:6px">
+        <option value="__new__">＋ New version block</option>
+      </select>
+      <div id="ul-editor-new-version-fields">
+        <input id="ul-editor-vnumber" placeholder="Auto-filled from latest version" style="margin-bottom:6px" onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('ul-editor-vname').focus()}">
+        <input id="ul-editor-vname" placeholder="Version name (e.g. Leaderboard Revamp)" onkeydown="if(event.key==='Enter'){event.preventDefault();saveUlEntry()}">
+      </div>
+    </div>
+
+    <div class="ul-editor-btns">
+      <button class="btn" onclick="closeUlEditor()">Cancel</button>
+      <button class="btn btn-p" onclick="saveUlEntry()">Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SUBHEADING EDITOR MODAL
+════════════════════════════════════════════ -->
+<div id="ul-subheading-modal-bg" onclick="if(event.target===this)closeUlSubheading()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:600;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(6px)">
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:1.75rem;max-width:420px;width:100%;box-shadow:0 0 0 1px var(--border),0 24px 48px rgba(0,0,0,.6);position:relative;animation:modalIn .2s cubic-bezier(.34,1.56,.64,1)">
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:var(--radius-lg) var(--radius-lg) 0 0"></div>
+    <button class="ul-editor-close" onclick="closeUlSubheading()">✕</button>
+    <div class="ul-editor-title" id="ul-subheading-heading" style="padding-top:4px">Add <span>Subheading</span></div>
+    <div class="ul-editor-row">
+      <label>Subheading Text</label>
+      <input id="ul-subheading-text" placeholder="e.g. 19 May 2026 · New Features" onkeydown="if(event.key==='Enter'){event.preventDefault();saveUlSubheading()}">
+    </div>
+    <div class="ul-editor-btns">
+      <button class="btn" onclick="closeUlSubheading()">Cancel</button>
+      <button class="btn btn-p" onclick="saveUlSubheading()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     VERSION BLOCK EDITOR MODAL
+════════════════════════════════════════════ -->
+<div id="ul-vblock-modal-bg" onclick="if(event.target===this)closeUlVBlockEditor()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:600;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(6px)">
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:1.75rem;max-width:420px;width:100%;box-shadow:0 0 0 1px var(--border),0 24px 48px rgba(0,0,0,.6);position:relative;animation:modalIn .2s cubic-bezier(.34,1.56,.64,1)">
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--amber),var(--red));border-radius:var(--radius-lg) var(--radius-lg) 0 0"></div>
+    <button class="ul-editor-close" onclick="closeUlVBlockEditor()">✕</button>
+    <div class="ul-editor-title" style="padding-top:4px">Edit <span>Version</span></div>
+    <div class="ul-editor-row">
+      <label>Version Number</label>
+      <input id="ul-vblock-number" placeholder="e.g. v3.1.0" onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('ul-vblock-name').focus()}">
+    </div>
+    <div class="ul-editor-row">
+      <label>Version Name</label>
+      <input id="ul-vblock-name" placeholder="e.g. Leaderboard Revamp" onkeydown="if(event.key==='Enter'){event.preventDefault();saveUlVBlock()}">
+    </div>
+    <div class="ul-editor-btns">
+      <button class="btn" onclick="closeUlVBlockEditor()">Cancel</button>
+      <button class="btn btn-p" onclick="saveUlVBlock()">Save</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══════════════════════════════════════════
      LOGIN MODAL
@@ -779,12 +1115,18 @@ html.light .tn{color:var(--blue)}
       <button class="tab admin-only" data-tab="routes" onclick="switchTab('routes',this)">Routes</button>
       <button class="tab admin-only" data-tab="formulas" onclick="switchTab('formulas',this)">Formulas</button>
       <button class="tab" data-tab="ts-rankings" onclick="switchTab('ts-rankings',this)">⚡ TS Rankings</button>
-      <button class="tab" data-tab="updates" onclick="switchTab('updates',this)">🗺️ Updates</button>
+      <button class="tab" data-tab="roadmap" onclick="switchTab('roadmap',this)">🗺️ Roadmap</button>
+      <button class="tab" data-tab="updates" onclick="switchTab('updates',this)">📋 Changelog</button>
       <button class="tab" data-tab="settings" onclick="switchTab('settings',this)">⚙️ Settings</button>
     </div>
   </div>
 
-  <!-- ── SEARCH (public) ── -->
+  <!-- Refresh available banner -->
+  <div id="refreshBanner" style="display:none;background:var(--blue);color:#fff;font-size:12px;font-family:var(--mono);padding:8px 1.5rem;align-items:center;gap:10px;justify-content:center">
+    <span>🔄 New data available</span>
+    <button onclick="applyRefreshNow()" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:var(--radius);padding:3px 12px;font-size:11px;cursor:pointer;font-family:var(--mono)">Reload leaderboard</button>
+    <button onclick="document.getElementById('refreshBanner').style.display='none'" style="background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:18px;line-height:1;padding:0 4px">×</button>
+  </div>
   <div id="tab-search" class="panel">
     <div class="page">
       <div class="search-zone">
@@ -1267,13 +1609,13 @@ With 0% fail rates → P(both succeed) = 100%
     </div>
   </div>
 
-    <!-- ── FUTURE UPDATES (public read, admin edit) ── -->
-  <div id="tab-updates" class="panel">
+    <!-- ── ROADMAP (public read, admin edit) ── -->
+  <div id="tab-roadmap" class="panel">
     <div class="page">
 
       <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:1rem">
-          <p class="sec" style="margin:0">🗺️ Future Updates &amp; Fixes</p>
+          <p class="sec" style="margin:0">🗺️ Roadmap — Coming Soon &amp; Known Fixes</p>
           <span id="updates-save-status" style="font-size:11px;font-family:var(--mono);color:var(--ink3)"></span>
         </div>
 
@@ -1338,6 +1680,9 @@ With 0% fail rates → P(both succeed) = 100%
       <div class="card" style="max-width:560px">
         <p class="sec">⚙️ Settings</p>
 
+        <!-- DISPLAY -->
+        <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin-bottom:10px">Display</div>
+
         <div class="settings-row">
           <div class="settings-row-info">
             <div class="settings-row-label">Light mode</div>
@@ -1350,13 +1695,156 @@ With 0% fail rates → P(both succeed) = 100%
           </label>
         </div>
 
-        
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Compact mode</div>
+            <div class="settings-row-hint">Tighter row spacing on the leaderboard — see more teams at once</div>
+          </div>
+          <label class="toggle-switch" aria-label="Toggle compact mode">
+            <input type="checkbox" id="compactToggle" onchange="applyCompactMode(this.checked)">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Entries per page</div>
+            <div class="settings-row-hint">How many teams to show per leaderboard page</div>
+          </div>
+          <select id="perPageSelect" onchange="applyPerPage(this.value)" style="width:auto;font-size:13px;padding:5px 10px;background:var(--paper3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--ink);font-family:var(--mono)">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+
+        <!-- SCOUTING -->
+        <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin:18px 0 10px">Scouting</div>
+
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Your team number</div>
+            <div class="settings-row-hint">Highlights your team in gold on the leaderboard</div>
+          </div>
+          <input type="text" id="myTeamInput" placeholder="e.g. 97230F" autocomplete="off"
+            style="width:100px;font-size:13px;padding:5px 10px;background:var(--paper3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--ink);font-family:var(--mono);text-transform:uppercase"
+            oninput="this.value=this.value.toUpperCase()" onchange="applyMyTeam(this.value)">
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Rival teams</div>
+            <div class="settings-row-hint">Comma-separated team numbers highlighted in red on the leaderboard</div>
+          </div>
+          <input type="text" id="rivalsInput" placeholder="e.g. 1234A, 5678B" autocomplete="off"
+            style="width:160px;font-size:12px;padding:5px 10px;background:var(--paper3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--ink);font-family:var(--mono);text-transform:uppercase"
+            oninput="this.value=this.value.toUpperCase()" onchange="applyRivals(this.value)">
+        </div>
+
+        <!-- SYNC -->
+        <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin:18px 0 10px">Sync</div>
+
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Auto-refresh interval</div>
+            <div class="settings-row-hint">How often to pull fresh data from the database</div>
+          </div>
+          <select id="refreshIntervalSelect" onchange="applyRefreshInterval(this.value)" style="width:auto;font-size:13px;padding:5px 10px;background:var(--paper3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--ink);font-family:var(--mono)">
+            <option value="0">Off</option>
+            <option value="30">30s</option>
+            <option value="60" selected>1 min</option>
+            <option value="300">5 min</option>
+          </select>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Show last synced time</div>
+            <div class="settings-row-hint">Display how long ago data was last refreshed in the topbar</div>
+          </div>
+          <label class="toggle-switch" aria-label="Toggle last synced time">
+            <input type="checkbox" id="showSyncTimeToggle" onchange="applyShowSyncTime(this.checked)" checked>
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+
+        <!-- DATA -->
+        <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin:18px 0 10px">Data</div>
+
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Export leaderboard</div>
+            <div class="settings-row-hint">Download all scouting data as CSV or JSON</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0">
+            <button class="btn btn-sm" onclick="exportCSV()" style="font-family:var(--mono);font-size:11px">⬇ CSV</button>
+            <button class="btn btn-sm" onclick="exportJSON()" style="font-family:var(--mono);font-size:11px">⬇ JSON</button>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Refresh banner</div>
+            <div class="settings-row-hint">Show a banner when new data is available instead of silently updating</div>
+          </div>
+          <label class="toggle-switch" aria-label="Toggle refresh banner">
+            <input type="checkbox" id="refreshBannerToggle" onchange="applyRefreshBanner(this.checked)">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Clear local cache</div>
+            <div class="settings-row-hint">Wipe all browser-stored preferences and cached scouting data</div>
+          </div>
+          <button class="btn btn-sm" onclick="clearLocalCache()" style="border-color:var(--red);color:var(--red);flex-shrink:0">Clear cache</button>
+        </div>
+
+        <!-- SESSION -->
+        <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin:18px 0 10px">Session</div>
+
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Remember admin login</div>
+            <div class="settings-row-hint">Stay logged in as admin across browser restarts — less secure, use on personal devices only</div>
+          </div>
+          <label class="toggle-switch" aria-label="Toggle remember admin">
+            <input type="checkbox" id="rememberAdminToggle" onchange="applyRememberAdmin(this.checked)">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+
+        <!-- ABOUT -->
+        <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin:18px 0 10px">About</div>
+
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Override Scout</div>
+            <div class="settings-row-hint">Built by Team 97230F Bot Go Brrr · VEX V5RC 2026–27</div>
+          </div>
+          <button class="btn btn-sm" onclick="switchTab('updates', document.querySelector('[data-tab=updates]'))" style="font-family:var(--mono);font-size:11px;flex-shrink:0">📋 Changelog</button>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Reset all settings</div>
+            <div class="settings-row-hint">Restore all preferences to their defaults</div>
+          </div>
+          <button class="btn btn-sm" onclick="resetAllSettings()" style="border-color:var(--ink3);color:var(--ink3);flex-shrink:0">Reset</button>
+        </div>
 
         <div class="settings-row" style="border-bottom:none;padding-bottom:0">
           <div class="settings-row-info">
-            <div class="settings-row-label" style="color:var(--ink3);font-weight:400;font-size:12px">Preference saved in your browser — no account required.</div>
+            <div class="settings-row-label" style="color:var(--ink3);font-weight:400;font-size:12px">Preferences saved in your browser — no account required.</div>
           </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -1580,6 +2068,39 @@ With 0% fail rates → P(both succeed) = 100%
     </div>
   </div>
 
+  <!-- ── UPDATE LOG (public) ── -->
+  <div id="tab-updates" class="panel">
+    <div class="page">
+    <div class="ul-wrap">
+
+      <header class="ul-page-header">
+        <div class="ul-header-text">
+          <p class="ul-kicker">Team 97230F · Bot Go Brrr · VEX V5RC 2026–27</p>
+          <h1 class="ul-h1">Update<br><span>Log</span></h1>
+          <p class="ul-subtitle">// started 04 May 2026</p>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
+          <div class="ul-badge-pill">V5RC 2026–27</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+            <button class="btn admin-only" onclick="openUlSubheading()" style="font-size:10px;padding:5px 14px">＋ Subheading</button>
+            <button class="btn btn-p admin-only" id="ul-add-btn" onclick="openUlEditor()" style="font-size:10px;padding:5px 14px">＋ Add Entry</button>
+            <button class="btn admin-only" id="ul-sync-btn" onclick="ulSnapshotAndSync()" style="font-size:10px;padding:5px 14px;border-color:rgba(61,189,110,.4);color:var(--green)" title="Read current DOM state and push everything to Supabase">⬆ Sync to Supabase</button>
+          </div>
+        </div>
+      </header>
+
+
+
+      <div id="ul-dynamic-wrap"><p id="ul-loading" style="color:var(--ink3);font-size:13px;padding:32px 0;text-align:center">Loading changelog…</p></div>
+      <footer class="ul-footer">
+        <span>Override Scout · Team 97230F Bot Go Brrr · VEX V5RC 2026–27</span>
+        <span><a href="https://instagram.com/97230f" target="_blank">@97230f</a> on Instagram</span>
+      </footer>
+
+    </div>
+    </div>
+  </div>
+
 </div><!-- end appShell -->
 
 <!-- ── SIDEBAR ──────────────────────────────────────────────
@@ -1621,6 +2142,12 @@ With 0% fail rates → P(both succeed) = 100%
     </a>
     <a class="sb-link" href="#" data-sbnav="about" onclick="sidebarNav('about');return false;">
       <span class="sb-link-icon">ℹ️</span> About us
+    </a>
+    <a class="sb-link" href="#" data-sbnav="roadmap" onclick="sidebarNav('roadmap');return false;">
+      <span class="sb-link-icon">🗺️</span> Roadmap
+    </a>
+    <a class="sb-link" href="#" data-sbnav="updates" onclick="sidebarNav('updates');return false;">
+      <span class="sb-link-icon">📋</span> Changelog
     </a>
     <div class="sb-nav-title" style="margin-top:12px">External links</div>
     <!-- External links open in a new tab (target="_blank") -->
@@ -1957,6 +2484,172 @@ const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 // Public read-only headers (anon key — safe to expose)
 const HDRS = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Accept': 'application/json' };
 
+/* ═══════════════════════════════════════════════════════
+   CHANGELOG SYNC — Supabase table: ul_changelog
+   Run once in Supabase SQL editor to create the table:
+
+   create table if not exists ul_changelog (
+     key   text primary key,
+     data  jsonb not null default '{}'::jsonb,
+     updated_at timestamptz not null default now()
+   );
+   alter table ul_changelog enable row level security;
+   create policy "public read"  on ul_changelog for select using (true);
+   create policy "admin upsert" on ul_changelog for insert with check (auth.role() = 'authenticated');
+   create policy "admin update" on ul_changelog for update using (auth.role() = 'authenticated');
+
+   The table stores one row (key='state') containing all four
+   changelog state objects: edits, vblock_edits, dividers, order.
+════════════════════════════════════════════════════════ */
+
+// In-memory changelog state (kept in sync with Supabase + localStorage cache)
+window._ulState = {
+  edits:        [],   // ul_edits_v1
+  vblock_edits: {},   // ul_vblock_edits_v1
+  dividers:     {},   // ul_dividers_v1
+  order:        null  // ul_order_v1
+};
+const UL_LS_KEY = 'ul_changelog_v1'; // single localStorage cache key
+
+// Load state from localStorage cache (synchronous, used on boot)
+function ulStateLoadCache() {
+  try {
+    const raw = localStorage.getItem(UL_LS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        window._ulState = Object.assign({ edits:[], vblock_edits:{}, dividers:{}, order:null }, parsed);
+      }
+    }
+  } catch(e) {}
+}
+
+// Save state to localStorage cache
+function ulStateSaveCache() {
+  try { localStorage.setItem(UL_LS_KEY, JSON.stringify(window._ulState)); } catch(e) {}
+}
+
+// Push current state to Supabase (admin only — fire-and-forget with toast on error)
+async function ulStatePushSupabase() {
+  if (!adminToken) return; // only admins write
+  try {
+    const res = await fetch(SB_URL + '/rest/v1/ul_changelog', {
+      method: 'POST',
+      headers: Object.assign({}, adminHdrs(), {
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      }),
+      body: JSON.stringify({ key: 'state', data: window._ulState, updated_at: new Date().toISOString() })
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      console.warn('ul_changelog push failed:', err);
+      showToast('Changelog sync failed — saved locally only', 'err', 4000);
+    }
+  } catch(e) {
+    console.warn('ul_changelog push error:', e);
+  }
+}
+
+// Pull state from Supabase and merge into _ulState + localStorage cache
+async function ulStatePullSupabase() {
+  try {
+    const res = await fetch(SB_URL + '/rest/v1/ul_changelog?key=eq.state&select=data', { headers: HDRS });
+    if (!res.ok) return;
+    const rows = await res.json();
+    if (!rows || !rows.length || !rows[0].data) return;
+    const remote = rows[0].data;
+    window._ulState = Object.assign({ edits:[], vblock_edits:{}, dividers:{}, order:null }, remote);
+    ulStateSaveCache(); // update local cache
+    // Re-render if DOM is ready
+    if (document.readyState !== 'loading') ulRenderFromState();
+  } catch(e) {
+    console.warn('ul_changelog pull error:', e);
+  }
+}
+
+// Save state then push to Supabase (call after every changelog mutation)
+function ulStateSave() {
+  ulStateSaveCache();
+  ulStatePushSupabase(); // async, fire-and-forget
+}
+
+// Boot: load from cache immediately, then pull fresh data from Supabase in background
+ulStateLoadCache();
+document.addEventListener('DOMContentLoaded', function() {
+  ulRenderFromState(); // instant render from localStorage cache
+});
+ulStatePullSupabase().then(function() { ulSeedNewVersions(); }); // async pull — will re-render when done
+
+/* ── ulSeedNewVersions: adds any new hardcoded version blocks that don't yet exist in _ulState.
+   This is how new changelog entries get added from code rather than the admin UI. ── */
+function ulSeedNewVersions() {
+  var state  = window._ulState;
+  var edits  = Array.isArray(state.edits) ? state.edits : [];
+  var vblocks = state.vblock_edits || {};
+  var order  = Array.isArray(state.order) ? state.order : [];
+  var changed = false;
+
+  function hasVersion(vid) { return !!vblocks[vid]; }
+  function addVersion(vid, num, name, entries) {
+    if (hasVersion(vid)) return;
+    vblocks[vid] = { num: num, name: name };
+    entries.forEach(function(e) { edits.push(e); });
+    order.push({ type: 'version', id: vid });
+    changed = true;
+  }
+
+  // ── v3.1.0 — Changelog Supabase Sync ──
+  addVersion('v_seed_310', 'v3.1.0', 'Changelog Supabase Sync', [
+    { id: 'e_seed_310_1', tag: 'feat', text: 'Changelog state synced to Supabase <code>ul_changelog</code> table — all edits, version block titles, dividers, and drag order stored as a single JSON row', versionId: 'v_seed_310' },
+    { id: 'e_seed_310_2', tag: 'feat', text: 'All four localStorage changelog keys (<code>ul_edits_v1</code>, <code>ul_vblock_edits_v1</code>, <code>ul_dividers_v1</code>, <code>ul_order_v1</code>) consolidated into a single <code>window._ulState</code> object with localStorage as a fast local cache', versionId: 'v_seed_310' },
+    { id: 'e_seed_310_3', tag: 'feat', text: 'On every write (add/edit/delete/reorder) state is upserted to Supabase; on page load cache is read instantly then Supabase pulls fresher data in background', versionId: 'v_seed_310' },
+    { id: 'e_seed_310_4', tag: 'feat', text: '<strong>⬆ Sync to Supabase</strong> admin button added to Update Log header — seeds the table from current DOM state on first run', versionId: 'v_seed_310' },
+  ]);
+
+  // ── v3.2.0 — Changelog rendered from Supabase ──
+  addVersion('v_seed_320', 'v3.2.0', 'Changelog Rendered from Supabase', [
+    { id: 'e_seed_320_1', tag: 'arch', text: 'Removed ~260 lines of hardcoded changelog HTML — all version blocks, entries, and dividers now rendered dynamically from <code>_ulState</code> via <code>ulRenderFromState()</code>', versionId: 'v_seed_320' },
+    { id: 'e_seed_320_2', tag: 'feat', text: 'Page renders instantly from localStorage cache then re-renders after Supabase pull — no blank flash on load', versionId: 'v_seed_320' },
+    { id: 'e_seed_320_3', tag: 'fix',  text: 'Fixed <code>buildDividerEl is not defined</code> — divider HTML inlined into <code>ulRenderFromState</code> instead of calling the IIFE-scoped helper', versionId: 'v_seed_320' },
+    { id: 'e_seed_320_4', tag: 'fix',  text: 'Fixed illegal return statement at line 3031 — <code>saveUpdates()</code> function declaration was accidentally consumed by a <code>str_replace</code> anchor leaving its body as loose top-level code', versionId: 'v_seed_320' },
+    { id: 'e_seed_320_5', tag: 'fix',  text: 'Fixed missing <code>/*</code> opening delimiter on <code>ulSnapshotAndSync</code> comment block causing "Unexpected identifier \'full\'" syntax error', versionId: 'v_seed_320' },
+  ]);
+
+  // ── v3.3.0 — Changelog Editor, Drag & Drop, Settings Overhaul, Navigation ──
+  addVersion('v_seed_330', 'v3.3.0', 'Editor, Drag & Drop, Settings & Navigation', [
+    // Changelog editor
+    { id: 'e_seed_330_1',  tag: 'feat', text: '✏ Edit button added to all changelog block types (version headers, entries, subheadings) — previously only some blocks had edit controls', versionId: 'v_seed_330' },
+    { id: 'e_seed_330_2',  tag: 'fix',  text: 'Fixed edit buttons disappearing after admin login — <code>ulRenderFromState()</code> re-rendered fresh DOM after the admin-visible sweep, leaving new elements without <code>admin-visible</code>; fixed by re-stamping at end of render', versionId: 'v_seed_330' },
+    // Drag & drop
+    { id: 'e_seed_330_3',  tag: 'feat', text: 'Drag handles added to version block headers and subheading dividers — previously hidden in left margin at <code>left:-26px</code>, now inline and visible for admins', versionId: 'v_seed_330' },
+    { id: 'e_seed_330_4',  tag: 'feat', text: 'Drag handles added to individual entry rows within version blocks — allows reordering entries inside a section via pointer drag', versionId: 'v_seed_330' },
+    { id: 'e_seed_330_5',  tag: 'fix',  text: 'Fixed drag system targeting <code>.ul-wrap > .ul-draggable</code> — blocks live inside <code>#ul-dynamic-wrap</code> (grandchild), not direct children; updated <code>getWrapItems</code>, <code>getIndicator</code>, and <code>commitDrop</code>', versionId: 'v_seed_330' },
+    { id: 'e_seed_330_6',  tag: 'fix',  text: 'Fixed drag not re-binding after admin login re-render — exposed <code>enableAllDrag</code> as <code>window._ulEnableAllDrag</code> so <code>ulRenderFromState</code> can call it after fresh renders', versionId: 'v_seed_330' },
+    // Sticky header
+    { id: 'e_seed_330_7',  tag: 'feat', text: 'Tab bar now stays on screen when scrolling — implemented via <code>position:fixed</code> JS approach (<code>pinTabs()</code>) since <code>position:sticky</code> requires an explicit height on the scroll container', versionId: 'v_seed_330' },
+    { id: 'e_seed_330_8',  tag: 'fix',  text: 'Fixed <code>pinTabs()</code> not accounting for sidebar width — now reads <code>shellRect.left</code> and sets <code>width:auto</code>; re-pins on resize, tab change, and sidebar toggle', versionId: 'v_seed_330' },
+    // URL & keyboard
+    { id: 'e_seed_330_9',  tag: 'feat', text: 'URL hash deep linking — switching tabs updates <code>location.hash</code> (e.g. <code>#changelog</code>); hash is restored on page load so shared links open the correct tab', versionId: 'v_seed_330' },
+    { id: 'e_seed_330_10', tag: 'feat', text: 'Arrow key navigation — ← / → cycles through visible tabs; ↑ / ↓ pages through the leaderboard when on that tab; keys ignored when typing in inputs', versionId: 'v_seed_330' },
+    // Mobile leaderboard
+    { id: 'e_seed_330_11', tag: 'feat', text: 'Mobile leaderboard card view — below 640px the table is replaced with tap-friendly cards showing rank, team, robot type, avg pins, matches, and AWP bar; respects my-team and rival highlights', versionId: 'v_seed_330' },
+    // Settings overhaul
+    { id: 'e_seed_330_12', tag: 'feat', text: 'Settings tab overhauled — added Compact mode, Entries per page, Your team number (gold highlight), Rival teams (red highlight), Auto-refresh interval, Show last synced time, Export CSV/JSON, Refresh banner, Clear cache, Remember admin login, and Reset all', versionId: 'v_seed_330' },
+    { id: 'e_seed_330_13', tag: 'feat', text: 'Export to CSV and JSON — downloads full leaderboard with rank, avg pins, AWP rate, success %, robot types, routes, and last scouted date', versionId: 'v_seed_330' },
+    { id: 'e_seed_330_14', tag: 'feat', text: 'Refresh banner — when enabled, auto-refresh shows a "New data available" banner instead of silently updating; user chooses when to reload', versionId: 'v_seed_330' },
+    { id: 'e_seed_330_15', tag: 'feat', text: 'Remember admin login — optionally persists Supabase JWT to localStorage so admin session survives browser restarts; off by default with a security warning', versionId: 'v_seed_330' },
+  ]);
+
+  if (changed) {
+    state.edits       = edits;
+    state.vblock_edits = vblocks;
+    state.order       = order;
+    ulStateSave();
+    ulRenderFromState();
+  }
+}
+
 /* ── formatMatchPins: formats a pins string like "2+1+0+3" into "G1:2 G2:1 G3:0 G4:3"
    for display in match history rows. Falls back to "N pins" for single values. ── */
 function formatMatchPins(pinsStr) {
@@ -2063,8 +2756,11 @@ async function tryLogin() {
 
     // Supabase returned a valid JWT — store it for authenticated requests
     adminToken = data.access_token;
+    const expMs = Date.now() + (data.expires_in * 1000);
     sessionStorage.setItem('sb_token', adminToken);
-    sessionStorage.setItem('sb_token_exp', Date.now() + (data.expires_in * 1000));
+    sessionStorage.setItem('sb_token_exp', expMs);
+    // Persist to localStorage if "remember admin" is enabled
+    _persistAdminToken(adminToken, expMs);
 
     isAdmin = true;
     errEl.textContent = '';
@@ -2080,6 +2776,9 @@ async function tryLogin() {
     renderLog();
     renderCalList();
     applyUpdatesAdminState();
+    if (typeof window._ulApplyDragMode === 'function') window._ulApplyDragMode();
+    // Pull latest changelog state from Supabase now that we're authed
+    ulStatePullSupabase().then(() => { window._ulReapplyAll && window._ulReapplyAll(); });
 
   } catch(e) {
     errEl.textContent = 'Network error — check your connection.';
@@ -2115,8 +2814,8 @@ async function logout() {
   document.getElementById('tab-leaderboard')?.classList.add('active');
   renderCalList();
   applyUpdatesAdminState();
+  if (typeof window._ulApplyDragMode === 'function') window._ulApplyDragMode();
 }
-
 function launchApp(admin) {
   document.getElementById('appShell').style.display = 'block';
   // Admin tabs hidden by default for viewers
@@ -2267,6 +2966,153 @@ function applyUpdatesAdminState() {
   }
 }
 
+/* ═══════════════════════════════════════════════════════
+   RENDER CHANGELOG FROM _ulState
+   Builds all version blocks, entries, and dividers from
+   the Supabase-sourced state object instead of hardcoded HTML.
+════════════════════════════════════════════════════════ */
+function ulRenderFromState() {
+  const wrap = document.getElementById('ul-dynamic-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+
+  const state       = window._ulState;
+  const edits       = Array.isArray(state.edits) ? state.edits : [];
+  const vblockEdits = state.vblock_edits || {};
+  const dividers    = state.dividers || {};
+  const order       = Array.isArray(state.order) ? state.order : [];
+
+  // Build lookup maps
+  const entryMap   = {}; // id → edit object
+  const versionMap = {}; // versionId → [entries]
+  const newVersionBlocks = []; // entries with isVersionBlock
+
+  edits.forEach(function(e) {
+    if (e.deleted) return;
+    if (e.isVersionBlock) { newVersionBlocks.push(e); return; }
+    entryMap[e.id] = e;
+    if (e.versionId) {
+      if (!versionMap[e.versionId]) versionMap[e.versionId] = [];
+      versionMap[e.versionId].push(e);
+    }
+  });
+
+  // Gather all version ids from order + any in vblockEdits not in order
+  const orderedIds = order.map(function(o) { return o.id; });
+  const allVids = Object.keys(vblockEdits).concat(
+    newVersionBlocks.map(function(v) { return v.id; })
+  ).filter(function(id, i, arr) { return arr.indexOf(id) === i; });
+
+  // Build render order: use saved order, append anything not in it
+  const renderOrder = [];
+  order.forEach(function(item) { renderOrder.push(item); });
+  allVids.forEach(function(vid) {
+    if (!orderedIds.includes(vid)) renderOrder.push({ type: 'version', id: vid });
+  });
+  Object.keys(dividers).forEach(function(divId) {
+    if (!orderedIds.includes(divId)) renderOrder.push({ type: 'divider', id: divId });
+  });
+
+  if (renderOrder.length === 0) {
+    wrap.innerHTML = '<p style="color:var(--ink3);font-size:13px;padding:32px 0;text-align:center">No changelog entries yet.</p>';
+    return;
+  }
+
+  renderOrder.forEach(function(item) {
+    if (item.type === 'divider') {
+      const d = dividers[item.id];
+      if (!d) return;
+      const divEl = document.createElement('div');
+      divEl.className = 'ul-date-divider ul-draggable';
+      divEl.setAttribute('data-ul-div-id', item.id);
+      divEl.dataset.ulText = d.text;
+      divEl.innerHTML =
+        '<span class="ul-drag-handle admin-only" title="Drag to reorder">⠿</span>' +
+        '<span class="ul-div-label">' + escHtml(d.text) + '</span>' +
+        '<span class="ul-divider-actions admin-only">' +
+          '<button class="ul-entry-btn" onclick="editUlDivider(this)">✏ Edit</button>' +
+          '<button class="ul-entry-btn del" onclick="deleteUlDivider(this)">✕</button>' +
+        '</span>';
+      wrap.appendChild(divEl);
+    } else if (item.type === 'version') {
+      const ve = vblockEdits[item.id];
+      if (!ve) return;
+      // Build version block
+      const vb = document.createElement('div');
+      vb.className = 'ul-version-block ul-draggable';
+      vb.setAttribute('draggable', 'false');
+      vb.dataset.ulVid = item.id;
+
+      const header = document.createElement('div');
+      header.className = 'ul-version-header';
+      header.innerHTML =
+        '<span class="ul-drag-handle admin-only" title="Drag to reorder" style="position:static;margin-right:4px">⠿</span>' +
+        '<span class="ul-v-number">' + escHtml(ve.num || '') + '</span>' +
+        '<span class="ul-v-name">'   + escHtml(ve.name || '') + '</span>' +
+        (ve.date ? '<span class="ul-v-date">' + escHtml(ve.date) + '</span>' : '') +
+        '<div class="ul-version-actions admin-only">' +
+          '<button class="ul-entry-btn" onclick="editUlVBlock(this)">✏ Edit version</button>' +
+          '<button class="ul-entry-btn" onclick="addUlEntryToVersion(this)">＋ Entry</button>' +
+        '</div>';
+      vb.appendChild(header);
+
+      const entriesDiv = document.createElement('div');
+      entriesDiv.className = 'ul-entries';
+      const entries = versionMap[item.id] || [];
+      entries.forEach(function(e) {
+        const row = document.createElement('div');
+        row.className = 'ul-entry ul-draggable';
+        row.dataset.ulId = e.id;
+        row.innerHTML =
+          '<span class="ul-drag-handle admin-only" title="Drag to reorder">⠿</span>' +
+          '<span class="ul-entry-tag ul-tag-' + escHtml(e.tag || 'feat') + '">' + escHtml(e.tag || 'feat') + '</span>' +
+          '<span class="ul-entry-text">' + (e.text || '') + '</span>' +
+          '<div class="ul-entry-actions admin-only">' +
+            '<button class="ul-entry-btn" onclick="editUlEntry(this)">✏ Edit</button>' +
+            '<button class="ul-entry-btn del" onclick="deleteUlEntry(this)">✕</button>' +
+          '</div>';
+        entriesDiv.appendChild(row);
+      });
+      vb.appendChild(entriesDiv);
+      wrap.appendChild(vb);
+    }
+  });
+
+  // Re-init drag handles
+  if (typeof window._ulEnableAllDrag === 'function') window._ulEnableAllDrag();
+  else if (typeof enableAllDrag === 'function') enableAllDrag();
+
+  // If admin is already logged in, reveal any newly rendered admin-only elements and ensure drag mode
+  if (typeof isAdmin !== 'undefined' && isAdmin) {
+    document.body.classList.add('ul-admin-drag');
+    wrap.querySelectorAll('.admin-only').forEach(function(el) { el.classList.add('admin-visible'); });
+  }
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+/* ═══════════════════════════════════════════════════════
+   CHANGELOG SNAPSHOT — pushes the current _ulState to Supabase.
+════════════════════════════════════════════════════════ */
+async function ulSnapshotAndSync() {
+  if (!isAdmin) return;
+  const btn = document.getElementById('ul-sync-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Syncing…'; }
+  try {
+    ulStateSaveCache();
+    await ulStatePushSupabase();
+    const count = (window._ulState.edits || []).length;
+    if (btn) { btn.textContent = '✅ Synced!'; btn.disabled = false; }
+    showToast('Changelog synced to Supabase (' + count + ' entries)', 'ok', 4000);
+    setTimeout(function() { if (btn) btn.textContent = '⬆ Sync to Supabase'; }, 3000);
+  } catch(e) {
+    console.error('ulSnapshotAndSync error:', e);
+    if (btn) { btn.textContent = '⬆ Sync to Supabase'; btn.disabled = false; }
+    showToast('Sync failed: ' + e.message, 'err', 5000);
+  }
+}
+
 async function saveUpdates() {
   if(!isAdmin) return;
   const future = document.getElementById('updates-future-edit')?.value.trim();
@@ -2297,6 +3143,769 @@ async function saveUpdates() {
     showToast('Save failed: ' + e.message, 'err', 5000);
   }
 }
+
+
+/* ═══════════════════════════════════════════════════════
+   UPDATE LOG EDITOR — add / edit / delete entries in #tab-updates
+   Changes synced to Supabase (ul_changelog table) and cached
+   in localStorage under 'ul_changelog_v1'. Applied
+   on top of the hardcoded HTML on each page load.
+════════════════════════════════════════════════════════ */
+(function() {
+  let _ulEditTarget = null;
+  let _ulSelectedTag = 'feat';
+
+  function stampIds() {
+    document.querySelectorAll('#tab-updates .ul-version-block').forEach((vb, vi) => {
+      if (!vb.dataset.ulVid) vb.dataset.ulVid = 'v' + vi;
+    });
+    document.querySelectorAll('#tab-updates .ul-entry').forEach((e, i) => {
+      if (!e.dataset.ulId) e.dataset.ulId = 'e' + i;
+    });
+  }
+
+  function loadEdits() {
+    return Array.isArray(window._ulState.edits) ? window._ulState.edits : [];
+  }
+  function saveEdits(edits) {
+    window._ulState.edits = edits;
+    ulStateSave();
+  }
+
+  function applyUlEdits() {
+    const edits = loadEdits();
+    edits.forEach(function(edit) {
+      if (edit.isVersionBlock) return;
+      if (edit.deleted) {
+        const el = document.querySelector('[data-ul-id="' + edit.id + '"]');
+        if (el) el.remove();
+      } else if (edit.isNew) {
+        const vb = document.querySelector('[data-ul-vid="' + edit.versionId + '"]');
+        if (vb) {
+          const container = vb.querySelector('.ul-entries');
+          if (container && !document.querySelector('[data-ul-id="' + edit.id + '"]')) {
+            container.appendChild(buildEntryEl(edit.id, edit.tag, edit.text));
+          }
+        }
+      } else {
+        const el = document.querySelector('[data-ul-id="' + edit.id + '"]');
+        if (el) {
+          const tagEl = el.querySelector('.ul-entry-tag');
+          const txtEl = el.querySelector('.ul-entry-text');
+          if (tagEl) { tagEl.className = 'ul-entry-tag ul-tag-' + edit.tag; tagEl.textContent = edit.tag; }
+          if (txtEl) txtEl.innerHTML = edit.text;
+        }
+      }
+    });
+  }
+
+  function buildEntryEl(id, tag, text) {
+    const div = document.createElement('div');
+    div.className = 'ul-entry ul-draggable';
+    div.dataset.ulId = id;
+    div.innerHTML =
+      '<span class="ul-drag-handle admin-only" title="Drag to reorder">⠿</span>' +
+      '<span class="ul-entry-tag ul-tag-' + tag + '">' + tag + '</span>' +
+      '<span class="ul-entry-text">' + text + '</span>' +
+      '<div class="ul-entry-actions admin-only">' +
+      '<button class="ul-entry-btn" onclick="editUlEntry(this)">&#9999; Edit</button>' +
+      '<button class="ul-entry-btn del" onclick="deleteUlEntry(this)">&#10005;</button>' +
+      '</div>';
+    return div;
+  }
+
+  function populateVersionPicker() {
+    const sel = document.getElementById('ul-editor-version-pick');
+    if (!sel) return;
+    while (sel.options.length > 1) sel.remove(1);
+    document.querySelectorAll('#tab-updates .ul-version-block').forEach(function(vb) {
+      const num  = (vb.querySelector('.ul-v-number') || {}).textContent || '';
+      const name = (vb.querySelector('.ul-v-name')   || {}).textContent || '';
+      const opt  = document.createElement('option');
+      opt.value = vb.dataset.ulVid;
+      opt.textContent = num + ' — ' + name;
+      sel.appendChild(opt);
+    });
+  }
+
+  window.openUlEditor = function(versionBlockEl) {
+    if (!isAdmin) return;
+    stampIds();
+    populateVersionPicker();
+    _ulEditTarget = { mode: 'new', versionBlock: versionBlockEl || null };
+    document.getElementById('ul-editor-heading').innerHTML = 'Add <span>Entry</span>';
+    document.getElementById('ul-editor-text').value = '';
+    document.getElementById('ul-editor-version-row').style.display = 'block';
+    document.getElementById('ul-editor-vnumber').value = '';
+    document.getElementById('ul-editor-vname').value = '';
+    const sel = document.getElementById('ul-editor-version-pick');
+    if (versionBlockEl && versionBlockEl.dataset && versionBlockEl.dataset.ulVid) {
+      sel.value = versionBlockEl.dataset.ulVid;
+      ulVersionPickChange(sel.value);
+    } else {
+      sel.value = '__new__';
+      ulVersionPickChange('__new__');
+    }
+    ulPickTag(document.querySelector('.ul-tag-opt[data-tag="feat"]'));
+    document.getElementById('ul-editor-modal-bg').classList.add('open');
+    setTimeout(function() { var t = document.getElementById('ul-editor-text'); if(t) t.focus(); }, 80);
+  };
+
+  window.closeUlEditor = function() {
+    document.getElementById('ul-editor-modal-bg').classList.remove('open');
+    _ulEditTarget = null;
+  };
+
+  window.ulPickTag = function(el) {
+    document.querySelectorAll('.ul-tag-opt').forEach(function(o) { o.classList.remove('selected'); });
+    el.classList.add('selected');
+    _ulSelectedTag = el.dataset.tag;
+  };
+
+  window.ulVersionPickChange = function(val) {
+    const newFields = document.getElementById('ul-editor-new-version-fields');
+    if (newFields) newFields.style.display = val === '__new__' ? 'block' : 'none';
+    if (val === '__new__') {
+      // Auto-suggest the next version number based on the highest existing one
+      const numEl = document.getElementById('ul-editor-vnumber');
+      if (numEl && !numEl.value.trim()) {
+        numEl.value = ulNextVersion();
+      }
+    }
+  };
+
+  function ulNextVersion() {
+    let best = [0, 0, 0];
+    document.querySelectorAll('#tab-updates .ul-v-number').forEach(function(el) {
+      // grab the last version in ranges like "v1.5.0 – 1.6.0"
+      const matches = el.textContent.match(/\d+\.\d+\.\d+/g);
+      if (!matches) return;
+      const last = matches[matches.length - 1].split('.').map(Number);
+      if (last[0] > best[0] || (last[0] === best[0] && last[1] > best[1]) || (last[0] === best[0] && last[1] === best[1] && last[2] > best[2])) {
+        best = last;
+      }
+    });
+    // Increment patch by default
+    return 'v' + best[0] + '.' + (best[1] + 1) + '.0';
+  }
+
+  window.editUlEntry = function(btn) {
+    if (!isAdmin) return;
+    stampIds();
+    populateVersionPicker();
+    const entryEl = btn.closest('.ul-entry');
+    const tagEl = entryEl.querySelector('.ul-entry-tag');
+    const txtEl = entryEl.querySelector('.ul-entry-text');
+    const tag  = tagEl ? tagEl.textContent.trim() : 'feat';
+    const text = txtEl ? txtEl.innerHTML : '';
+    _ulEditTarget = { mode: 'edit', entryEl: entryEl };
+    document.getElementById('ul-editor-heading').innerHTML = 'Edit <span>Entry</span>';
+    document.getElementById('ul-editor-text').value = text;
+    document.getElementById('ul-editor-version-row').style.display = 'none';
+    const tagBtn = document.querySelector('.ul-tag-opt[data-tag="' + tag + '"]');
+    if (tagBtn) ulPickTag(tagBtn); else ulPickTag(document.querySelector('.ul-tag-opt'));
+    document.getElementById('ul-editor-modal-bg').classList.add('open');
+    setTimeout(function() { var t = document.getElementById('ul-editor-text'); if(t) t.focus(); }, 80);
+  };
+
+  window.deleteUlEntry = function(btn) {
+    if (!isAdmin) return;
+    if (!confirm('Delete this changelog entry?')) return;
+    const entryEl = btn.closest('.ul-entry');
+    const id = entryEl.dataset.ulId;
+    const edits = loadEdits().filter(function(e) { return e.id !== id; });
+    edits.push({ id: id, deleted: true });
+    saveEdits(edits);
+    entryEl.remove();
+    showToast('Entry deleted', 'ok');
+  };
+
+  window.addUlEntryToVersion = function(btn) {
+    if (!isAdmin) return;
+    const vb = btn.closest('.ul-version-block');
+    openUlEditor(vb);
+  };
+
+  window.saveUlEntry = function() {
+    if (!isAdmin) return;
+    const text = document.getElementById('ul-editor-text').value.trim();
+    if (!text) { showToast('Entry text cannot be empty', 'err'); return; }
+    const edits = loadEdits();
+
+    if (_ulEditTarget && _ulEditTarget.mode === 'edit') {
+      const entryEl = _ulEditTarget.entryEl;
+      const id = entryEl.dataset.ulId;
+      const tagEl = entryEl.querySelector('.ul-entry-tag');
+      const txtEl = entryEl.querySelector('.ul-entry-text');
+      if (tagEl) { tagEl.className = 'ul-entry-tag ul-tag-' + _ulSelectedTag; tagEl.textContent = _ulSelectedTag; }
+      if (txtEl) txtEl.innerHTML = text;
+      const idx = edits.findIndex(function(e) { return e.id === id && !e.deleted && !e.isNew && !e.isVersionBlock; });
+      const record = { id: id, tag: _ulSelectedTag, text: text };
+      if (idx >= 0) edits[idx] = record; else edits.push(record);
+      saveEdits(edits);
+      showToast('Entry updated', 'ok');
+    } else {
+      const sel = document.getElementById('ul-editor-version-pick');
+      const pickedVid = sel.value;
+      let targetVb;
+      if (pickedVid === '__new__') {
+        const vnum  = (document.getElementById('ul-editor-vnumber').value || '').trim() || 'vX.X.X';
+        const vname = (document.getElementById('ul-editor-vname').value   || '').trim() || 'Untitled';
+        targetVb = createVersionBlock(vnum, vname);
+      } else {
+        targetVb = document.querySelector('[data-ul-vid="' + pickedVid + '"]');
+      }
+      if (!targetVb) { showToast('Could not find version block', 'err'); return; }
+      stampIds();
+      const newId = 'ul_new_' + Date.now();
+      const newEl = buildEntryEl(newId, _ulSelectedTag, text);
+      targetVb.querySelector('.ul-entries').appendChild(newEl);
+      edits.push({ id: newId, tag: _ulSelectedTag, text: text, isNew: true, versionId: targetVb.dataset.ulVid });
+      saveEdits(edits);
+      showToast('Entry added', 'ok');
+    }
+    closeUlEditor();
+  };
+
+  function createVersionBlock(vnum, vname) {
+    const footer = document.querySelector('#tab-updates .ul-footer');
+    const wrap   = document.querySelector('#tab-updates .ul-wrap');
+    const vb = document.createElement('div');
+    const vid = 'v_new_' + Date.now();
+    vb.className = 'ul-version-block';
+    vb.dataset.ulVid = vid;
+    vb.innerHTML =
+      '<div class="ul-version-header">' +
+      '<span class="ul-drag-handle admin-only" title="Drag to reorder" style="position:static;margin-right:4px">⠿</span>' +
+      '<span class="ul-v-number">' + vnum + '</span>' +
+      '<span class="ul-v-name">' + vname + '</span>' +
+      '<div class="ul-version-actions admin-only">' +
+      '<button class="ul-entry-btn" onclick="editUlVBlock(this)">✏ Edit version</button>' +
+      '<button class="ul-entry-btn" onclick="addUlEntryToVersion(this)">＋ Entry</button>' +
+      '</div></div>' +
+      '<div class="ul-entries"></div>';
+    const edits = loadEdits();
+    edits.push({ id: vid, isVersionBlock: true, vnum: vnum, vname: vname });
+    saveEdits(edits);
+    if (footer) wrap.insertBefore(vb, footer);
+    else wrap.appendChild(vb);
+    return vb;
+  }
+
+  function restoreNewVersionBlocks() {
+    const edits = loadEdits();
+    const footer = document.querySelector('#tab-updates .ul-footer');
+    const wrap   = document.querySelector('#tab-updates .ul-wrap');
+    edits.filter(function(e) { return e.isVersionBlock; }).forEach(function(e) {
+      if (document.querySelector('[data-ul-vid="' + e.id + '"]')) return;
+      const vb = document.createElement('div');
+      vb.className = 'ul-version-block';
+      vb.dataset.ulVid = e.id;
+      vb.innerHTML =
+        '<div class="ul-version-header">' +
+        '<span class="ul-drag-handle admin-only" title="Drag to reorder" style="position:static;margin-right:4px">⠿</span>' +
+        '<span class="ul-v-number">' + e.vnum + '</span>' +
+        '<span class="ul-v-name">' + e.vname + '</span>' +
+        '<div class="ul-version-actions admin-only">' +
+        '<button class="ul-entry-btn" onclick="editUlVBlock(this)">✏ Edit version</button>' +
+        '<button class="ul-entry-btn" onclick="addUlEntryToVersion(this)">＋ Entry</button>' +
+        '</div></div>' +
+        '<div class="ul-entries"></div>';
+      if (footer) wrap.insertBefore(vb, footer);
+      else wrap.appendChild(vb);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    stampIds();
+    restoreNewVersionBlocks();
+    applyUlEdits();
+    stampIds();
+  });
+  // Expose for _ulReapplyAll (called after Supabase pull)
+  window._ulApplyEntries = function() {
+    stampIds();
+    restoreNewVersionBlocks();
+    applyUlEdits();
+    stampIds();
+  };
+})();
+
+/* ── VERSION BLOCK EDITOR ── */
+(function() {
+  let _ulVBlockTarget = null; // the version block element being edited
+
+  window.editUlVBlock = function(btn) {
+    if (!isAdmin) return;
+    const vb = btn.closest('.ul-version-block');
+    _ulVBlockTarget = vb;
+    const num  = (vb.querySelector('.ul-v-number') || {}).textContent || '';
+    const name = (vb.querySelector('.ul-v-name')   || {}).textContent || '';
+    document.getElementById('ul-vblock-number').value = num;
+    document.getElementById('ul-vblock-name').value   = name;
+    const bg = document.getElementById('ul-vblock-modal-bg');
+    bg.style.display = 'flex';
+    setTimeout(function() { document.getElementById('ul-vblock-number').focus(); }, 80);
+  };
+
+  window.closeUlVBlockEditor = function() {
+    document.getElementById('ul-vblock-modal-bg').style.display = 'none';
+    _ulVBlockTarget = null;
+  };
+
+  window.saveUlVBlock = function() {
+    if (!isAdmin || !_ulVBlockTarget) return;
+    const num  = document.getElementById('ul-vblock-number').value.trim();
+    const name = document.getElementById('ul-vblock-name').value.trim();
+    if (!num && !name) { showToast('Enter a version number or name', 'err'); return; }
+
+    // Update DOM
+    const numEl  = _ulVBlockTarget.querySelector('.ul-v-number');
+    const nameEl = _ulVBlockTarget.querySelector('.ul-v-name');
+    if (numEl)  numEl.textContent  = num;
+    if (nameEl) nameEl.textContent = name;
+
+    // Persist in _ulState (syncs to Supabase)
+    const vid = _ulVBlockTarget.dataset.ulVid;
+    if (!window._ulState.vblock_edits) window._ulState.vblock_edits = {};
+    window._ulState.vblock_edits[vid] = { num: num, name: name };
+    ulStateSave();
+
+    showToast('Version updated', 'ok');
+    closeUlVBlockEditor();
+  };
+
+  // Re-apply any saved version block title edits on load
+  function applyUlVBlockEdits() {
+    try {
+      const stored = window._ulState.vblock_edits || {};
+      Object.keys(stored).forEach(function(vid) {
+        const vb = document.querySelector('[data-ul-vid="' + vid + '"]');
+        if (!vb) return;
+        const e = stored[vid];
+        const numEl  = vb.querySelector('.ul-v-number');
+        const nameEl = vb.querySelector('.ul-v-name');
+        if (numEl  && e.num)  numEl.textContent  = e.num;
+        if (nameEl && e.name) nameEl.textContent = e.name;
+      });
+    } catch(e) {}
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    applyUlVBlockEdits();
+  });
+  window._applyUlVBlockEdits = applyUlVBlockEdits;
+})();
+
+
+/* ═══════════════════════════════════════════════════════
+   SUBHEADINGS + DRAG & DROP for Update Log  (v2 — clean rewrite)
+════════════════════════════════════════════════════════ */
+(function() {
+
+  /* ────────────────────────────────────────────────────
+     SUBHEADING EDITOR
+  ──────────────────────────────────────────────────── */
+  var _dividerTarget = null;
+
+  window.openUlSubheading = function(divEl) {
+    if (!isAdmin) return;
+    _dividerTarget = divEl || null;
+    var heading = document.getElementById('ul-subheading-heading');
+    var input   = document.getElementById('ul-subheading-text');
+    if (_dividerTarget) {
+      heading.innerHTML = 'Edit <span>Subheading</span>';
+      // Text is stored in data-ul-text attribute for reliability
+      input.value = _dividerTarget.dataset.ulText || '';
+    } else {
+      heading.innerHTML = 'Add <span>Subheading</span>';
+      input.value = '';
+    }
+    var bg = document.getElementById('ul-subheading-modal-bg');
+    bg.style.display = 'flex';
+    setTimeout(function() { input.focus(); input.select(); }, 60);
+  };
+
+  window.closeUlSubheading = function() {
+    document.getElementById('ul-subheading-modal-bg').style.display = 'none';
+    _dividerTarget = null;
+  };
+
+  window.editUlDivider = function(btn) {
+    if (!isAdmin) return;
+    openUlSubheading(btn.closest('.ul-date-divider'));
+  };
+
+  window.deleteUlDivider = function(btn) {
+    if (!isAdmin) return;
+    if (!confirm('Delete this subheading?')) return;
+    var el = btn.closest('.ul-date-divider');
+    var id = el.getAttribute('data-ul-div-id');
+    if (id) {
+      if (!window._ulState.dividers) window._ulState.dividers = {};
+      delete window._ulState.dividers[id];
+      // Remove from order
+      if (window._ulState.order) {
+        window._ulState.order = window._ulState.order.filter(function(o) { return o.id !== id; });
+      }
+      ulStateSave();
+    }
+    ulRenderFromState();
+    showToast('Subheading deleted', 'ok');
+  };
+
+  window.saveUlSubheading = function() {
+    if (!isAdmin) return;
+    var text = document.getElementById('ul-subheading-text').value.trim();
+    if (!text) { showToast('Subheading cannot be empty', 'err'); return; }
+
+    if (_dividerTarget) {
+      // Update existing
+      var id = _dividerTarget.getAttribute('data-ul-div-id');
+      if (!window._ulState.dividers) window._ulState.dividers = {};
+      if (!window._ulState.dividers[id]) window._ulState.dividers[id] = {};
+      window._ulState.dividers[id].text = text;
+      ulStateSave();
+      ulRenderFromState();
+      showToast('Subheading updated', 'ok');
+    } else {
+      // Create new — add to end of order
+      var id = 'div_' + Date.now();
+      if (!window._ulState.dividers) window._ulState.dividers = {};
+      window._ulState.dividers[id] = { text: text };
+      if (!window._ulState.order) window._ulState.order = [];
+      window._ulState.order.push({ type: 'divider', id: id });
+      ulStateSave();
+      ulRenderFromState();
+      showToast('Subheading added', 'ok');
+    }
+    closeUlSubheading();
+  };
+
+  function buildDividerEl(id, text) {
+    var el = document.createElement('div');
+    el.className = 'ul-date-divider ul-draggable';
+    el.setAttribute('data-ul-div-id', id);
+    el.dataset.ulText = text;
+    el.innerHTML =
+      '<span class="ul-drag-handle admin-only" title="Drag to reorder">⠿</span>' +
+      '<span class="ul-div-label">' + text + '</span>' +
+      '<span class="ul-divider-actions admin-only">' +
+      '<button class="ul-entry-btn" onclick="editUlDivider(this)">&#9999; Edit</button>' +
+      '<button class="ul-entry-btn del" onclick="deleteUlDivider(this)">&#10005;</button>' +
+      '</span>';
+    return el;
+  }
+
+  /* ────────────────────────────────────────────────────
+     DRAG & DROP  (pointer-events based — reliable cross-browser)
+  ──────────────────────────────────────────────────── */
+  var _dragEl   = null;
+  var _dragGhost = null;
+  var _offsetX  = 0;
+  var _offsetY  = 0;
+  var _indicator = null;   // the drop-position line
+
+  function getWrapItems() {
+    return Array.from(document.querySelectorAll('#ul-dynamic-wrap > .ul-draggable'));
+  }
+
+  function getIndicator() {
+    if (!_indicator) {
+      _indicator = document.createElement('div');
+      _indicator.style.cssText = 'height:2px;background:var(--red);border-radius:2px;margin:0;pointer-events:none;display:none;transition:top .08s;position:absolute;left:0;right:0;';
+      document.getElementById('ul-dynamic-wrap').appendChild(_indicator);
+    }
+    return _indicator;
+  }
+
+  function bindDrag(el) {
+    if (el._ulDragBound) return;
+    el._ulDragBound = true;
+
+    var handle = el.querySelector('.ul-drag-handle');
+    if (!handle) return;
+
+    handle.addEventListener('pointerdown', function(e) {
+      if (!isAdmin) return;
+      e.preventDefault();
+      handle.setPointerCapture(e.pointerId);
+
+      var rect = el.getBoundingClientRect();
+      _offsetX = e.clientX - rect.left;
+      _offsetY = e.clientY - rect.top;
+      _dragEl = el;
+
+      // Create ghost
+      _dragGhost = el.cloneNode(true);
+      _dragGhost.style.cssText =
+        'position:fixed;width:' + rect.width + 'px;opacity:0.55;pointer-events:none;' +
+        'z-index:9999;left:' + rect.left + 'px;top:' + rect.top + 'px;' +
+        'box-shadow:0 8px 24px rgba(0,0,0,.4);border-radius:var(--radius);' +
+        'background:var(--surface2);border:1px solid var(--border2);';
+      document.body.appendChild(_dragGhost);
+
+      el.style.opacity = '0.3';
+      getIndicator().style.display = 'block';
+    });
+
+    handle.addEventListener('pointermove', function(e) {
+      if (!_dragEl || _dragEl !== el) return;
+      e.preventDefault();
+      var x = e.clientX - _offsetX;
+      var y = e.clientY - _offsetY;
+      _dragGhost.style.left = x + 'px';
+      _dragGhost.style.top  = y + 'px';
+
+      // Find insertion point
+      var items = getWrapItems().filter(function(i) { return i !== _dragEl; });
+      var target = null, before = true;
+      for (var i = 0; i < items.length; i++) {
+        var r = items[i].getBoundingClientRect();
+        var mid = r.top + r.height / 2;
+        if (e.clientY < mid) { target = items[i]; before = true; break; }
+        else { target = items[i]; before = false; }
+      }
+      var ind = getIndicator();
+      var wrap = document.querySelector('#tab-updates .ul-wrap');
+      var wrapRect = wrap.getBoundingClientRect();
+      if (target) {
+        var tr = target.getBoundingClientRect();
+        ind.style.display = 'block';
+        ind.style.position = 'absolute';
+        var indY = before
+          ? (tr.top - wrapRect.top + wrap.scrollTop - 1)
+          : (tr.bottom - wrapRect.top + wrap.scrollTop - 1);
+        ind.style.top = indY + 'px';
+        ind.style.left = '0';
+        ind.style.right = '0';
+        ind.style.width = '';
+        ind._insertTarget = target;
+        ind._insertBefore = before;
+      } else {
+        ind.style.display = 'none';
+        ind._insertTarget = null;
+      }
+    });
+
+    handle.addEventListener('pointerup', function(e) {
+      if (!_dragEl || _dragEl !== el) return;
+      commitDrop();
+    });
+
+    handle.addEventListener('pointercancel', function() {
+      cancelDrag();
+    });
+  }
+
+  function commitDrop() {
+    if (!_dragEl) return;
+    var ind = getIndicator();
+    var wrap = document.getElementById('ul-dynamic-wrap');
+    if (ind._insertTarget) {
+      if (ind._insertBefore) {
+        wrap.insertBefore(_dragEl, ind._insertTarget);
+      } else {
+        ind._insertTarget.after(_dragEl);
+      }
+    }
+    cancelDrag();
+    saveUlOrder();
+  }
+
+  function cancelDrag() {
+    if (_dragEl) _dragEl.style.opacity = '';
+    if (_dragGhost) _dragGhost.remove();
+    var ind = getIndicator();
+    ind.style.display = 'none';
+    ind._insertTarget = null;
+    _dragEl = null;
+    _dragGhost = null;
+  }
+
+  function enableAllDrag() {
+    // Bind top-level blocks (version blocks + dividers)
+    getWrapItems().forEach(bindDrag);
+    // Bind individual entry rows within each version block
+    document.querySelectorAll('#ul-dynamic-wrap .ul-entries .ul-entry.ul-draggable').forEach(function(entry) {
+      bindEntryDrag(entry);
+    });
+  }
+
+  function bindEntryDrag(el) {
+    if (el._ulEntryDragBound) return;
+    el._ulEntryDragBound = true;
+    var handle = el.querySelector('.ul-drag-handle');
+    if (!handle) return;
+
+    handle.addEventListener('pointerdown', function(e) {
+      if (!isAdmin) return;
+      e.preventDefault();
+      e.stopPropagation();
+      handle.setPointerCapture(e.pointerId);
+
+      var container = el.closest('.ul-entries');
+      var rect = el.getBoundingClientRect();
+      _dragEl = el;
+      _dragEl._entryContainer = container;
+
+      _dragGhost = el.cloneNode(true);
+      _dragGhost.style.cssText =
+        'position:fixed;width:' + rect.width + 'px;opacity:0.55;pointer-events:none;' +
+        'z-index:9999;left:' + rect.left + 'px;top:' + rect.top + 'px;' +
+        'box-shadow:0 4px 16px rgba(0,0,0,.4);background:var(--surface2);border:1px solid var(--border2);';
+      document.body.appendChild(_dragGhost);
+      el.style.opacity = '0.3';
+
+      var ind = getEntryIndicator(container);
+      ind.style.display = 'block';
+    });
+
+    handle.addEventListener('pointermove', function(e) {
+      if (!_dragEl || _dragEl !== el) return;
+      e.preventDefault();
+      _dragGhost.style.left = (e.clientX - (el.getBoundingClientRect().width / 2)) + 'px';
+      _dragGhost.style.top  = (e.clientY - 14) + 'px';
+
+      var container = _dragEl._entryContainer;
+      var siblings = Array.from(container.querySelectorAll(':scope > .ul-entry.ul-draggable')).filter(function(i) { return i !== _dragEl; });
+      var target = null, before = true;
+      for (var i = 0; i < siblings.length; i++) {
+        var r = siblings[i].getBoundingClientRect();
+        if (e.clientY < r.top + r.height / 2) { target = siblings[i]; before = true; break; }
+        else { target = siblings[i]; before = false; }
+      }
+      var ind = getEntryIndicator(container);
+      var cRect = container.getBoundingClientRect();
+      if (target) {
+        var tr = target.getBoundingClientRect();
+        ind.style.display = 'block';
+        ind.style.top = (before ? (tr.top - cRect.top - 1) : (tr.bottom - cRect.top - 1)) + 'px';
+        ind._insertTarget = target;
+        ind._insertBefore = before;
+      } else {
+        ind.style.display = 'none';
+        ind._insertTarget = null;
+      }
+    });
+
+    handle.addEventListener('pointerup', function() {
+      if (!_dragEl || _dragEl !== el) return;
+      var container = _dragEl._entryContainer;
+      var ind = getEntryIndicator(container);
+      if (ind._insertTarget) {
+        if (ind._insertBefore) container.insertBefore(_dragEl, ind._insertTarget);
+        else ind._insertTarget.after(_dragEl);
+      }
+      ind.style.display = 'none';
+      ind._insertTarget = null;
+      if (_dragEl) _dragEl.style.opacity = '';
+      if (_dragGhost) _dragGhost.remove();
+      _dragEl = null; _dragGhost = null;
+      saveUlOrder();
+    });
+
+    handle.addEventListener('pointercancel', cancelDrag);
+  }
+
+  var _entryIndicators = new WeakMap();
+  function getEntryIndicator(container) {
+    if (!_entryIndicators.has(container)) {
+      var ind = document.createElement('div');
+      ind.style.cssText = 'height:2px;background:var(--blue);border-radius:2px;pointer-events:none;display:none;position:absolute;left:0;right:0;';
+      container.style.position = 'relative';
+      container.appendChild(ind);
+      _entryIndicators.set(container, ind);
+    }
+    return _entryIndicators.get(container);
+  }
+
+  function applyDragMode() {
+    if (isAdmin) {
+      document.body.classList.add('ul-admin-drag');
+    } else {
+      document.body.classList.remove('ul-admin-drag');
+    }
+    enableAllDrag();
+  }
+  window._ulApplyDragMode = applyDragMode;
+  window._ulEnableAllDrag = enableAllDrag;
+
+  /* ────────────────────────────────────────────────────
+     PERSIST & RESTORE ORDER
+  ──────────────────────────────────────────────────── */
+  function saveUlOrder() {
+    var wrap = document.getElementById('ul-dynamic-wrap');
+    if (!wrap) return;
+    var order = [];
+    wrap.querySelectorAll(':scope > .ul-draggable').forEach(function(el) {
+      var vid   = el.getAttribute('data-ul-vid');
+      var divId = el.getAttribute('data-ul-div-id');
+      if (vid)   order.push({ type: 'version', id: vid });
+      else if (divId) order.push({ type: 'divider', id: divId });
+    });
+    window._ulState.order = order;
+    ulStateSave();
+  }
+
+  function restoreUlOrder() {
+    // No-op — order is applied via ulRenderFromState
+  }
+
+  /* ────────────────────────────────────────────────────
+     RESTORE CUSTOM DIVIDERS FROM STATE
+  ──────────────────────────────────────────────────── */
+  function restoreDividers() {
+    // No-op — dividers are rendered via ulRenderFromState
+  }
+
+  /* ────────────────────────────────────────────────────
+     STAMP IDs + UPDATE HARDCODED DIVIDER STRUCTURE
+  ──────────────────────────────────────────────────── */
+  function initDividers() {
+    // Stamp IDs on hardcoded dividers and fix their inner HTML to use .ul-div-label
+    document.querySelectorAll('#tab-updates .ul-date-divider').forEach(function(el, i) {
+      if (!el.getAttribute('data-ul-div-id')) el.setAttribute('data-ul-div-id', 'hd_' + i);
+      // Rebuild innerHTML for reliable text extraction
+      var labelEl = el.querySelector('.ul-div-label');
+      if (!labelEl) {
+        // Old structure: <span class="ul-drag-handle">...</span><span>TEXT<span actions>...</span></span>
+        var spanWrap = el.querySelector('span:not(.ul-drag-handle):not(.ul-divider-actions)');
+        var txt = '';
+        if (spanWrap) {
+          spanWrap.childNodes.forEach(function(n) { if (n.nodeType === 3) txt += n.textContent; });
+        }
+        txt = txt.trim();
+        if (!txt) {
+          // fallback: try full text content minus button text
+          txt = el.textContent.replace(/✏ Edit|✕|⠿|⣿|⠿/g, '').trim();
+        }
+        el.dataset.ulText = txt;
+        el.innerHTML =
+          '<span class="ul-drag-handle admin-only" title="Drag to reorder">⠿</span>' +
+          '<span class="ul-div-label">' + txt + '</span>' +
+          '<span class="ul-divider-actions admin-only">' +
+          '<button class="ul-entry-btn" onclick="editUlDivider(this)">&#9999; Edit</button>' +
+          '<button class="ul-entry-btn del" onclick="deleteUlDivider(this)">&#10005;</button>' +
+          '</span>';
+      } else {
+        el.dataset.ulText = labelEl.textContent.trim();
+      }
+    });
+  }
+
+  /* ── Boot ── */
+  function ulReapplyAll() {
+    ulRenderFromState();
+  }
+  window._ulReapplyAll = ulReapplyAll;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    ulReapplyAll();
+  });
+
+})();
+
+
 
 function setSyncStatus(s, t) {
   document.getElementById('syncDot').className = 'sync-dot' + (s==='ok'?' ok':s==='err'?' err':'');
@@ -2564,6 +4173,10 @@ function closeDetail() {
   _reProfileOpen = false;
 }
 document.addEventListener('keydown', e=>{
+  // Ignore when typing in an input/textarea/select
+  const tag = document.activeElement.tagName;
+  const typing = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || document.activeElement.isContentEditable;
+
   if(e.key==='Escape') {
     closeDetail();
     closeLoginModal();
@@ -2571,7 +4184,43 @@ document.addEventListener('keydown', e=>{
     closeEditEntryModal();
     closeEditCalModal();
   }
+
+  // Arrow left/right — cycle visible tabs
+  if(!typing && (e.key==='ArrowLeft' || e.key==='ArrowRight')) {
+    e.preventDefault();
+    const visibleTabs = Array.from(document.querySelectorAll('.tab:not([style*="display:none"])')).filter(b => {
+      return window.getComputedStyle(b).display !== 'none';
+    });
+    const activeIdx = visibleTabs.findIndex(b => b.classList.contains('active'));
+    const dir = e.key === 'ArrowRight' ? 1 : -1;
+    const nextIdx = (activeIdx + dir + visibleTabs.length) % visibleTabs.length;
+    const next = visibleTabs[nextIdx];
+    if(next) { next.click(); next.scrollIntoView({ block:'nearest', inline:'center' }); }
+  }
+
+  // Arrow up/down — page through leaderboard if on leaderboard tab
+  if(!typing && (e.key==='ArrowDown' || e.key==='ArrowUp')) {
+    const lb = document.getElementById('tab-leaderboard');
+    if(lb && lb.classList.contains('active')) {
+      e.preventDefault();
+      lbPage(e.key==='ArrowDown' ? 1 : -1);
+    }
+  }
 });
+
+// Restore tab from URL hash on load
+(function() {
+  const hash = location.hash.replace('#','');
+  if(hash) {
+    const btn = document.querySelector(`.tab[data-tab="${hash}"]`);
+    if(btn && window.getComputedStyle(btn).display !== 'none') {
+      // Defer until after app init
+      window.addEventListener('load', function() {
+        setTimeout(function() { btn.click(); }, 100);
+      });
+    }
+  }
+})();
 // Delegated click handler for team rows (works on dynamically generated innerHTML)
 document.addEventListener('click', function(e) {
   if(e.target.closest('button,a[onclick],[data-action]')) return; // ignore edit/delete controls inside rows
@@ -3824,6 +5473,9 @@ function switchTab(t, el) {
   el.classList.add('active');
   setSidebarActiveLink(t);
 
+  // Update URL hash for deep linking
+  history.replaceState(null, '', '#' + t);
+
   // Animate out current panel, then swap
   const outgoing = document.querySelector('.panel.active');
   const incoming = document.getElementById('tab-'+t);
@@ -3837,7 +5489,7 @@ function switchTab(t, el) {
     if(t==='predict') { calcProb(); updateTsBadges(); }
     if(t==='routes') renderRoutes();
     if(t==='log') renderLog();
-    if(t==='updates') loadUpdates();
+    if(t==='updates'||t==='roadmap') loadUpdates();
     if(t==='ts-rankings') tsApply();
     document.dispatchEvent(new CustomEvent('tabchange', { detail: { tab: t } }));
   }
@@ -3878,9 +5530,13 @@ function toggleTrueSkillPanel() {
 /* ═══════════════════════════════════════════════════════
    INIT — check if already logged in this session
 ════════════════════════════════════════════════════════ */
-// Restore admin session if JWT is still valid (not expired)
-const storedToken = sessionStorage.getItem('sb_token');
-const storedExp   = parseInt(sessionStorage.getItem('sb_token_exp') || '0');
+// Restore admin session — check sessionStorage first, then localStorage (remember me)
+const storedToken = sessionStorage.getItem('sb_token') ||
+  (localStorage.getItem('os_remember_admin') === '1' ? localStorage.getItem('os_admin_token') : null);
+const storedExp = parseInt(
+  sessionStorage.getItem('sb_token_exp') ||
+  (localStorage.getItem('os_remember_admin') === '1' ? localStorage.getItem('os_admin_exp') : '0') || '0'
+);
 if(storedToken && Date.now() < storedExp) {
   adminToken = storedToken;
   isAdmin = true;
@@ -5536,12 +7192,333 @@ function applyTheme(isLight) {
 }
 
 
-
 // Restore saved theme on load
 (function() {
   const saved = localStorage.getItem('os_theme');
   if (saved === 'light') applyTheme(true);
 })();
+
+/* ═══════════════════════════════════════════════════════
+   SETTINGS — compact mode, per page, scouting, sync, cache
+════════════════════════════════════════════════════════ */
+
+// ── Compact mode ──
+function applyCompactMode(on) {
+  document.body.classList.toggle('compact-mode', on);
+  try { localStorage.setItem('os_compact', on ? '1' : '0'); } catch(e) {}
+  const t = document.getElementById('compactToggle');
+  if (t) t.checked = on;
+}
+
+// ── Entries per page ──
+let LB_PG_OVERRIDE = null;
+function applyPerPage(val) {
+  LB_PG_OVERRIDE = parseInt(val) || 25;
+  try { localStorage.setItem('os_per_page', val); } catch(e) {}
+  const sel = document.getElementById('perPageSelect');
+  if (sel) sel.value = val;
+  lbApplyFilter(lbActiveF);
+}
+
+// Patch lbRender to respect LB_PG_OVERRIDE
+const _origLbRender = lbRender;
+window.lbRender = function() {
+  const pg = LB_PG_OVERRIDE || LB_PG;
+  const start = (lbPg - 1) * pg;
+  const sl = lbFiltered.slice(start, start + pg);
+  const tot = lbFiltered.length, pages = Math.ceil(tot / pg);
+  if (!sl.length) {
+    document.getElementById('lbMain').innerHTML = allTeams.length === 0
+      ? '<div class="empty"><span class="spin"></span><br><br>Loading…</div>'
+      : '<div class="empty">No teams match this filter.</div>';
+    return;
+  }
+  const myTeam = (localStorage.getItem('os_my_team') || '').trim().toUpperCase();
+  const rivals = (localStorage.getItem('os_rivals') || '').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+  document.getElementById('lbMain').innerHTML = `
+    <div style="border:1.5px solid var(--ink);border-radius:var(--radius-lg);overflow:hidden">
+    <div class="tw"><table>
+      <thead><tr>
+        <th style="width:24px;font-family:var(--mono);font-size:11px;color:var(--ink3)">#</th>
+        <th onclick="lbSortBy('team')" id="lbth-team">Team</th>
+        <th onclick="lbSortBy('count')" id="lbth-count">Matches</th>
+        <th onclick="lbSortBy('avg_pins')" id="lbth-avg_pins" class="sorted">Avg Pins ↕</th>
+        <th onclick="lbSortBy('awp_pct')" id="lbth-awp_pct">AWP Rate</th>
+        <th>Robot Type</th>
+      </tr></thead><tbody>
+      ${sl.map((t, i) => {
+        const isMe = myTeam && t.team === myTeam;
+        const isRival = rivals.includes(t.team);
+        const rowStyle = isMe
+          ? 'cursor:pointer;background:rgba(255,210,0,.08);outline:1px solid rgba(255,210,0,.3)'
+          : isRival
+          ? 'cursor:pointer;background:rgba(255,77,26,.07);outline:1px solid rgba(255,77,26,.25)'
+          : 'cursor:pointer';
+        const badge = isMe ? ' 🏠' : isRival ? ' ⚔' : '';
+        return `<tr data-team="${t.team.replace(/"/g,'&quot;')}" style="${rowStyle}">
+          <td style="font-family:var(--mono);font-size:11px;color:var(--ink3)">${start+i+1}</td>
+          <td><span class="tn">${t.team.replace(/</g,'&lt;')}</span>${badge}</td>
+          <td style="font-family:var(--mono)">${t.count}</td>
+          <td style="font-family:var(--mono);font-weight:600">${parseFloat(t.avg_pins).toFixed(1)}</td>
+          <td><div style="display:flex;align-items:center;gap:6px">
+            <span style="font-family:var(--mono);min-width:34px">${(parseFloat(t.awp_pct)||0).toFixed(0)}%</span>
+            <div class="awp-wrap"><div class="awp-fill" style="width:${Math.min(parseFloat(t.awp_pct)||0,100)}%"></div></div>
+          </div></td>
+          <td style="font-size:12px;color:var(--ink2)">${t.types ? t.types.replace(/</g,'&lt;') : ''}</td>
+        </tr>`;
+      }).join('')}
+      </tbody></table></div></div>
+    <div class="lb-card-list">
+      ${sl.map((t, i) => {
+        const isMe = myTeam && t.team === myTeam;
+        const isRival = rivals.includes(t.team);
+        const badge = isMe ? ' 🏠' : isRival ? ' ⚔' : '';
+        const cardClass = isMe ? 'lb-card lb-card-me' : isRival ? 'lb-card lb-card-rival' : 'lb-card';
+        const awp = Math.min(parseFloat(t.awp_pct)||0, 100);
+        return `<div class="${cardClass}" data-team="${t.team.replace(/"/g,'&quot;')}" onclick="openDetail('${t.team.replace(/'/g,"\\'")}')">
+          <div class="lb-card-rank">${start+i+1}</div>
+          <div class="lb-card-body">
+            <div class="lb-card-team">${t.team.replace(/</g,'&lt;')}${badge}</div>
+            <div class="lb-card-meta">${t.types ? t.types.replace(/</g,'&lt;') : '—'}</div>
+            <div class="lb-card-stats">
+              <div class="lb-card-stat"><div class="lb-card-stat-v">${t.count}</div><div class="lb-card-stat-l">Matches</div></div>
+              <div class="lb-card-stat"><div class="lb-card-stat-v">${parseFloat(t.avg_pins).toFixed(1)}</div><div class="lb-card-stat-l">Avg Pins</div></div>
+              <div class="lb-card-stat">
+                <div class="lb-card-awp">
+                  <span class="lb-card-stat-v">${awp.toFixed(0)}%</span>
+                  <div class="lb-card-awp-bar"><div class="lb-card-awp-fill" style="width:${awp}%"></div></div>
+                </div>
+                <div class="lb-card-stat-l">AWP Rate</div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  const pgEl = document.getElementById('lbPager');
+  if (pages > 1) {
+    pgEl.style.display = 'flex';
+    document.getElementById('lbPi').textContent = `Page ${lbPg} of ${pages} (${tot} teams)`;
+    document.getElementById('lbPrev').disabled = lbPg === 1;
+    document.getElementById('lbNext').disabled = lbPg === pages;
+  } else pgEl.style.display = 'none';
+};
+
+// ── My team ──
+function applyMyTeam(val) {
+  val = val.trim().toUpperCase();
+  try { localStorage.setItem('os_my_team', val); } catch(e) {}
+  lbRender();
+}
+
+// ── Rivals ──
+function applyRivals(val) {
+  try { localStorage.setItem('os_rivals', val.toUpperCase()); } catch(e) {}
+  lbRender();
+}
+
+// ── Auto-refresh ──
+let _refreshTimer = null;
+function applyRefreshInterval(val) {
+  try { localStorage.setItem('os_refresh_interval', val); } catch(e) {}
+  clearInterval(_refreshTimer);
+  const secs = parseInt(val);
+  if (secs > 0) {
+    _refreshTimer = setInterval(() => {
+      if (_refreshBannerEnabled) {
+        // Just show banner — don't silently update
+        showRefreshBanner();
+      } else {
+        loadData().then(() => {
+          _lastSyncTime = Date.now();
+          updateSyncTimeDisplay();
+        });
+      }
+    }, secs * 1000);
+  }
+}
+
+// ── Last synced time ──
+let _lastSyncTime = Date.now();
+let _syncTimeTimer = null;
+function updateSyncTimeDisplay() {
+  const show = localStorage.getItem('os_show_sync_time') !== '0';
+  if (!show) return;
+  const el = document.getElementById('syncTxt');
+  if (!el) return;
+  const secs = Math.round((Date.now() - _lastSyncTime) / 1000);
+  const label = secs < 10 ? 'just now' : secs < 60 ? secs + 's ago' : Math.round(secs/60) + 'min ago';
+  if (el.textContent && !el.textContent.includes('Loading')) {
+    const base = el.textContent.split('·')[0].trim();
+    el.textContent = base + ' · ' + label;
+  }
+}
+function applyShowSyncTime(on) {
+  try { localStorage.setItem('os_show_sync_time', on ? '1' : '0'); } catch(e) {}
+  const t = document.getElementById('showSyncTimeToggle');
+  if (t) t.checked = on;
+  clearInterval(_syncTimeTimer);
+  if (on) _syncTimeTimer = setInterval(updateSyncTimeDisplay, 10000);
+}
+
+// ── Clear cache ──
+function clearLocalCache() {
+  if (!confirm('Clear all local browser data for Override Scout? This cannot be undone.')) return;
+  const keys = ['override_scout_v3','ul_changelog_v1','ts_cache','os_theme','os_compact','os_per_page','os_my_team','os_rivals','os_refresh_interval','os_show_sync_time','os_refresh_banner','os_remember_admin','os_admin_token','os_admin_exp'];
+  keys.forEach(k => { try { localStorage.removeItem(k); } catch(e) {} });
+  showToast('Local cache cleared — reloading…', 'ok', 2000);
+  setTimeout(() => location.reload(), 2000);
+}
+
+// ── Reset all settings ──
+function resetAllSettings() {
+  if (!confirm('Reset all settings to defaults?')) return;
+  applyTheme(false);
+  applyCompactMode(false);
+  applyPerPage('25');
+  applyMyTeam('');
+  applyRivals('');
+  applyRefreshInterval('60');
+  applyShowSyncTime(true);
+  applyRefreshBanner(false);
+  applyRememberAdmin(false);
+  loadSettingsFromStorage();
+  showToast('Settings reset to defaults', 'ok', 2500);
+}
+
+// ── Export CSV ──
+function exportCSV() {
+  if (!allTeams.length) { showToast('No data to export yet', 'err', 2500); return; }
+  const headers = ['rank','team','matches','avg_pins','awp_rate_pct','awp_count','success_pct','robot_types','routes','last_scouted'];
+  const rows = allTeams.map((t, i) => [
+    i + 1,
+    t.team,
+    t.count,
+    parseFloat(t.avg_pins).toFixed(2),
+    (parseFloat(t.awp_pct) || 0).toFixed(1),
+    t.awp_count || 0,
+    (parseFloat(t.success_pct) || 0).toFixed(1),
+    '"' + (t.types || '').replace(/"/g, '""') + '"',
+    '"' + (t.routes || '').replace(/"/g, '""') + '"',
+    t.last ? new Date(t.last).toLocaleDateString() : ''
+  ]);
+  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  _downloadFile('override-scout-leaderboard.csv', 'text/csv', csv);
+  showToast('CSV downloaded', 'ok', 2000);
+}
+
+// ── Export JSON ──
+function exportJSON() {
+  if (!allTeams.length) { showToast('No data to export yet', 'err', 2500); return; }
+  const out = allTeams.map((t, i) => ({
+    rank: i + 1,
+    team: t.team,
+    matches: t.count,
+    avg_pins: parseFloat(t.avg_pins),
+    awp_rate_pct: parseFloat(t.awp_pct) || 0,
+    awp_count: t.awp_count || 0,
+    success_pct: parseFloat(t.success_pct) || 0,
+    robot_types: t.types || '',
+    routes: t.routes || '',
+    last_scouted: t.last || null
+  }));
+  _downloadFile('override-scout-leaderboard.json', 'application/json', JSON.stringify(out, null, 2));
+  showToast('JSON downloaded', 'ok', 2000);
+}
+
+function _downloadFile(filename, type, content) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type }));
+  a.download = filename;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+
+// ── Refresh banner ──
+let _refreshBannerEnabled = false;
+let _pendingRefreshData = null;
+
+function applyRefreshBanner(on) {
+  _refreshBannerEnabled = on;
+  try { localStorage.setItem('os_refresh_banner', on ? '1' : '0'); } catch(e) {}
+  const t = document.getElementById('refreshBannerToggle');
+  if (t) t.checked = on;
+  if (!on) document.getElementById('refreshBanner').style.display = 'none';
+}
+
+function showRefreshBanner() {
+  if (!_refreshBannerEnabled) return;
+  const banner = document.getElementById('refreshBanner');
+  banner.style.display = 'flex';
+}
+
+function applyRefreshNow() {
+  document.getElementById('refreshBanner').style.display = 'none';
+  loadData();
+}
+
+// ── Remember admin session ──
+function applyRememberAdmin(on) {
+  try { localStorage.setItem('os_remember_admin', on ? '1' : '0'); } catch(e) {}
+  const t = document.getElementById('rememberAdminToggle');
+  if (t) t.checked = on;
+  // If turning off, remove persisted token
+  if (!on) {
+    try { localStorage.removeItem('os_admin_token'); localStorage.removeItem('os_admin_exp'); } catch(e) {}
+  }
+}
+
+// Hook into login to persist token in localStorage if "remember" is on
+const _origSetItem = window._origSessionSet;
+function _persistAdminToken(token, exp) {
+  if (localStorage.getItem('os_remember_admin') === '1') {
+    try {
+      localStorage.setItem('os_admin_token', token);
+      localStorage.setItem('os_admin_exp', String(exp));
+    } catch(e) {}
+  }
+}
+function loadSettingsFromStorage() {
+  // Compact
+  const compact = localStorage.getItem('os_compact') === '1';
+  applyCompactMode(compact);
+
+  // Per page
+  const pp = localStorage.getItem('os_per_page') || '25';
+  LB_PG_OVERRIDE = parseInt(pp);
+  const ppSel = document.getElementById('perPageSelect');
+  if (ppSel) ppSel.value = pp;
+
+  // My team
+  const myTeam = localStorage.getItem('os_my_team') || '';
+  const myTeamEl = document.getElementById('myTeamInput');
+  if (myTeamEl) myTeamEl.value = myTeam;
+
+  // Rivals
+  const rivals = localStorage.getItem('os_rivals') || '';
+  const rivalsEl = document.getElementById('rivalsInput');
+  if (rivalsEl) rivalsEl.value = rivals;
+
+  // Auto-refresh
+  const interval = localStorage.getItem('os_refresh_interval') ?? '60';
+  const intSel = document.getElementById('refreshIntervalSelect');
+  if (intSel) intSel.value = interval;
+  applyRefreshInterval(interval);
+
+  // Show sync time
+  const showSync = localStorage.getItem('os_show_sync_time') !== '0';
+  applyShowSyncTime(showSync);
+
+  // Refresh banner
+  const banner = localStorage.getItem('os_refresh_banner') === '1';
+  applyRefreshBanner(banner);
+
+  // Remember admin
+  const remEl = document.getElementById('rememberAdminToggle');
+  if (remEl) remEl.checked = localStorage.getItem('os_remember_admin') === '1';
+}
+
+document.addEventListener('DOMContentLoaded', loadSettingsFromStorage);
 
 /* ═══════════════════════════════════════════════════════
    🇮🇱  DONATION POPUP
@@ -5599,6 +7576,45 @@ function applyTheme(isLight) {
   };
 })();
 
+</script>
+
+<script>
+// Pin tabs bar using fixed positioning, accounting for topbar height
+(function() {
+  function pinTabs() {
+    var shell = document.getElementById('appShell');
+    var topbar = shell.querySelector('.topbar');
+    var tabsWrap = shell.querySelector('.tabs-wrap');
+    var shellRect = shell.getBoundingClientRect();
+
+    topbar.style.position = 'fixed';
+    topbar.style.top = '0';
+    topbar.style.left = shellRect.left + 'px';
+    topbar.style.right = '0';
+    topbar.style.zIndex = '50';
+    topbar.style.width = 'auto';
+
+    var topbarH = topbar.offsetHeight;
+
+    tabsWrap.style.position = 'fixed';
+    tabsWrap.style.top = topbarH + 'px';
+    tabsWrap.style.left = shellRect.left + 'px';
+    tabsWrap.style.right = '0';
+    tabsWrap.style.zIndex = '40';
+    tabsWrap.style.width = 'auto';
+
+    var tabsH = tabsWrap.offsetHeight;
+    shell.style.paddingTop = (topbarH + tabsH) + 'px';
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    pinTabs();
+    window.addEventListener('resize', pinTabs);
+    // Re-pin when sidebar toggles (which changes shellRect.left)
+    document.addEventListener('tabchange', pinTabs);
+    document.addEventListener('sidebarToggle', pinTabs);
+  });
+})();
 </script>
 </body>
 </html>
