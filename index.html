@@ -126,6 +126,27 @@ html.light select option{background:var(--surface);color:var(--ink)}
 .settings-row-label{font-size:13px;color:var(--ink);margin-bottom:2px;font-weight:600}
 .settings-row-hint{font-size:11px;color:var(--ink3);font-family:var(--mono)}
 
+/* ── CALCULATOR SIDE-BY-SIDE MODE ── */
+body.calc-sidebyside #calc-sidebyside-wrap {
+  display:flex !important;
+  gap:1rem;
+  align-items:flex-start;
+}
+body.calc-sidebyside #win-prob-col {
+  flex:1;
+  min-width:0;
+}
+body.calc-sidebyside #auton-calc-panel {
+  flex:1;
+  min-width:0;
+  display:block !important;
+}
+@media(max-width:900px) {
+  body.calc-sidebyside #calc-sidebyside-wrap {
+    flex-direction:column;
+  }
+}
+
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:8px;height:8px}
 ::-webkit-scrollbar-track{background:var(--paper2);border-radius:0}
@@ -1312,7 +1333,7 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
     <div class="page">
       <div class="row-bar">
         <input type="text" id="logQ" placeholder="Search team, event, route…" oninput="renderLogDebounced()" style="max-width:260px">
-        <select id="logFil" onchange="renderLog()" style="max-width:150px">
+        <select id="logFil" onchange="logPg=1;renderLog()" style="max-width:150px">
           <option value="">All entries</option>
           <option value="sig">Sig events only</option>
           <option value="awp">AWP achieved</option>
@@ -1348,15 +1369,20 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
           </table>
         </div>
       </div>
+      <div class="pager" id="logPager" style="display:none;margin-top:.5rem">
+        <button class="pb" id="logPrev" onclick="logPageNav(-1)" disabled>← Prev</button>
+        <span class="pi" id="logPi"></span>
+        <button class="pb" id="logNext" onclick="logPageNav(1)">Next →</button>
+      </div>
     </div>
   </div>
 
   <!-- ── WIN PROBABILITY (admin) ── -->
  <div id="tab-predict" class="panel">
-  <div class="page">
+  <div class="page" id="predict-page">
 
-    <!-- True Skill Toggle -->
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
+    <!-- True Skill Toggle + Auton Calculator Toggle -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;flex-wrap:wrap">
       <button
         id="ts-toggle-btn"
         onclick="toggleTrueSkillPanel()"
@@ -1368,6 +1394,17 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
         <span style="font-size:10px;font-family:var(--mono);font-weight:700;color:var(--blue);background:var(--blue-bg);border:1px solid #c0d8f5;border-radius:99px;padding:1px 7px;letter-spacing:.3px;text-transform:uppercase">Experimental</span>
         <span id="ts-toggle-chevron" style="font-size:10px;color:var(--ink3);margin-left:2px;transition:transform .2s">▾</span>
       </button>
+      <button
+        id="auton-calc-toggle-btn"
+        onclick="(function(){var p=document.getElementById('auton-calc-panel');var open=p.style.display==='none'||p.style.display==='';p.style.display=open?'block':'none';var btn=document.getElementById('auton-calc-toggle-btn');btn.setAttribute('aria-pressed',open);btn.style.borderColor=open?'var(--red)':'';btn.style.color=open?'var(--ink)':'';document.getElementById('auton-calc-chevron').style.transform=open?'rotate(180deg)':'rotate(0deg)';})()"
+        style="display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border-radius:var(--radius);font-size:12px;font-family:var(--sans);font-weight:500;cursor:pointer;border:1.5px solid var(--paper3);background:var(--paper2);color:var(--ink2);transition:all .15s"
+        aria-pressed="false"
+      >
+        <span style="font-size:13px">⚡</span>
+        <span>Auton Calculator</span>
+        <span style="font-size:10px;font-family:var(--mono);font-weight:700;color:var(--blue);background:var(--blue-bg);border:1px solid #c0d8f5;border-radius:99px;padding:1px 7px;letter-spacing:.3px;text-transform:uppercase">Experimental</span>
+        <span id="auton-calc-chevron" style="font-size:10px;color:var(--ink3);margin-left:2px;transition:transform .2s">▾</span>
+      </button>
     </div>
 
     <!-- TrueSkill Correlation Panel -->
@@ -1378,6 +1415,10 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
       </div>
     </div>
 
+    <!-- Side-by-side wrapper (flex row when setting enabled) -->
+    <div id="calc-sidebyside-wrap" style="display:contents">
+
+    <div id="win-prob-col">
     <div class="g2" style="margin-bottom:1rem; align-items:start">
       <div class="alliance-panel red-panel" id="predict-red-panel"></div>
       <div class="alliance-panel blue-panel" id="predict-blue-panel"></div>
@@ -1402,6 +1443,185 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
       <div id="outcomeDetail" style="display:none"></div>
 
     </div>
+    </div><!-- /#win-prob-col -->
+
+    <!-- ── AUTON CALCULATOR panel (hidden until toggled) ── -->
+    <div id="auton-calc-panel" style="display:none">
+    <div class="card" style="margin-top:.75rem">
+      <p class="hint" style="margin-bottom:1rem">Enter team numbers to auto-fill stats from the database, or set values manually.</p>
+
+      <!-- Fail Distribution Toggle -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
+        <button
+          id="em-faildist-toggle-btn"
+          onclick="emToggleFailDistPanel()"
+          style="display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border-radius:var(--radius);font-size:12px;font-family:var(--sans);font-weight:500;cursor:pointer;border:1.5px solid var(--paper3);background:var(--paper2);color:var(--ink2);transition:all .15s"
+          aria-pressed="false"
+        >
+          <span style="font-size:13px">📊</span>
+          <span>Standard Distribution Integration</span>
+          <span style="font-size:10px;font-family:var(--mono);font-weight:700;color:var(--volt);background:rgba(200,255,0,.1);border:1px solid rgba(200,255,0,.3);border-radius:99px;padding:1px 7px;letter-spacing:.3px;text-transform:uppercase">New</span>
+          <span id="em-faildist-toggle-chevron" style="font-size:10px;color:var(--ink3);margin-left:2px;transition:transform .2s">▾</span>
+        </button>
+      </div>
+      <div class="g2" style="margin-bottom:1rem;align-items:start">
+        <!-- Red -->
+        <div class="alliance-panel red-panel">
+          <p class="sec" style="color:var(--red)">🔴 Red Alliance</p>
+          <p style="font-size:11px;color:var(--ink3);font-family:var(--mono);margin-bottom:10px">Stats auto-fill from database</p>
+          <div style="background:var(--paper2);border-radius:var(--radius);padding:10px;margin-bottom:10px">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--red);margin-bottom:8px">Robot 1</div>
+            <div style="margin-bottom:4px"><label>Team #</label>
+              <input id="em-r1" placeholder="e.g. 97230F" oninput="emAutoFill('em-r1');syncTeamSlot('em-r1')"></div>
+            <div id="em-r1-pins-normal" style="margin-bottom:8px">
+              <div class="g2">
+                <div><label>Avg G1 pins</label><input type="number" id="em-r1g1" min="0" max="10" value="2" oninput="emCalcProb()"></div>
+                <div><label>Avg G2 pins</label><input type="number" id="em-r1g2" min="0" max="10" value="1" oninput="emCalcProb()"></div>
+              </div>
+            </div>
+            <div class="g2">
+              <div><label>Failure rate %</label><input type="number" id="em-r1fail" min="0" max="100" value="0" oninput="emCalcProb()"></div>
+              <div><label>AWP contrib. %</label><input type="number" id="em-r1awp" min="0" max="100" value="50" oninput="emCalcProb()" style="display:none"></div>
+            </div>
+          </div>
+          <div style="background:var(--paper2);border-radius:var(--radius);padding:10px">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--red);margin-bottom:8px">Robot 2</div>
+            <div style="margin-bottom:4px"><label>Team #</label>
+              <input id="em-r2" placeholder="e.g. 9123X" oninput="emAutoFill('em-r2');syncTeamSlot('em-r2')"></div>
+            <div id="em-r2-pins-normal" style="margin-bottom:8px">
+              <div class="g2">
+                <div><label>Avg G1 pins</label><input type="number" id="em-r2g1" min="0" max="10" value="2" oninput="emCalcProb()"></div>
+                <div><label>Avg G2 pins</label><input type="number" id="em-r2g2" min="0" max="10" value="1" oninput="emCalcProb()"></div>
+              </div>
+            </div>
+            <div class="g2">
+              <div><label>Failure rate %</label><input type="number" id="em-r2fail" min="0" max="100" value="0" oninput="emCalcProb()"></div>
+              <div><label>AWP contrib. %</label><input type="number" id="em-r2awp" min="0" max="100" value="50" oninput="emCalcProb()" style="display:none"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Blue -->
+        <div class="alliance-panel blue-panel">
+          <p class="sec" style="color:var(--blue)">🔵 Blue Alliance</p>
+          <p style="font-size:11px;color:var(--ink3);font-family:var(--mono);margin-bottom:10px">Stats auto-fill from database</p>
+          <div style="background:var(--paper2);border-radius:var(--radius);padding:10px;margin-bottom:10px">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--blue);margin-bottom:8px">Robot 1</div>
+            <div style="margin-bottom:4px"><label>Team #</label>
+              <input id="em-b1" placeholder="e.g. 5678A" oninput="emAutoFill('em-b1');syncTeamSlot('em-b1')"></div>
+            <div id="em-b1-pins-normal" style="margin-bottom:8px">
+              <div class="g2">
+                <div><label>Avg G1 pins</label><input type="number" id="em-b1g1" min="0" max="10" value="2" oninput="emCalcProb()"></div>
+                <div><label>Avg G2 pins</label><input type="number" id="em-b1g2" min="0" max="10" value="1" oninput="emCalcProb()"></div>
+              </div>
+            </div>
+            <div class="g2">
+              <div><label>Failure rate %</label><input type="number" id="em-b1fail" min="0" max="100" value="0" oninput="emCalcProb()"></div>
+              <div><label>AWP contrib. %</label><input type="number" id="em-b1awp" min="0" max="100" value="50" oninput="emCalcProb()" style="display:none"></div>
+            </div>
+          </div>
+          <div style="background:var(--paper2);border-radius:var(--radius);padding:10px">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--blue);margin-bottom:8px">Robot 2</div>
+            <div style="margin-bottom:4px"><label>Team #</label>
+              <input id="em-b2" placeholder="e.g. 9999Z" oninput="emAutoFill('em-b2');syncTeamSlot('em-b2')"></div>
+            <div id="em-b2-pins-normal" style="margin-bottom:8px">
+              <div class="g2">
+                <div><label>Avg G1 pins</label><input type="number" id="em-b2g1" min="0" max="10" value="2" oninput="emCalcProb()"></div>
+                <div><label>Avg G2 pins</label><input type="number" id="em-b2g2" min="0" max="10" value="1" oninput="emCalcProb()"></div>
+              </div>
+            </div>
+            <div class="g2">
+              <div><label>Failure rate %</label><input type="number" id="em-b2fail" min="0" max="100" value="0" oninput="emCalcProb()"></div>
+              <div><label>AWP contrib. %</label><input type="number" id="em-b2awp" min="0" max="100" value="50" oninput="emCalcProb()" style="display:none"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Results -->
+      <div class="card" id="em-probResults">
+        <p class="sec" id="em-mostOutcome">Most probable outcome: —</p>
+        <p class="hint" style="margin-bottom:10px">All 16 possible robot success/failure combinations. Each segment width = probability. Click any segment to see stats.</p>
+        <div class="outcome-legend" id="em-outcomeLegend"></div>
+        <div class="outcome-bar-wrap" id="em-outcomeBar"></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;font-family:var(--mono);color:var(--ink3);margin-bottom:1rem">
+          <span>← Red wins</span><span>Tie zone</span><span>Blue wins →</span>
+        </div>
+        <div id="em-outcomeDetail" style="display:none"></div>
+      </div>
+      <!-- Fail Distribution Panel -->
+      <div id="em-faildist-panel" style="display:none;margin-top:1rem">
+        <div class="card">
+          <p class="sec" style="margin-bottom:4px">📊 Standard Distribution Integration</p>
+          <p class="hint" style="margin-bottom:12px">For each robot, set the probability of scoring each pin count when their auton fails. Percentages must total 100%. The calculator branches each failed robot across all pin possibilities separately — no averaging.</p>
+          <div class="g2" style="align-items:start">
+            <!-- Red -->
+            <div>
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--red);margin-bottom:8px">🔴 Red Alliance</div>
+              <div style="background:var(--paper2);border-radius:var(--radius);padding:10px;margin-bottom:8px">
+                <div style="font-size:11px;font-weight:600;color:var(--ink2);margin-bottom:6px">Robot 1 <span id="em-r1-faildist-name" style="color:var(--ink3);font-weight:400"></span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                  <span style="font-size:11px;color:var(--ink3)">Pins on fail → %</span>
+                  <span id="em-r1-faildist-total" style="font-size:10px;font-family:var(--mono);color:var(--ink3)">0%</span>
+                </div>
+                <div id="em-r1-faildist" style="display:flex;flex-direction:column;gap:3px"></div>
+                <div style="display:flex;gap:4px;margin-top:6px">
+                  <button onclick="emAddFailPin('em-r1')" style="font-size:10px;padding:3px 8px;background:var(--paper3);border:1px solid var(--border2);border-radius:4px;color:var(--ink2);cursor:pointer">+ pin count</button>
+                  <button onclick="emRemoveFailPin('em-r1')" style="font-size:10px;padding:3px 8px;background:var(--paper3);border:1px solid var(--border2);border-radius:4px;color:var(--ink3);cursor:pointer">− remove</button>
+                </div>
+              </div>
+              <div style="background:var(--paper2);border-radius:var(--radius);padding:10px">
+                <div style="font-size:11px;font-weight:600;color:var(--ink2);margin-bottom:6px">Robot 2 <span id="em-r2-faildist-name" style="color:var(--ink3);font-weight:400"></span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                  <span style="font-size:11px;color:var(--ink3)">Pins on fail → %</span>
+                  <span id="em-r2-faildist-total" style="font-size:10px;font-family:var(--mono);color:var(--ink3)">0%</span>
+                </div>
+                <div id="em-r2-faildist" style="display:flex;flex-direction:column;gap:3px"></div>
+                <div style="display:flex;gap:4px;margin-top:6px">
+                  <button onclick="emAddFailPin('em-r2')" style="font-size:10px;padding:3px 8px;background:var(--paper3);border:1px solid var(--border2);border-radius:4px;color:var(--ink2);cursor:pointer">+ pin count</button>
+                  <button onclick="emRemoveFailPin('em-r2')" style="font-size:10px;padding:3px 8px;background:var(--paper3);border:1px solid var(--border2);border-radius:4px;color:var(--ink3);cursor:pointer">− remove</button>
+                </div>
+              </div>
+            </div>
+            <!-- Blue -->
+            <div>
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--blue);margin-bottom:8px">🔵 Blue Alliance</div>
+              <div style="background:var(--paper2);border-radius:var(--radius);padding:10px;margin-bottom:8px">
+                <div style="font-size:11px;font-weight:600;color:var(--ink2);margin-bottom:6px">Robot 1 <span id="em-b1-faildist-name" style="color:var(--ink3);font-weight:400"></span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                  <span style="font-size:11px;color:var(--ink3)">Pins on fail → %</span>
+                  <span id="em-b1-faildist-total" style="font-size:10px;font-family:var(--mono);color:var(--ink3)">0%</span>
+                </div>
+                <div id="em-b1-faildist" style="display:flex;flex-direction:column;gap:3px"></div>
+                <div style="display:flex;gap:4px;margin-top:6px">
+                  <button onclick="emAddFailPin('em-b1')" style="font-size:10px;padding:3px 8px;background:var(--paper3);border:1px solid var(--border2);border-radius:4px;color:var(--ink2);cursor:pointer">+ pin count</button>
+                  <button onclick="emRemoveFailPin('em-b1')" style="font-size:10px;padding:3px 8px;background:var(--paper3);border:1px solid var(--border2);border-radius:4px;color:var(--ink3);cursor:pointer">− remove</button>
+                </div>
+              </div>
+              <div style="background:var(--paper2);border-radius:var(--radius);padding:10px">
+                <div style="font-size:11px;font-weight:600;color:var(--ink2);margin-bottom:6px">Robot 2 <span id="em-b2-faildist-name" style="color:var(--ink3);font-weight:400"></span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                  <span style="font-size:11px;color:var(--ink3)">Pins on fail → %</span>
+                  <span id="em-b2-faildist-total" style="font-size:10px;font-family:var(--mono);color:var(--ink3)">0%</span>
+                </div>
+                <div id="em-b2-faildist" style="display:flex;flex-direction:column;gap:3px"></div>
+                <div style="display:flex;gap:4px;margin-top:6px">
+                  <button onclick="emAddFailPin('em-b2')" style="font-size:10px;padding:3px 8px;background:var(--paper3);border:1px solid var(--border2);border-radius:4px;color:var(--ink2);cursor:pointer">+ pin count</button>
+                  <button onclick="emRemoveFailPin('em-b2')" style="font-size:10px;padding:3px 8px;background:var(--paper3);border:1px solid var(--border2);border-radius:4px;color:var(--ink3);cursor:pointer">− remove</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Quick-fill Add Entry button -->
+      <div class="card" id="em-add-entry-bar" style="display:none;margin-top:1rem">
+        <p class="sec" style="margin-bottom:6px">Log this match</p>
+        <p class="hint" style="margin-bottom:10px">Fill in the Add Entry form for one of these teams with the match number pre-set.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" id="em-add-buttons"></div>
+      </div>
+    </div><!-- /.auton-calculator card -->
+    </div><!-- /#auton-calc-panel -->
+
+    </div><!-- /#calc-sidebyside-wrap -->
     
   </div>
 </div>
@@ -1498,11 +1718,69 @@ segments are sized proportionally to P(outcome).
 Red win %  = Σ P(outcomes where redScore > blueScore)
 Blue win % = Σ P(outcomes where blueScore > redScore)
 Tie %      = Σ P(outcomes where scores are equal)</div>
-        <p class="sec" style="margin-top:1rem">AWP probability</p>
-        <div class="formula-box">AWP% = R1_awp × R2_awp   (per outcome, if both succeed)
+        <p class="sec" style="margin-top:1rem">Win probability (distribution-aware model) <span style="font-size:10px;font-family:var(--mono);color:var(--green);background:var(--green-bg);border:1px solid rgba(61,189,110,.3);border-radius:3px;padding:1px 6px;margin-left:6px">NEW</span></p>
+        <div class="formula-box">Extension of the 16-outcome model that uses each robot's
+Fail Pin Distribution instead of a single fail outcome.
 
-Both robots must succeed AND individually earn AWP.
+On success: robot scores its entered G1 + G2 pins.
+On fail:    robot scores according to its Fail Pin Distribution
+            (empirical discrete distribution, see below).
+
+All outcome combinations are enumerated (cartesian product).
+Each branch has weight = P(succeed) or P(fail) × weight(pins).
+
+For each outcome:
+  P(outcome) = ∏ P(robot_i branch)
+  P(succeed) = 1 − FailRate
+  P(fail, k pins) = FailRate × dist_weight(k)   [normalised to sum=1]
+
+Scores are computed per outcome, then bar segments are
+sized proportionally to P(outcome).
+
+Red win %  = Σ P(outcomes where redScore > blueScore)
+Blue win % = Σ P(outcomes where blueScore > redScore)
+Tie %      = Σ P(outcomes where scores are equal)</div>
+        <p class="sec" style="margin-top:1rem">Fail pin distribution <span style="font-size:10px;font-family:var(--mono);color:var(--green);background:var(--green-bg);border:1px solid rgba(61,189,110,.3);border-radius:3px;padding:1px 6px;margin-left:6px">NEW</span></p>
+        <div class="formula-box">When a robot fails, it may still score partial pins.
+The Fail Pin Distribution models this as a discrete
+empirical distribution entered manually per robot.
+
+Input: % weight for each pin count (0 pins, 1 pin, 2 pins, …)
+       Weights are normalised so they sum to 100%.
+
+Example:
+  0 pins → 60%,  1 pin → 30%,  2 pins → 10%
+  → P(fail, 0 pins) = 0.60 × FailRate
+  → P(fail, 1 pin)  = 0.30 × FailRate
+  → P(fail, 2 pins) = 0.10 × FailRate
+
+If no distribution is entered, fail defaults to 0 pins (100%).
+Each pin count becomes a separate branch in the outcome tree.</div>
+        <p class="sec" style="margin-top:1rem">AWP probability</p>
+        <div class="formula-box">AWP is a deterministic rule, not a per-robot probability.
+
+An alliance earns the Autonomous Win Point if:
+  1. Total alliance pins scored ≥ 7
+  2. At least 3 goals have ≥ 2 pins each
+
+For each outcome scenario the calculator checks whether the alliance's combined
+pin counts satisfy both conditions. The AWP % in the legend is the sum of
+probabilities of all scenarios where the rule is met.
+
 AWP earns WP (ranking pts), NOT autonomous match score.</div>
+        <p class="sec" style="margin-top:1rem">TrueSkill win probability <span style="font-size:10px;font-family:var(--mono);color:var(--green);background:var(--green-bg);border:1px solid rgba(61,189,110,.3);border-radius:3px;padding:1px 6px;margin-left:6px">NEW</span></p>
+        <div class="formula-box">P(A beats B) = Φ( (μA − μB) / √(2β² + σA² + σB²) )
+
+  β = 25/6 ≈ 4.167  (standard TrueSkill β)
+  μ = skill mean,  σ = uncertainty (standard deviation)
+
+Φ(x) = standard normal CDF (Abramowitz &amp; Stegun approx.)
+  — implemented as normalCDF(x), max error &lt; 1.5 × 10⁻⁷
+
+Alliance σ is pooled:  σ_alliance = √((σ₁² + σ₂²) / 2)
+
+Source: Microsoft TrueSkill (Herbrich et al., 2006)
+Data:   vrc-data-analysis.com — VRC Worlds 2026 (1,362 teams)</div>
         <p class="sec" style="margin-top:1rem">Worked example</p>
         <div class="formula-box">Red: R1 → 4 pins total, 0% fail | R2 → 3 pins total, 0% fail
   RawScore = 7 × 5 = 35
@@ -1702,6 +1980,18 @@ With 0% fail rates → P(both succeed) = 100%
           </div>
           <label class="toggle-switch" aria-label="Toggle compact mode">
             <input type="checkbox" id="compactToggle" onchange="applyCompactMode(this.checked)">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <div class="settings-row-label">Side-by-side calculators</div>
+            <div class="settings-row-hint">Show the win probability and auton calculators next to each other on the Predict tab</div>
+          </div>
+          <label class="toggle-switch" aria-label="Toggle side-by-side calculators">
+            <input type="checkbox" id="sideBySideToggle" onchange="applyCalcSideBySide(this.checked)">
             <div class="toggle-track"></div>
             <div class="toggle-thumb"></div>
           </label>
@@ -2186,7 +2476,6 @@ With 0% fail rates → P(both succeed) = 100%
     </div>
     <div class="sched-tabs">
       <button class="sched-tab active" onclick="switchSchedTab('schedule',this)">📋 Match Schedule</button>
-      <button class="sched-tab" onclick="switchSchedTab('calc',this)">⚡ Auton Calculator</button>
     </div>
     <div class="sched-body">
 
@@ -2217,102 +2506,8 @@ With 0% fail rates → P(both succeed) = 100%
         <div id="sched-list"><div class="empty" style="padding:2rem">Load the schedule using your RobotEvents token above.</div></div>
       </div>
 
-      <!-- AUTON CALCULATOR PANEL (embedded, separate IDs prefixed with "em-") -->
-      <div class="sched-panel" id="sched-panel-calc">
-        <div id="sched-match-from" style="display:none;margin-bottom:12px">
-          <div class="selected-match-pill" id="sched-match-pill">No match selected</div>
-          <span style="font-size:11px;color:var(--ink3);margin-left:8px">Teams auto-filled from schedule. Click any match to change.</span>
-        </div>
-        <div class="g2" style="margin-bottom:1rem;align-items:start">
-          <!-- Red -->
-          <div class="alliance-panel red-panel">
-            <p class="sec" style="color:var(--red)">🔴 Red Alliance</p>
-            <p style="font-size:11px;color:var(--ink3);font-family:var(--mono);margin-bottom:10px">Stats auto-fill from database</p>
-            <div style="background:var(--paper2);border-radius:var(--radius);padding:10px;margin-bottom:10px">
-              <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--red);margin-bottom:8px">Robot 1</div>
-              <div style="margin-bottom:4px"><label>Team #</label>
-                <input id="em-r1" placeholder="e.g. 97230F" oninput="emAutoFill('em-r1')"></div>
-              <div id="em-r1-pins-normal" style="margin-bottom:8px">
-                <div class="g2">
-                  <div><label>Avg G1 pins</label><input type="number" id="em-r1g1" min="0" max="10" value="2" oninput="emCalcProb()"></div>
-                  <div><label>Avg G2 pins</label><input type="number" id="em-r1g2" min="0" max="10" value="1" oninput="emCalcProb()"></div>
-                </div>
-              </div>
-              <div class="g2">
-                <div><label>Failure rate %</label><input type="number" id="em-r1fail" min="0" max="100" value="0" oninput="emCalcProb()"></div>
-                <div><label>AWP contrib. %</label><input type="number" id="em-r1awp" min="0" max="100" value="50" oninput="emCalcProb()"></div>
-              </div>
-            </div>
-            <div style="background:var(--paper2);border-radius:var(--radius);padding:10px">
-              <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--red);margin-bottom:8px">Robot 2</div>
-              <div style="margin-bottom:4px"><label>Team #</label>
-                <input id="em-r2" placeholder="e.g. 9123X" oninput="emAutoFill('em-r2')"></div>
-              <div id="em-r2-pins-normal" style="margin-bottom:8px">
-                <div class="g2">
-                  <div><label>Avg G1 pins</label><input type="number" id="em-r2g1" min="0" max="10" value="2" oninput="emCalcProb()"></div>
-                  <div><label>Avg G2 pins</label><input type="number" id="em-r2g2" min="0" max="10" value="1" oninput="emCalcProb()"></div>
-                </div>
-              </div>
-              <div class="g2">
-                <div><label>Failure rate %</label><input type="number" id="em-r2fail" min="0" max="100" value="0" oninput="emCalcProb()"></div>
-                <div><label>AWP contrib. %</label><input type="number" id="em-r2awp" min="0" max="100" value="50" oninput="emCalcProb()"></div>
-              </div>
-            </div>
-          </div>
-          <!-- Blue -->
-          <div class="alliance-panel blue-panel">
-            <p class="sec" style="color:var(--blue)">🔵 Blue Alliance</p>
-            <p style="font-size:11px;color:var(--ink3);font-family:var(--mono);margin-bottom:10px">Stats auto-fill from database</p>
-            <div style="background:var(--paper2);border-radius:var(--radius);padding:10px;margin-bottom:10px">
-              <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--blue);margin-bottom:8px">Robot 1</div>
-              <div style="margin-bottom:4px"><label>Team #</label>
-                <input id="em-b1" placeholder="e.g. 5678A" oninput="emAutoFill('em-b1')"></div>
-              <div id="em-b1-pins-normal" style="margin-bottom:8px">
-                <div class="g2">
-                  <div><label>Avg G1 pins</label><input type="number" id="em-b1g1" min="0" max="10" value="2" oninput="emCalcProb()"></div>
-                  <div><label>Avg G2 pins</label><input type="number" id="em-b1g2" min="0" max="10" value="1" oninput="emCalcProb()"></div>
-                </div>
-              </div>
-              <div class="g2">
-                <div><label>Failure rate %</label><input type="number" id="em-b1fail" min="0" max="100" value="0" oninput="emCalcProb()"></div>
-                <div><label>AWP contrib. %</label><input type="number" id="em-b1awp" min="0" max="100" value="50" oninput="emCalcProb()"></div>
-              </div>
-            </div>
-            <div style="background:var(--paper2);border-radius:var(--radius);padding:10px">
-              <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--blue);margin-bottom:8px">Robot 2</div>
-              <div style="margin-bottom:4px"><label>Team #</label>
-                <input id="em-b2" placeholder="e.g. 9999Z" oninput="emAutoFill('em-b2')"></div>
-              <div id="em-b2-pins-normal" style="margin-bottom:8px">
-                <div class="g2">
-                  <div><label>Avg G1 pins</label><input type="number" id="em-b2g1" min="0" max="10" value="2" oninput="emCalcProb()"></div>
-                  <div><label>Avg G2 pins</label><input type="number" id="em-b2g2" min="0" max="10" value="1" oninput="emCalcProb()"></div>
-                </div>
-              </div>
-              <div class="g2">
-                <div><label>Failure rate %</label><input type="number" id="em-b2fail" min="0" max="100" value="0" oninput="emCalcProb()"></div>
-                <div><label>AWP contrib. %</label><input type="number" id="em-b2awp" min="0" max="100" value="50" oninput="emCalcProb()"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Results -->
-        <div class="card" id="em-probResults">
-          <p class="sec" id="em-mostOutcome">Most probable outcome: —</p>
-          <p class="hint" style="margin-bottom:10px">All 16 possible robot success/failure combinations. Each segment width = probability. Click any segment to see stats.</p>
-          <div class="outcome-legend" id="em-outcomeLegend"></div>
-          <div class="outcome-bar-wrap" id="em-outcomeBar"></div>
-          <div style="display:flex;justify-content:space-between;font-size:10px;font-family:var(--mono);color:var(--ink3);margin-bottom:1rem">
-            <span>← Red wins</span><span>Tie zone</span><span>Blue wins →</span>
-          </div>
-          <div id="em-outcomeDetail" style="display:none"></div>
-        </div>
-        <!-- Quick-fill Add Entry button -->
-        <div class="card" id="em-add-entry-bar" style="display:none">
-          <p class="sec" style="margin-bottom:6px">Log this match</p>
-          <p class="hint" style="margin-bottom:10px">Fill in the Add Entry form for one of these teams with the match number pre-set.</p>
-          <div style="display:flex;gap:8px;flex-wrap:wrap" id="em-add-buttons"></div>
-        </div>
-      </div>
+      <!-- AUTON CALCULATOR PANEL — moved to Win Probability tab -->
+      <div class="sched-panel" id="sched-panel-calc" style="display:none"></div>
 
     </div>
   </div>
@@ -2641,6 +2836,39 @@ function ulSeedNewVersions() {
     { id: 'e_seed_330_15', tag: 'feat', text: 'Remember admin login — optionally persists Supabase JWT to localStorage so admin session survives browser restarts; off by default with a security warning', versionId: 'v_seed_330' },
   ]);
 
+  addVersion('v_seed_340', 'v3.4.0', 'TrueSkill, Normal Distribution &amp; Auton Calc', [
+    { id: 'e_seed_340_1', tag: 'feat', text: '🆕 Standard normal CDF (<code>normalCDF</code>) added — Abramowitz &amp; Stegun polynomial approximation (max error &lt; 1.5×10⁻⁷); shared primitive used by TrueSkill win-probability', versionId: 'v_seed_340' },
+    { id: 'e_seed_340_2', tag: 'feat', text: 'TrueSkill win probability integrated — <code>P(A beats B) = Φ((μA−μB) / √(2β²+σA²+σB²))</code> using Microsoft TrueSkill formula (β = 25/6); alliance σ pooled as RMS of both robots; data from vrc-data-analysis.com (1,362 Worlds teams)', versionId: 'v_seed_340' },
+    { id: 'e_seed_340_3', tag: 'feat', text: 'Fail pin distribution added to auton outcome calculator — each robot can now have an empirical discrete distribution over pin counts on fail (e.g. 60% → 0 pins, 30% → 1 pin, 10% → 2 pins); weights normalised to 100% and each pin count becomes a separate branch in the outcome tree', versionId: 'v_seed_340' },
+    { id: 'e_seed_340_4', tag: 'arch', text: 'Win probability model extended — original 16-outcome (2⁴) model preserved; new distribution-aware model added alongside it, expanding fail branches via cartesian product using each robot\'s discrete pin distribution; defaults to 0 pins on fail when no distribution is set', versionId: 'v_seed_340' },
+    { id: 'e_seed_340_5', tag: 'feat', text: 'Formulas tab updated — new sections for "Fail pin distribution" (NEW) and "TrueSkill win probability" (NEW); win probability section updated to document the distribution-aware outcome model', versionId: 'v_seed_340' },
+  ]);
+
+  addVersion('v_seed_350', 'v3.5.0', 'Auton Calculator Persistence &amp; Distribution Integration', [
+    { id: 'e_seed_350_1', tag: 'feat', text: 'Auton calculator team numbers now persist across page reloads and tab switches — stored in <code>localStorage</code> under <code>os_em_teams</code>; values are restored on page load and stats are auto-filled immediately', versionId: 'v_seed_350' },
+    { id: 'e_seed_350_2', tag: 'feat', text: 'Clearing the calculator from the schedule modal also wipes the persisted team state, so a manual reset stays reset after reload', versionId: 'v_seed_350' },
+    { id: 'e_seed_350_3', tag: 'feat', text: 'Fail pin distribution integrated into auton outcome calculator — each robot can define a discrete empirical distribution over pin counts scored on fail (e.g. 60% → 0 pins, 30% → 1 pin, 10% → 2 pins); weights are normalised to 100% and each pin count becomes its own branch in the cartesian-product outcome tree', versionId: 'v_seed_350' },
+    { id: 'e_seed_350_4', tag: 'arch', text: 'Outcome tree expanded from fixed 2⁴ (16 branches) to variable cartesian product — branch count scales with each robot\'s distribution size; falls back to 0-pin fail branch when no distribution is entered, preserving existing behaviour', versionId: 'v_seed_350' },
+  ]);
+
+  addVersion('v_seed_360', 'v3.6.0', 'Cross-Block Entry Dragging', [
+    { id: 'e_seed_360_1', tag: 'feat', text: 'Changelog entries can now be dragged between version blocks — drag handle detects which <code>.ul-entries</code> container the cursor is over and inserts the entry there, not just within the original block', versionId: 'v_seed_360' },
+    { id: 'e_seed_360_2', tag: 'feat', text: 'Drop indicator (blue line) follows the cursor across all version blocks during a drag, hiding on the previous block as the cursor moves to a new one', versionId: 'v_seed_360' },
+    { id: 'e_seed_360_3', tag: 'arch', text: '<code>saveUlOrder</code> now also walks every version block after a drop and updates each entry\'s <code>versionId</code> in <code>_ulState.edits</code> to match its current block — persists cross-block moves to Supabase correctly', versionId: 'v_seed_360' },
+  ]);
+
+  addVersion('v_seed_370', 'v3.7.0', 'Side-by-Side Calculator View', [
+    { id: 'e_seed_370_1', tag: 'feat', text: 'New setting: "Side-by-side calculators" — when enabled, the win probability calculator and auton calculator are shown as a flex row on the Predict tab instead of stacked; automatically opens the auton calculator panel when toggled on', versionId: 'v_seed_370' },
+    { id: 'e_seed_370_2', tag: 'feat', text: 'Setting persisted to <code>localStorage</code> under <code>os_calc_sidebyside</code> and restored on page load; resets to off with "Reset all settings"', versionId: 'v_seed_370' },
+    { id: 'e_seed_370_3', tag: 'arch', text: 'Layout collapses back to stacked on viewports below 900px so the side-by-side view doesn\'t break on mobile or narrow windows', versionId: 'v_seed_370' },
+  ]);
+
+  addVersion('v_seed_380', 'v3.8.0', 'Auton Fail Rate Consistency Fix', [
+    { id: 'e_seed_380_1', tag: 'fix', text: 'Auton fail % now matches between the win probability and auton outcome calculators for the same robot — both now compute fail rate from all scouted entries rather than the SAWP-filtered subset, since a failed auton is a failed auton regardless of route mode', versionId: 'v_seed_380' },
+    { id: 'e_seed_380_2', tag: 'feat', text: 'Team numbers are now linked across both calculators — typing a team in either the win probability calculator or the auton outcome calculator syncs it to the same slot in the other calculator and triggers autofill in both', versionId: 'v_seed_380' },
+    { id: 'e_seed_380_3', tag: 'arch', text: 'Unified team persistence: both calculators now save under the same <code>os_em_teams</code> key (keyed by slot ID r1/r2/b1/b2); on restore, both calculators are populated simultaneously; clear button now also resets win-probability team inputs', versionId: 'v_seed_380' },
+  ]);
+
   if (changed) {
     state.edits       = edits;
     state.vblock_edits = vblocks;
@@ -2677,7 +2905,7 @@ function debounce(fn, wait) {
   return function(...args) { clearTimeout(timer); timer = setTimeout(() => fn.apply(this, args), wait); };
 }
 const tsApplyDebounced   = debounce(() => tsApply(),   150);
-const renderLogDebounced = debounce(() => renderLog(),  150);
+const renderLogDebounced = debounce(() => { logPg = 1; renderLog(); }, 150);
 
 // Admin auth token — set after Supabase login, cleared on logout
 let adminToken = null;
@@ -3743,10 +3971,10 @@ async function saveUpdates() {
       e.stopPropagation();
       handle.setPointerCapture(e.pointerId);
 
-      var container = el.closest('.ul-entries');
       var rect = el.getBoundingClientRect();
       _dragEl = el;
-      _dragEl._entryContainer = container;
+      _dragEl._entryContainer = el.closest('.ul-entries');
+      _dragEl._activeEntryContainer = _dragEl._entryContainer;
 
       _dragGhost = el.cloneNode(true);
       _dragGhost.style.cssText =
@@ -3755,9 +3983,6 @@ async function saveUpdates() {
         'box-shadow:0 4px 16px rgba(0,0,0,.4);background:var(--surface2);border:1px solid var(--border2);';
       document.body.appendChild(_dragGhost);
       el.style.opacity = '0.3';
-
-      var ind = getEntryIndicator(container);
-      ind.style.display = 'block';
     });
 
     handle.addEventListener('pointermove', function(e) {
@@ -3766,16 +3991,38 @@ async function saveUpdates() {
       _dragGhost.style.left = (e.clientX - (el.getBoundingClientRect().width / 2)) + 'px';
       _dragGhost.style.top  = (e.clientY - 14) + 'px';
 
-      var container = _dragEl._entryContainer;
-      var siblings = Array.from(container.querySelectorAll(':scope > .ul-entry.ul-draggable')).filter(function(i) { return i !== _dragEl; });
+      // Find which .ul-entries container the cursor is hovering over
+      var allContainers = Array.from(document.querySelectorAll('#ul-dynamic-wrap .ul-entries'));
+      var hoveredContainer = null;
+      for (var ci = 0; ci < allContainers.length; ci++) {
+        var cr = allContainers[ci].getBoundingClientRect();
+        // Extend hit area: accept if cursor is within horizontal bounds and within 24px vertically
+        if (e.clientX >= cr.left && e.clientX <= cr.right &&
+            e.clientY >= cr.top - 24 && e.clientY <= cr.bottom + 24) {
+          hoveredContainer = allContainers[ci];
+          break;
+        }
+      }
+      // Fall back to the original container if cursor isn't over any block
+      if (!hoveredContainer) hoveredContainer = _dragEl._entryContainer;
+
+      // Hide indicator on previous container if it changed
+      if (_dragEl._activeEntryContainer && _dragEl._activeEntryContainer !== hoveredContainer) {
+        var oldInd = getEntryIndicator(_dragEl._activeEntryContainer);
+        oldInd.style.display = 'none';
+        oldInd._insertTarget = null;
+      }
+      _dragEl._activeEntryContainer = hoveredContainer;
+
+      var siblings = Array.from(hoveredContainer.querySelectorAll(':scope > .ul-entry.ul-draggable')).filter(function(i) { return i !== _dragEl; });
       var target = null, before = true;
       for (var i = 0; i < siblings.length; i++) {
         var r = siblings[i].getBoundingClientRect();
         if (e.clientY < r.top + r.height / 2) { target = siblings[i]; before = true; break; }
         else { target = siblings[i]; before = false; }
       }
-      var ind = getEntryIndicator(container);
-      var cRect = container.getBoundingClientRect();
+      var ind = getEntryIndicator(hoveredContainer);
+      var cRect = hoveredContainer.getBoundingClientRect();
       if (target) {
         var tr = target.getBoundingClientRect();
         ind.style.display = 'block';
@@ -3783,21 +4030,40 @@ async function saveUpdates() {
         ind._insertTarget = target;
         ind._insertBefore = before;
       } else {
-        ind.style.display = 'none';
+        // No siblings or cursor is below all — append to bottom of container
+        ind.style.display = 'block';
+        ind.style.top = (hoveredContainer.getBoundingClientRect().bottom - cRect.top - 1) + 'px';
         ind._insertTarget = null;
+        ind._insertBefore = false;
+        ind._appendTo = hoveredContainer;
       }
     });
 
     handle.addEventListener('pointerup', function() {
       if (!_dragEl || _dragEl !== el) return;
-      var container = _dragEl._entryContainer;
+      var container = _dragEl._activeEntryContainer || _dragEl._entryContainer;
       var ind = getEntryIndicator(container);
+
       if (ind._insertTarget) {
         if (ind._insertBefore) container.insertBefore(_dragEl, ind._insertTarget);
         else ind._insertTarget.after(_dragEl);
+      } else if (ind._appendTo) {
+        ind._appendTo.appendChild(_dragEl);
       }
-      ind.style.display = 'none';
-      ind._insertTarget = null;
+
+      // If entry moved to a different version block, update its versionId in state
+      var newVid = container.closest('.ul-version-block') && container.closest('.ul-version-block').getAttribute('data-ul-vid');
+      var entryId = _dragEl.dataset.ulId;
+      if (newVid && entryId && window._ulState && window._ulState.edits && window._ulState.edits[entryId]) {
+        window._ulState.edits[entryId].versionId = newVid;
+      }
+
+      // Hide all entry indicators
+      document.querySelectorAll('#ul-dynamic-wrap .ul-entries').forEach(function(c) {
+        var i = _entryIndicators.get(c);
+        if (i) { i.style.display = 'none'; i._insertTarget = null; i._appendTo = null; }
+      });
+
       if (_dragEl) _dragEl.style.opacity = '';
       if (_dragGhost) _dragGhost.remove();
       _dragEl = null; _dragGhost = null;
@@ -3844,6 +4110,19 @@ async function saveUpdates() {
       else if (divId) order.push({ type: 'divider', id: divId });
     });
     window._ulState.order = order;
+
+    // Persist entry order within each version block (supports cross-block drags)
+    wrap.querySelectorAll('.ul-version-block').forEach(function(vb) {
+      var vid = vb.getAttribute('data-ul-vid');
+      if (!vid) return;
+      vb.querySelectorAll(':scope .ul-entries > .ul-entry[data-ul-id]').forEach(function(row) {
+        var eid = row.getAttribute('data-ul-id');
+        if (!eid || !window._ulState.edits) return;
+        if (!window._ulState.edits[eid]) window._ulState.edits[eid] = {};
+        window._ulState.edits[eid].versionId = vid;
+      });
+    });
+
     ulStateSave();
   }
 
@@ -4041,6 +4320,9 @@ function lbApplyFilter(f) {
     lbSortC='avg_pins'; lbSortD=1;
     lbFiltered=[...allTeams];
   }
+  // Skip DOM work when the leaderboard tab isn't visible; switchTab will flush.
+  if (!_isTabActive('leaderboard')) { _lbDirty = true; return; }
+  _lbDirty = false;
   lbSortRender();
 }
 function lbSortBy(col) {
@@ -4606,59 +4888,93 @@ function showMsg(id, txt, type) {
 /* ═══════════════════════════════════════════════════════
    ADMIN — SCOUT LOG
 ════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════
+   SCOUT LOG — paginated render
+   LOG_PG rows per page; only renders DOM when tab is active.
+════════════════════════════════════════════════════════ */
+const LOG_PG = 50;
+let logPg = 1;
+let _logDirty = false; // true when data changed but tab isn't visible
+let _lbDirty  = false; // true when leaderboard data changed but tab isn't visible
+
+function _isTabActive(tabId) {
+  return document.getElementById('tab-' + tabId)?.classList.contains('active');
+}
+
 function renderLog() {
-  const q=(document.getElementById('logQ')?.value||'').toLowerCase();
-  const fil=document.getElementById('logFil')?.value||'';
-  const rows=allEntries.filter(e=>{
-    if(q&&![e.team,e.event,e.round,e.side,e.type,e.route,e.pins,e.notes,e.awp,e.sig].some(v=>(v||'').toLowerCase().includes(q))) return false;
-    if(fil==='sig'&&e.sig!=='yes') return false;
-    if(fil==='awp'&&e.awp!=='Y') return false;
+  // If the log tab isn't visible, mark dirty and bail — switchTab will call us.
+  if (!_isTabActive('log')) { _logDirty = true; return; }
+  _logDirty = false;
+
+  const q   = (document.getElementById('logQ')?.value || '').toLowerCase();
+  const fil = document.getElementById('logFil')?.value || '';
+
+  const rows = allEntries.filter(e => {
+    if (q && ![e.team, e.event, e.round, e.side, e.type, e.route, e.pins, e.notes, e.awp, e.sig]
+               .some(v => (v || '').toLowerCase().includes(q))) return false;
+    if (fil === 'sig' && e.sig !== 'yes') return false;
+    if (fil === 'awp' && e.awp !== 'Y') return false;
     return true;
   });
-  const teams=new Set(allEntries.map(e=>e.team)).size;
-  const awps=allEntries.filter(e=>e.awp==='Y').length;
-  const avg=allEntries.length?(allEntries.reduce((s,e)=>s+pins(e),0)/allEntries.length).toFixed(1):'—';
-  document.getElementById('logCards').innerHTML=`
+
+  // Summary cards (always uses full allEntries, not filtered slice)
+  const teams = new Set(allEntries.map(e => e.team)).size;
+  const awps  = allEntries.filter(e => e.awp === 'Y').length;
+  const avg   = allEntries.length
+    ? (allEntries.reduce((s, e) => s + pins(e), 0) / allEntries.length).toFixed(1)
+    : '—';
+  document.getElementById('logCards').innerHTML = `
     <div class="mc"><div class="mc-l">Entries</div><div class="mc-v">${allEntries.length}</div></div>
     <div class="mc"><div class="mc-l">Teams</div><div class="mc-v">${teams}</div></div>
     <div class="mc"><div class="mc-l">Avg pins</div><div class="mc-v">${avg}</div></div>
     <div class="mc"><div class="mc-l">AWP achieved</div><div class="mc-v">${awps}</div></div>`;
 
-  // Build set of local entry IDs for fast lookup
-  const localIds = new Set(localDb.map(e=>String(e.id)));
-
-  // Update local cache banner and button
+  // Local cache banner
+  const localIds  = new Set(localDb.map(e => String(e.id)));
   const cacheCard = document.getElementById('localCacheCard');
   const cacheBtn  = document.getElementById('clearCacheBtn');
-  if(localDb.length > 0) {
-    if(cacheCard) { cacheCard.style.display='block'; document.getElementById('localCacheCount').textContent=localDb.length; }
-    if(cacheBtn)  cacheBtn.style.display='';
+  if (localDb.length > 0) {
+    if (cacheCard) { cacheCard.style.display = 'block'; document.getElementById('localCacheCount').textContent = localDb.length; }
+    if (cacheBtn)  cacheBtn.style.display = '';
   } else {
-    if(cacheCard) cacheCard.style.display='none';
-    if(cacheBtn)  cacheBtn.style.display='none';
+    if (cacheCard) cacheCard.style.display = 'none';
+    if (cacheBtn)  cacheBtn.style.display = 'none';
   }
 
-  if(!rows.length){ document.getElementById('logBody').innerHTML=`<tr><td colspan="13" class="empty">No entries yet.</td></tr>`; return; }
-  document.getElementById('logBody').innerHTML=rows.map(e=>{
+  if (!rows.length) {
+    document.getElementById('logBody').innerHTML = `<tr><td colspan="13" class="empty">No entries yet.</td></tr>`;
+    document.getElementById('logPager').style.display = 'none';
+    return;
+  }
+
+  // Clamp page to valid range after filter changes
+  const pages = Math.ceil(rows.length / LOG_PG);
+  if (logPg > pages) logPg = pages;
+  if (logPg < 1)     logPg = 1;
+
+  const start  = (logPg - 1) * LOG_PG;
+  const pageRows = rows.slice(start, start + LOG_PG);
+
+  document.getElementById('logBody').innerHTML = pageRows.map(e => {
     const isLocal = localIds.has(String(e.id));
     const rawTs = e.ts || e.created_at || '';
     const tsDisplay = rawTs ? (() => {
       const d = new Date(rawTs);
-      if(isNaN(d)) return rawTs.slice(0,10) || '—';
-      const pad = n => String(n).padStart(2,'0');
-      return d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'2-digit'})
+      if (isNaN(d)) return rawTs.slice(0, 10) || '—';
+      const pad = n => String(n).padStart(2, '0');
+      return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: '2-digit' })
              + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
     })() : '—';
-    return `<tr${isLocal?' style="background:rgba(122,92,0,.06)"':''}>
+    return `<tr${isLocal ? ' style="background:rgba(122,92,0,.06)"' : ''}>
     <td style="text-align:center"><input type="checkbox" class="log-row-cb" data-id="${esc(e.id)}" onchange="logUpdateBatchBar()" style="width:auto;margin:0"></td>
-    <td><strong>${esc(e.team)}</strong>${isLocal?' <span class="badge" style="background:var(--amber-bg);color:var(--amber);border:1px solid #f0d070;font-size:10px">Local</span>':''}</td>
-    <td>${esc(e.event||'—')} ${e.sig==='yes'?'<span class="badge b-sig">Sig</span>':''}</td>
-    <td>${esc(e.round||'—')}</td><td>${esc(e.side||'—')}</td><td>${esc(e.type||'—')}</td>
-    <td><code>${esc(e.route||'—')}</code></td>
-    <td>${esc(e.pins||'0')}${e.maxpins?' / '+esc(e.maxpins):''}</td>
-    <td>${parseInt(e.bonuses)||0}</td>
-    <td><span class="badge ${e.awp==='Y'?'b-awp':e.awp==='?'?'b-q':'b-no'}">${esc(e.awp||'N')}</span></td>
-    <td style="max-width:160px;font-size:12px;color:var(--ink2)">${esc(e.notes||'')}</td>
+    <td><strong>${esc(e.team)}</strong>${isLocal ? ' <span class="badge" style="background:var(--amber-bg);color:var(--amber);border:1px solid #f0d070;font-size:10px">Local</span>' : ''}</td>
+    <td>${esc(e.event || '—')} ${e.sig === 'yes' ? '<span class="badge b-sig">Sig</span>' : ''}</td>
+    <td>${esc(e.round || '—')}</td><td>${esc(e.side || '—')}</td><td>${esc(e.type || '—')}</td>
+    <td><code>${esc(e.route || '—')}</code></td>
+    <td>${esc(e.pins || '0')}${e.maxpins ? ' / ' + esc(e.maxpins) : ''}</td>
+    <td>${parseInt(e.bonuses) || 0}</td>
+    <td><span class="badge ${e.awp === 'Y' ? 'b-awp' : e.awp === '?' ? 'b-q' : 'b-no'}">${esc(e.awp || 'N')}</span></td>
+    <td style="max-width:160px;font-size:12px;color:var(--ink2)">${esc(e.notes || '')}</td>
     <td style="font-family:var(--mono);font-size:11px;color:var(--ink3);white-space:nowrap">${tsDisplay}</td>
     <td style="display:flex;gap:4px;align-items:center">
       <button class="btn btn-sm" onclick="openEditEntryModal('${esc(e.id)}')" title="Edit entry">✏</button>
@@ -4666,6 +4982,24 @@ function renderLog() {
     </td>
   </tr>`;
   }).join('');
+
+  // Pager
+  const pager = document.getElementById('logPager');
+  if (pages > 1) {
+    pager.style.display = 'flex';
+    document.getElementById('logPi').textContent = `Page ${logPg} of ${pages} (${rows.length} entries)`;
+    document.getElementById('logPrev').disabled = logPg === 1;
+    document.getElementById('logNext').disabled = logPg === pages;
+  } else {
+    pager.style.display = 'none';
+  }
+}
+
+function logPageNav(dir) {
+  logPg += dir;
+  renderLog();
+  // Scroll log table into view smoothly
+  document.getElementById('tab-log')?.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 /* ── Scout Log batch delete helpers ── */
@@ -4908,12 +5242,12 @@ function autoFill(id) {
   const avgG1=src.reduce((s,e)=>{const p=(e.pins||'0').split('+');return s+(parseInt(p[0])||0);},0)/src.length;
   const avgG2=src.reduce((s,e)=>{const p=(e.pins||'0').split('+');return s+(parseInt(p[1])||0);},0)/src.length;
   const awpRate=Math.round(src.filter(e=>e.awp==='Y').length/src.length*100);
-  const knownEntries=src.filter(e=>e.failed==='Y'||e.failed==='N');
+  // Fail rate uses all entries (not SAWP-filtered) so both calculators stay consistent
+  const knownEntries=ms.filter(e=>e.failed==='Y'||e.failed==='N');
   const failRate=knownEntries.length ? Math.round(knownEntries.filter(e=>e.failed==='Y').length/knownEntries.length*100) : 0;
 
   const g1m={r1:'r1g1',r2:'r2g1',b1:'b1g1',b2:'b2g1'};
   const g2m={r1:'r1g2',r2:'r2g2',b1:'b1g2',b2:'b2g2'};
-  const am={r1:'r1awp',r2:'r2awp',b1:'b1awp',b2:'b2awp'};
   const fm={r1:'r1fail',r2:'r2fail',b1:'b1fail',b2:'b2fail'};
 
   if(useSawp) {
@@ -4926,19 +5260,19 @@ function autoFill(id) {
     const ownG2el  = document.getElementById(id+'-own-g2');
     const allyG1el = document.getElementById(id+'-ally-g1');
     const allyG2el = document.getElementById(id+'-ally-g2');
-    if(ownG1el)  ownG1el.value  = avgOwnG1.toFixed(1);
-    if(ownG2el)  ownG2el.value  = avgOwnG2.toFixed(1);
-    if(allyG1el) allyG1el.value = avgAllyG1.toFixed(1);
-    if(allyG2el) allyG2el.value = avgAllyG2.toFixed(1);
+    if(ownG1el)  ownG1el.value  = Math.round(avgOwnG1);
+    if(ownG2el)  ownG2el.value  = Math.round(avgOwnG2);
+    if(allyG1el) allyG1el.value = Math.round(avgAllyG1);
+    if(allyG2el) allyG2el.value = Math.round(avgAllyG2);
     // g1/g2 for calcProb = total across both quadrants
-    if(g1m[id]) document.getElementById(g1m[id]).value = (avgOwnG1 + avgAllyG1).toFixed(1);
-    if(g2m[id]) document.getElementById(g2m[id]).value = (avgOwnG2 + avgAllyG2).toFixed(1);
+    if(g1m[id]) document.getElementById(g1m[id]).value = Math.round(avgOwnG1 + avgAllyG1);
+    if(g2m[id]) document.getElementById(g2m[id]).value = Math.round(avgOwnG2 + avgAllyG2);
   } else {
     // Only write if the field isn't locked by a partner's SAWP mode
     const g1el = g1m[id] ? document.getElementById(g1m[id]) : null;
     const g2el = g2m[id] ? document.getElementById(g2m[id]) : null;
-    if(g1el && !g1el.disabled) g1el.value = avgG1.toFixed(1);
-    if(g2el && !g2el.disabled) g2el.value = avgG2.toFixed(1);
+    if(g1el && !g1el.disabled) g1el.value = Math.round(avgG1);
+    if(g2el && !g2el.disabled) g2el.value = Math.round(avgG2);
   }
 
   // Toggle the visible pin section
@@ -4946,7 +5280,6 @@ function autoFill(id) {
   const sawpSec   = document.getElementById(id+'-pins-sawp');
   if(normalSec) normalSec.style.display = useSawp ? 'none' : 'block';
   if(sawpSec)   sawpSec.style.display   = useSawp ? 'block' : 'none';
-  if(am[id])  document.getElementById(am[id]).value=awpRate;
   if(fm[id])  document.getElementById(fm[id]).value=failRate;
 
   // Update the stats badge shown under the toggle
@@ -5017,8 +5350,8 @@ function syncSawpPins(id) {
   const totalG2 = v(id+'-own-g2') + v(id+'-ally-g2');
   const g1map = {r1:'r1g1',r2:'r2g1',b1:'b1g1',b2:'b2g1'};
   const g2map = {r1:'r1g2',r2:'r2g2',b1:'b1g2',b2:'b2g2'};
-  if(g1map[id]) document.getElementById(g1map[id]).value = totalG1.toFixed(1);
-  if(g2map[id]) document.getElementById(g2map[id]).value = totalG2.toFixed(1);
+  if(g1map[id]) document.getElementById(g1map[id]).value = Math.round(totalG1);
+  if(g2map[id]) document.getElementById(g2map[id]).value = Math.round(totalG2);
   calcProb();
 }
 
@@ -5106,17 +5439,25 @@ function outcomeColour(winner, index, margin) {
 function calcProb() {
   const nv = id => parseFloat(document.getElementById(id)?.value) || 0;
 
-  // Per-robot inputs
+  // Per-robot inputs — no AWP % input; AWP is computed from the rule
   const robots = [
-    { id:'r1', side:'red',  g1:nv('r1g1'), g2:nv('r1g2'), fail:nv('r1fail')/100, awp:nv('r1awp')/100,
+    { id:'r1', side:'red',  g1:nv('r1g1'), g2:nv('r1g2'), fail:nv('r1fail')/100,
       label: (document.getElementById('r1')?.value.trim().toUpperCase() || 'R1') },
-    { id:'r2', side:'red',  g1:nv('r2g1'), g2:nv('r2g2'), fail:nv('r2fail')/100, awp:nv('r2awp')/100,
+    { id:'r2', side:'red',  g1:nv('r2g1'), g2:nv('r2g2'), fail:nv('r2fail')/100,
       label: (document.getElementById('r2')?.value.trim().toUpperCase() || 'R2') },
-    { id:'b1', side:'blue', g1:nv('b1g1'), g2:nv('b1g2'), fail:nv('b1fail')/100, awp:nv('b1awp')/100,
+    { id:'b1', side:'blue', g1:nv('b1g1'), g2:nv('b1g2'), fail:nv('b1fail')/100,
       label: (document.getElementById('b1')?.value.trim().toUpperCase() || 'B1') },
-    { id:'b2', side:'blue', g1:nv('b2g1'), g2:nv('b2g2'), fail:nv('b2fail')/100, awp:nv('b2awp')/100,
+    { id:'b2', side:'blue', g1:nv('b2g1'), g2:nv('b2g2'), fail:nv('b2fail')/100,
       label: (document.getElementById('b2')?.value.trim().toUpperCase() || 'B2') },
   ];
+
+  // AWP rule: alliance scores ≥7 total pins AND ≥3 goals with ≥2 pins each
+  function allianceAwp(allianceRobots) {
+    const goals = allianceRobots.flatMap(r => r.succeeds ? [r.g1, r.g2] : [0, 0]);
+    const totalPins = goals.reduce((s, g) => s + g, 0);
+    const goalsWithTwoPlus = goals.filter(g => g >= 2).length;
+    return totalPins >= 7 && goalsWithTwoPlus >= 3;
+  }
 
   // Enumerate all 16 outcomes (each robot succeeds/fails)
   const outcomes = [];
@@ -5144,9 +5485,9 @@ function calcProb() {
     else if (blueRaw > redRaw)  { blueScore += 12; }
     else                        { redScore  += 6; blueScore += 6; }
 
-    // AWP probabilities (only if robot succeeded AND contributes AWP)
-    const redAwpProb  = robotStates.filter(r=>r.side==='red' ).reduce((p,r)=>p*(r.succeeds?r.awp:0),1)*100;
-    const blueAwpProb = robotStates.filter(r=>r.side==='blue').reduce((p,r)=>p*(r.succeeds?r.awp:0),1)*100;
+    // AWP: deterministic rule check per alliance
+    const redAwp  = allianceAwp(robotStates.filter(r => r.side==='red'));
+    const blueAwp = allianceAwp(robotStates.filter(r => r.side==='blue'));
 
     const winner = redScore > blueScore ? 'Red wins' : blueScore > redScore ? 'Blue wins' : 'Tie';
 
@@ -5157,7 +5498,7 @@ function calcProb() {
     outcomes.push({
       mask, probability, robotStates,
       redPins, bluePins, redRaw, blueRaw, redScore, blueScore,
-      redAwpProb, blueAwpProb, winner,
+      redAwp, blueAwp, winner,
       successLabels, failLabels
     });
   }
@@ -5216,13 +5557,17 @@ function calcProb() {
   const redTotal  = outcomes.filter(o=>o.winner==='Red wins').reduce((s,o)=>s+o.probability,0);
   const tieTotal  = outcomes.filter(o=>o.winner==='Tie').reduce((s,o)=>s+o.probability,0);
   const blueTotal = outcomes.filter(o=>o.winner==='Blue wins').reduce((s,o)=>s+o.probability,0);
+  const redAwpTotal  = outcomes.filter(o=>o.redAwp).reduce((s,o)=>s+o.probability,0);
+  const blueAwpTotal = outcomes.filter(o=>o.blueAwp).reduce((s,o)=>s+o.probability,0);
   legend.innerHTML = [
-    { label:'Red wins', colour:'#c8410a', prob:redTotal },
-    { label:'Tie',      colour:'#888888', prob:tieTotal },
-    { label:'Blue wins',colour:'#1a5fb4', prob:blueTotal },
+    { label:'Red wins',  colour:'#c8410a',         prob:redTotal },
+    { label:'Tie',       colour:'#888888',          prob:tieTotal },
+    { label:'Blue wins', colour:'#1a5fb4',          prob:blueTotal },
+    { label:'Red AWP',   colour:'#c8410a',opacity:.55, prob:redAwpTotal },
+    { label:'Blue AWP',  colour:'#1a5fb4',opacity:.55, prob:blueAwpTotal },
   ].map(l=>`
     <div class="outcome-legend-item">
-      <div class="outcome-legend-swatch" style="background:${l.colour}"></div>
+      <div class="outcome-legend-swatch" style="background:${l.colour};${l.opacity?'opacity:'+l.opacity:''}"></div>
       <span>${l.label}: <strong>${(l.prob*100).toFixed(1)}%</strong></span>
     </div>`).join('');
 
@@ -5290,10 +5635,22 @@ function showOutcomeDetail(o, clickedSeg, allOutcomes) {
           : `<span style="color:var(--ink3)">Failed — 0 pins</span>`}
       </div>
       <div style="font-size:10px;color:var(--ink3);font-family:var(--mono);margin-top:2px">
-        Fail rate: ${(r.fail*100).toFixed(0)}% · AWP: ${(r.awp*100).toFixed(0)}%
+        Fail rate: ${(r.fail*100).toFixed(0)}%
       </div>
     </div>`;
   }
+
+  // Compute AWP for each alliance in this outcome using the rule
+  const redRobotsD  = o.robotStates.filter(r=>r.side==='red');
+  const blueRobotsD = o.robotStates.filter(r=>r.side==='blue');
+  function awpCheck(allianceRobots) {
+    const goals = allianceRobots.flatMap(r => r.succeeds ? [r.g1, r.g2] : [0, 0]);
+    const total = goals.reduce((s, g) => s + g, 0);
+    const qualified = goals.filter(g => g >= 2).length;
+    return { met: total >= 7 && qualified >= 3, total, qualified };
+  }
+  const redAwpD  = awpCheck(redRobotsD);
+  const blueAwpD = awpCheck(blueRobotsD);
 
   det.innerHTML = `
     <div class="outcome-detail" style="position:relative">
@@ -5350,11 +5707,11 @@ function showOutcomeDetail(o, clickedSeg, allOutcomes) {
                 <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">Pin pts</span>
                 <span style="font-size:13px;font-weight:600;font-family:var(--mono)">${o.redRaw}</span>
               </div>
-              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0">
-                <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">AWP prob</span>
-                <span style="font-size:13px;font-weight:600;font-family:var(--mono)">${o.redAwpProb.toFixed(1)}%</span>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0" title="≥7 total pins AND ≥3 goals with ≥2 pins each">
+                <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">AWP</span>
+                <span style="font-size:13px;font-weight:600;font-family:var(--mono)">${redAwpD.met?'✅ Yes':'❌ No'} <span style="font-size:10px;color:var(--ink3)">(${redAwpD.total}pins · ${redAwpD.qualified}goals≥2)</span></span>
               </div>
-              <div style="margin-top:8px">${redRobots.map(robotRow).join('')}</div>
+              <div style="margin-top:8px">${redRobotsD.map(robotRow).join('')}</div>
             </div>
 
             <!-- BLUE column -->
@@ -5372,11 +5729,11 @@ function showOutcomeDetail(o, clickedSeg, allOutcomes) {
                 <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">Pin pts</span>
                 <span style="font-size:13px;font-weight:600;font-family:var(--mono)">${o.blueRaw}</span>
               </div>
-              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0">
-                <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">AWP prob</span>
-                <span style="font-size:13px;font-weight:600;font-family:var(--mono)">${o.blueAwpProb.toFixed(1)}%</span>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0" title="≥7 total pins AND ≥3 goals with ≥2 pins each">
+                <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">AWP</span>
+                <span style="font-size:13px;font-weight:600;font-family:var(--mono)">${blueAwpD.met?'✅ Yes':'❌ No'} <span style="font-size:10px;color:var(--ink3)">(${blueAwpD.total}pins · ${blueAwpD.qualified}goals≥2)</span></span>
               </div>
-              <div style="margin-top:8px">${blueRobots.map(robotRow).join('')}</div>
+              <div style="margin-top:8px">${blueRobotsD.map(robotRow).join('')}</div>
             </div>
           </div>
 
@@ -5488,7 +5845,8 @@ function switchTab(t, el) {
     incoming.classList.add('active');
     if(t==='predict') { calcProb(); updateTsBadges(); }
     if(t==='routes') renderRoutes();
-    if(t==='log') renderLog();
+    if(t==='log') { logPg = _logDirty ? 1 : logPg; renderLog(); }
+    if(t==='leaderboard' && _lbDirty) { _lbDirty = false; lbSortRender(); }
     if(t==='updates'||t==='roadmap') loadUpdates();
     if(t==='ts-rankings') tsApply();
     document.dispatchEvent(new CustomEvent('tabchange', { detail: { tab: t } }));
@@ -6301,11 +6659,13 @@ function openSchedModal(evOrId) {
   document.getElementById('sched-match-from').style.display = 'none';
   document.getElementById('em-add-entry-bar').style.display = 'none';
 
-  // Reset calc
+  // Reset calc — clear both calculators
   ['em-r1','em-r2','em-b1','em-b2'].forEach(id => { document.getElementById(id).value = ''; });
+  ['r1','r2','b1','b2'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
   ['em-r1g1','em-r1g2','em-r2g1','em-r2g2','em-b1g1','em-b1g2','em-b2g1','em-b2g2'].forEach(id => { document.getElementById(id).value = 2; });
   ['em-r1fail','em-r2fail','em-b1fail','em-b2fail'].forEach(id => { document.getElementById(id).value = 0; });
   ['em-r1awp','em-r2awp','em-b1awp','em-b2awp'].forEach(id => { document.getElementById(id).value = 50; });
+  try { localStorage.removeItem('os_em_teams'); } catch(e) {}
   emCalcProb();
 
   // Restore token
@@ -6547,9 +6907,9 @@ function emAutoFill(id) {
 
   const avgG1 = src.reduce((s,e)=>{const p=(e.pins||'0').split('+');return s+(parseInt(p[0])||0);},0)/src.length;
   const avgG2 = src.reduce((s,e)=>{const p=(e.pins||'0').split('+');return s+(parseInt(p[1])||0);},0)/src.length;
-  // AWP and fail rates use the same SAWP-filtered src so SAWP runs don't skew them
+  // AWP and fail rates use all entries so they stay consistent with the win-prob calculator
   const awpRate = Math.round(src.filter(e=>e.awp==='Y').length/src.length*100);
-  const knownEntries = src.filter(e=>e.failed==='Y'||e.failed==='N');
+  const knownEntries = ms.filter(e=>e.failed==='Y'||e.failed==='N');
   const failRate = knownEntries.length ? Math.round(knownEntries.filter(e=>e.failed==='Y').length/knownEntries.length*100) : 0;
 
   const g1el = document.getElementById('em-'+suffix+'g1');
@@ -6557,51 +6917,194 @@ function emAutoFill(id) {
   const awpEl = document.getElementById('em-'+suffix+'awp');
   const failEl = document.getElementById('em-'+suffix+'fail');
 
-  if(g1el) g1el.value = avgG1.toFixed(1);
-  if(g2el) g2el.value = avgG2.toFixed(1);
+  if(g1el) g1el.value = Math.round(avgG1);
+  if(g2el) g2el.value = Math.round(avgG2);
   if(awpEl) awpEl.value = awpRate;
   if(failEl) failEl.value = failRate;
   emCalcProb();
 }
 
+function emAddFailPin(robotId) {
+  const container = document.getElementById(robotId + '-faildist');
+  const rows = container.querySelectorAll('.em-faildist-row');
+  const nextPin = rows.length; // 0, 1, 2...
+  const row = document.createElement('div');
+  row.className = 'em-faildist-row';
+  row.style.cssText = 'display:flex;align-items:center;gap:6px';
+  row.innerHTML = `<span style="font-size:11px;font-family:var(--mono);color:var(--ink2);min-width:38px">${nextPin} pin${nextPin!==1?'s':''}</span>
+    <input type="number" min="0" max="100" value="0" step="1"
+      style="width:60px;font-size:12px;padding:3px 6px"
+      oninput="emUpdateFailDistTotal('${robotId}');emCalcProb()">
+    <span style="font-size:10px;color:var(--ink3)">%</span>`;
+  container.appendChild(row);
+  // Auto-open if collapsed
+  const body = document.getElementById(robotId + '-faildist-body');
+  if (body && body.style.display === 'none') {
+    body.style.display = 'block';
+    const chevron = body.previousElementSibling?.querySelector('.em-faildist-chevron');
+    if (chevron) chevron.style.transform = 'rotate(180deg)';
+  }
+  emUpdateFailDistTotal(robotId);
+  emCalcProb();
+}
+
+function emRemoveFailPin(robotId) {
+  const container = document.getElementById(robotId + '-faildist');
+  const rows = container.querySelectorAll('.em-faildist-row');
+  if (rows.length > 0) { rows[rows.length - 1].remove(); }
+  emUpdateFailDistTotal(robotId);
+  emCalcProb();
+}
+
+function emToggleFailDistPanel() {
+  const panel  = document.getElementById('em-faildist-panel');
+  const btn    = document.getElementById('em-faildist-toggle-btn');
+  const chev   = document.getElementById('em-faildist-toggle-chevron');
+  const open   = panel.style.display !== 'none';
+  if (open) {
+    panel.style.display = 'none';
+    btn.style.background   = 'var(--paper2)';
+    btn.style.color        = 'var(--ink2)';
+    btn.style.borderColor  = 'var(--paper3)';
+    btn.setAttribute('aria-pressed','false');
+    chev.style.transform   = '';
+  } else {
+    panel.style.display = 'block';
+    btn.style.background   = 'rgba(200,255,0,.08)';
+    btn.style.color        = 'var(--volt)';
+    btn.style.borderColor  = 'var(--volt)';
+    btn.setAttribute('aria-pressed','true');
+    chev.style.transform   = 'rotate(180deg)';
+    // Sync robot name labels
+    ['r1','r2','b1','b2'].forEach(s => {
+      const team = document.getElementById('em-'+s)?.value?.trim();
+      const lbl  = document.getElementById('em-'+s+'-faildist-name');
+      if (lbl) lbl.textContent = team ? '— '+team : '';
+    });
+  }
+}
+
+function emToggleFailDist(robotId, btn) {
+  const body = document.getElementById(robotId + '-faildist-body');
+  const chevron = btn.querySelector('.em-faildist-chevron');
+  const open = body.style.display === 'none';
+  body.style.display = open ? 'block' : 'none';
+  chevron.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+function emUpdateFailDistTotal(robotId) {
+  const container = document.getElementById(robotId + '-faildist');
+  const inputs = container.querySelectorAll('input');
+  const total = Array.from(inputs).reduce((s, el) => s + (+el.value || 0), 0);
+  const label = document.getElementById(robotId + '-faildist-total');
+  if (label) {
+    const rows = container.querySelectorAll('.em-faildist-row');
+    if (rows.length === 0) {
+      label.textContent = '0%';
+      label.style.color = 'var(--ink3)';
+    } else {
+      label.textContent = 'total: ' + total + '%';
+      label.style.color = Math.abs(total - 100) < 0.01 ? 'var(--green)' : total > 100 ? 'var(--red)' : 'var(--ink3)';
+    }
+  }
+}
+
+function emGetFailDist(robotId) {
+  // Returns array of {pins, weight} normalised to sum=1. Falls back to 0 pins if empty.
+  const container = document.getElementById(robotId + '-faildist');
+  if (!container) return [{pins:0, weight:1}];
+  const rows = container.querySelectorAll('.em-faildist-row');
+  if (!rows.length) return [{pins:0, weight:1}];
+  const entries = Array.from(rows).map((row, i) => ({
+    pins: i,
+    weight: +(row.querySelector('input')?.value || 0)
+  })).filter(e => e.weight > 0);
+  if (!entries.length) return [{pins:0, weight:1}];
+  const total = entries.reduce((s, e) => s + e.weight, 0);
+  return entries.map(e => ({pins: e.pins, weight: e.weight / total}));
+}
+
 function emCalcProb() {
   const robots = [
-    { id:'em-r1', g1:+document.getElementById('em-r1g1')?.value||0, g2:+document.getElementById('em-r1g2')?.value||0, fail:(+document.getElementById('em-r1fail')?.value||0)/100, awp:(+document.getElementById('em-r1awp')?.value||0)/100, alliance:'red' },
-    { id:'em-r2', g1:+document.getElementById('em-r2g1')?.value||0, g2:+document.getElementById('em-r2g2')?.value||0, fail:(+document.getElementById('em-r2fail')?.value||0)/100, awp:(+document.getElementById('em-r2awp')?.value||0)/100, alliance:'red' },
-    { id:'em-b1', g1:+document.getElementById('em-b1g1')?.value||0, g2:+document.getElementById('em-b1g2')?.value||0, fail:(+document.getElementById('em-b1fail')?.value||0)/100, awp:(+document.getElementById('em-b1awp')?.value||0)/100, alliance:'blue' },
-    { id:'em-b2', g1:+document.getElementById('em-b2g1')?.value||0, g2:+document.getElementById('em-b2g2')?.value||0, fail:(+document.getElementById('em-b2fail')?.value||0)/100, awp:(+document.getElementById('em-b2awp')?.value||0)/100, alliance:'blue' },
+    { id:'em-r1', g1:+document.getElementById('em-r1g1')?.value||0, g2:+document.getElementById('em-r1g2')?.value||0, fail:(+document.getElementById('em-r1fail')?.value||0)/100, failDist:emGetFailDist('em-r1'), alliance:'red' },
+    { id:'em-r2', g1:+document.getElementById('em-r2g1')?.value||0, g2:+document.getElementById('em-r2g2')?.value||0, fail:(+document.getElementById('em-r2fail')?.value||0)/100, failDist:emGetFailDist('em-r2'), alliance:'red' },
+    { id:'em-b1', g1:+document.getElementById('em-b1g1')?.value||0, g2:+document.getElementById('em-b1g2')?.value||0, fail:(+document.getElementById('em-b1fail')?.value||0)/100, failDist:emGetFailDist('em-b1'), alliance:'blue' },
+    { id:'em-b2', g1:+document.getElementById('em-b2g1')?.value||0, g2:+document.getElementById('em-b2g2')?.value||0, fail:(+document.getElementById('em-b2fail')?.value||0)/100, failDist:emGetFailDist('em-b2'), alliance:'blue' },
   ];
 
-  const outcomes = [];
-  for(let mask=0;mask<16;mask++){
-    const robotStates = robots.map((r,i)=>{
-      const success = !((mask>>i)&1);
-      return { ...r, success, prob: success?(1-r.fail):r.fail,
-        pinsG1: success?r.g1:0, pinsG2: success?r.g2:0 };
+  // AWP rule: ≥7 total alliance pins AND ≥3 goals with ≥2 pins each
+  function allianceAwp(allianceRobots) {
+    const goals = allianceRobots.flatMap(r => [r.pinsG1, r.pinsG2]);
+    const total  = goals.reduce((s, g) => s + g, 0);
+    const qualified = goals.filter(g => g >= 2).length;
+    return { met: total >= 7 && qualified >= 3, total, qualified };
+  }
+
+  // Build all outcome scenarios via cartesian product.
+  // Each robot contributes: 1 success branch + N fail branches (one per pin count in dist).
+  // Start with a single seed scenario, then expand robot by robot.
+  let scenarios = [{ prob:1, robotStates:[] }];
+  robots.forEach(r => {
+    const next = [];
+    scenarios.forEach(sc => {
+      // Success branch
+      next.push({
+        prob: sc.prob * (1 - r.fail),
+        robotStates: [...sc.robotStates, { ...r, success:true, pinsG1:r.g1, pinsG2:r.g2, failPins:null }]
+      });
+      // Fail branches — one per pin count in distribution
+      r.failDist.forEach(({pins, weight}) => {
+        next.push({
+          prob: sc.prob * r.fail * weight,
+          robotStates: [...sc.robotStates, { ...r, success:false, pinsG1:pins, pinsG2:0, failPins:pins }]
+        });
+      });
     });
+    scenarios = next;
+  });
+
+  // Collapse scenarios into display outcomes (score + winner)
+  const outcomes = scenarios.map(sc => {
+    const robotStates = sc.robotStates;
     const redPins  = robotStates.filter(r=>r.alliance==='red').reduce((s,r)=>s+r.pinsG1+r.pinsG2,0);
     const bluePins = robotStates.filter(r=>r.alliance==='blue').reduce((s,r)=>s+r.pinsG1+r.pinsG2,0);
     const redRaw = redPins*5, blueRaw = bluePins*5;
     let redFinal=redRaw, blueFinal=blueRaw;
     if(redRaw>blueRaw){redFinal+=12;}else if(blueRaw>redRaw){blueFinal+=12;}else{redFinal+=6;blueFinal+=6;}
     const winner = redFinal>blueFinal?'Red wins':blueFinal>redFinal?'Blue wins':'Tie';
-    const prob = robotStates.reduce((p,r)=>p*r.prob,1);
-    const redRobots  = robotStates.filter(r=>r.alliance==='red');
-    const blueRobots = robotStates.filter(r=>r.alliance==='blue');
-    // AWP per alliance: both robots on that alliance must succeed, then multiply their AWP rates
-    const redAwpProb  = redRobots.every(r=>r.success)  ? redRobots.reduce((p,r)=>p*r.awp,1)  : 0;
-    const blueAwpProb = blueRobots.every(r=>r.success) ? blueRobots.reduce((p,r)=>p*r.awp,1) : 0;
-    // Combined AWP: both alliances earn their AWP (treated as independent)
-    const awpProb = redAwpProb * blueAwpProb;
-    outcomes.push({mask,prob,robotStates,redRaw,blueRaw,redFinal,blueFinal,winner,awpProb,
-      redPins,bluePins,margin:Math.abs(redFinal-blueFinal)});
-  }
+    const redA  = allianceAwp(robotStates.filter(r=>r.alliance==='red'));
+    const blueA = allianceAwp(robotStates.filter(r=>r.alliance==='blue'));
+    return { prob:sc.prob, robotStates, redRaw, blueRaw, redFinal, blueFinal, winner,
+      redAwp:redA.met, blueAwp:blueA.met,
+      redAwpDetail:redA, blueAwpDetail:blueA,
+      redPins, bluePins, margin:Math.abs(redFinal-blueFinal) };
+  });
 
-  const totalProb = outcomes.reduce((s,o)=>s+o.prob,0)||1;
-  const mostLikely = [...outcomes].sort((a,b)=>b.prob-a.prob)[0];
-  document.getElementById('em-mostOutcome').textContent = 'Most probable: ' +
-    mostLikely.winner + ' (' + (mostLikely.prob*100).toFixed(1) + '%) — ' +
-    mostLikely.redFinal + ' vs ' + mostLikely.blueFinal;
+  // Merge scenarios with identical scores into single bar segments (for display only)
+  const merged = [];
+  outcomes.forEach(o => {
+    const key = `${o.redFinal}|${o.blueFinal}`;
+    const existing = merged.find(m => `${m.redFinal}|${m.blueFinal}` === key);
+    if (existing) {
+      const oldProb = existing.prob;
+      existing.prob += o.prob;
+      // AWP: treat as probability-weighted (true=1, false=0) for merged display
+      existing.redAwpProb  = (existing.redAwpProb  * oldProb + (o.redAwp  ? o.prob : 0)) / existing.prob;
+      existing.blueAwpProb = (existing.blueAwpProb * oldProb + (o.blueAwp ? o.prob : 0)) / existing.prob;
+    } else {
+      merged.push({...o, redAwpProb: o.redAwp?1:0, blueAwpProb: o.blueAwp?1:0});
+    }
+  });
+
+  // Keep full unmerged list for navigation (preserves all robotStates detail)
+  const allForNav = [...outcomes].filter(o => o.prob > 0.0001);
+  window._emOutcomesBarOrder  = allForNav;
+  window._emOutcomesProbOrder = [...allForNav].sort((a,b) => b.prob - a.prob);
+
+  const totalProb = merged.reduce((s,o)=>s+o.prob,0)||1;
+  const mostLikely = [...merged].sort((a,b)=>b.prob-a.prob)[0];
+  const emWinnerLabel = mostLikely.winner === 'Red wins' ? '🔴 Red' : mostLikely.winner === 'Blue wins' ? '🔵 Blue' : '🤝 Tie';
+  document.getElementById('em-mostOutcome').textContent = 'Most likely to win: ' + emWinnerLabel + ' (' + (mostLikely.prob*100).toFixed(1) + '%)';
 
   // Colour helpers (same as main)
   const emOutcomeColour = (winner, idx, margin) => {
@@ -6611,7 +7114,7 @@ function emCalcProb() {
     return `hsl(213,${40+Math.round(t*55)}%,${58-Math.round(t*18)}%)`;
   };
 
-  const sorted = [...outcomes].sort((a,b)=>{
+  const sorted = [...merged].sort((a,b)=>{
     const wmap={'Red wins':0,'Tie':1,'Blue wins':2};
     const d=(wmap[a.winner]??1)-(wmap[b.winner]??1);
     return d!==0?d:b.prob-a.prob;
@@ -6625,80 +7128,377 @@ function emCalcProb() {
     seg.className='outcome-seg';
     seg.style.cssText=`flex:${pct};background:${emOutcomeColour(o.winner,i,o.margin)};`;
     if(pct>5){const lbl=document.createElement('div');lbl.className='outcome-seg-label';lbl.textContent=pct.toFixed(0)+'%';seg.appendChild(lbl);}
-    seg.onclick=()=>showEmOutcomeDetail(o,pct,totalProb,outcomes);
+    seg.onclick=()=>{
+      document.querySelectorAll('#em-outcomeBar .outcome-seg').forEach(s=>s.classList.remove('selected'));
+      seg.classList.add('selected');
+      // Find the highest-prob unmerged outcome matching this score bucket
+      const match = allForNav
+        .filter(x => x.redFinal === o.redFinal && x.blueFinal === o.blueFinal)
+        .sort((a,b) => b.prob - a.prob)[0] || o;
+      showEmOutcomeDetail(match, pct, totalProb, allForNav);
+    };
     bar.appendChild(seg);
   });
 
+  // Auto-show most likely outcome
+  const mostSeg = bar.children[0];
+  if (mostSeg) mostSeg.click();
+
   // Legend
-  const redPct   = outcomes.filter(o=>o.winner==='Red wins').reduce((s,o)=>s+o.prob,0)/totalProb*100;
-  const tiePct   = outcomes.filter(o=>o.winner==='Tie').reduce((s,o)=>s+o.prob,0)/totalProb*100;
-  const bluePct  = outcomes.filter(o=>o.winner==='Blue wins').reduce((s,o)=>s+o.prob,0)/totalProb*100;
-  const awpTotal = outcomes.reduce((s,o)=>s+o.prob*o.awpProb,0)/totalProb*100;
+  const redPct      = outcomes.filter(o=>o.winner==='Red wins').reduce((s,o)=>s+o.prob,0)/totalProb*100;
+  const tiePct      = outcomes.filter(o=>o.winner==='Tie').reduce((s,o)=>s+o.prob,0)/totalProb*100;
+  const bluePct     = outcomes.filter(o=>o.winner==='Blue wins').reduce((s,o)=>s+o.prob,0)/totalProb*100;
+  const redAwpLeg   = outcomes.filter(o=>o.redAwp).reduce((s,o)=>s+o.prob,0)/totalProb*100;
+  const blueAwpLeg  = outcomes.filter(o=>o.blueAwp).reduce((s,o)=>s+o.prob,0)/totalProb*100;
   document.getElementById('em-outcomeLegend').innerHTML =
     `<span class="outcome-legend-item"><span class="outcome-legend-swatch" style="background:var(--red)"></span>Red ${redPct.toFixed(1)}%</span>
      <span class="outcome-legend-item"><span class="outcome-legend-swatch" style="background:#aaa"></span>Tie ${tiePct.toFixed(1)}%</span>
      <span class="outcome-legend-item"><span class="outcome-legend-swatch" style="background:var(--blue)"></span>Blue ${bluePct.toFixed(1)}%</span>
-     <span class="outcome-legend-item"><span class="outcome-legend-swatch" style="background:var(--green)"></span>AWP ${awpTotal.toFixed(1)}%</span>`;
+     <span class="outcome-legend-item"><span class="outcome-legend-swatch" style="background:var(--red);opacity:.55"></span>Red AWP ${redAwpLeg.toFixed(1)}%</span>
+     <span class="outcome-legend-item"><span class="outcome-legend-swatch" style="background:var(--blue);opacity:.55"></span>Blue AWP ${blueAwpLeg.toFixed(1)}%</span>`;
 }
 
 function showEmOutcomeDetail(o, pct, totalProb, allOutcomes) {
+  // Store state for navigation
+  const mode = window._emOutcomeNavMode || 'prob';
+  const probOrder = [...allOutcomes].sort((a,b)=>b.prob-a.prob);
+  const barOrder  = allOutcomes;
+  window._emOutcomesProbOrder = probOrder;
+  window._emOutcomesBarOrder  = barOrder;
+  const activeList = mode === 'bar' ? barOrder : probOrder;
+  const idx = activeList.indexOf(o);
+  if (idx !== -1) window._emCurrentOutcomeIdx = idx;
+
   const detail = document.getElementById('em-outcomeDetail');
   detail.style.display = 'block';
 
-  // Helper: safely set text on a newly created element
-  const el = (tag, cls, txt) => { const e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; };
+  const rank  = idx + 1;
+  const total = activeList.length;
+  const winColor = o.winner==='Red wins' ? 'var(--red)' : o.winner==='Blue wins' ? 'var(--blue)' : '#777777';
+  const modeLabel = mode === 'bar' ? 'bar order' : 'high→low probability';
 
-  // Static score/stats section is safe to build with innerHTML (no user input)
-  const wrapper = el('div','outcome-detail');
+  const redRobots  = o.robotStates.filter(r=>r.alliance==='red');
+  const blueRobots = o.robotStates.filter(r=>r.alliance==='blue');
 
-  const head = el('div','outcome-detail-head');
-  head.appendChild(el('div','outcome-detail-title', o.winner));
-  head.appendChild(el('div','outcome-detail-prob', pct.toFixed(2)+'% chance'));
-  wrapper.appendChild(head);
+  function emAwpCheck(allianceRobots) {
+    const goals = allianceRobots.flatMap(r => [r.pinsG1, r.pinsG2]);
+    const total  = goals.reduce((s, g) => s + g, 0);
+    const qualified = goals.filter(g => g >= 2).length;
+    return { met: total >= 7 && qualified >= 3, total, qualified };
+  }
+  const redAwpD  = o.redAwpDetail  || emAwpCheck(redRobots);
+  const blueAwpD = o.blueAwpDetail || emAwpCheck(blueRobots);
 
-  const statGrid = el('div','outcome-stat-grid');
-  const stats = [
-    ['Red score',  o.redFinal,                        'color:var(--red)'],
-    ['Blue score', o.blueFinal,                        'color:var(--blue)'],
-    ['Margin',     o.margin+' pts',                    ''],
-    ['AWP prob',   (o.awpProb*100).toFixed(0)+'%',    'color:var(--green)'],
-  ];
-  stats.forEach(([label, value, style])=>{
-    const box = el('div','outcome-stat');
-    box.appendChild(el('div','outcome-stat-l', label));
-    const v = el('div','outcome-stat-v', String(value));
-    if(style) v.style.cssText = style;
-    box.appendChild(v);
-    statGrid.appendChild(box);
-  });
-  wrapper.appendChild(statGrid);
+  function robotRow(r) {
+    const c  = r.alliance==='red' ? 'var(--red)' : 'var(--blue)';
+    const bg = r.alliance==='red' ? 'rgba(200,65,10,.07)' : 'rgba(26,95,180,.07)';
+    const border = r.success ? (r.alliance==='red' ? 'rgba(200,65,10,.2)' : 'rgba(26,95,180,.2)') : 'var(--paper3)';
+    const teamInputId = r.id;
+    const teamName = (document.getElementById(teamInputId)?.value || r.id).replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const label = r.alliance==='red'
+      ? (r.id==='em-r1' ? 'R1' : 'R2')
+      : (r.id==='em-b1' ? 'B1' : 'B2');
+    return `<div style="background:${bg};border-radius:var(--radius);padding:7px 9px;margin-bottom:5px;border:1px solid ${border}">
+      <div style="font-weight:600;font-family:var(--mono);font-size:12px;color:${c};margin-bottom:3px">${label} ${r.success?'✅':'❌'}</div>
+      <div style="font-size:11px;color:var(--ink2)">
+        ${r.success
+          ? `G1: <strong>${r.pinsG1}</strong> · G2: <strong>${r.pinsG2}</strong> · Total: <strong>${r.pinsG1+r.pinsG2}</strong> pins`
+          : `<span style="color:var(--ink3)">Failed — ${r.pinsG1>0?r.pinsG1+' pins':'0 pins'}</span>`}
+      </div>
+      <div style="font-size:10px;color:var(--ink3);font-family:var(--mono);margin-top:2px">
+        Fail rate: ${(r.fail*100).toFixed(0)}%
+      </div>
+    </div>`;
+  }
 
-  // Robot cards — user-supplied team names set via textContent to prevent XSS
-  const robotRow = el('div','outcome-robot-row');
-  o.robotStates.forEach(r => {
-    const card = el('div', 'outcome-robot-card '+(r.success?'success':'fail'));
+  const successLabels = o.robotStates.filter(r=>r.success).map(r=>r.alliance==='red'?(r.id==='em-r1'?'R1':'R2'):(r.id==='em-b1'?'B1':'B2'));
+  const failLabels    = o.robotStates.filter(r=>!r.success).map(r=>r.alliance==='red'?(r.id==='em-r1'?'R1':'R2'):(r.id==='em-b1'?'B1':'B2'));
 
-    const nameDiv = el('div','outcome-robot-name');
-    nameDiv.textContent = (r.alliance==='red'?'🔴':'🔵')+' ';
-    const rawName = document.getElementById('em-'+r.id.replace('em-',''))?.value || r.id;
-    nameDiv.appendChild(document.createTextNode(rawName)); // safe: textNode, not innerHTML
-    card.appendChild(nameDiv);
+  detail.innerHTML = `
+    <div class="outcome-detail" style="position:relative">
 
-    const pinsDiv = el('div','outcome-robot-pins');
-    pinsDiv.textContent = (r.success ? '✅' : '❌') + ' ' +
-      (r.success ? 'G1:'+r.pinsG1+' G2:'+r.pinsG2 : 'Failed');
-    card.appendChild(pinsDiv);
+      <!-- NAV MODE TOGGLE -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:10px;font-size:11px;font-family:var(--mono);color:var(--ink3)">
+        <span>Navigate by:</span>
+        <button onclick="setEmOutcomeNavMode('prob')"
+          style="padding:3px 10px;border-radius:99px;border:1px solid var(--paper3);font-size:11px;font-family:var(--mono);cursor:pointer;transition:all .15s;
+            background:${mode==='prob'?'var(--ink)':'var(--paper2)'};color:${mode==='prob'?'var(--paper)':'var(--ink2)'}">
+          High→Low %
+        </button>
+        <button onclick="setEmOutcomeNavMode('bar')"
+          style="padding:3px 10px;border-radius:99px;border:1px solid var(--paper3);font-size:11px;font-family:var(--mono);cursor:pointer;transition:all .15s;
+            background:${mode==='bar'?'var(--ink)':'var(--paper2)'};color:${mode==='bar'?'var(--paper)':'var(--ink2)'}">
+          Bar order
+        </button>
+      </div>
 
-    robotRow.appendChild(card);
-  });
-  wrapper.appendChild(robotRow);
+      <div style="display:flex;align-items:stretch;gap:0">
+        <!-- LEFT ARROW -->
+        <button onclick="navigateEmOutcome(-1)" title="Previous scenario"
+          style="flex-shrink:0;width:36px;background:var(--ink);color:var(--paper);border:none;border-radius:var(--radius) 0 0 var(--radius);cursor:pointer;font-size:18px;transition:background .15s;display:flex;align-items:center;justify-content:center;">&#8592;</button>
 
-  detail.innerHTML = '';
-  detail.appendChild(wrapper);
+        <!-- MAIN CONTENT -->
+        <div style="flex:1;min-width:0;padding:0 12px">
+
+          <!-- Header row -->
+          <div class="outcome-detail-head">
+            <div>
+              <div class="outcome-detail-title" style="color:${winColor}">${o.winner}</div>
+              <div style="font-size:12px;color:var(--ink3);font-family:var(--mono);margin-top:2px">
+                #${rank} of ${total} (${modeLabel}) · Ran: ${successLabels.join(', ')||'none'}${failLabels.length?' · Failed: '+failLabels.join(', '):''}
+              </div>
+            </div>
+            <div class="outcome-detail-prob">${(o.prob*100).toFixed(2)}% chance</div>
+          </div>
+
+          <!-- Two-column alliance stats -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+
+            <!-- RED column -->
+            <div style="background:rgba(200,65,10,.06);border:1.5px solid rgba(200,65,10,.25);border-radius:var(--radius-lg);padding:10px">
+              <div style="font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.6px;color:var(--red);font-weight:700;margin-bottom:8px">🔴 Red Alliance${o.winner==='Red wins'?' <span style="color:#FFD700;font-size:11px;letter-spacing:.3px">WIN 👑</span>':''}</div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:.5px solid rgba(200,65,10,.15)">
+                <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">Final score</span>
+                <span style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--red)">${o.redFinal}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:.5px solid rgba(200,65,10,.15)">
+                <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">Pins scored</span>
+                <span style="font-size:13px;font-weight:600;font-family:var(--mono);color:var(--red)">${o.redPins}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:.5px solid rgba(200,65,10,.15)">
+                <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">Pin pts</span>
+                <span style="font-size:13px;font-weight:600;font-family:var(--mono)">${o.redRaw}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0" title="≥7 total pins AND ≥3 goals with ≥2 pins each">
+                <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">AWP</span>
+                <span style="font-size:13px;font-weight:600;font-family:var(--mono)">${redAwpD.met?'✅ Yes':'❌ No'} <span style="font-size:10px;color:var(--ink3)">(${redAwpD.total}pins · ${redAwpD.qualified}goals≥2)</span></span>
+              </div>
+              <div style="margin-top:8px">${redRobots.map(robotRow).join('')}</div>
+            </div>
+
+            <!-- BLUE column -->
+            <div style="background:rgba(26,95,180,.06);border:1.5px solid rgba(26,95,180,.25);border-radius:var(--radius-lg);padding:10px">
+              <div style="font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.6px;color:var(--blue);font-weight:700;margin-bottom:8px">🔵 Blue Alliance${o.winner==='Blue wins'?' <span style="color:#FFD700;font-size:11px;letter-spacing:.3px">WIN 👑</span>':''}</div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:.5px solid rgba(26,95,180,.15)">
+                <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">Final score</span>
+                <span style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--blue)">${o.blueFinal}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:.5px solid rgba(26,95,180,.15)">
+                <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">Pins scored</span>
+                <span style="font-size:13px;font-weight:600;font-family:var(--mono);color:var(--blue)">${o.bluePins}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:.5px solid rgba(26,95,180,.15)">
+                <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">Pin pts</span>
+                <span style="font-size:13px;font-weight:600;font-family:var(--mono)">${o.blueRaw}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0" title="≥7 total pins AND ≥3 goals with ≥2 pins each">
+                <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">AWP</span>
+                <span style="font-size:13px;font-weight:600;font-family:var(--mono)">${blueAwpD.met?'✅ Yes':'❌ No'} <span style="font-size:10px;color:var(--ink3)">(${blueAwpD.total}pins · ${blueAwpD.qualified}goals≥2)</span></span>
+              </div>
+              <div style="margin-top:8px">${blueRobots.map(robotRow).join('')}</div>
+            </div>
+          </div>
+
+          <!-- Score breakdown footer -->
+          <div style="font-size:11px;color:var(--ink3);font-family:var(--mono);border-top:.5px solid var(--paper3);padding-top:8px">
+            <span style="color:var(--red)">${o.redPins} pins × 5 = ${o.redRaw}${o.redFinal>o.redRaw?' + 12 bonus':o.redFinal===o.redRaw+6?' + 6 tie':''} = <strong>${o.redFinal}</strong></span>
+            &nbsp;vs&nbsp;
+            <span style="color:var(--blue)">${o.bluePins} pins × 5 = ${o.blueRaw}${o.blueFinal>o.blueRaw?' + 12 bonus':o.blueFinal===o.blueRaw+6?' + 6 tie':''} = <strong>${o.blueFinal}</strong></span>
+          </div>
+        </div>
+
+        <!-- RIGHT ARROW -->
+        <button onclick="navigateEmOutcome(1)" title="Next scenario"
+          style="flex-shrink:0;width:36px;background:var(--ink);color:var(--paper);border:none;border-radius:0 var(--radius) var(--radius) 0;cursor:pointer;font-size:18px;transition:background .15s;display:flex;align-items:center;justify-content:center;">&#8594;</button>
+      </div>
+    </div>`;
 }
 
-// Init embedded calc on page load
-emCalcProb();
+function navigateEmOutcome(dir) {
+  const mode = window._emOutcomeNavMode || 'prob';
+  const list = mode === 'bar' ? window._emOutcomesBarOrder : window._emOutcomesProbOrder;
+  if (!list || !list.length) return;
+  const cur = window._emCurrentOutcomeIdx || 0;
+  const newIdx = (cur + dir + list.length) % list.length;
+  const o = list[newIdx];
+  const totalProb = list.reduce((s,x)=>s+x.prob,0)||1;
+  showEmOutcomeDetail(o, o.prob/totalProb*100, totalProb, window._emOutcomesBarOrder);
+}
+
+function setEmOutcomeNavMode(mode) {
+  window._emOutcomeNavMode = mode;
+  const curList  = mode === 'bar' ? window._emOutcomesBarOrder  : window._emOutcomesProbOrder;
+  const prevList = mode === 'bar' ? window._emOutcomesProbOrder : window._emOutcomesBarOrder;
+  if (!curList || !curList.length) return;
+  const prevO = prevList ? prevList[window._emCurrentOutcomeIdx || 0] : null;
+  const newIdx = prevO ? Math.max(0, curList.indexOf(prevO)) : 0;
+  window._emCurrentOutcomeIdx = newIdx;
+  const o = curList[newIdx];
+  const totalProb = curList.reduce((s,x)=>s+x.prob,0)||1;
+  showEmOutcomeDetail(o, o.prob/totalProb*100, totalProb, window._emOutcomesBarOrder);
+}
+
+// Init embedded calc on page load — seed with realistic test data
+(function seedTestData() {
+  const teams = ['97230F','1234A','5678B','9999Z'];
+  ['em-r1','em-r2','em-b1','em-b2'].forEach((id,i)=>{
+    const el=document.getElementById(id); if(el&&!el.value) el.value=teams[i];
+  });
+  const fields = {
+    'em-r1g1':4,'em-r2g1':3,'em-b1g1':5,'em-b2g1':2,
+    'em-r1g2':2,'em-r2g2':1,'em-b1g2':3,'em-b2g2':1,
+    'em-r1fail':20,'em-r2fail':35,'em-b1fail':15,'em-b2fail':40,
+    'em-r1awp':70,'em-r2awp':55,'em-b1awp':80,'em-b2awp':45,
+  };
+  Object.entries(fields).forEach(([id,v])=>{ const el=document.getElementById(id); if(el) el.value=v; });
+  const dists = {
+    'em-r1':[50,30,20],
+    'em-r2':[60,25,15],
+    'em-b1':[40,35,25],
+    'em-b2':[70,20,10],
+  };
+  Object.entries(dists).forEach(([robotId,dist])=>{
+    dist.forEach(()=>emAddFailPin(robotId));
+    const rows=document.getElementById(robotId+'-faildist').querySelectorAll('.em-faildist-row');
+    rows.forEach((row,i)=>{ const inp=row.querySelector('input'); if(inp) inp.value=dist[i]; });
+    emUpdateFailDistTotal(robotId);
+  });
+  emCalcProb();
+})();
+
+
+// ── SEED TEST DATA: 10,000 auton entries across 100 teams ──────────────────
+// Cached in localStorage under 'os_seed_v1' so it is only generated once.
+// To force a fresh seed, run: localStorage.removeItem('os_seed_v1') in console.
+(function injectTestEntries() {
+  const SEED_KEY    = 'os_seed_v1';
+  const SEED_MARKER = 'seeded_10k_v1'; // bump this string to invalidate old cache
+
+  // ── Check whether we already injected this seed ──────────────────────────
+  try {
+    if (localStorage.getItem(SEED_KEY) === SEED_MARKER) {
+      // Data already in localDb / override_scout_v3 — just rebuild UI state.
+      setAllTeams(buildStats(allEntries));
+      setSyncStatus('ok', allTeams.length + ' teams · ' + allEntries.length + ' entries (seed cached)');
+      renderLog();
+      lbApplyFilter(lbActiveF);
+      console.log('[TestSeed] Skipped — seed already present (' + allEntries.length + ' entries)');
+      return;
+    }
+  } catch(e) {}
+
+  // ── 100-team roster: number prefix + letter suffix, varied stats ──────────
+  const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const teams = [];
+  // Keep the original showcase teams first
+  const showcaseTeams = [
+    { id:'97230F', failRate:0.15, g1Avg:4, g2Avg:2, awpRate:0.75, failPinAvg:0.8 },
+    { id:'1234A',  failRate:0.30, g1Avg:3, g2Avg:1, awpRate:0.55, failPinAvg:0.5 },
+    { id:'5678B',  failRate:0.10, g1Avg:5, g2Avg:3, awpRate:0.85, failPinAvg:1.2 },
+    { id:'9999Z',  failRate:0.40, g1Avg:2, g2Avg:1, awpRate:0.40, failPinAvg:0.3 },
+    { id:'4321C',  failRate:0.20, g1Avg:4, g2Avg:2, awpRate:0.60, failPinAvg:0.6 },
+    { id:'8888D',  failRate:0.25, g1Avg:3, g2Avg:2, awpRate:0.50, failPinAvg:1.0 },
+    { id:'1111E',  failRate:0.05, g1Avg:6, g2Avg:3, awpRate:0.90, failPinAvg:1.5 },
+    { id:'2222F',  failRate:0.35, g1Avg:2, g2Avg:1, awpRate:0.45, failPinAvg:0.2 },
+    { id:'3333G',  failRate:0.18, g1Avg:4, g2Avg:2, awpRate:0.70, failPinAvg:0.7 },
+    { id:'7777H',  failRate:0.22, g1Avg:3, g2Avg:2, awpRate:0.65, failPinAvg:0.9 },
+  ];
+  showcaseTeams.forEach(t => teams.push(t));
+
+  // Generate remaining 90 teams deterministically from index so stats are stable
+  const bases = [100,200,300,400,500,600,700,800,900,1000,
+                 1100,1200,1300,1400,1500,1600,1700,1800,1900,2000,
+                 2100,2200,2300,2400,2500,2600,2700,2800,2900,3000,
+                 3100,3200,3300,3400,3500,3600,3700,3800,3900,4000,
+                 4100,4200,4300,4400,4500,4600,4700,4800,4900,5000,
+                 5100,5200,5300,5400,5500,5600,5700,5800,5900,6000,
+                 6100,6200,6300,6400,6500,6600,6700,6800,6900,7000,
+                 7100,7200,7300,7400,7500,7600,7700,7800,7900,8000,
+                 8100,8200,8300,8400,8500,8600,8700,8800,8900,9000];
+  bases.forEach((base, i) => {
+    const letter = letters[i % letters.length];
+    const frac   = i / 89; // 0→1 across the set
+    teams.push({
+      id:          String(base) + letter,
+      failRate:    0.05 + frac * 0.45,          // 5%→50%
+      g1Avg:       Math.max(1, 6 - frac * 4),   // 6→2
+      g2Avg:       Math.max(0, 3 - frac * 2.5), // 3→0.5
+      awpRate:     0.90 - frac * 0.60,           // 90%→30%
+      failPinAvg:  0.2 + frac * 1.5,            // 0.2→1.7
+    });
+  });
+
+  const events = [
+    'NSW-SIG-2026','VIC-REG-2026','QLD-REG-2026','SA-REG-2026',
+    'WA-REG-2026','TAS-REG-2026','ACT-REG-2026','NT-REG-2026',
+    'NZ-SIG-2026','APAC-OPEN-2026'
+  ];
+  const sides  = ['red','blue'];
+  const types  = ['Catapult','Flywheel','Puncher','Intake','Slingshot'];
+  const routes = ['Normal','Risky','Safe','Corner','Diagonal'];
+  const rounds = [];
+  for (let q = 1; q <= 50; q++) rounds.push('Q' + q);
+  rounds.push('QF1','QF2','SF1','SF2','F1','F2');
+
+  function ri(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+  function rn(avg,sd){
+    let u=0,v=0; while(!u)u=Math.random(); while(!v)v=Math.random();
+    return Math.max(0, avg + sd*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v));
+  }
+
+  const existing = new Set((localDb||[]).map(e=>e.id));
+  let added = 0;
+  const ENTRIES_PER_TEAM = 100; // 100 teams × 100 = 10,000
+
+  teams.forEach(team => {
+    for (let i = 0; i < ENTRIES_PER_TEAM; i++) {
+      const failed  = Math.random() < team.failRate ? 'Y' : 'N';
+      const g1      = failed==='Y' ? Math.max(0,Math.round(rn(team.failPinAvg,0.8))) : Math.max(0,Math.round(rn(team.g1Avg,1.2)));
+      const g2      = failed==='Y' ? 0 : Math.max(0,Math.round(rn(team.g2Avg,0.8)));
+      const awp     = (failed==='N' && Math.random()<team.awpRate) ? 'Y' : 'N';
+      const maxpins = g1 + g2 + ri(0,3);
+      // Spread timestamps across the past 120 days
+      const daysAgo = ri(0, 120);
+      const entry = {
+        id:      crypto.randomUUID(),
+        team:    team.id,
+        event:   events[ri(0,events.length-1)],
+        round:   rounds[ri(0,rounds.length-1)],
+        side:    sides[ri(0,1)],
+        sig:     Math.random()<0.3 ? 'Y' : 'N',
+        type:    types[ri(0,types.length-1)],
+        route:   routes[ri(0,routes.length-1)],
+        pins:    g1+'+'+g2,
+        maxpins: String(maxpins),
+        bonuses: 0,
+        awp,
+        failed,
+        notes:   '',
+        ts:      new Date(Date.now() - daysAgo*86400000 - ri(0,86400)*1000).toISOString()
+      };
+      if (!existing.has(entry.id)) {
+        localDb.unshift(entry);
+        allEntries.unshift(entry);
+        added++;
+      }
+    }
+  });
+
+  // Persist to localStorage once — refresh will not regenerate
+  try {
+    localStorage.setItem('override_scout_v3', JSON.stringify(localDb));
+    localStorage.setItem(SEED_KEY, SEED_MARKER);
+  } catch(e) {
+    console.warn('[TestSeed] localStorage write failed (quota?)', e);
+  }
+
+  setAllTeams(buildStats(allEntries));
+  setSyncStatus('ok', allTeams.length+' teams · '+allEntries.length+' entries ('+added+' test entries injected)');
+  renderLog();
+  lbApplyFilter(lbActiveF);
+  console.log('[TestSeed] Injected '+added+' entries across '+teams.length+' teams');
+})();
+// ────────────────────────────────────────────────────────────────────────────
 
 // Restore saved tokens on load
 loadReToken();
@@ -6732,7 +7532,7 @@ function renderRobotPanel(color, robots, calcFn, fillFn, syncFn) {
       <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:${cssColor};margin-bottom:8px">Robot ${robotNum}</div>
       <div style="margin-bottom:8px">
         <label>Team #</label>
-        <input id="${id}" placeholder="${phMap[id]||'e.g. team #'}" oninput="${fillFn}('${id}');updateTsBadges()">
+        <input id="${id}" placeholder="${phMap[id]||'e.g. team #'}" oninput="${fillFn}('${id}');syncTeamSlot('${id}');updateTsBadges()">
         <div class="ts-mini-badge" id="ts-badge-${id}"></div>
       </div>
       <div class="sawp-toggle" id="${id}-sawp-toggle">
@@ -6744,25 +7544,24 @@ function renderRobotPanel(color, robots, calcFn, fillFn, syncFn) {
       <div class="sawp-badge" id="${id}-sawp-badge"></div>
       <div id="${id}-pins-normal" style="margin-bottom:8px">
         <div class="g2">
-          <div><label>Avg G1 pins</label><input type="number" id="${id}g1" min="0" max="10" value="2" oninput="${calcFn}"></div>
-          <div><label>Avg G2 pins</label><input type="number" id="${id}g2" min="0" max="10" value="1" oninput="${calcFn}"></div>
+          <div><label>Avg G1 pins</label><input type="number" id="${id}g1" min="0" max="10" step="1" value="2" oninput="${calcFn}"></div>
+          <div><label>Avg G2 pins</label><input type="number" id="${id}g2" min="0" max="10" step="1" value="1" oninput="${calcFn}"></div>
         </div>
       </div>
       <div id="${id}-pins-sawp" style="display:none;margin-bottom:8px">
         <div style="font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.4px;color:var(--ink3);margin-bottom:5px">${ownEmoji} Own quadrant</div>
         <div class="g2" style="margin-bottom:6px">
-          <div><label>Own G1 pins</label><input type="number" id="${id}-own-g1" min="0" max="10" value="2" oninput="${syncFn}('${id}')"></div>
-          <div><label>Own G2 pins</label><input type="number" id="${id}-own-g2" min="0" max="10" value="1" oninput="${syncFn}('${id}')"></div>
+          <div><label>Own G1 pins</label><input type="number" id="${id}-own-g1" min="0" max="10" step="1" value="2" oninput="${syncFn}('${id}')"></div>
+          <div><label>Own G2 pins</label><input type="number" id="${id}-own-g2" min="0" max="10" step="1" value="1" oninput="${syncFn}('${id}')"></div>
         </div>
         <div style="font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.4px;color:var(--ink3);margin-bottom:5px">${allyEmoji} Alliance quadrant</div>
         <div class="g2">
-          <div><label>Alliance G1 pins</label><input type="number" id="${id}-ally-g1" min="0" max="10" value="1" oninput="${syncFn}('${id}')"></div>
-          <div><label>Alliance G2 pins</label><input type="number" id="${id}-ally-g2" min="0" max="10" value="0" oninput="${syncFn}('${id}')"></div>
+          <div><label>Alliance G1 pins</label><input type="number" id="${id}-ally-g1" min="0" max="10" step="1" value="1" oninput="${syncFn}('${id}')"></div>
+          <div><label>Alliance G2 pins</label><input type="number" id="${id}-ally-g2" min="0" max="10" step="1" value="0" oninput="${syncFn}('${id}')"></div>
         </div>
       </div>
       <div class="g2">
         <div><label>Failure rate %</label><input type="number" id="${id}fail" min="0" max="100" value="0" oninput="${calcFn}"></div>
-        <div><label>AWP contrib. %</label><input type="number" id="${id}awp"  min="0" max="100" value="50" oninput="${calcFn}"></div>
       </div>
     </div>`;
   };
@@ -7382,6 +8181,7 @@ function resetAllSettings() {
   applyShowSyncTime(true);
   applyRefreshBanner(false);
   applyRememberAdmin(false);
+  applyCalcSideBySide(false);
   loadSettingsFromStorage();
   showToast('Settings reset to defaults', 'ok', 2500);
 }
@@ -7516,9 +8316,81 @@ function loadSettingsFromStorage() {
   // Remember admin
   const remEl = document.getElementById('rememberAdminToggle');
   if (remEl) remEl.checked = localStorage.getItem('os_remember_admin') === '1';
+
+  // Auton calculator team numbers
+  emRestoreTeams();
+
+  // Side-by-side calculators
+  const sideBySide = localStorage.getItem('os_calc_sidebyside') === '1';
+  applyCalcSideBySide(sideBySide);
 }
 
 document.addEventListener('DOMContentLoaded', loadSettingsFromStorage);
+
+/* ── Side-by-side calculator mode ── */
+function applyCalcSideBySide(on) {
+  try { localStorage.setItem('os_calc_sidebyside', on ? '1' : '0'); } catch(e) {}
+  document.body.classList.toggle('calc-sidebyside', !!on);
+  const t = document.getElementById('sideBySideToggle');
+  if (t) t.checked = !!on;
+  // When enabling, ensure the auton calc panel is open
+  if (on) {
+    const p = document.getElementById('auton-calc-panel');
+    const btn = document.getElementById('auton-calc-toggle-btn');
+    const chev = document.getElementById('auton-calc-chevron');
+    if (p) p.style.display = 'block';
+    if (btn) { btn.setAttribute('aria-pressed', 'true'); btn.style.borderColor = 'var(--red)'; btn.style.color = 'var(--ink)'; }
+    if (chev) chev.style.transform = 'rotate(180deg)';
+  }
+}
+
+/* ── Unified team persistence + cross-calculator sync ── */
+const TEAM_SLOT_MAP = { r1:'em-r1', r2:'em-r2', b1:'em-b1', b2:'em-b2' };
+const TEAM_SLOT_MAP_REV = { 'em-r1':'r1', 'em-r2':'r2', 'em-b1':'b1', 'em-b2':'b2' };
+
+function saveAllTeams() {
+  try {
+    const teams = {};
+    ['r1','r2','b1','b2'].forEach(id => {
+      teams[id] = document.getElementById(id)?.value || '';
+    });
+    localStorage.setItem('os_em_teams', JSON.stringify(teams));
+  } catch(e) {}
+}
+
+function emSaveTeams() { saveAllTeams(); }
+
+function emRestoreTeams() {
+  try {
+    const raw = localStorage.getItem('os_em_teams');
+    if (!raw) return;
+    const teams = JSON.parse(raw);
+    const get = id => teams[id] || teams['em-'+id] || '';
+    ['r1','r2','b1','b2'].forEach(id => {
+      const val = get(id);
+      if (!val) return;
+      const wpEl = document.getElementById(id);
+      if (wpEl) { wpEl.value = val; autoFill(id); }
+      const emEl = document.getElementById('em-'+id);
+      if (emEl) { emEl.value = val; emAutoFill('em-'+id); }
+    });
+  } catch(e) {}
+}
+
+function syncTeamSlot(srcId) {
+  const isEm = srcId.startsWith('em-');
+  const wpId  = isEm ? TEAM_SLOT_MAP_REV[srcId] : srcId;
+  const emId  = isEm ? srcId : TEAM_SLOT_MAP[srcId];
+  const val   = document.getElementById(srcId)?.value || '';
+  const otherId = isEm ? wpId : emId;
+  const otherEl = document.getElementById(otherId);
+  if (otherEl && otherEl.value !== val) {
+    otherEl.value = val;
+    if (isEm) { autoFill(wpId); updateTsBadges(); }
+    else       { emAutoFill(emId); }
+  }
+  saveAllTeams();
+}
 
 /* ═══════════════════════════════════════════════════════
    🇮🇱  DONATION POPUP
