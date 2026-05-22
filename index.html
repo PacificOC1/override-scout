@@ -136,7 +136,7 @@ body.calc-sidebyside #win-prob-col {
   flex:1;
   min-width:0;
 }
-body.calc-sidebyside #auton-calc-panel {
+body.calc-sidebyside #tab-predict.active #auton-calc-panel {
   flex:1;
   min-width:0;
   display:block !important;
@@ -995,11 +995,310 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
 .ul-divider-actions{display:none;gap:4px;align-items:center;flex-shrink:0}
 #tab-updates .ul-date-divider:hover .ul-divider-actions{display:flex}
 
+/* ══════════════════════════════════════════════════
+   NEW UX + ANALYTICS FEATURES
+════════════════════════════════════════════════════ */
+
+/* ── Keyboard shortcut hint ── */
+.kbd-hint{
+  display:inline-block;padding:1px 5px;border-radius:3px;font-size:9px;
+  font-family:var(--mono);border:1px solid var(--border2);background:var(--paper3);
+  color:var(--ink3);vertical-align:middle;margin-left:4px;letter-spacing:0;
+}
+
+/* ── Keyboard shortcut overlay ── */
+#kbd-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:20000;
+  display:flex;align-items:center;justify-content:center;padding:1rem;
+  backdrop-filter:blur(6px);animation:fadeIn .15s ease;
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+#kbd-overlay-box{
+  background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);
+  padding:1.5rem;max-width:480px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.7);
+  max-height:80vh;overflow-y:auto;
+}
+#kbd-overlay h3{font-family:var(--barlow);font-size:18px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.5px;margin-bottom:1rem;color:var(--ink)}
+.kbd-row{display:flex;align-items:center;justify-content:space-between;
+  padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;font-family:var(--mono)}
+.kbd-row:last-child{border-bottom:none}
+.kbd-keys{display:flex;gap:4px}
+.kbd-desc{color:var(--ink2)}
+
+/* ── Search history dropdown ── */
+#search-history-drop{
+  position:absolute;top:100%;left:0;right:0;z-index:200;
+  background:var(--surface);border:1px solid var(--border2);border-radius:0 0 var(--radius-lg) var(--radius-lg);
+  box-shadow:0 8px 24px rgba(0,0,0,.4);overflow:hidden;
+}
+.sh-item{
+  display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;
+  font-size:12px;font-family:var(--mono);color:var(--ink2);
+  transition:background .1s;
+}
+.sh-item:hover{background:var(--paper3);color:var(--ink)}
+.sh-item-icon{color:var(--ink3);font-size:11px;flex-shrink:0}
+.sh-item-clear{margin-left:auto;color:var(--ink3);font-size:10px;padding:1px 5px;
+  border-radius:3px;border:1px solid var(--border)}
+.sh-item-clear:hover{background:var(--red-bg);color:var(--red-text);border-color:rgba(255,77,26,.3)}
+.search-zone{position:relative} /* ensure dropdown anchors */
+
+/* ── Team Compare modal ── */
+#compare-modal-bg{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:600;
+  align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(6px);
+}
+#compare-modal-bg.open{display:flex}
+#compare-modal{
+  background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);
+  width:100%;max-width:820px;max-height:90vh;display:flex;flex-direction:column;
+  box-shadow:0 24px 64px rgba(0,0,0,.7),var(--glow-blue);
+  animation:modalIn .2s cubic-bezier(.34,1.56,.64,1);overflow:hidden;
+}
+#compare-modal-head{
+  padding:.875rem 1.25rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;
+  background:var(--paper2);
+}
+#compare-modal-body{flex:1;overflow-y:auto;padding:1.25rem}
+.cmp-input-row{display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap}
+.cmp-input-row input{flex:1;min-width:120px;max-width:180px;padding:8px 10px;
+  border:1px solid var(--border2);border-radius:var(--radius);font-family:var(--mono);
+  font-size:13px;background:var(--paper);color:var(--ink)}
+.cmp-input-row input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 2px rgba(61,142,240,.2)}
+.cmp-table{width:100%;border-collapse:collapse;font-size:12px}
+.cmp-table th{text-align:left;padding:8px 10px;font-size:9px;font-family:var(--mono);
+  text-transform:uppercase;letter-spacing:.6px;color:var(--ink3);
+  border-bottom:1px solid var(--border);background:var(--paper2)}
+.cmp-table td{padding:9px 10px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:12px}
+.cmp-table tr:last-child td{border-bottom:none}
+.cmp-table tr:hover td{background:var(--paper3)}
+.cmp-bar-cell{display:flex;align-items:center;gap:8px}
+.cmp-bar-wrap{height:6px;border-radius:3px;background:var(--border2);flex:1;overflow:hidden}
+.cmp-bar-fill{height:100%;border-radius:3px;background:var(--blue);transition:width .4s}
+.cmp-best{color:var(--green);font-weight:700}
+.cmp-worst{color:var(--red-text)}
+.cmp-team-head{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--ink);
+  padding:0 10px;border-bottom:2px solid var(--border)}
+
+/* ── Sparkline trend mini-chart ── */
+.sparkline-wrap{display:inline-flex;align-items:center;gap:4px;vertical-align:middle}
+.sparkline-canvas{width:60px;height:20px;vertical-align:middle}
+.trend-up{color:var(--green)}
+.trend-dn{color:var(--red-text)}
+.trend-flat{color:var(--ink3)}
+
+/* ── Starred teams ── */
+.star-btn{
+  background:none;border:none;cursor:pointer;font-size:14px;line-height:1;
+  color:var(--ink3);padding:2px 4px;border-radius:3px;transition:color .12s,transform .1s;
+  vertical-align:middle;
+}
+.star-btn:hover{color:var(--amber);transform:scale(1.2)}
+.star-btn.starred{color:var(--amber)}
+#starred-section{
+  background:var(--paper2);border:1px solid var(--border2);border-radius:var(--radius-lg);
+  padding:10px 14px;margin-bottom:.75rem;display:none;
+}
+#starred-section.has-stars{display:block}
+.starred-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px}
+.starred-chip{
+  display:inline-flex;align-items:center;gap:5px;padding:3px 10px 3px 8px;
+  background:var(--amber-bg);border:1px solid rgba(240,192,48,.35);border-radius:3px;
+  font-family:var(--mono);font-size:12px;font-weight:700;color:var(--amber);cursor:pointer;
+  transition:background .1s;
+}
+.starred-chip:hover{background:rgba(240,192,48,.2)}
+.starred-chip-x{color:var(--ink3);font-size:10px;margin-left:2px}
+
+/* ── Prediction accuracy tracker ── */
+#pred-history-wrap{
+  margin-top:1rem;padding:1rem;background:var(--paper2);border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+}
+.ph-row{
+  display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;
+  padding:6px 0;border-bottom:1px solid var(--border);font-size:11px;font-family:var(--mono);
+}
+.ph-row:last-child{border-bottom:none}
+.ph-correct{color:var(--green)}
+.ph-wrong{color:var(--red-text)}
+.ph-accuracy-bar{height:8px;border-radius:4px;background:var(--border2);overflow:hidden;margin-top:4px}
+.ph-accuracy-fill{height:100%;border-radius:4px;background:var(--green);transition:width .5s}
+
+/* ── OPR/DPR/CCWM display in search results ── */
+.opr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:.5rem}
+.opr-card{background:var(--paper2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:8px 10px;text-align:center}
+.opr-card-l{font-size:8px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.6px;
+  color:var(--ink3);margin-bottom:3px}
+.opr-card-v{font-size:15px;font-weight:700;font-family:var(--mono);color:var(--ink)}
+
+/* ── Performance trend section ── */
+.trend-section{margin-top:.75rem}
+.trend-section-hd{font-size:9px;font-family:var(--mono);text-transform:uppercase;
+  letter-spacing:.8px;color:var(--ink3);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.trend-section-hd::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── Compare trigger in leaderboard rows ── */
+.cmp-trigger{
+  display:inline-flex;align-items:center;gap:4px;padding:2px 8px;
+  border-radius:3px;border:1px solid var(--border2);background:transparent;
+  color:var(--ink3);font-size:9px;font-family:var(--mono);cursor:pointer;
+  text-transform:uppercase;letter-spacing:.4px;transition:all .12s;margin-left:4px;
+}
+.cmp-trigger:hover{background:var(--blue-bg);border-color:rgba(61,142,240,.4);color:var(--blue)}
+
+/* ── MOBILE BOTTOM NAV BAR ── */
+#mobile-bottom-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:var(--paper2);border-top:1px solid var(--border);
+  padding:4px 0 env(safe-area-inset-bottom, 4px);
+  flex-direction:row;align-items:stretch;
+}
+@media(max-width:768px){
+  #mobile-bottom-nav{display:flex}
+  /* push appShell content above bottom nav */
+  #appShell{padding-bottom:60px}
+}
+.mbn-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;padding:6px 2px;background:none;border:none;cursor:pointer;
+  color:var(--ink3);font-size:9px;font-family:var(--mono);text-transform:uppercase;
+  letter-spacing:.5px;transition:color .12s,background .12s;min-width:0;
+}
+.mbn-btn .mbn-icon{font-size:18px;line-height:1}
+.mbn-btn:hover{background:var(--paper3);color:var(--ink)}
+.mbn-btn.active{color:var(--red-text)}
+.mbn-btn.active .mbn-icon{filter:drop-shadow(0 0 4px rgba(204,61,20,.5))}
+
+/* ── PIT SCOUT log rows ── */
+.pit-row{
+  display:grid;grid-template-columns:auto 1fr 1fr 1fr auto;gap:8px;align-items:center;
+  padding:8px 10px;border-bottom:1px solid var(--border);font-size:12px;
+}
+.pit-row:last-child{border-bottom:none}
+.pit-row:hover{background:var(--paper2)}
+@media(max-width:640px){.pit-row{grid-template-columns:1fr 1fr;}}
+
+/* ── ALLIANCE HELPER ── */
+.al-suggestion-card{
+  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:1rem;margin-bottom:.75rem;position:relative;overflow:hidden;
+}
+.al-suggestion-card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px}
+.al-suggestion-card.rank-1::before{background:var(--amber)}
+.al-suggestion-card.rank-2::before{background:var(--ink3)}
+.al-suggestion-card.rank-3::before{background:rgba(205,127,50,1)}
+.al-rank-badge{
+  font-family:var(--barlow);font-size:22px;font-weight:800;color:var(--ink3);
+  margin-right:8px;min-width:32px;text-align:center;
+}
+.al-team-num{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ink)}
+.al-score-bar{height:6px;border-radius:3px;background:var(--border2);overflow:hidden;margin:6px 0 2px}
+.al-score-fill{height:100%;border-radius:3px;background:var(--green);transition:width .4s}
+.al-full-row{
+  display:grid;grid-template-columns:auto 1fr auto auto auto auto auto;gap:8px;
+  align-items:center;padding:7px 10px;border-bottom:1px solid var(--border);
+  font-size:12px;cursor:pointer;transition:background .1s;
+}
+.al-full-row:hover{background:var(--paper3)}
+.al-full-row.al-picked{opacity:.35;text-decoration:line-through}
+.al-full-row.al-mine{background:var(--amber-bg)!important;font-weight:700}
+
+/* ── Quick-jump search bar (global) ── */
+#quick-search-bar{
+  position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-20px);
+  z-index:10001;width:min(480px,90vw);opacity:0;pointer-events:none;
+  transition:opacity .18s,transform .18s;
+}
+#quick-search-bar.open{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+#quick-search-input{
+  width:100%;padding:12px 18px;border-radius:var(--radius-lg);
+  border:1.5px solid var(--border2);background:var(--surface);color:var(--ink);
+  font-size:16px;font-family:var(--mono);box-shadow:0 8px 32px rgba(0,0,0,.5),var(--glow-blue);
+}
+#quick-search-input:focus{outline:none;border-color:var(--blue)}
+#quick-search-results{
+  background:var(--surface);border:1px solid var(--border2);border-top:none;
+  border-radius:0 0 var(--radius-lg) var(--radius-lg);
+  box-shadow:0 8px 24px rgba(0,0,0,.4);max-height:280px;overflow-y:auto;
+}
+.qs-result{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 18px;cursor:pointer;border-bottom:1px solid var(--border);
+  transition:background .1s;font-size:13px;
+}
+.qs-result:last-child{border-bottom:none}
+.qs-result:hover,.qs-result.qs-active{background:var(--blue-bg)}
+.qs-result-team{font-family:var(--mono);font-weight:700;font-size:14px;color:var(--ink)}
+.qs-result-meta{font-family:var(--mono);font-size:11px;color:var(--ink3)}
+
 </style>
 </head>
 <body>
 
 <div id="toast"></div>
+
+<!-- ── QUICK SEARCH BAR ── -->
+<div id="quick-search-bar">
+  <input id="quick-search-input" type="text" placeholder="Search team… (Esc to close)" autocomplete="off"
+    oninput="qsSearch(this.value)" onkeydown="qsKey(event)">
+  <div id="quick-search-results"></div>
+</div>
+
+<!-- ── KEYBOARD SHORTCUTS OVERLAY ── -->
+<div id="kbd-overlay" style="display:none" onclick="if(event.target===this)closeKbdOverlay()">
+  <div id="kbd-overlay-box">
+    <h3>⌨️ Keyboard Shortcuts</h3>
+    <div class="kbd-row"><div class="kbd-keys"><span class="kbd-hint">T</span></div><div class="kbd-desc">Quick team search</div></div>
+    <div class="kbd-row"><div class="kbd-keys"><span class="kbd-hint">1</span>–<span class="kbd-hint">9</span></div><div class="kbd-desc">Switch tabs by position</div></div>
+    <div class="kbd-row"><div class="kbd-keys"><span class="kbd-hint">R</span></div><div class="kbd-desc">Refresh data</div></div>
+    <div class="kbd-row"><div class="kbd-keys"><span class="kbd-hint">C</span></div><div class="kbd-desc">Open team comparison</div></div>
+    <div class="kbd-row"><div class="kbd-keys"><span class="kbd-hint">L</span></div><div class="kbd-desc">Jump to Leaderboard tab</div></div>
+    <div class="kbd-row"><div class="kbd-keys"><span class="kbd-hint">Esc</span></div><div class="kbd-desc">Close modal / overlay</div></div>
+    <div class="kbd-row"><div class="kbd-keys"><span class="kbd-hint">?</span></div><div class="kbd-desc">Show this help</div></div>
+    <div style="margin-top:1rem;text-align:center">
+      <button onclick="closeKbdOverlay()" class="btn-sm">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TEAM COMPARE MODAL ── -->
+<div id="compare-modal-bg" onclick="if(event.target===this)closeCompareModal()">
+  <div id="compare-modal">
+    <div id="compare-modal-head">
+      <div style="font-family:var(--barlow);font-size:16px;font-weight:800;text-transform:uppercase;letter-spacing:.5px">
+        ⚖️ Team <span style="color:var(--blue)">Comparison</span>
+      </div>
+      <button class="sched-modal-close" onclick="closeCompareModal()">✕</button>
+    </div>
+    <div id="compare-modal-body">
+      <div class="cmp-input-row" id="cmp-inputs">
+        <input id="cmp-t1" placeholder="Team 1" oninput="runCompare()" style="border-color:rgba(61,142,240,.5)">
+        <input id="cmp-t2" placeholder="Team 2" oninput="runCompare()" style="border-color:rgba(255,77,26,.5)">
+        <input id="cmp-t3" placeholder="Team 3 (opt)" oninput="runCompare()">
+        <input id="cmp-t4" placeholder="Team 4 (opt)" oninput="runCompare()">
+      </div>
+      <div id="cmp-result"><div style="font-size:12px;font-family:var(--mono);color:var(--ink3);text-align:center;padding:2rem">Enter team numbers above to compare stats side by side.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PREDICTION HISTORY MODAL ── -->
+<div id="pred-hist-modal-bg" onclick="if(event.target===this)document.getElementById('pred-hist-modal-bg').style.display='none'"
+  style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:600;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(6px)">
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);width:100%;max-width:560px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.7);animation:modalIn .2s cubic-bezier(.34,1.56,.64,1);overflow:hidden">
+    <div style="padding:.875rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--paper2);flex-shrink:0">
+      <div style="font-family:var(--barlow);font-size:16px;font-weight:800;text-transform:uppercase;letter-spacing:.5px">📊 Prediction Accuracy</div>
+      <button class="sched-modal-close" onclick="document.getElementById('pred-hist-modal-bg').style.display='none'">✕</button>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:1.25rem" id="pred-hist-body">
+      <div style="font-size:12px;font-family:var(--mono);color:var(--ink3);text-align:center;padding:2rem">No predictions logged yet. Make a prediction in Win Probability and click "Log Result" after the match.</div>
+    </div>
+  </div>
+</div>
 
 <!-- ═══════════════════════════════════════════
      UPDATE ENTRY EDITOR MODAL
@@ -1120,6 +1419,7 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
       <span class="sync-txt" id="syncTxt">Loading…</span>
       <button class="btn-admin-trigger" id="adminLoginBtn" onclick="openLoginModal()">Admin</button>
       <button class="btn-sm danger" id="logoutBtn" onclick="logout()" style="display:none">Logout admin</button>
+      <button class="btn-sm" onclick="openKbdOverlay()" title="Keyboard shortcuts" style="padding:4px 8px">⌨️ <span class="kbd-hint">?</span></button>
     </div>
   </div>
 
@@ -1131,10 +1431,14 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
       <button class="tab" data-tab="calendar" onclick="switchTab('calendar',this)">📅 Events</button>
       <button class="tab" data-tab="about" onclick="switchTab('about',this)">About</button>
       <button class="tab admin-only" data-tab="add" onclick="switchTab('add',this)">+ Add Entry</button>
+      <button class="tab admin-only" data-tab="pit" onclick="switchTab('pit',this)">🤖 Pit Scout</button>
       <button class="tab admin-only" data-tab="log" onclick="switchTab('log',this)">Scout Log</button>
+      <button class="tab" data-tab="alliance" onclick="switchTab('alliance',this)">🤝 Alliance</button>
       <button class="tab admin-only" data-tab="predict" onclick="switchTab('predict',this)">Win Probability</button>
       <button class="tab admin-only" data-tab="routes" onclick="switchTab('routes',this)">Routes</button>
       <button class="tab admin-only" data-tab="formulas" onclick="switchTab('formulas',this)">Formulas</button>
+      <button class="tab" data-tab="skills" onclick="switchTab('skills',this)">🎯 Skills</button>
+      <button class="tab" data-tab="resources" onclick="switchTab('resources',this)">📚 Resources</button>
       <button class="tab" data-tab="ts-rankings" onclick="switchTab('ts-rankings',this)">⚡ TS Rankings</button>
       <button class="tab" data-tab="roadmap" onclick="switchTab('roadmap',this)">🗺️ Roadmap</button>
       <button class="tab" data-tab="updates" onclick="switchTab('updates',this)">📋 Changelog</button>
@@ -1152,8 +1456,9 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
     <div class="page">
       <div class="search-zone">
         <input class="si" id="pubSearch" type="text" placeholder="Search team number (e.g. 97230F)…"
-          onkeydown="if(event.key==='Enter')pubDoSearch()">
+          onkeydown="if(event.key==='Enter')pubDoSearch()" oninput="shInput(this.value)" onfocus="shShowDrop()" onblur="setTimeout(shHideDrop,200)">
         <button class="sb" onclick="pubDoSearch()">Search</button>
+        <div id="search-history-drop" style="display:none"></div>
       </div>
       <div id="pubResult">
         <div class="empty"><span class="spin"></span><br><br>Loading database…</div>
@@ -1164,12 +1469,20 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
   <!-- ── LEADERBOARD (public) ── -->
   <div id="tab-leaderboard" class="panel active">
     <div class="page">
-      <div class="filters">
+      <!-- Starred teams quick-access -->
+      <div id="starred-section">
+        <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin-bottom:4px">⭐ Starred Teams</div>
+        <div class="starred-row" id="starred-chips"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:.5rem">
+      <div class="filters" style="margin-bottom:0;flex:1">
         <span class="fl">Filter:</span>
         <span class="chip on" onclick="lbFilter('all',this)">All teams</span>
         <span class="chip"    onclick="lbFilter('sig',this)">Sig events</span>
         <span class="chip"    onclick="lbFilter('awp',this)">AWP achieved</span>
         <span class="chip"    onclick="lbFilter('top',this)">Top pins</span>
+      </div>
+      <button onclick="openCompareModal()" class="btn-sm" title="Compare teams side by side [C]" style="white-space:nowrap">⚖️ Compare <span class="kbd-hint">C</span></button>
       </div>
       <div class="g4" id="lbCards" style="margin-bottom:1rem;display:none">
         <div class="mc"><div class="mc-l">Teams</div><div class="mc-v" id="lbT">—</div></div>
@@ -1325,6 +1638,156 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
         <!-- Status message shown after save attempt -->
         <div id="add-msg"></div>
       </div>
+
+      <!-- ── LOG SKILLS RUN (admin) ── -->
+      <div class="card admin-only" id="skills-add-card" style="border-left:3px solid var(--red);margin-top:1rem">
+        <p class="sec">🎯 Log Skills Run</p>
+        <div class="g3" style="margin-bottom:12px">
+          <div><label>Team #</label><input id="sk-team" placeholder="e.g. 97230F" oninput="this.value=this.value.toUpperCase()"></div>
+          <div><label>Event</label><input id="sk-event" placeholder="e.g. Mall of America"></div>
+          <div><label>Run Type</label>
+            <select id="sk-type">
+              <option value="auton">Autonomous Skills</option>
+              <option value="driver">Driver Skills</option>
+            </select>
+          </div>
+        </div>
+        <div class="g3" style="margin-bottom:12px">
+          <div><label>Score</label><input id="sk-score" type="number" min="0" step="1" placeholder="e.g. 42"></div>
+          <div><label>Attempt #</label><input id="sk-attempt" type="number" min="1" step="1" placeholder="1" value="1"></div>
+          <div><label>Notes (optional)</label><input id="sk-notes" placeholder="e.g. missed post 3"></div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-p" onclick="saveSkillsRun()">+ Log Run</button>
+          <span id="sk-msg" style="font-size:12px;font-family:var(--mono);color:var(--green)"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PIT SCOUT (admin) ── -->
+  <div id="tab-pit" class="panel">
+    <div class="page">
+      <div class="card">
+        <p class="sec">🤖 Pit Scouting Form</p>
+        <p class="hint" style="margin-bottom:14px">Record robot specs, drive train, and autonomous capabilities from the pit. Data is saved per team and available in team profiles.</p>
+        <div class="g3" style="margin-bottom:12px">
+          <div><label>Team #</label><input id="pit-team" placeholder="e.g. 97230F" oninput="this.value=this.value.toUpperCase()"></div>
+          <div><label>Team Name (optional)</label><input id="pit-name" placeholder="e.g. Bot Go Brrr"></div>
+          <div><label>Event</label><input id="pit-event" placeholder="e.g. Mall of America"></div>
+        </div>
+        <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin:14px 0 10px">Drive Train</div>
+        <div class="g3" style="margin-bottom:12px">
+          <div><label>Drive Type</label>
+            <select id="pit-drive">
+              <option value="">— select —</option>
+              <option>Tank Drive</option>
+              <option>X-Drive (Holonomic)</option>
+              <option>H-Drive</option>
+              <option>Mecanum</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div><label>Motor Count</label>
+            <select id="pit-motors">
+              <option value="">— select —</option>
+              <option>4 motors</option>
+              <option>6 motors</option>
+              <option>8 motors</option>
+            </select>
+          </div>
+          <div><label>Drive Ratio / RPM (optional)</label><input id="pit-ratio" placeholder="e.g. 360 rpm"></div>
+        </div>
+        <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin:14px 0 10px">Robot Specs</div>
+        <div class="g3" style="margin-bottom:12px">
+          <div><label>Robot Type</label>
+            <select id="pit-type">
+              <option value="">— select —</option>
+              <option>Claw Bot</option>
+              <option>Puncher</option>
+              <option>Catapult</option>
+              <option>Flywheel</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div><label>Lift / Mechanism</label><input id="pit-lift" placeholder="e.g. 4-bar, no lift"></div>
+          <div><label>Weight (approx kg)</label><input id="pit-weight" type="number" min="0" step="0.1" placeholder="e.g. 8.5"></div>
+        </div>
+        <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin:14px 0 10px">Autonomous Capabilities</div>
+        <div class="g2" style="margin-bottom:12px">
+          <div><label>Auton Routes Available</label><input id="pit-routes" placeholder="e.g. Left AWP, Right 5-pin, SAWP"></div>
+          <div><label>Best Auton (claimed)</label><input id="pit-best-auton" placeholder="e.g. 6 pins consistently"></div>
+        </div>
+        <div class="g2" style="margin-bottom:12px">
+          <div><label>Can run SAWP?</label>
+            <select id="pit-sawp">
+              <option value="">Unknown</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+              <option value="sometimes">Sometimes / practicing</option>
+            </select>
+          </div>
+          <div><label>Programming Language</label>
+            <select id="pit-lang">
+              <option value="">— select —</option>
+              <option>VEXcode Blocks</option>
+              <option>VEXcode C++</option>
+              <option>PROS (C++)</option>
+              <option>VEXcode Python</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:12px">
+          <label>Pit Notes <span style="font-weight:400;color:var(--ink3)">(general observations, strategy, team vibe)</span></label>
+          <textarea id="pit-notes" rows="3" placeholder="e.g. Very consistent auton, friendly team, looking to be picked…"></textarea>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-p" onclick="savePitEntry()">Save Pit Entry</button>
+          <button class="btn" onclick="clearPitForm()">Clear</button>
+        </div>
+        <div id="pit-msg"></div>
+      </div>
+      <div class="card" style="margin-top:1rem">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+          <p class="sec" style="margin-bottom:0">Pit Scout Log</p>
+          <input id="pit-log-q" placeholder="Filter by team…" oninput="renderPitLog()" style="max-width:180px;font-size:12px;padding:5px 10px">
+          <button class="btn btn-sm" onclick="exportPitCSV()" style="margin-left:auto">⬇ Export CSV</button>
+        </div>
+        <div id="pit-log-body">
+          <div class="empty" style="padding:24px 0">No pit entries yet.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ALLIANCE SELECTION HELPER (public) ── -->
+  <div id="tab-alliance" class="panel">
+    <div class="page">
+      <div class="card">
+        <p class="sec">🤝 Alliance Selection Helper</p>
+        <p class="hint" style="margin-bottom:14px">Enter your team number and mark teams as picked or unavailable. The helper ranks remaining teams by scouting strength and suggests your best alliance partners.</p>
+        <div class="g2" style="margin-bottom:14px">
+          <div>
+            <label>Your Team #</label>
+            <input id="al-my-team" placeholder="e.g. 97230F" oninput="this.value=this.value.toUpperCase();runAlliance()" style="font-size:14px;font-weight:700">
+          </div>
+          <div>
+            <label>Picked / Unavailable Teams <span style="font-weight:400;color:var(--ink3)">(comma-separated)</span></label>
+            <input id="al-picked" placeholder="e.g. 1234A,5678B" oninput="runAlliance()">
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
+          <button class="btn btn-p" onclick="runAlliance()">🔄 Refresh</button>
+          <button class="btn" onclick="alResetPicked()">Clear picked list</button>
+          <span id="al-status" style="font-size:11px;font-family:var(--mono);color:var(--ink3)"></span>
+        </div>
+        <div id="al-suggestions"></div>
+      </div>
+      <div class="card" style="margin-top:1rem">
+        <p class="sec">📋 All Available Teams</p>
+        <p class="hint" style="margin-bottom:10px">Click a team row to mark them as picked/unavailable.</p>
+        <div id="al-full-table"><div class="empty">Loading data…</div></div>
+      </div>
     </div>
   </div>
 
@@ -1374,8 +1837,8 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
         <span class="pi" id="logPi"></span>
         <button class="pb" id="logNext" onclick="logPageNav(1)">Next →</button>
       </div>
-    </div>
-  </div>
+    </div><!-- /.page -->
+  </div><!-- /#tab-log -->
 
   <!-- ── WIN PROBABILITY (admin) ── -->
  <div id="tab-predict" class="panel">
@@ -1396,7 +1859,7 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
       </button>
       <button
         id="auton-calc-toggle-btn"
-        onclick="(function(){var p=document.getElementById('auton-calc-panel');var open=p.style.display==='none'||p.style.display==='';p.style.display=open?'block':'none';var btn=document.getElementById('auton-calc-toggle-btn');btn.setAttribute('aria-pressed',open);btn.style.borderColor=open?'var(--red)':'';btn.style.color=open?'var(--ink)':'';document.getElementById('auton-calc-chevron').style.transform=open?'rotate(180deg)':'rotate(0deg)';})()"
+        onclick="toggleAutonCalcPanel()"
         style="display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border-radius:var(--radius);font-size:12px;font-family:var(--sans);font-weight:500;cursor:pointer;border:1.5px solid var(--paper3);background:var(--paper2);color:var(--ink2);transition:all .15s"
         aria-pressed="false"
       >
@@ -1448,91 +1911,83 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
     <!-- ── AUTON CALCULATOR panel (hidden until toggled) ── -->
     <div id="auton-calc-panel" style="display:none">
     <div class="card" style="margin-top:.75rem">
-      <p class="hint" style="margin-bottom:1rem">Enter team numbers to auto-fill stats from the database, or set values manually.</p>
 
-      <!-- Fail Distribution Toggle -->
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
+      <!-- Card header: hint left, SD toggle right -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:1rem;flex-wrap:wrap">
+        <p class="hint" style="margin:0;flex:1;min-width:0">Enter team numbers to auto-fill stats, or set values manually.</p>
         <button
           id="em-faildist-toggle-btn"
           onclick="emToggleFailDistPanel()"
-          style="display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border-radius:var(--radius);font-size:12px;font-family:var(--sans);font-weight:500;cursor:pointer;border:1.5px solid var(--paper3);background:var(--paper2);color:var(--ink2);transition:all .15s"
+          style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:var(--radius);font-size:11px;font-family:var(--sans);font-weight:500;cursor:pointer;border:1.5px solid var(--paper3);background:var(--paper2);color:var(--ink2);transition:all .15s;flex-shrink:0;white-space:nowrap"
           aria-pressed="false"
         >
-          <span style="font-size:13px">📊</span>
-          <span>Standard Distribution Integration</span>
-          <span style="font-size:10px;font-family:var(--mono);font-weight:700;color:var(--volt);background:rgba(200,255,0,.1);border:1px solid rgba(200,255,0,.3);border-radius:99px;padding:1px 7px;letter-spacing:.3px;text-transform:uppercase">New</span>
-          <span id="em-faildist-toggle-chevron" style="font-size:10px;color:var(--ink3);margin-left:2px;transition:transform .2s">▾</span>
+          <span style="font-size:12px">📊</span>
+          <span>Std. Distribution</span>
+          <span style="font-size:9px;font-family:var(--mono);font-weight:700;color:var(--volt);background:rgba(200,255,0,.1);border:1px solid rgba(200,255,0,.3);border-radius:99px;padding:1px 6px;letter-spacing:.3px;text-transform:uppercase">New</span>
+          <span id="em-faildist-toggle-chevron" style="font-size:10px;color:var(--ink3);transition:transform .2s">▾</span>
         </button>
       </div>
-      <div class="g2" style="margin-bottom:1rem;align-items:start">
+
+      <!-- Red + Blue side by side -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;align-items:start">
         <!-- Red -->
-        <div class="alliance-panel red-panel">
-          <p class="sec" style="color:var(--red)">🔴 Red Alliance</p>
-          <p style="font-size:11px;color:var(--ink3);font-family:var(--mono);margin-bottom:10px">Stats auto-fill from database</p>
-          <div style="background:var(--paper2);border-radius:var(--radius);padding:10px;margin-bottom:10px">
-            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--red);margin-bottom:8px">Robot 1</div>
-            <div style="margin-bottom:4px"><label>Team #</label>
+        <div class="alliance-panel red-panel" style="padding:.75rem">
+          <p class="sec" style="color:var(--red);margin-bottom:8px">🔴 Red Alliance</p>
+          <!-- Robot 1 -->
+          <div style="background:var(--paper2);border-radius:var(--radius);padding:8px;margin-bottom:8px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--red);margin-bottom:6px">Robot 1</div>
+            <div style="margin-bottom:6px"><label>Team #</label>
               <input id="em-r1" placeholder="e.g. 97230F" oninput="emAutoFill('em-r1');syncTeamSlot('em-r1')"></div>
-            <div id="em-r1-pins-normal" style="margin-bottom:8px">
-              <div class="g2">
+            <div id="em-r1-pins-normal" style="margin-bottom:6px">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
                 <div><label>Avg G1 pins</label><input type="number" id="em-r1g1" min="0" max="10" value="2" oninput="emCalcProb()"></div>
                 <div><label>Avg G2 pins</label><input type="number" id="em-r1g2" min="0" max="10" value="1" oninput="emCalcProb()"></div>
               </div>
             </div>
-            <div class="g2">
-              <div><label>Failure rate %</label><input type="number" id="em-r1fail" min="0" max="100" value="0" oninput="emCalcProb()"></div>
-              <div><label>AWP contrib. %</label><input type="number" id="em-r1awp" min="0" max="100" value="50" oninput="emCalcProb()" style="display:none"></div>
-            </div>
+            <div><label>Failure rate %</label><input type="number" id="em-r1fail" min="0" max="100" value="0" oninput="emCalcProb()"></div>
           </div>
-          <div style="background:var(--paper2);border-radius:var(--radius);padding:10px">
-            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--red);margin-bottom:8px">Robot 2</div>
-            <div style="margin-bottom:4px"><label>Team #</label>
+          <!-- Robot 2 -->
+          <div style="background:var(--paper2);border-radius:var(--radius);padding:8px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--red);margin-bottom:6px">Robot 2</div>
+            <div style="margin-bottom:6px"><label>Team #</label>
               <input id="em-r2" placeholder="e.g. 9123X" oninput="emAutoFill('em-r2');syncTeamSlot('em-r2')"></div>
-            <div id="em-r2-pins-normal" style="margin-bottom:8px">
-              <div class="g2">
+            <div id="em-r2-pins-normal" style="margin-bottom:6px">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
                 <div><label>Avg G1 pins</label><input type="number" id="em-r2g1" min="0" max="10" value="2" oninput="emCalcProb()"></div>
                 <div><label>Avg G2 pins</label><input type="number" id="em-r2g2" min="0" max="10" value="1" oninput="emCalcProb()"></div>
               </div>
             </div>
-            <div class="g2">
-              <div><label>Failure rate %</label><input type="number" id="em-r2fail" min="0" max="100" value="0" oninput="emCalcProb()"></div>
-              <div><label>AWP contrib. %</label><input type="number" id="em-r2awp" min="0" max="100" value="50" oninput="emCalcProb()" style="display:none"></div>
-            </div>
+            <div><label>Failure rate %</label><input type="number" id="em-r2fail" min="0" max="100" value="0" oninput="emCalcProb()"></div>
           </div>
         </div>
         <!-- Blue -->
-        <div class="alliance-panel blue-panel">
-          <p class="sec" style="color:var(--blue)">🔵 Blue Alliance</p>
-          <p style="font-size:11px;color:var(--ink3);font-family:var(--mono);margin-bottom:10px">Stats auto-fill from database</p>
-          <div style="background:var(--paper2);border-radius:var(--radius);padding:10px;margin-bottom:10px">
-            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--blue);margin-bottom:8px">Robot 1</div>
-            <div style="margin-bottom:4px"><label>Team #</label>
+        <div class="alliance-panel blue-panel" style="padding:.75rem">
+          <p class="sec" style="color:var(--blue);margin-bottom:8px">🔵 Blue Alliance</p>
+          <!-- Robot 1 -->
+          <div style="background:var(--paper2);border-radius:var(--radius);padding:8px;margin-bottom:8px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--blue);margin-bottom:6px">Robot 1</div>
+            <div style="margin-bottom:6px"><label>Team #</label>
               <input id="em-b1" placeholder="e.g. 5678A" oninput="emAutoFill('em-b1');syncTeamSlot('em-b1')"></div>
-            <div id="em-b1-pins-normal" style="margin-bottom:8px">
-              <div class="g2">
+            <div id="em-b1-pins-normal" style="margin-bottom:6px">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
                 <div><label>Avg G1 pins</label><input type="number" id="em-b1g1" min="0" max="10" value="2" oninput="emCalcProb()"></div>
                 <div><label>Avg G2 pins</label><input type="number" id="em-b1g2" min="0" max="10" value="1" oninput="emCalcProb()"></div>
               </div>
             </div>
-            <div class="g2">
-              <div><label>Failure rate %</label><input type="number" id="em-b1fail" min="0" max="100" value="0" oninput="emCalcProb()"></div>
-              <div><label>AWP contrib. %</label><input type="number" id="em-b1awp" min="0" max="100" value="50" oninput="emCalcProb()" style="display:none"></div>
-            </div>
+            <div><label>Failure rate %</label><input type="number" id="em-b1fail" min="0" max="100" value="0" oninput="emCalcProb()"></div>
           </div>
-          <div style="background:var(--paper2);border-radius:var(--radius);padding:10px">
-            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--blue);margin-bottom:8px">Robot 2</div>
-            <div style="margin-bottom:4px"><label>Team #</label>
+          <!-- Robot 2 -->
+          <div style="background:var(--paper2);border-radius:var(--radius);padding:8px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--blue);margin-bottom:6px">Robot 2</div>
+            <div style="margin-bottom:6px"><label>Team #</label>
               <input id="em-b2" placeholder="e.g. 9999Z" oninput="emAutoFill('em-b2');syncTeamSlot('em-b2')"></div>
-            <div id="em-b2-pins-normal" style="margin-bottom:8px">
-              <div class="g2">
+            <div id="em-b2-pins-normal" style="margin-bottom:6px">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
                 <div><label>Avg G1 pins</label><input type="number" id="em-b2g1" min="0" max="10" value="2" oninput="emCalcProb()"></div>
                 <div><label>Avg G2 pins</label><input type="number" id="em-b2g2" min="0" max="10" value="1" oninput="emCalcProb()"></div>
               </div>
             </div>
-            <div class="g2">
-              <div><label>Failure rate %</label><input type="number" id="em-b2fail" min="0" max="100" value="0" oninput="emCalcProb()"></div>
-              <div><label>AWP contrib. %</label><input type="number" id="em-b2awp" min="0" max="100" value="50" oninput="emCalcProb()" style="display:none"></div>
-            </div>
+            <div><label>Failure rate %</label><input type="number" id="em-b2fail" min="0" max="100" value="0" oninput="emCalcProb()"></div>
           </div>
         </div>
       </div>
@@ -1544,6 +1999,30 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
         <div class="outcome-bar-wrap" id="em-outcomeBar"></div>
         <div style="display:flex;justify-content:space-between;font-size:10px;font-family:var(--mono);color:var(--ink3);margin-bottom:1rem">
           <span>← Red wins</span><span>Tie zone</span><span>Blue wins →</span>
+        </div>
+        <!-- Alliance AWP bars -->
+        <div id="em-awp-bars" style="display:none;margin-bottom:1rem">
+          <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.7px;color:var(--ink3);margin-bottom:6px">Alliance AWP probability</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px">
+                <span style="font-size:10px;font-family:var(--mono);color:var(--red);font-weight:600">🔴 Red</span>
+                <span id="em-awp-red-pct" style="font-size:12px;font-family:var(--mono);font-weight:700;color:var(--red)">0%</span>
+              </div>
+              <div style="height:8px;border-radius:4px;background:var(--border);overflow:hidden">
+                <div id="em-awp-red-fill" style="height:100%;border-radius:4px;background:linear-gradient(90deg,#a33010,var(--red));width:0%;transition:width .4s cubic-bezier(.22,.68,0,1.2)"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px">
+                <span style="font-size:10px;font-family:var(--mono);color:var(--blue);font-weight:600">🔵 Blue</span>
+                <span id="em-awp-blue-pct" style="font-size:12px;font-family:var(--mono);font-weight:700;color:var(--blue)">0%</span>
+              </div>
+              <div style="height:8px;border-radius:4px;background:var(--border);overflow:hidden">
+                <div id="em-awp-blue-fill" style="height:100%;border-radius:4px;background:linear-gradient(90deg,var(--blue-dim),var(--blue));width:0%;transition:width .4s cubic-bezier(.22,.68,0,1.2)"></div>
+              </div>
+            </div>
+          </div>
         </div>
         <div id="em-outcomeDetail" style="display:none"></div>
       </div>
@@ -1623,10 +2102,10 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
 
     </div><!-- /#calc-sidebyside-wrap -->
     
-  </div>
-</div>
+  </div><!-- /#predict-page -->
+  </div><!-- /#tab-predict -->
 
-<div id="tab-routes" class="panel">
+  <div id="tab-routes" class="panel">
   <div class="page">
 
     <!-- Field overview diagram -->
@@ -1952,7 +2431,170 @@ With 0% fail rates → P(both succeed) = 100%
     </div>
   </div>
 
-  <!-- ── SETTINGS (public) ── -->
+  <!-- ── SKILLS (public view, add admin-only) ── -->
+  <div id="tab-skills" class="panel">
+
+    <!-- ── HERO BANNER ── -->
+    <div id="sk-hero" style="
+      background:linear-gradient(160deg,var(--paper2) 0%,var(--paper) 60%);
+      border-bottom:1px solid var(--border);
+      padding:2rem 1.5rem 0;
+      position:relative;overflow:hidden;">
+      <!-- decorative glow blobs -->
+      <div style="position:absolute;top:-40px;left:-40px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(204,61,20,.18) 0%,transparent 70%);pointer-events:none"></div>
+      <div style="position:absolute;top:-20px;right:-20px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(61,142,240,.12) 0%,transparent 70%);pointer-events:none"></div>
+
+      <div style="max-width:1100px;margin:0 auto;position:relative">
+        <!-- Title -->
+        <div style="text-align:center;margin-bottom:1.75rem">
+          <div style="font-family:var(--barlow);font-size:clamp(22px,4vw,38px);font-weight:800;letter-spacing:1px;text-transform:uppercase;line-height:1.1;color:var(--ink)">
+            VEX V5RC <span style="color:var(--red)">Skills</span> Standings
+          </div>
+          <div style="font-size:10px;font-family:var(--mono);color:var(--ink3);letter-spacing:1.5px;text-transform:uppercase;margin-top:6px">2026–27 Season · Override Scout by 97230F</div>
+        </div>
+
+        <!-- Top-score spotlight cards -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:0;max-width:560px;margin-left:auto;margin-right:auto" id="sk-spotlight">
+          <div class="sk-spot-card" id="sk-spot-auton" style="
+            background:linear-gradient(135deg,rgba(61,189,110,.08) 0%,var(--surface) 60%);
+            border:1px solid rgba(61,189,110,.25);border-radius:var(--radius-lg);
+            padding:1rem 1.25rem;text-align:center;position:relative;overflow:hidden">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--green),transparent)"></div>
+            <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1.2px;color:var(--green);font-weight:700;margin-bottom:6px">Highest Programming</div>
+            <div style="font-size:44px;font-weight:800;font-family:var(--barlow);color:var(--ink);line-height:1" id="sk-spot-auton-score">—</div>
+            <div style="font-size:10px;font-family:var(--mono);color:var(--ink3);margin-top:2px" id="sk-spot-auton-sub">No runs yet</div>
+            <div style="font-size:12px;font-family:var(--mono);font-weight:700;color:var(--ink);margin-top:6px" id="sk-spot-auton-team"></div>
+          </div>
+          <div class="sk-spot-card" id="sk-spot-driver" style="
+            background:linear-gradient(135deg,rgba(61,142,240,.08) 0%,var(--surface) 60%);
+            border:1px solid rgba(61,142,240,.25);border-radius:var(--radius-lg);
+            padding:1rem 1.25rem;text-align:center;position:relative;overflow:hidden">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--blue),transparent)"></div>
+            <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1.2px;color:var(--blue);font-weight:700;margin-bottom:6px">Highest Driver</div>
+            <div style="font-size:44px;font-weight:800;font-family:var(--barlow);color:var(--ink);line-height:1" id="sk-spot-driver-score">—</div>
+            <div style="font-size:10px;font-family:var(--mono);color:var(--ink3);margin-top:2px" id="sk-spot-driver-sub">No runs yet</div>
+            <div style="font-size:12px;font-family:var(--mono);font-weight:700;color:var(--ink);margin-top:6px" id="sk-spot-driver-team"></div>
+          </div>
+        </div>
+
+        <!-- Filter tab bar (mimics reference image's HS / MS / College tabs) -->
+        <div style="display:flex;gap:0;margin-top:1.5rem;border-bottom:none;justify-content:center">
+          <button id="sk-filter-both"   onclick="skSetFilter('both',this)"
+            style="padding:9px 24px;font-size:11px;font-family:var(--mono);font-weight:700;text-transform:uppercase;letter-spacing:.8px;
+                   border:1px solid var(--border2);border-right:none;border-radius:var(--radius) 0 0 var(--radius);
+                   cursor:pointer;background:var(--red);color:#fff;border-color:var(--red);
+                   transition:all .15s">Combined</button>
+          <button id="sk-filter-auton"  onclick="skSetFilter('auton',this)"
+            style="padding:9px 24px;font-size:11px;font-family:var(--mono);font-weight:700;text-transform:uppercase;letter-spacing:.8px;
+                   border:1px solid var(--border2);border-right:none;
+                   cursor:pointer;background:var(--paper3);color:var(--ink2);
+                   transition:all .15s">Autonomous</button>
+          <button id="sk-filter-driver" onclick="skSetFilter('driver',this)"
+            style="padding:9px 24px;font-size:11px;font-family:var(--mono);font-weight:700;text-transform:uppercase;letter-spacing:.8px;
+                   border:1px solid var(--border2);border-radius:0 var(--radius) var(--radius) 0;
+                   cursor:pointer;background:var(--paper3);color:var(--ink2);
+                   transition:all .15s">Driver</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MAIN CONTENT ── -->
+    <div class="page" style="padding-top:1.25rem">
+
+      <!-- Search + export bar -->
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:.75rem">
+        <div style="flex:1;min-width:160px;max-width:280px;display:flex;border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden;transition:border-color .15s;box-shadow:none"
+             onfocusin="this.style.borderColor='var(--red)'" onfocusout="this.style.borderColor='var(--border2)'">
+          <input id="sk-search" type="text" placeholder="Search team…"
+            style="flex:1;border:none;outline:none;padding:7px 12px;font-size:12px;font-family:var(--mono);background:var(--surface);color:var(--ink)"
+            oninput="skRender()" autocomplete="off">
+          <span style="padding:7px 10px;font-size:13px;color:var(--ink3);background:var(--surface);display:flex;align-items:center">🔍</span>
+        </div>
+        <div style="font-size:11px;font-family:var(--mono);color:var(--ink3)" id="sk-count-label"></div>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn btn-sm" onclick="exportSkillsCSV()" style="font-size:10px">⬇ CSV</button>
+        </div>
+      </div>
+
+      <!-- Leaderboard table -->
+      <div id="sk-lb-wrap">
+        <div class="empty" style="padding:48px 0">No skills runs logged yet.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── RESOURCES (public) ── -->
+  <div id="tab-resources" class="panel">
+    <div class="page">
+
+      <div class="card" style="margin-bottom:1rem">
+        <p class="sec">📚 VEX V5RC Resources</p>
+        <p class="hint" style="margin-bottom:1rem">Useful links and references for the 2026–27 Push Back season. Click any card to open.</p>
+        <div class="g2" style="margin-bottom:1rem">
+
+          <a href="https://www.robotevents.com/" target="_blank" rel="noopener" style="text-decoration:none">
+            <div class="card" style="cursor:pointer;border-left:3px solid var(--red);margin-bottom:0;transition:border-color .15s,background .15s" onmouseover="this.style.background='var(--paper3)'" onmouseout="this.style.background=''">
+              <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px">🏆 RobotEvents</div>
+              <div style="font-size:11px;font-family:var(--mono);color:var(--ink3)">Official event registrations, team profiles, rankings, and results for all VEX competitions.</div>
+            </div>
+          </a>
+
+          <a href="https://www.vexrobotics.com/v5/competition/vrc-current-game" target="_blank" rel="noopener" style="text-decoration:none">
+            <div class="card" style="cursor:pointer;border-left:3px solid var(--blue);margin-bottom:0;transition:background .15s" onmouseover="this.style.background='var(--paper3)'" onmouseout="this.style.background=''">
+              <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px">📖 Game Manual</div>
+              <div style="font-size:11px;font-family:var(--mono);color:var(--ink3)">Official Push Back game manual and rules on VEX Robotics.</div>
+            </div>
+          </a>
+
+          <a href="https://vrc-data-analysis.com/" target="_blank" rel="noopener" style="text-decoration:none">
+            <div class="card" style="cursor:pointer;border-left:3px solid var(--green);margin-bottom:0;transition:background .15s" onmouseover="this.style.background='var(--paper3)'" onmouseout="this.style.background=''">
+              <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px">⚡ VRC Data Analysis</div>
+              <div style="font-size:11px;font-family:var(--mono);color:var(--ink3)">Source of TrueSkill rankings integrated into Override Scout. Browse Worlds-level team stats.</div>
+            </div>
+          </a>
+
+          <a href="https://www.vexforum.com/" target="_blank" rel="noopener" style="text-decoration:none">
+            <div class="card" style="cursor:pointer;border-left:3px solid var(--amber);margin-bottom:0;transition:background .15s" onmouseover="this.style.background='var(--paper3)'" onmouseout="this.style.background=''">
+              <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px">💬 VEX Forum</div>
+              <div style="font-size:11px;font-family:var(--mono);color:var(--ink3)">Official Q&amp;A, game rules clarifications, strategy threads, and the VEX community hub.</div>
+            </div>
+          </a>
+
+          <a href="https://github.com/johnholbrook/vf-qna" target="_blank" rel="noopener" style="text-decoration:none">
+            <div class="card" style="cursor:pointer;border-left:3px solid var(--volt);margin-bottom:0;transition:background .15s" onmouseover="this.style.background='var(--paper3)'" onmouseout="this.style.background=''">
+              <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px">📋 Game Q&amp;A Archive</div>
+              <div style="font-size:11px;font-family:var(--mono);color:var(--ink3)">Searchable archive of official VEX game Q&amp;A rulings — useful for rules edge cases.</div>
+            </div>
+          </a>
+
+          <a href="https://www.youtube.com/@VEXRobotics" target="_blank" rel="noopener" style="text-decoration:none">
+            <div class="card" style="cursor:pointer;border-left:3px solid var(--red);margin-bottom:0;transition:background .15s" onmouseover="this.style.background='var(--paper3)'" onmouseout="this.style.background=''">
+              <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px">▶ VEX YouTube</div>
+              <div style="font-size:11px;font-family:var(--mono);color:var(--ink3)">Official VEX Robotics YouTube channel — game reveal, tutorials, and competition streams.</div>
+            </div>
+          </a>
+
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="sec">🗓 Season Key Dates</p>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Date</th><th>Milestone</th></tr></thead>
+            <tbody>
+              <tr><td style="font-family:var(--mono)">Sep 3, 2026</td><td>Sig event AWP criteria tightens</td></tr>
+              <tr><td style="font-family:var(--mono)">TBD</td><td>Worlds 2026–27 qualifier cutoff</td></tr>
+              <tr><td style="font-family:var(--mono)">TBD</td><td>VEX World Championship 2027</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <div id="tab-settings" class="panel">
     <div class="page">
       <div class="card" style="max-width:560px">
@@ -2372,6 +3014,7 @@ With 0% fail rates → P(both succeed) = 100%
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
           <div class="ul-badge-pill">V5RC 2026–27</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+            <button id="ul-order-btn" onclick="ulToggleOrder()" style="font-size:10px;padding:5px 14px;background:var(--paper2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--ink2);cursor:pointer;font-family:var(--mono)" title="Toggle changelog order">↓ Newest first</button>
             <button class="btn admin-only" onclick="openUlSubheading()" style="font-size:10px;padding:5px 14px">＋ Subheading</button>
             <button class="btn btn-p admin-only" id="ul-add-btn" onclick="openUlEditor()" style="font-size:10px;padding:5px 14px">＋ Add Entry</button>
             <button class="btn admin-only" id="ul-sync-btn" onclick="ulSnapshotAndSync()" style="font-size:10px;padding:5px 14px;border-color:rgba(61,189,110,.4);color:var(--green)" title="Read current DOM state and push everything to Supabase">⬆ Sync to Supabase</button>
@@ -2427,6 +3070,9 @@ With 0% fail rates → P(both succeed) = 100%
     <a class="sb-link" href="#" data-sbnav="leaderboard" onclick="sidebarNav('leaderboard');return false;">
       <span class="sb-link-icon">🏆</span> Leaderboard
     </a>
+    <a class="sb-link" href="#" data-sbnav="skills" onclick="sidebarNav('skills');return false;">
+      <span class="sb-link-icon">🎯</span> Skills
+    </a>
     <a class="sb-link" href="#" data-sbnav="ts-rankings" onclick="sidebarNav('ts-rankings');return false;">
       <span class="sb-link-icon">⚡</span> TS Rankings
     </a>
@@ -2435,6 +3081,9 @@ With 0% fail rates → P(both succeed) = 100%
     </a>
     <a class="sb-link" href="#" data-sbnav="roadmap" onclick="sidebarNav('roadmap');return false;">
       <span class="sb-link-icon">🗺️</span> Roadmap
+    </a>
+    <a class="sb-link" href="#" data-sbnav="alliance" onclick="sidebarNav('alliance');return false;">
+      <span class="sb-link-icon">🤝</span> Alliance Helper
     </a>
     <a class="sb-link" href="#" data-sbnav="updates" onclick="sidebarNav('updates');return false;">
       <span class="sb-link-icon">📋</span> Changelog
@@ -2869,6 +3518,62 @@ function ulSeedNewVersions() {
     { id: 'e_seed_380_3', tag: 'arch', text: 'Unified team persistence: both calculators now save under the same <code>os_em_teams</code> key (keyed by slot ID r1/r2/b1/b2); on restore, both calculators are populated simultaneously; clear button now also resets win-probability team inputs', versionId: 'v_seed_380' },
   ]);
 
+  addVersion('v_seed_390', 'v3.9.0', 'Auton Rate Field &amp; Alliance AWP Bars', [
+    { id: 'e_seed_390_1', tag: 'feat', text: 'Renamed "AWP contrib. %" → "Auton rate %" in the Auton Calculator — the field is now visible and editable for all four robots, auto-filled from the scouting database when a team number is entered', versionId: 'v_seed_390' },
+    { id: 'e_seed_390_2', tag: 'feat', text: 'Alliance-wide AWP probability bars added below the outcome bar — two side-by-side progress bars show the probability that 🔴 Red and 🔵 Blue each achieve the AWP condition, derived from the full outcome probability model', versionId: 'v_seed_390' },
+    { id: 'e_seed_390_3', tag: 'fix',  text: 'Alliance AWP bars hidden and Auton rate inputs reset to 0 when the calculator is cleared via the schedule modal — prevents stale percentages persisting across matches', versionId: 'v_seed_390' },
+  ]);
+
+  addVersion('v_seed_3100', 'v3.10.0', 'UX Overhaul &amp; Analytics Expansion', [
+    { id: 'e_seed_3100_1',  tag: 'feat', text: '⌨️ Keyboard shortcuts — <code>T</code> opens quick team search, <code>1</code>–<code>9</code> switch tabs, <code>R</code> refreshes data, <code>C</code> opens team comparison, <code>L</code> jumps to leaderboard, <code>?</code> shows the shortcut help overlay', versionId: 'v_seed_3100' },
+    { id: 'e_seed_3100_2',  tag: 'feat', text: '🔍 Quick search overlay — floating search bar (<code>T</code> key) with live filtered results, arrow-key navigation, and Enter to jump straight to a team profile without leaving the current tab', versionId: 'v_seed_3100' },
+    { id: 'e_seed_3100_3',  tag: 'feat', text: '🕐 Search history — the Search tab input now shows a dropdown of recently searched teams on focus; individual entries are clickable to re-search; full history can be cleared in one tap', versionId: 'v_seed_3100' },
+    { id: 'e_seed_3100_4',  tag: 'feat', text: '⭐ Starred teams — every leaderboard row and team profile has a star button; starred teams appear in a persistent quick-access strip at the top of the leaderboard, stored in <code>localStorage</code> under <code>os_starred_teams</code>', versionId: 'v_seed_3100' },
+    { id: 'e_seed_3100_5',  tag: 'feat', text: '⚖️ Team comparison modal — accessible via <code>C</code> key or the new Compare button on the leaderboard; enter up to 4 team numbers for a side-by-side table covering avg pins, recent avg, best match, matches, AWP rate, fail rate, consistency, TrueSkill rank &amp; score, and OPR; best values highlighted green, worst red, with proportional fill bars per metric', versionId: 'v_seed_3100' },
+    { id: 'e_seed_3100_6',  tag: 'feat', text: '📈 Performance sparklines — each leaderboard row now shows a mini trend line under the avg pins value rendered on a canvas element; green when recent performance is improving, red when declining', versionId: 'v_seed_3100' },
+    { id: 'e_seed_3100_7',  tag: 'feat', text: '📊 Extended stats panel in team search — after searching a team, a 6-cell grid appears with Avg Pins, Best Match, Consistency %, AWP Rate, Matches, and Fail Rate computed live from scouting entries', versionId: 'v_seed_3100' },
+    { id: 'e_seed_3100_8',  tag: 'feat', text: '📉 Performance trend chart in team search — below the stats grid, a larger canvas chart shows the team\'s recent match-by-match pin trajectory with a trending-up or trending-down label', versionId: 'v_seed_3100' },
+    { id: 'e_seed_3100_9',  tag: 'feat', text: '📊 Prediction accuracy tracker — Win Probability tab now has "Log Prediction" and "View History" buttons after computing an outcome; past predictions can be resolved (red/blue/tie won) and overall accuracy % is tracked with a visual bar; stored in <code>localStorage</code> under <code>os_pred_history</code>', versionId: 'v_seed_3100' },
+    { id: 'e_seed_3100_10', tag: 'ux',  text: '⚖️ Compare shortcut in team search results — a small Compare button appears in the team profile panel and pre-fills that team into slot 1 of the comparison modal', versionId: 'v_seed_3100' },
+    { id: 'e_seed_3100_11', tag: 'arch', text: '<code>drawSparkline(canvas, vals)</code> helper added — lightweight canvas-based line chart renderer shared by leaderboard rows, compare modal, and team trend charts; no external charting library', versionId: 'v_seed_3100' },
+    { id: 'e_seed_3100_12', tag: 'arch', text: '<code>window.lbRender</code> patched to inject star buttons, sparkline canvases, and compare triggers into leaderboard rows after each render cycle via a <code>setTimeout(0)</code> pass', versionId: 'v_seed_3100' },
+  ]);
+
+  // ── v3.11.0 — Pit Scouting, Match Notes, Alliance Selection & Platform Improvements ──
+  addVersion('v_seed_3110', 'v3.11.0', 'Pit Scouting, Match Notes, Alliance Selection &amp; Platform Improvements', [
+    { id: 'e_seed_3110_1',  tag: 'feat', text: '🤖 Pit scouting form — dedicated form to record robot specs, drive train type, and autonomous capabilities for each team; data stored alongside match scouting entries', versionId: 'v_seed_3110' },
+    { id: 'e_seed_3110_2',  tag: 'feat', text: '📝 Match notes — quick freeform text field per match for jotting observations mid-competition; notes are exportable alongside match data', versionId: 'v_seed_3110' },
+    { id: 'e_seed_3110_3',  tag: 'feat', text: '📤 Export to CSV/JSON — full data export covering all scouting entries, pit notes, and match history; compatible with spreadsheets and offline analysis tools for sharing with alliance partners', versionId: 'v_seed_3110' },
+    { id: 'e_seed_3110_4',  tag: 'feat', text: '🤝 Alliance selection helper — given your team number and the current pick list, suggests optimal alliance partners from remaining available teams based on TrueSkill rank, avg pins, and auton reliability', versionId: 'v_seed_3110' },
+    { id: 'e_seed_3110_5',  tag: 'feat', text: '📡 Service Worker / offline mode — app shell and static assets cached via Service Worker so Override Scout loads and functions without internet; essential for competition venues with unreliable Wi-Fi', versionId: 'v_seed_3110' },
+    { id: 'e_seed_3110_6',  tag: 'feat', text: '🔗 Share via URL — team numbers and match setups encoded into the URL hash so a specific calculator or team profile can be shared as a direct link with alliance partners', versionId: 'v_seed_3110' },
+    { id: 'e_seed_3110_7',  tag: 'ux',  text: '📱 Bottom navigation bar on mobile — replaces the collapsing top sidebar on narrow screens with a thumb-friendly bottom nav bar; primary tabs accessible without stretching to the top of the screen', versionId: 'v_seed_3110' },
+  ]);
+
+  // ── v3.12.0 — Donation Popup &amp; Per-Team Share Links ──
+  addVersion('v_seed_3120', 'v3.12.0', 'Donation Popup &amp; Per-Team Share Links', [
+    { id: 'e_seed_3120_1', tag: 'feat', text: '💚 Donation popup — rotating animated banner appears 5 s after launch (for public viewers) linking to the team GoFundMe; cycles through 5 message variants every 30 s; auto-hides after 8 s; dismissable via ✕ button; non-intrusive spring-entry animation; hidden for admin sessions', versionId: 'v_seed_3120' },
+    { id: 'e_seed_3120_2', tag: 'feat', text: '🔗 Per-team share button in Alliance Selection — each suggestion card and the full ranking table now has a 🔗 Share button that copies a direct link to that team\'s profile (e.g. <code>#search?team=97230F</code>) to the clipboard via <code>window.shareTeam()</code>; falls back to a <code>prompt()</code> on browsers that deny clipboard access', versionId: 'v_seed_3120' },
+    { id: 'e_seed_3120_3', tag: 'ux',  text: 'Donation popup styled with gradient accent bar, spring cubic-bezier entrance, and 8 s auto-dismiss — consistent with existing modal design language and respects both dark and light themes via CSS custom properties', versionId: 'v_seed_3120' },
+  ]);
+
+  // ── v3.13.0 — Skills Leaderboard ──
+  addVersion('v_seed_3130', 'v3.13.0', 'Skills Leaderboard', [
+    { id: 'e_seed_3130_1', tag: 'feat', text: '🎯 New Skills tab — dedicated leaderboard for Autonomous Skills and Driver Skills runs; stores all runs in <code>localStorage</code> under <code>os_skills_v1</code>; accessible from the tab bar, sidebar, and URL hash (<code>#skills</code>)', versionId: 'v_seed_3130' },
+    { id: 'e_seed_3130_2', tag: 'feat', text: 'Admin log-run form — enter team number, event, run type (auton/driver), score, attempt number, and optional notes; validates required fields and confirms with a toast on save', versionId: 'v_seed_3130' },
+    { id: 'e_seed_3130_3', tag: 'feat', text: 'Three leaderboard views — <strong>Combined</strong> (best auton + best driver per team), <strong>Auton only</strong>, and <strong>Driver only</strong>; filter chips switch the sort key and column layout in real time', versionId: 'v_seed_3130' },
+    { id: 'e_seed_3130_4', tag: 'feat', text: 'Summary stats strip — shows total teams, total runs logged, best auton score, and best driver score across all entries; hidden when no data exists', versionId: 'v_seed_3130' },
+    { id: 'e_seed_3130_5', tag: 'feat', text: 'Per-team run drilldown (admin) — expand button on each leaderboard row reveals a full list of that team\'s individual attempts with type, score, attempt number, event, notes, and a delete button', versionId: 'v_seed_3130' },
+    { id: 'e_seed_3130_6', tag: 'feat', text: 'CSV export — downloads all logged skills runs with team, type, score, attempt, event, notes, and ISO timestamp columns', versionId: 'v_seed_3130' },
+    { id: 'e_seed_3130_7', tag: 'ux',  text: 'Your team (from settings) highlighted in gold on the skills leaderboard; medal emoji for top-3 ranks; proportional score bar under each team name for quick visual comparison', versionId: 'v_seed_3130' },
+  ]);
+
+  // ── v3.14.0 — Resources Tab &amp; Add Entry Consolidation ──
+  addVersion('v_seed_3140', 'v3.14.0', 'Resources Tab &amp; Add Entry Consolidation', [
+    { id: 'e_seed_3140_1', tag: 'feat', text: '📚 New Resources tab — public tab with curated links (RobotEvents, Game Manual, VRC Data Analysis, VEX Forum, Q&amp;A Archive, VEX YouTube) and a season key dates table for quick reference during competition', versionId: 'v_seed_3140' },
+    { id: 'e_seed_3140_2', tag: 'ux',  text: 'Log Skills Run form moved from the Skills tab into the Add Entry tab — all admin data-entry forms now live in one place; the Skills tab focuses purely on the leaderboard view', versionId: 'v_seed_3140' },
+  ]);
+
   if (changed) {
     state.edits       = edits;
     state.vblock_edits = vblocks;
@@ -3199,6 +3904,16 @@ function applyUpdatesAdminState() {
    Builds all version blocks, entries, and dividers from
    the Supabase-sourced state object instead of hardcoded HTML.
 ════════════════════════════════════════════════════════ */
+/* ── Changelog order toggle ── */
+window._ulNewestFirst = true; // default: newest at top (current behaviour)
+
+function ulToggleOrder() {
+  window._ulNewestFirst = !window._ulNewestFirst;
+  const btn = document.getElementById('ul-order-btn');
+  if (btn) btn.textContent = window._ulNewestFirst ? '↓ Newest first' : '↑ Oldest first';
+  ulRenderFromState();
+}
+
 function ulRenderFromState() {
   const wrap = document.getElementById('ul-dynamic-wrap');
   if (!wrap) return;
@@ -3246,7 +3961,10 @@ function ulRenderFromState() {
     return;
   }
 
-  renderOrder.forEach(function(item) {
+  // Apply order direction (newest first = default, oldest first = reversed)
+  const orderedItems = window._ulNewestFirst ? renderOrder : [...renderOrder].reverse();
+
+  orderedItems.forEach(function(item) {
     if (item.type === 'divider') {
       const d = dividers[item.id];
       if (!d) return;
@@ -4445,6 +5163,24 @@ function openDetail(t) {
       🌐 Expand — Full Team Profile (RobotEvents)
     </button>
     <div id="re-profile-panel"></div>
+    ${(()=>{
+      const pit = getPitDataForTeam ? getPitDataForTeam(t.team) : null;
+      if (!pit) return '';
+      return `<div style="margin:14px 0 0;padding:10px 12px;background:var(--green-bg);border-radius:var(--radius);border-left:3px solid var(--green)">
+        <div style="font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--green);font-weight:600;margin-bottom:8px">🤖 Pit Scout Data</div>
+        <div style="font-size:12px;color:var(--ink2);line-height:1.7">
+          ${pit.drive ? '<div><strong>Drive:</strong> '+esc(pit.drive)+(pit.motors?' · '+esc(pit.motors):'')+'</div>' : ''}
+          ${pit.type  ? '<div><strong>Robot:</strong> '+esc(pit.type)+(pit.lift?' · '+esc(pit.lift):'')+'</div>' : ''}
+          ${pit.routes ? '<div><strong>Routes:</strong> '+esc(pit.routes)+'</div>' : ''}
+          ${pit.best_auton ? '<div><strong>Best auton:</strong> '+esc(pit.best_auton)+'</div>' : ''}
+          ${pit.sawp  ? '<div><strong>SAWP capable:</strong> '+esc(pit.sawp)+'</div>' : ''}
+          ${pit.notes ? '<div style="margin-top:4px;font-style:italic;color:var(--ink3)">'+esc(pit.notes)+'</div>' : ''}
+        </div>
+      </div>`;
+    })()}
+    <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap">
+      <button class="btn btn-sm" onclick="window.shareTeam('${esc(t.team)}')" title="Copy shareable link">🔗 Share team link</button>
+    </div>
   `;
   document.getElementById('overlay')?.classList.add('open');
   document.body.style.overflow='hidden';
@@ -5849,15 +6585,40 @@ function switchTab(t, el) {
     if(t==='leaderboard' && _lbDirty) { _lbDirty = false; lbSortRender(); }
     if(t==='updates'||t==='roadmap') loadUpdates();
     if(t==='ts-rankings') tsApply();
+    if(t==='alliance') { setTimeout(runAlliance, 50); }
+    if(t==='pit') { renderPitLog(); }
+    if(t==='skills') { skRender(); }
+    if(t==='calendar') { loadCalEvents(); }
     document.dispatchEvent(new CustomEvent('tabchange', { detail: { tab: t } }));
   }
 
   if (outgoing) {
     outgoing.classList.add('exit');
-    outgoing.addEventListener('animationend', activateIncoming, { once: true });
+    let activated = false;
+    const safeActivate = () => { if (!activated) { activated = true; activateIncoming(); } };
+    outgoing.addEventListener('animationend', safeActivate, { once: true });
+    setTimeout(safeActivate, 300); // fallback: fire if animationend never arrives
   } else {
     activateIncoming();
   }
+}
+
+/* ── Auton Calculator panel toggle ── */
+function toggleAutonCalcPanel() {
+  const p    = document.getElementById('auton-calc-panel');
+  const btn  = document.getElementById('auton-calc-toggle-btn');
+  const chev = document.getElementById('auton-calc-chevron');
+  // Clear any stuck exit animation on the predict panel before resizing
+  const predictPanel = document.getElementById('tab-predict');
+  if (predictPanel) { predictPanel.classList.remove('exit'); }
+  const isOpen = p.style.display === 'block';
+  requestAnimationFrame(() => {
+    p.style.display = isOpen ? 'none' : 'block';
+    btn.setAttribute('aria-pressed', String(!isOpen));
+    btn.style.borderColor = isOpen ? '' : 'var(--red)';
+    btn.style.color       = isOpen ? '' : 'var(--ink)';
+    chev.style.transform  = isOpen ? '' : 'rotate(180deg)';
+  });
 }
 
 /* ── True Skill panel toggle ── */
@@ -6664,7 +7425,9 @@ function openSchedModal(evOrId) {
   ['r1','r2','b1','b2'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
   ['em-r1g1','em-r1g2','em-r2g1','em-r2g2','em-b1g1','em-b1g2','em-b2g1','em-b2g2'].forEach(id => { document.getElementById(id).value = 2; });
   ['em-r1fail','em-r2fail','em-b1fail','em-b2fail'].forEach(id => { document.getElementById(id).value = 0; });
-  ['em-r1awp','em-r2awp','em-b1awp','em-b2awp'].forEach(id => { document.getElementById(id).value = 50; });
+  ['em-r1awp','em-r2awp','em-b1awp','em-b2awp'].forEach(id => { const el=document.getElementById(id); if(el) el.value=0; });
+  const awpBarsEl = document.getElementById('em-awp-bars');
+  if (awpBarsEl) awpBarsEl.style.display = 'none';
   try { localStorage.removeItem('os_em_teams'); } catch(e) {}
   emCalcProb();
 
@@ -7156,6 +7919,18 @@ function emCalcProb() {
      <span class="outcome-legend-item"><span class="outcome-legend-swatch" style="background:var(--blue)"></span>Blue ${bluePct.toFixed(1)}%</span>
      <span class="outcome-legend-item"><span class="outcome-legend-swatch" style="background:var(--red);opacity:.55"></span>Red AWP ${redAwpLeg.toFixed(1)}%</span>
      <span class="outcome-legend-item"><span class="outcome-legend-swatch" style="background:var(--blue);opacity:.55"></span>Blue AWP ${blueAwpLeg.toFixed(1)}%</span>`;
+
+  // Alliance AWP probability bars
+  const awpBarsEl = document.getElementById('em-awp-bars');
+  if (awpBarsEl) {
+    awpBarsEl.style.display = 'block';
+    const rPct = Math.min(redAwpLeg, 100);
+    const bPct = Math.min(blueAwpLeg, 100);
+    document.getElementById('em-awp-red-pct').textContent  = rPct.toFixed(1) + '%';
+    document.getElementById('em-awp-blue-pct').textContent = bPct.toFixed(1) + '%';
+    document.getElementById('em-awp-red-fill').style.width  = rPct + '%';
+    document.getElementById('em-awp-blue-fill').style.width = bPct + '%';
+  }
 }
 
 function showEmOutcomeDetail(o, pct, totalProb, allOutcomes) {
@@ -8327,20 +9102,621 @@ function loadSettingsFromStorage() {
 
 document.addEventListener('DOMContentLoaded', loadSettingsFromStorage);
 
+/* ══════════════════════════════════════════════════════════════
+   NEW FEATURES — UX + ANALYTICS
+   1. Keyboard shortcuts
+   2. Quick search overlay (T key)
+   3. Search history
+   4. Starred teams
+   5. Team comparison modal
+   6. Performance sparklines (injected into lbRender)
+   7. OPR/DPR/CCWM computed from entry data (in search results)
+   8. Prediction accuracy tracker
+   9. Performance trend in team profile
+══════════════════════════════════════════════════════════════ */
+
+/* ─── 1. KEYBOARD SHORTCUTS ─────────────────────────────── */
+document.addEventListener('keydown', function(e) {
+  const tag = (document.activeElement || {}).tagName || '';
+  const inInput = ['INPUT','TEXTAREA','SELECT'].includes(tag);
+
+  // Always: Escape closes overlays
+  if (e.key === 'Escape') {
+    if (document.getElementById('quick-search-bar').classList.contains('open')) { closeQuickSearch(); return; }
+    if (document.getElementById('kbd-overlay').style.display !== 'none') { closeKbdOverlay(); return; }
+    if (document.getElementById('compare-modal-bg').classList.contains('open')) { closeCompareModal(); return; }
+  }
+
+  if (inInput) return; // below shortcuts don't fire inside inputs
+
+  // ? → keyboard help
+  if (e.key === '?') { openKbdOverlay(); return; }
+
+  // T → quick search
+  if (e.key === 't' || e.key === 'T') { openQuickSearch(); return; }
+
+  // R → refresh
+  if (e.key === 'r' || e.key === 'R') {
+    if (typeof loadData === 'function') { loadData(); showToastNew('Refreshing…'); }
+    return;
+  }
+
+  // C → compare modal
+  if (e.key === 'c' || e.key === 'C') { openCompareModal(); return; }
+
+  // L → leaderboard tab
+  if (e.key === 'l' || e.key === 'L') {
+    const lb = document.querySelector('[data-tab="leaderboard"]');
+    if (lb) lb.click();
+    return;
+  }
+
+  // 1-9 → switch tabs by position
+  if (e.key >= '1' && e.key <= '9') {
+    const tabs = Array.from(document.querySelectorAll('.tab:not([style*="display:none"]):not(.admin-only:not(.admin-visible))'));
+    const idx = parseInt(e.key) - 1;
+    if (tabs[idx]) tabs[idx].click();
+  }
+});
+
+function openKbdOverlay() {
+  document.getElementById('kbd-overlay').style.display = 'flex';
+}
+function closeKbdOverlay() {
+  document.getElementById('kbd-overlay').style.display = 'none';
+}
+
+/* ─── 2. QUICK SEARCH OVERLAY ───────────────────────────── */
+let qsSelectedIdx = -1;
+function openQuickSearch() {
+  const bar = document.getElementById('quick-search-bar');
+  bar.classList.add('open');
+  const inp = document.getElementById('quick-search-input');
+  inp.value = '';
+  document.getElementById('quick-search-results').innerHTML = '';
+  inp.focus();
+  qsSelectedIdx = -1;
+}
+function closeQuickSearch() {
+  document.getElementById('quick-search-bar').classList.remove('open');
+}
+function qsSearch(q) {
+  q = q.trim().toUpperCase();
+  const res = document.getElementById('quick-search-results');
+  if (!q || !window.allTeams) { res.innerHTML = ''; return; }
+  const matches = allTeams.filter(t => t.team.toUpperCase().includes(q)).slice(0, 8);
+  if (!matches.length) { res.innerHTML = '<div class="qs-result" style="cursor:default"><span class="qs-result-meta">No teams found</span></div>'; return; }
+  res.innerHTML = matches.map((t, i) => `
+    <div class="qs-result" data-team="${t.team}" onclick="qsGo('${t.team}')">
+      <span class="qs-result-team">${t.team}</span>
+      <span class="qs-result-meta">${parseFloat(t.avg_pins||0).toFixed(1)} avg pins · ${t.count} matches</span>
+    </div>`).join('');
+  qsSelectedIdx = -1;
+}
+function qsKey(e) {
+  const items = document.querySelectorAll('.qs-result');
+  if (e.key === 'ArrowDown') { qsSelectedIdx = Math.min(qsSelectedIdx+1, items.length-1); qsHighlight(items); e.preventDefault(); }
+  else if (e.key === 'ArrowUp') { qsSelectedIdx = Math.max(qsSelectedIdx-1, 0); qsHighlight(items); e.preventDefault(); }
+  else if (e.key === 'Enter') {
+    if (qsSelectedIdx >= 0 && items[qsSelectedIdx]) {
+      qsGo(items[qsSelectedIdx].dataset.team);
+    } else {
+      const val = document.getElementById('quick-search-input').value.trim();
+      if (val) qsGo(val);
+    }
+  } else if (e.key === 'Escape') { closeQuickSearch(); }
+}
+function qsHighlight(items) {
+  items.forEach((el, i) => el.classList.toggle('qs-active', i === qsSelectedIdx));
+}
+function qsGo(team) {
+  closeQuickSearch();
+  // Switch to search tab and populate
+  const tab = document.querySelector('[data-tab="search"]');
+  if (tab) tab.click();
+  setTimeout(() => {
+    const inp = document.getElementById('pubSearch');
+    if (inp) { inp.value = team; }
+    if (typeof pubDoSearch === 'function') pubDoSearch();
+  }, 80);
+  shAddHistory(team);
+}
+
+/* ─── 3. SEARCH HISTORY ─────────────────────────────────── */
+const SH_KEY = 'os_search_history';
+function shGetHistory() {
+  try { return JSON.parse(localStorage.getItem(SH_KEY) || '[]'); } catch(e) { return []; }
+}
+function shAddHistory(team) {
+  team = (team||'').trim().toUpperCase();
+  if (!team) return;
+  let h = shGetHistory().filter(t => t !== team);
+  h.unshift(team);
+  h = h.slice(0, 12);
+  try { localStorage.setItem(SH_KEY, JSON.stringify(h)); } catch(e) {}
+}
+function shShowDrop() {
+  const h = shGetHistory();
+  const drop = document.getElementById('search-history-drop');
+  if (!drop) return;
+  if (!h.length) { drop.style.display = 'none'; return; }
+  drop.style.display = 'block';
+  drop.innerHTML = h.map(t => `
+    <div class="sh-item" onclick="shUse('${t}')">
+      <span class="sh-item-icon">🕐</span>
+      <span>${t}</span>
+    </div>`).join('') +
+    `<div class="sh-item" style="justify-content:center" onclick="shClearHistory()">
+      <span style="font-size:10px;color:var(--ink3)">Clear history</span>
+    </div>`;
+}
+function shHideDrop() {
+  const drop = document.getElementById('search-history-drop');
+  if (drop) drop.style.display = 'none';
+}
+function shInput(val) {
+  if (val.trim()) { shHideDrop(); }
+  else { shShowDrop(); }
+}
+function shUse(team) {
+  const inp = document.getElementById('pubSearch');
+  if (inp) inp.value = team;
+  shHideDrop();
+  if (typeof pubDoSearch === 'function') pubDoSearch();
+}
+function shClearHistory() {
+  try { localStorage.removeItem(SH_KEY); } catch(e) {}
+  shHideDrop();
+}
+// Hook into pubDoSearch to record searches
+const _origPubDoSearch = window.pubDoSearch;
+window.pubDoSearch = function() {
+  const inp = document.getElementById('pubSearch');
+  if (inp && inp.value.trim()) shAddHistory(inp.value.trim());
+  if (typeof _origPubDoSearch === 'function') _origPubDoSearch.apply(this, arguments);
+  // After a short delay, inject analytics extras
+  setTimeout(() => injectSearchExtras(), 300);
+};
+
+/* ─── 4. STARRED TEAMS ──────────────────────────────────── */
+const STAR_KEY = 'os_starred_teams';
+function getStarred() {
+  try { return JSON.parse(localStorage.getItem(STAR_KEY) || '[]'); } catch(e) { return []; }
+}
+function toggleStar(team) {
+  let stars = getStarred();
+  if (stars.includes(team)) {
+    stars = stars.filter(t => t !== team);
+    showToastNew('⭐ Unstarred ' + team);
+  } else {
+    stars.push(team);
+    showToastNew('⭐ Starred ' + team);
+  }
+  try { localStorage.setItem(STAR_KEY, JSON.stringify(stars)); } catch(e) {}
+  renderStarredSection();
+  // Update all star buttons on page
+  document.querySelectorAll('.star-btn').forEach(btn => {
+    if (btn.dataset.team === team) btn.classList.toggle('starred', stars.includes(team));
+  });
+}
+function renderStarredSection() {
+  const stars = getStarred();
+  const sec = document.getElementById('starred-section');
+  const chips = document.getElementById('starred-chips');
+  if (!sec || !chips) return;
+  if (!stars.length) { sec.classList.remove('has-stars'); return; }
+  sec.classList.add('has-stars');
+  chips.innerHTML = stars.map(t => `
+    <span class="starred-chip" onclick="gotoTeam('${t}')">
+      ⭐ ${t}
+      <span class="starred-chip-x" onclick="event.stopPropagation();toggleStar('${t}')" title="Remove">✕</span>
+    </span>`).join('');
+}
+function gotoTeam(team) {
+  const tab = document.querySelector('[data-tab="search"]');
+  if (tab) tab.click();
+  setTimeout(() => {
+    const inp = document.getElementById('pubSearch');
+    if (inp) inp.value = team;
+    if (typeof pubDoSearch === 'function') pubDoSearch();
+  }, 80);
+}
+// Initialise starred on load
+document.addEventListener('DOMContentLoaded', renderStarredSection);
+// Also render now (DOMContentLoaded may have already fired)
+renderStarredSection();
+
+/* Helper: small toast (separate from the existing showMsg) */
+function showToastNew(msg, dur=2200) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;background:var(--surface);border:1px solid var(--border2);padding:9px 16px;border-radius:var(--radius-lg);font-family:var(--mono);font-size:12px;color:var(--ink);box-shadow:0 4px 16px rgba(0,0,0,.4);animation:fadeIn .2s ease;pointer-events:none';
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.style.cssText='',350); }, dur);
+}
+
+/* Patch lbRender to inject star buttons + sparklines + compare */
+const _origLbRenderNew = window.lbRender;
+window.lbRender = function() {
+  _origLbRenderNew.apply(this, arguments);
+  // After lbRender, inject star buttons into every row
+  setTimeout(() => {
+    const stars = getStarred();
+    document.querySelectorAll('#lbMain tr[data-team]').forEach(row => {
+      const team = row.dataset.team;
+      if (!team) return;
+      // Star button
+      if (!row.querySelector('.star-btn')) {
+        const td = row.querySelector('td:nth-child(2)');
+        if (td) {
+          const btn = document.createElement('button');
+          btn.className = 'star-btn' + (stars.includes(team) ? ' starred' : '');
+          btn.dataset.team = team;
+          btn.title = 'Star this team';
+          btn.textContent = '★';
+          btn.onclick = function(e) { e.stopPropagation(); toggleStar(team); };
+          td.appendChild(btn);
+        }
+      }
+      // Sparkline
+      if (!row.querySelector('.sparkline-canvas')) {
+        const pinsTd = row.querySelector('td:nth-child(4)');
+        if (pinsTd && window.allEntries) {
+          const teamEntries = allEntries.filter(en => (en.team||'').toUpperCase() === team.toUpperCase());
+          if (teamEntries.length >= 3) {
+            const recent = [...teamEntries].sort((a,b)=>(b.ts||b.created_at||'').localeCompare(a.ts||a.created_at||'')).slice(0,10).reverse();
+            const vals = recent.map(en => { const p=(en.pins||'0+0').split('+'); return (parseInt(p[0])||0)+(parseInt(p[1])||0); });
+            const canvas = document.createElement('canvas');
+            canvas.className = 'sparkline-canvas';
+            canvas.width = 60; canvas.height = 20;
+            drawSparkline(canvas, vals);
+            pinsTd.appendChild(document.createElement('br'));
+            pinsTd.appendChild(canvas);
+          }
+        }
+      }
+    });
+  }, 0);
+};
+
+/* ─── SPARKLINE DRAWING ──────────────────────────────────── */
+function drawSparkline(canvas, vals) {
+  if (!vals || vals.length < 2) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const min = Math.min(...vals), max = Math.max(...vals);
+  const range = max - min || 1;
+  const pts = vals.map((v, i) => [i / (vals.length-1) * W, H - ((v-min)/range) * (H-4) - 2]);
+  ctx.clearRect(0, 0, W, H);
+  ctx.beginPath();
+  ctx.moveTo(pts[0][0], pts[0][1]);
+  pts.slice(1).forEach(([x,y]) => ctx.lineTo(x,y));
+  const isUp = vals[vals.length-1] >= vals[0];
+  ctx.strokeStyle = isUp ? '#3dbd6e' : '#cc3d14';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  // Last dot
+  const last = pts[pts.length-1];
+  ctx.beginPath();
+  ctx.arc(last[0], last[1], 2.5, 0, Math.PI*2);
+  ctx.fillStyle = isUp ? '#3dbd6e' : '#cc3d14';
+  ctx.fill();
+}
+
+/* ─── 5. TEAM COMPARISON MODAL ──────────────────────────── */
+function openCompareModal() {
+  document.getElementById('compare-modal-bg').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('cmp-t1').focus(), 80);
+}
+function closeCompareModal() {
+  document.getElementById('compare-modal-bg').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function runCompare() {
+  const ids = ['cmp-t1','cmp-t2','cmp-t3','cmp-t4']
+    .map(id => (document.getElementById(id)?.value||'').trim().toUpperCase())
+    .filter(Boolean);
+
+  const res = document.getElementById('cmp-result');
+  if (!ids.length || !window.allTeams) {
+    res.innerHTML = '<div style="font-size:12px;font-family:var(--mono);color:var(--ink3);text-align:center;padding:2rem">Enter team numbers above to compare.</div>';
+    return;
+  }
+
+  const teams = ids.map(id => allTeams.find(t => t.team.toUpperCase() === id) || null);
+  const found = teams.filter(Boolean);
+  if (!found.length) {
+    res.innerHTML = '<div style="font-size:12px;font-family:var(--mono);color:var(--red-text);text-align:center;padding:2rem">No matching teams found in database.</div>';
+    return;
+  }
+
+  // Compute OPR-style stats from entries per team
+  function teamStats(tObj) {
+    if (!tObj) return null;
+    const entries = (window.allEntries||[]).filter(e=>(e.team||'').toUpperCase()===tObj.team.toUpperCase());
+    const pinsArr = entries.map(e=>{ const p=(e.pins||'0+0').split('+'); return (parseInt(p[0])||0)+(parseInt(p[1])||0); });
+    const recent = [...entries].sort((a,b)=>(b.ts||b.created_at||'').localeCompare(a.ts||a.created_at||'')).slice(0,5);
+    const recentAvg = recent.length ? recent.reduce((s,e)=>{ const p=(e.pins||'0+0').split('+'); return s+(parseInt(p[0])||0)+(parseInt(p[1])||0); },0)/recent.length : 0;
+    const maxPins = pinsArr.length ? Math.max(...pinsArr) : 0;
+    const consistency = pinsArr.length >= 2 ? (1 - stdDev(pinsArr)/Math.max(1,average(pinsArr))) : null;
+    const awpPct = entries.length ? entries.filter(e=>e.awp==='Y').length/entries.length*100 : 0;
+    const failPct = entries.length ? entries.filter(e=>e.failed==='Y').length/entries.length*100 : 0;
+    const ts = window.TS_DB && window.tsGet ? tsGet(tObj.team) : null;
+    return {
+      team: tObj.team,
+      count: tObj.count || entries.length,
+      avg: parseFloat(tObj.avg_pins||0),
+      recentAvg,
+      maxPins,
+      consistency,
+      awpPct,
+      failPct,
+      tsRank: ts ? ts.ts_rank : null,
+      tsScore: ts ? ts.ts : null,
+      opr: ts ? ts.opr : null,
+      entries: pinsArr,
+    };
+  }
+
+  const stats = found.map(teamStats);
+
+  const metrics = [
+    { label:'Avg Pins',     key:'avg',         fmt:v=>v.toFixed(1),  higher:true },
+    { label:'Recent Avg (5)',key:'recentAvg',   fmt:v=>v.toFixed(1),  higher:true },
+    { label:'Best Match',   key:'maxPins',      fmt:v=>v,             higher:true },
+    { label:'Matches',      key:'count',        fmt:v=>v,             higher:true },
+    { label:'AWP Rate',     key:'awpPct',       fmt:v=>v.toFixed(0)+'%', higher:true },
+    { label:'Fail Rate',    key:'failPct',      fmt:v=>v.toFixed(0)+'%', higher:false },
+    { label:'Consistency',  key:'consistency',  fmt:v=>v!==null?(v*100).toFixed(0)+'%':'—', higher:true },
+    { label:'TrueSkill Rank',key:'tsRank',      fmt:v=>v?'#'+Math.round(v):'—', higher:false },
+    { label:'TrueSkill Score',key:'tsScore',    fmt:v=>v?v.toFixed(1):'—', higher:true },
+    { label:'OPR',          key:'opr',          fmt:v=>v?v.toFixed(1):'—', higher:true },
+  ];
+
+  const colors = ['var(--blue)','var(--red)','var(--green)','var(--amber)'];
+
+  let html = '<table class="cmp-table"><thead><tr>';
+  html += '<th>Metric</th>';
+  stats.forEach((s,i) => {
+    html += `<th class="cmp-team-head" style="color:${colors[i]}">${s.team}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  metrics.forEach(m => {
+    const vals = stats.map(s => s[m.key]);
+    const numVals = vals.map(v => typeof v === 'number' ? v : null).filter(v=>v!==null);
+    const best = numVals.length ? (m.higher ? Math.max(...numVals) : Math.min(...numVals)) : null;
+    const worst = numVals.length ? (m.higher ? Math.min(...numVals) : Math.max(...numVals)) : null;
+
+    html += `<tr><td style="color:var(--ink3);font-family:var(--mono)">${m.label}</td>`;
+    vals.forEach((v, i) => {
+      const displayVal = m.fmt(v !== null ? v : 0);
+      const numV = typeof v === 'number' ? v : null;
+      let cls = '';
+      if (numV !== null && best !== null && numV === best && numVals.length > 1) cls = 'cmp-best';
+      else if (numV !== null && worst !== null && numV === worst && numVals.length > 1) cls = 'cmp-worst';
+      // Bar
+      let barHtml = '';
+      if (numV !== null && best && best > 0) {
+        const pct = Math.min(100, (numV/best)*100);
+        barHtml = `<div class="cmp-bar-wrap"><div class="cmp-bar-fill" style="width:${pct}%;background:${colors[i]}"></div></div>`;
+      }
+      html += `<td class="${cls}"><div class="cmp-bar-cell"><span>${displayVal}</span>${barHtml}</div></td>`;
+    });
+    html += '</tr>';
+  });
+
+  // Sparkline row
+  html += `<tr><td style="color:var(--ink3);font-family:var(--mono)">Trend</td>`;
+  stats.forEach((s,i) => {
+    const canvas_id = 'cmp-spark-' + i;
+    html += `<td><canvas id="${canvas_id}" width="100" height="24" style="display:block"></canvas></td>`;
+  });
+  html += '</tr>';
+
+  html += '</tbody></table>';
+  res.innerHTML = html;
+
+  // Draw sparklines
+  stats.forEach((s, i) => {
+    const canvas = document.getElementById('cmp-spark-' + i);
+    if (canvas && s.entries.length >= 2) {
+      canvas.style.width = '100px';
+      drawSparkline(canvas, s.entries.slice(-10));
+    }
+  });
+}
+
+function average(arr) { return arr.reduce((a,b)=>a+b,0)/arr.length; }
+function stdDev(arr) {
+  const avg = average(arr);
+  return Math.sqrt(arr.reduce((s,v)=>s+(v-avg)**2,0)/arr.length);
+}
+
+/* ─── 6. OPR/DPR in search profile (injected into pubResult rendering) ── */
+// Hook into the existing renderTeamCard-style flow
+// We patch the pubResult innerHTML by observing when team result appears
+// (pubDoSearch is already patched above to call injectSearchExtras)
+
+function injectSearchExtras() {
+  const res = document.getElementById('pubResult');
+  if (!res) return;
+  const teamEl = res.querySelector('.tn');
+  if (!teamEl) return;
+  const team = teamEl.textContent.trim().toUpperCase();
+  if (!team || !window.allEntries) return;
+
+  // Add star button if not already there
+  if (!res.querySelector('.star-btn')) {
+    const stars = getStarred();
+    const btn = document.createElement('button');
+    btn.className = 'star-btn' + (stars.includes(team) ? ' starred' : '');
+    btn.dataset.team = team;
+    btn.title = 'Star this team';
+    btn.textContent = '★ ' + (stars.includes(team) ? 'Starred' : 'Star team');
+    btn.style.cssText = 'margin:6px 0;font-size:13px;padding:4px 12px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--paper3);font-family:var(--mono);cursor:pointer;display:flex;align-items:center;gap:4px';
+    btn.onclick = function() { toggleStar(team); btn.textContent = '★ ' + (getStarred().includes(team) ? 'Starred' : 'Star team'); btn.classList.toggle('starred', getStarred().includes(team)); };
+    teamEl.closest('.card') && teamEl.closest('.card').insertAdjacentElement('afterbegin', btn);
+    if (!teamEl.closest('.card')) res.insertAdjacentElement('afterbegin', btn);
+  }
+
+  // Compute and inject OPR grid
+  if (!res.querySelector('.opr-grid')) {
+    const entries = allEntries.filter(e=>(e.team||'').toUpperCase()===team);
+    if (entries.length) {
+      const pinsArr = entries.map(e=>{ const p=(e.pins||'0+0').split('+'); return (parseInt(p[0])||0)+(parseInt(p[1])||0); });
+      const avg = average(pinsArr).toFixed(1);
+      const best = Math.max(...pinsArr);
+      const consistency = pinsArr.length >= 2 ? (1 - stdDev(pinsArr)/Math.max(1,average(pinsArr)))*100 : null;
+      const awpPct = (entries.filter(e=>e.awp==='Y').length/entries.length*100).toFixed(0);
+      const div = document.createElement('div');
+      div.className = 'opr-grid';
+      div.innerHTML = `
+        <div class="opr-card"><div class="opr-card-l">Avg Pins</div><div class="opr-card-v" style="color:var(--blue)">${avg}</div></div>
+        <div class="opr-card"><div class="opr-card-l">Best Match</div><div class="opr-card-v" style="color:var(--green)">${best}</div></div>
+        <div class="opr-card"><div class="opr-card-l">Consistency</div><div class="opr-card-v">${consistency!==null?consistency.toFixed(0)+'%':'—'}</div></div>
+        <div class="opr-card"><div class="opr-card-l">AWP Rate</div><div class="opr-card-v">${awpPct}%</div></div>
+        <div class="opr-card"><div class="opr-card-l">Matches</div><div class="opr-card-v">${entries.length}</div></div>
+        <div class="opr-card"><div class="opr-card-l">Fail Rate</div><div class="opr-card-v" style="color:var(--red-text)">${(entries.filter(e=>e.failed==='Y').length/entries.length*100).toFixed(0)}%</div></div>`;
+
+      // Trend chart
+      const trendDiv = document.createElement('div');
+      trendDiv.className = 'trend-section';
+      const recent = [...entries].sort((a,b)=>(b.ts||b.created_at||'').localeCompare(a.ts||a.created_at||'')).slice(0,15).reverse();
+      const recentPins = recent.map(e=>{ const p=(e.pins||'0+0').split('+'); return (parseInt(p[0])||0)+(parseInt(p[1])||0); });
+      const trendCanvas = document.createElement('canvas');
+      trendCanvas.width = 240; trendCanvas.height = 36;
+      trendCanvas.style.cssText = 'display:block;width:100%;max-width:300px';
+      const isUp = recentPins.length>=2 && recentPins[recentPins.length-1] >= recentPins[0];
+      const trendLabel = recentPins.length<2 ? '' : isUp ? '📈 Trending up' : '📉 Trending down';
+      trendDiv.innerHTML = `<div class="trend-section-hd">📊 Recent Performance Trend <span style="margin-left:4px;font-size:10px;color:${isUp?'var(--green)':'var(--red-text)'}">${trendLabel}</span></div>`;
+      trendDiv.appendChild(trendCanvas);
+      setTimeout(() => { if(recentPins.length>=2) drawSparkline(trendCanvas, recentPins); }, 50);
+
+      // Inject after the first card or at the start of pubResult
+      const firstCard = res.querySelector('.card') || res.querySelector('.sbox') || res.firstElementChild;
+      if (firstCard) {
+        firstCard.after(div);
+        div.after(trendDiv);
+      } else {
+        res.appendChild(div);
+        res.appendChild(trendDiv);
+      }
+      // Add compare button
+      const cmpBtn = document.createElement('button');
+      cmpBtn.className = 'cmp-trigger';
+      cmpBtn.textContent = '⚖️ Compare';
+      cmpBtn.onclick = () => { openCompareModal(); setTimeout(()=>{ const inp=document.getElementById('cmp-t1'); if(inp){inp.value=team;runCompare();} },50); };
+      res.insertAdjacentElement('afterbegin', cmpBtn);
+    }
+  }
+  shAddHistory(team);
+}
+
+/* ─── 7. PREDICTION ACCURACY TRACKER ────────────────────── */
+const PRED_HIST_KEY = 'os_pred_history';
+function getPredHistory() {
+  try { return JSON.parse(localStorage.getItem(PRED_HIST_KEY)||'[]'); } catch(e){ return []; }
+}
+function logPrediction(redPct, winner) {
+  const h = getPredHistory();
+  h.unshift({ ts: new Date().toISOString(), redPct, winner, correct: null });
+  try { localStorage.setItem(PRED_HIST_KEY, JSON.stringify(h.slice(0,50))); } catch(e) {}
+  renderPredHistory();
+  showToastNew('📊 Prediction logged');
+}
+function resolvePrediction(idx, actualWinner) {
+  const h = getPredHistory();
+  if (!h[idx]) return;
+  const pred = h[idx].redPct > 50 ? 'red' : 'blue';
+  h[idx].correct = (pred === actualWinner);
+  h[idx].actual = actualWinner;
+  try { localStorage.setItem(PRED_HIST_KEY, JSON.stringify(h)); } catch(e) {}
+  renderPredHistory();
+}
+function renderPredHistory() {
+  const modal = document.getElementById('pred-hist-modal-bg');
+  const body = document.getElementById('pred-hist-body');
+  if (!body) return;
+  const h = getPredHistory();
+  if (!h.length) { body.innerHTML = '<div style="font-size:12px;font-family:var(--mono);color:var(--ink3);text-align:center;padding:2rem">No predictions logged yet.</div>'; return; }
+  const resolved = h.filter(p=>p.correct!==null);
+  const accuracy = resolved.length ? (resolved.filter(p=>p.correct).length/resolved.length*100).toFixed(0) : null;
+  body.innerHTML = (accuracy !== null ? `
+    <div style="margin-bottom:1rem;padding:12px;background:var(--paper2);border-radius:var(--radius-lg);border:1px solid var(--border);text-align:center">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Prediction Accuracy (${resolved.length} resolved)</div>
+      <div style="font-size:28px;font-weight:700;font-family:var(--mono);color:${accuracy>=60?'var(--green)':accuracy>=40?'var(--amber)':'var(--red-text)'}">${accuracy}%</div>
+      <div class="ph-accuracy-bar"><div class="ph-accuracy-fill" style="width:${accuracy}%"></div></div>
+    </div>` : '') +
+  h.map((p,i) => {
+    const date = new Date(p.ts).toLocaleDateString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    const predicted = p.redPct > 50 ? 'Red' : 'Blue';
+    const confidence = p.redPct > 50 ? p.redPct : (100-p.redPct);
+    let status = '';
+    if (p.correct === true) status = '<span class="ph-correct">✓ Correct</span>';
+    else if (p.correct === false) status = '<span class="ph-wrong">✗ Wrong ('+p.actual+' won)</span>';
+    else status = `<select onchange="resolvePrediction(${i},this.value)" style="font-size:10px;font-family:var(--mono);padding:2px 5px;border-radius:3px;border:1px solid var(--border2);background:var(--paper);color:var(--ink)">
+      <option value="">Log result…</option><option value="red">Red won</option><option value="blue">Blue won</option><option value="tie">Tie</option></select>`;
+    return `<div class="ph-row">
+      <span style="color:var(--ink3)">${date}</span>
+      <span>Pred: <strong style="color:${predicted==='Red'?'var(--red)':'var(--blue)'}">${predicted}</strong> @ ${confidence.toFixed(0)}%</span>
+      <span>${status}</span>
+    </div>`;
+  }).join('');
+}
+
+// Inject "Log Prediction" button into the Win Probability outcome detail
+const _origShowOutcomeDetail = window.showOutcomeDetail;
+window.showOutcomeDetail = function(o, clickedSeg, allOutcomes) {
+  if (typeof _origShowOutcomeDetail === 'function') _origShowOutcomeDetail.apply(this, arguments);
+  setTimeout(() => {
+    const det = document.getElementById('outcomeDetail');
+    if (!det || !det.style.display || det.style.display === 'none') return;
+    if (det.querySelector('.log-pred-btn')) return;
+    const totalProb = allOutcomes.reduce((s,x)=>s+x.probability,0)||1;
+    const redPct = allOutcomes.filter(x=>x.winner==='Red wins').reduce((s,x)=>s+x.probability,0)/totalProb*100;
+    const btn = document.createElement('button');
+    btn.className = 'log-pred-btn btn-sm';
+    btn.textContent = '📊 Log Prediction';
+    btn.style.cssText = 'margin-top:.75rem;display:block;width:100%';
+    btn.onclick = () => { logPrediction(redPct, null); };
+    det.appendChild(btn);
+    const histBtn = document.createElement('button');
+    histBtn.className = 'btn-sm';
+    histBtn.textContent = 'View History';
+    histBtn.style.cssText = 'margin-top:4px;display:block;width:100%;color:var(--ink3)';
+    histBtn.onclick = () => { renderPredHistory(); document.getElementById('pred-hist-modal-bg').style.display='flex'; };
+    det.appendChild(histBtn);
+  }, 100);
+};
+
+/* ─── Init all features on DOMContentLoaded ──────────────── */
+document.addEventListener('DOMContentLoaded', function() {
+  renderStarredSection();
+  renderPredHistory();
+});
+
+
 /* ── Side-by-side calculator mode ── */
 function applyCalcSideBySide(on) {
   try { localStorage.setItem('os_calc_sidebyside', on ? '1' : '0'); } catch(e) {}
   document.body.classList.toggle('calc-sidebyside', !!on);
   const t = document.getElementById('sideBySideToggle');
   if (t) t.checked = !!on;
-  // When enabling, ensure the auton calc panel is open
+  // When enabling, ensure the auton calc panel is open — but only if we're on the predict tab
   if (on) {
-    const p = document.getElementById('auton-calc-panel');
-    const btn = document.getElementById('auton-calc-toggle-btn');
-    const chev = document.getElementById('auton-calc-chevron');
-    if (p) p.style.display = 'block';
-    if (btn) { btn.setAttribute('aria-pressed', 'true'); btn.style.borderColor = 'var(--red)'; btn.style.color = 'var(--ink)'; }
-    if (chev) chev.style.transform = 'rotate(180deg)';
+    const predictActive = document.getElementById('tab-predict')?.classList.contains('active');
+    if (predictActive) {
+      const p = document.getElementById('auton-calc-panel');
+      const btn = document.getElementById('auton-calc-toggle-btn');
+      const chev = document.getElementById('auton-calc-chevron');
+      if (p) p.style.display = 'block';
+      if (btn) { btn.setAttribute('aria-pressed', 'true'); btn.style.borderColor = 'var(--red)'; btn.style.color = 'var(--ink)'; }
+      if (chev) chev.style.transform = 'rotate(180deg)';
+    }
   }
 }
 
@@ -8450,41 +9826,703 @@ function syncTeamSlot(srcId) {
 
 </script>
 
+<!-- ── MOBILE BOTTOM NAV BAR ── -->
+<nav id="mobile-bottom-nav" aria-label="Primary navigation">
+  <button class="mbn-btn active" data-mbn="leaderboard" onclick="mbnNav('leaderboard',this)">
+    <span class="mbn-icon">🏆</span>Board
+  </button>
+  <button class="mbn-btn" data-mbn="search" onclick="mbnNav('search',this)">
+    <span class="mbn-icon">🔍</span>Search
+  </button>
+  <button class="mbn-btn" data-mbn="alliance" onclick="mbnNav('alliance',this)">
+    <span class="mbn-icon">🤝</span>Alliance
+  </button>
+  <button class="mbn-btn" data-mbn="calendar" onclick="mbnNav('calendar',this)">
+    <span class="mbn-icon">📅</span>Events
+  </button>
+  <button class="mbn-btn" data-mbn="settings" onclick="mbnNav('settings',this)">
+    <span class="mbn-icon">⚙️</span>More
+  </button>
+</nav>
+
 <script>
-// Pin tabs bar using fixed positioning, accounting for topbar height
+/* ── Mobile bottom nav ── */
+function mbnNav(tab, el) {
+  document.querySelectorAll('.mbn-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const tabBtn = document.querySelector('[data-tab="'+tab+'"]');
+  if (tabBtn) switchTab(tab, tabBtn);
+}
+// Keep bottom nav in sync when tabs are switched via other means
+document.addEventListener('tabchange', function(e) {
+  const tab = e.detail && e.detail.tab;
+  if (!tab) return;
+  document.querySelectorAll('.mbn-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mbn === tab);
+  });
+});
+
+/* ── Service Worker registration (offline mode) ── */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    // Inline SW as a blob so we don't need a separate sw.js file
+    const swCode = `
+const CACHE = 'override-scout-v1';
+const ASSETS = [self.location.href.replace(/\\/[^\\/]*$/, '/') || '/'];
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys =>
+    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+  ).then(() => self.clients.claim()));
+});
+self.addEventListener('fetch', e => {
+  if (e.request.method !== 'GET') return;
+  // Don't intercept Supabase API calls — always go to network
+  if (e.request.url.includes('supabase.co')) return;
+  e.respondWith(
+    fetch(e.request).then(res => {
+      const clone = res.clone();
+      caches.open(CACHE).then(c => c.put(e.request, clone));
+      return res;
+    }).catch(() => caches.match(e.request))
+  );
+});
+`;
+    const blob = new Blob([swCode], { type: 'application/javascript' });
+    const swUrl = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(swUrl).then(function(reg) {
+      console.log('SW registered:', reg.scope);
+      // Show offline-ready toast once
+      if (!localStorage.getItem('os_sw_shown')) {
+        reg.installing && reg.installing.addEventListener('statechange', function(e) {
+          if (e.target.state === 'activated') {
+            showToast('✅ Offline mode ready — app cached for venue use', 'ok', 4000);
+            try { localStorage.setItem('os_sw_shown', '1'); } catch(err) {}
+          }
+        });
+      }
+    }).catch(function(err) {
+      console.log('SW registration failed (blob SW not supported in this context):', err.message);
+    });
+  });
+}
+
+/* ── Share via URL (encode team/tab in hash) ── */
+(function() {
+  // On load: if hash has ?team=X, open that team in search
+  window.addEventListener('DOMContentLoaded', function() {
+    const hash = location.hash.replace('#','');
+    if (!hash) return;
+    // Support #search?team=97230F
+    const m = hash.match(/^([a-z-]+)(?:\?(.*))?$/);
+    if (!m) return;
+    const tab = m[1], params = new URLSearchParams(m[2] || '');
+    const teamParam = params.get('team');
+    // Restore tab
+    const tabEl = document.querySelector('[data-tab="'+tab+'"]');
+    if (tabEl) switchTab(tab, tabEl);
+    // If team in params, auto-search after data loads
+    if (teamParam) {
+      const trySearch = function() {
+        const inp = document.getElementById('pubSearch');
+        if (inp) {
+          inp.value = teamParam.toUpperCase();
+          switchTab('search', document.querySelector('[data-tab="search"]'));
+          pubDoSearch();
+        }
+      };
+      // Try immediately, then again after data loads
+      setTimeout(trySearch, 800);
+      setTimeout(trySearch, 2500);
+    }
+  });
+
+  // Expose a share helper: shareTeam('97230F') copies a URL
+  window.shareTeam = function(team) {
+    const url = location.origin + location.pathname + '#search?team=' + encodeURIComponent(team);
+    navigator.clipboard.writeText(url).then(function() {
+      showToast('🔗 Link copied: ' + url, 'ok', 3500);
+    }).catch(function() {
+      prompt('Copy this link:', url);
+    });
+  };
+})();
+
+/* ══════════════════════════════════════════════════════════
+   SKILLS RUNS — localStorage-backed, exportable
+══════════════════════════════════════════════════════════ */
+const SK_LS_KEY = 'os_skills_v1';
+let _skEntries = [];
+(function() {
+  try { _skEntries = JSON.parse(localStorage.getItem(SK_LS_KEY) || '[]'); } catch(e) { _skEntries = []; }
+})();
+
+let _skFilter = 'both'; // 'both' | 'auton' | 'driver'
+
+function skSave() {
+  try { localStorage.setItem(SK_LS_KEY, JSON.stringify(_skEntries)); } catch(e) {}
+}
+
+function saveSkillsRun() {
+  const team    = (document.getElementById('sk-team')?.value || '').trim().toUpperCase();
+  const event_  = (document.getElementById('sk-event')?.value || '').trim();
+  const type    = document.getElementById('sk-type')?.value || 'auton';
+  const score   = parseInt(document.getElementById('sk-score')?.value || '0', 10);
+  const attempt = parseInt(document.getElementById('sk-attempt')?.value || '1', 10);
+  const notes   = (document.getElementById('sk-notes')?.value || '').trim();
+  const msg     = document.getElementById('sk-msg');
+
+  if (!team)           { if (msg) { msg.style.color='var(--red)'; msg.textContent='Team # required.'; } return; }
+  if (isNaN(score) || score < 0) { if (msg) { msg.style.color='var(--red)'; msg.textContent='Valid score required.'; } return; }
+
+  const entry = {
+    id:      'sk_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+    team,
+    event:   event_,
+    type,      // 'auton' | 'driver'
+    score,
+    attempt,
+    notes,
+    ts:      Date.now()
+  };
+
+  _skEntries.push(entry);
+  skSave();
+  skRender();
+
+  // Clear form fields
+  ['sk-team','sk-event','sk-score','sk-notes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const attemptEl = document.getElementById('sk-attempt');
+  if (attemptEl) attemptEl.value = '1';
+
+  if (msg) {
+    msg.style.color = 'var(--green)';
+    msg.textContent = '✓ Run logged for ' + team;
+    setTimeout(() => { msg.textContent = ''; }, 3000);
+  }
+  showToast('🎯 Skills run logged — ' + team + ' ' + score + ' pts (' + type + ')', 'ok');
+}
+
+function skDeleteRun(id) {
+  _skEntries = _skEntries.filter(e => e.id !== id);
+  skSave();
+  skRender();
+  showToast('Skills run deleted', 'ok');
+}
+
+function skSetFilter(f, el) {
+  _skFilter = f;
+  // Style the segmented control buttons
+  ['both','auton','driver'].forEach(k => {
+    const b = document.getElementById('sk-filter-'+k);
+    if (!b) return;
+    if (k === f) {
+      b.style.background = 'var(--red)';
+      b.style.color = '#fff';
+      b.style.borderColor = 'var(--red)';
+    } else {
+      b.style.background = 'var(--paper3)';
+      b.style.color = 'var(--ink2)';
+      b.style.borderColor = 'var(--border2)';
+    }
+  });
+  skRender();
+}
+
+/* Build per-team summary from raw entries */
+function skBuildLeaderboard() {
+  const byTeam = {};
+  _skEntries.forEach(e => {
+    if (!byTeam[e.team]) byTeam[e.team] = { team: e.team, auton: [], driver: [] };
+    byTeam[e.team][e.type === 'driver' ? 'driver' : 'auton'].push(e);
+  });
+
+  return Object.values(byTeam).map(t => {
+    const bestAutonEntry  = t.auton.length  ? t.auton.reduce((a,b)=>b.score>a.score?b:a)  : null;
+    const bestDriverEntry = t.driver.length ? t.driver.reduce((a,b)=>b.score>a.score?b:a) : null;
+    const bestAuton  = bestAutonEntry  ? bestAutonEntry.score  : null;
+    const bestDriver = bestDriverEntry ? bestDriverEntry.score : null;
+    const combined   = (bestAuton || 0) + (bestDriver || 0);
+    return { team: t.team, bestAuton, bestDriver, combined,
+             autonRuns: t.auton.length, driverRuns: t.driver.length,
+             bestAutonEntry, bestDriverEntry };
+  });
+}
+
+function skRender() {
+  const lb  = skBuildLeaderboard();
+  const wrap = document.getElementById('sk-lb-wrap');
+  if (!wrap) return;
+
+  // Update spotlight cards
+  const allAuton  = _skEntries.filter(e => e.type === 'auton');
+  const allDriver = _skEntries.filter(e => e.type === 'driver');
+  const topAuton  = allAuton.length  ? allAuton.reduce((a,b)=>b.score>a.score?b:a)  : null;
+  const topDriver = allDriver.length ? allDriver.reduce((a,b)=>b.score>a.score?b:a) : null;
+
+  const spotA = document.getElementById('sk-spot-auton-score');
+  const spotAS = document.getElementById('sk-spot-auton-sub');
+  const spotAT = document.getElementById('sk-spot-auton-team');
+  if (spotA)  spotA.textContent  = topAuton  ? topAuton.score  : '—';
+  if (spotAS) spotAS.textContent = topAuton  ? (topAuton.event || 'Skills run') : 'No runs yet';
+  if (spotAT) spotAT.textContent = topAuton  ? topAuton.team   : '';
+
+  const spotD = document.getElementById('sk-spot-driver-score');
+  const spotDS = document.getElementById('sk-spot-driver-sub');
+  const spotDT = document.getElementById('sk-spot-driver-team');
+  if (spotD)  spotD.textContent  = topDriver  ? topDriver.score  : '—';
+  if (spotDS) spotDS.textContent = topDriver  ? (topDriver.event || 'Skills run') : 'No runs yet';
+  if (spotDT) spotDT.textContent = topDriver  ? topDriver.team   : '';
+
+  // Search filter
+  const q = (document.getElementById('sk-search')?.value || '').trim().toUpperCase();
+
+  // Sort by selected filter
+  let sorted;
+  if (_skFilter === 'auton') {
+    sorted = lb.filter(t => t.bestAuton !== null).sort((a,b) => b.bestAuton - a.bestAuton);
+  } else if (_skFilter === 'driver') {
+    sorted = lb.filter(t => t.bestDriver !== null).sort((a,b) => b.bestDriver - a.bestDriver);
+  } else {
+    sorted = lb.slice().sort((a,b) => b.combined - a.combined);
+  }
+
+  if (q) sorted = sorted.filter(t => t.team.includes(q));
+
+  const countEl = document.getElementById('sk-count-label');
+  if (countEl) countEl.textContent = sorted.length + ' team' + (sorted.length!==1?'s':'');
+
+  if (!sorted.length) {
+    wrap.innerHTML = '<div class="empty" style="padding:48px 0">' + (q ? 'No teams match "'+esc(q)+'".' : 'No skills runs logged yet.') + '</div>';
+    return;
+  }
+
+  const maxScore = _skFilter === 'auton'  ? Math.max(...sorted.map(t => t.bestAuton  || 0))
+                 : _skFilter === 'driver' ? Math.max(...sorted.map(t => t.bestDriver || 0))
+                 : Math.max(...sorted.map(t => t.combined));
+
+  const myTeam_ = typeof myTeam !== 'undefined' ? myTeam : (localStorage.getItem('os_my_team')||'');
+  const isAdmin_ = typeof isAdmin !== 'undefined' && isAdmin;
+  const medals = ['🥇','🥈','🥉'];
+
+  // Table header columns depend on filter
+  const colsBoth   = `<div style="color:var(--green)">Auton</div><div style="color:var(--blue)">Driver</div><div>Combined</div>`;
+  const colsSingle = `<div>Best Score</div><div>Runs</div>`;
+  const gridBoth   = `40px 1fr 80px 80px 100px${isAdmin_?' 36px':''}`;
+  const gridSingle = `40px 1fr 100px 60px${isAdmin_?' 36px':''}`;
+  const grid = _skFilter === 'both' ? gridBoth : gridSingle;
+  const hdrCols = _skFilter === 'both' ? colsBoth : colsSingle;
+
+  wrap.innerHTML = `
+  <div style="border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+    <!-- Header row -->
+    <div style="display:grid;grid-template-columns:${grid};gap:0;
+                padding:8px 14px;background:var(--paper3);
+                font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);
+                border-bottom:1px solid var(--border2)">
+      <div>Rank</div><div>Team</div>${hdrCols}${isAdmin_?'<div></div>':''}
+    </div>
+
+    ${sorted.map((t, i) => {
+      const mainScore = _skFilter==='auton'  ? (t.bestAuton  ?? 0)
+                      : _skFilter==='driver' ? (t.bestDriver ?? 0)
+                      : t.combined;
+      const pct   = maxScore ? Math.round(mainScore / maxScore * 100) : 0;
+      const isMe  = t.team === myTeam_;
+      const isTop = i < 3;
+
+      // Accent colour for rank badge
+      const rankColor = i===0 ? '#f0c030' : i===1 ? '#a8a49c' : i===2 ? '#cd7f32' : 'var(--ink3)';
+
+      // How long ago best run was
+      const refEntry = _skFilter==='driver' ? t.bestDriverEntry : t.bestAutonEntry;
+      const daysAgo  = refEntry ? Math.floor((Date.now()-refEntry.ts)/86400000) : null;
+      const agoLabel = daysAgo===0 ? 'Today' : daysAgo===1 ? '1 day ago' : daysAgo!==null ? daysAgo+' days ago' : '';
+
+      return `
+      <div style="display:grid;grid-template-columns:${grid};gap:0;
+                  padding:10px 14px;border-top:1px solid var(--border);align-items:center;
+                  background:${isMe?'rgba(240,192,48,.06)':isTop?'rgba(204,61,20,.03)':'transparent'};
+                  transition:background .12s;cursor:default"
+           onmouseenter="this.style.background='var(--paper3)'"
+           onmouseleave="this.style.background='${isMe?'rgba(240,192,48,.06)':isTop?'rgba(204,61,20,.03)':'transparent'}'">
+
+        <!-- Rank -->
+        <div style="font-family:var(--mono);font-size:${isTop?'16px':'13px'};font-weight:800;color:${rankColor};text-align:center">
+          ${i<3 ? medals[i] : i+1}
+        </div>
+
+        <!-- Team + score bar -->
+        <div style="min-width:0">
+          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+            <span style="font-family:var(--mono);font-weight:800;font-size:${isTop?'15px':'13px'};color:${isMe?'var(--amber)':'var(--ink)'}">${esc(t.team)}</span>
+            ${isMe ? '<span style="font-size:8px;background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,192,48,.3);padding:1px 6px;border-radius:3px;font-family:var(--mono);font-weight:700">YOU</span>' : ''}
+          </div>
+          <!-- Score fill bar -->
+          <div style="margin-top:4px;height:3px;border-radius:2px;background:var(--border2);width:min(100%,120px);overflow:hidden">
+            <div style="height:100%;border-radius:2px;width:${pct}%;
+                        background:${i===0?'linear-gradient(90deg,var(--amber),var(--red))':i===1?'var(--ink2)':'var(--red)'};
+                        transition:width .4s cubic-bezier(.22,.68,0,1.2)"></div>
+          </div>
+          ${agoLabel ? `<div style="font-size:9px;color:var(--ink3);font-family:var(--mono);margin-top:2px">${agoLabel}</div>` : ''}
+        </div>
+
+        ${_skFilter==='both' ? `
+          <!-- Auton score -->
+          <div>
+            <div style="font-family:var(--mono);font-size:${isTop?'16px':'14px'};font-weight:${isTop?'800':'600'};
+                        color:${t.bestAuton!==null?'var(--ink)':'var(--ink3)'}">${t.bestAuton??'—'}</div>
+            ${t.bestAuton!==null ? '<div style="font-size:8px;font-family:var(--mono);color:var(--green);letter-spacing:.5px;text-transform:uppercase;font-weight:700">best</div>' : ''}
+          </div>
+          <!-- Driver score -->
+          <div>
+            <div style="font-family:var(--mono);font-size:${isTop?'16px':'14px'};font-weight:${isTop?'800':'600'};
+                        color:${t.bestDriver!==null?'var(--ink)':'var(--ink3)'}">${t.bestDriver??'—'}</div>
+            ${t.bestDriver!==null ? '<div style="font-size:8px;font-family:var(--mono);color:var(--blue);letter-spacing:.5px;text-transform:uppercase;font-weight:700">best</div>' : ''}
+          </div>
+          <!-- Combined -->
+          <div style="font-family:var(--mono);font-size:${isTop?'20px':'16px'};font-weight:800;
+                      color:${i===0?'var(--amber)':i===1?'var(--ink)':'var(--ink2)'}">${t.combined}</div>
+        ` : `
+          <!-- Single score -->
+          <div>
+            <div style="font-family:var(--mono);font-size:${isTop?'20px':'16px'};font-weight:800;
+                        color:${i===0?'var(--amber)':i===1?'var(--ink)':'var(--ink2)'}">${mainScore}</div>
+            <div style="font-size:8px;font-family:var(--mono);color:${_skFilter==='auton'?'var(--green)':'var(--blue)'};letter-spacing:.5px;text-transform:uppercase;font-weight:700">best</div>
+          </div>
+          <!-- Run count -->
+          <div style="font-family:var(--mono);font-size:12px;color:var(--ink3)">
+            ${_skFilter==='auton'?t.autonRuns:t.driverRuns} run${(_skFilter==='auton'?t.autonRuns:t.driverRuns)!==1?'s':''}
+          </div>
+        `}
+
+        ${isAdmin_ ? `
+        <div style="text-align:right">
+          <button class="btn btn-sm" style="padding:2px 8px;font-size:9px;color:var(--ink3)" onclick="skShowRunsForTeam('${esc(t.team)}')" title="Show all runs">▾</button>
+        </div>` : ''}
+      </div>
+      <div id="sk-runs-${esc(t.team)}" style="display:none;padding:10px 14px 12px;border-top:1px solid var(--border);background:var(--paper2)"></div>
+      `;
+    }).join('')}
+  </div>`;
+}
+
+function skShowRunsForTeam(team) {
+  const el = document.getElementById('sk-runs-' + team);
+  if (!el) return;
+  if (el.style.display !== 'none') { el.style.display = 'none'; return; }
+  const runs = _skEntries.filter(e => e.team === team).sort((a,b) => b.ts - a.ts);
+  el.innerHTML = runs.map(r => `
+    <div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:11px;flex-wrap:wrap">
+      <span style="background:${r.type==='auton'?'var(--green-bg)':'var(--blue-bg)'};color:${r.type==='auton'?'var(--green)':'var(--blue)'};padding:1px 7px;border-radius:3px;font-size:9px;font-weight:700;text-transform:uppercase">${esc(r.type)}</span>
+      <span style="font-weight:700;font-size:14px">${r.score} pts</span>
+      <span style="color:var(--ink3)">Attempt ${r.attempt}</span>
+      ${r.event ? `<span style="color:var(--ink3)">${esc(r.event)}</span>` : ''}
+      ${r.notes ? `<span style="color:var(--ink2)">${esc(r.notes)}</span>` : ''}
+      <button class="btn btn-sm" style="margin-left:auto;color:var(--red);border-color:rgba(204,61,20,.3);font-size:9px;padding:1px 8px" onclick="skDeleteRun('${esc(r.id)}')">✕ Delete</button>
+    </div>`).join('') || '<div style="color:var(--ink3);font-size:11px;padding:4px 0">No runs yet.</div>';
+  el.style.display = 'block';
+}
+
+function exportSkillsCSV() {
+  if (!_skEntries.length) { showToast('No skills runs to export', 'err'); return; }
+  const hdr = 'Team,Type,Score,Attempt,Event,Notes,Timestamp';
+  const rows = _skEntries.map(e =>
+    [e.team, e.type, e.score, e.attempt, e.event, e.notes, new Date(e.ts).toISOString()].map(v => '"'+(v??'').toString().replace(/"/g,'""')+'"').join(',')
+  );
+  const blob = new Blob([hdr + '\n' + rows.join('\n')], { type:'text/csv' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'override_skills_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  showToast('Skills CSV exported — ' + _skEntries.length + ' runs', 'ok');
+}
+
+/* ══════════════════════════════════════════════════════════
+   PIT SCOUT — localStorage-backed, exportable
+══════════════════════════════════════════════════════════ */
+const PIT_LS_KEY = 'os_pit_scout_v1';
+let _pitEntries = [];
+(function() {
+  try { _pitEntries = JSON.parse(localStorage.getItem(PIT_LS_KEY) || '[]'); } catch(e) { _pitEntries = []; }
+})();
+
+function savePitEntry() {
+  const team = (document.getElementById('pit-team').value || '').trim().toUpperCase();
+  if (!team) { document.getElementById('pit-msg').innerHTML = '<span style="color:var(--red-text);font-size:12px;margin-top:8px;display:block">Team # is required.</span>'; return; }
+  const entry = {
+    id: Date.now() + Math.random(),
+    ts: new Date().toISOString(),
+    team,
+    name:       document.getElementById('pit-name').value.trim(),
+    event:      document.getElementById('pit-event').value.trim(),
+    drive:      document.getElementById('pit-drive').value,
+    motors:     document.getElementById('pit-motors').value,
+    ratio:      document.getElementById('pit-ratio').value.trim(),
+    type:       document.getElementById('pit-type').value,
+    lift:       document.getElementById('pit-lift').value.trim(),
+    weight:     document.getElementById('pit-weight').value,
+    routes:     document.getElementById('pit-routes').value.trim(),
+    best_auton: document.getElementById('pit-best-auton').value.trim(),
+    sawp:       document.getElementById('pit-sawp').value,
+    lang:       document.getElementById('pit-lang').value,
+    notes:      document.getElementById('pit-notes').value.trim(),
+  };
+  // Overwrite existing entry for same team+event if exists
+  const existIdx = _pitEntries.findIndex(e => e.team === team && e.event === entry.event);
+  if (existIdx >= 0) _pitEntries[existIdx] = entry;
+  else _pitEntries.unshift(entry);
+  try { localStorage.setItem(PIT_LS_KEY, JSON.stringify(_pitEntries)); } catch(e) {}
+  document.getElementById('pit-msg').innerHTML = '<span style="color:var(--green);font-size:12px;margin-top:8px;display:block">✅ Pit entry saved for ' + esc(team) + '.</span>';
+  renderPitLog();
+  setTimeout(() => { const m = document.getElementById('pit-msg'); if (m) m.innerHTML = ''; }, 3000);
+}
+
+function clearPitForm() {
+  ['pit-team','pit-name','pit-event','pit-ratio','pit-lift','pit-weight','pit-routes','pit-best-auton','pit-notes']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['pit-drive','pit-motors','pit-type','pit-sawp','pit-lang']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.selectedIndex = 0; });
+  const m = document.getElementById('pit-msg'); if (m) m.innerHTML = '';
+}
+
+function renderPitLog() {
+  const q = (document.getElementById('pit-log-q')?.value || '').trim().toUpperCase();
+  const rows = q ? _pitEntries.filter(e => (e.team||'').includes(q) || (e.name||'').toUpperCase().includes(q)) : _pitEntries;
+  const body = document.getElementById('pit-log-body');
+  if (!body) return;
+  if (!rows.length) {
+    body.innerHTML = '<div class="empty" style="padding:24px 0">' + (_pitEntries.length ? 'No matching entries.' : 'No pit entries yet. Fill out the form above.') + '</div>';
+    return;
+  }
+  body.innerHTML = rows.map(e => `
+    <div class="pit-row">
+      <div style="font-family:var(--mono);font-weight:700;font-size:13px">${esc(e.team)}</div>
+      <div>
+        <div style="font-size:12px;color:var(--ink)">${esc(e.name||'—')}</div>
+        <div style="font-size:10px;color:var(--ink3);font-family:var(--mono)">${esc(e.event||'—')}</div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--ink2)">${esc(e.drive||'—')} ${e.motors?'· '+esc(e.motors):''}</div>
+        <div style="font-size:10px;color:var(--ink3);font-family:var(--mono)">${esc(e.type||'—')}</div>
+      </div>
+      <div style="font-size:11px;color:var(--ink2)">
+        <div>${e.sawp==='yes'?'✅ SAWP':e.sawp==='sometimes'?'🟡 SAWP maybe':e.sawp==='no'?'❌ No SAWP':'—'}</div>
+        <div style="font-size:10px;color:var(--ink3);font-family:var(--mono)">${esc(e.best_auton||'—')}</div>
+      </div>
+      <div style="display:flex;gap:4px">
+        <button class="btn btn-sm" onclick="pitPrefill(${JSON.stringify(e.id)})" title="Load into form">✏</button>
+        <button class="btn btn-sm btn-d" onclick="deletePitEntry(${JSON.stringify(e.id)})" title="Delete">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function pitPrefill(id) {
+  const e = _pitEntries.find(en => String(en.id) === String(id));
+  if (!e) return;
+  const set = (i, v) => { const el = document.getElementById(i); if (el) el.value = v || ''; };
+  set('pit-team', e.team); set('pit-name', e.name); set('pit-event', e.event);
+  set('pit-drive', e.drive); set('pit-motors', e.motors); set('pit-ratio', e.ratio);
+  set('pit-type', e.type); set('pit-lift', e.lift); set('pit-weight', e.weight);
+  set('pit-routes', e.routes); set('pit-best-auton', e.best_auton);
+  set('pit-sawp', e.sawp); set('pit-lang', e.lang); set('pit-notes', e.notes);
+  switchTab('pit', document.querySelector('[data-tab="pit"]'));
+}
+
+function deletePitEntry(id) {
+  if (!confirm('Delete this pit entry?')) return;
+  _pitEntries = _pitEntries.filter(e => String(e.id) !== String(id));
+  try { localStorage.setItem(PIT_LS_KEY, JSON.stringify(_pitEntries)); } catch(err) {}
+  renderPitLog();
+}
+
+function exportPitCSV() {
+  if (!_pitEntries.length) { showToast('No pit entries to export', 'err', 2000); return; }
+  const hdr = 'Team,Name,Event,Drive,Motors,Ratio,Type,Lift,Weight,Routes,BestAuton,SAWP,Lang,Notes,Date';
+  const rows = _pitEntries.map(e => [
+    e.team, e.name, e.event, e.drive, e.motors, e.ratio, e.type, e.lift, e.weight,
+    e.routes, e.best_auton, e.sawp, e.lang,
+    '"'+(e.notes||'').replace(/"/g,"'")+'"', e.ts||''
+  ].join(','));
+  const blob = new Blob([hdr+'\n'+rows.join('\n')], {type:'text/csv'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'override_pit_scout_'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+  showToast('Pit scout CSV exported — '+_pitEntries.length+' entries', 'ok');
+}
+
+// Also expose pit data in the pit section of team profiles
+function getPitDataForTeam(team) {
+  return _pitEntries.find(e => e.team === (team||'').toUpperCase().trim()) || null;
+}
+
+/* ══════════════════════════════════════════════════════════
+   ALLIANCE SELECTION HELPER
+══════════════════════════════════════════════════════════ */
+let _alPickedSet = new Set();
+try { _alPickedSet = new Set(JSON.parse(localStorage.getItem('os_al_picked') || '[]')); } catch(e) {}
+
+function alSavePicked() {
+  try { localStorage.setItem('os_al_picked', JSON.stringify([..._alPickedSet])); } catch(e) {}
+}
+
+function alResetPicked() {
+  _alPickedSet.clear();
+  alSavePicked();
+  const inp = document.getElementById('al-picked');
+  if (inp) inp.value = '';
+  runAlliance();
+}
+
+function alScore(team) {
+  // Composite score: 60% avg_pins, 20% awp_pct, 10% success_pct, 10% TrueSkill (if available)
+  const avg = parseFloat(team.avg_pins) || 0;
+  const awp = parseFloat(team.awp_pct)  || 0;
+  const suc = parseFloat(team.success_pct) || 0;
+  const ts  = tsGet ? (tsGet(team.team)?.ts || 25) : 25;
+  const tsNorm = Math.max(0, Math.min(100, (ts / 50) * 100)); // normalise ts ~0-50 → 0-100
+  return avg * 0.6 + awp * 0.2 + suc * 0.1 + tsNorm * 0.1;
+}
+
+function runAlliance() {
+  const myTeam = (document.getElementById('al-my-team')?.value || '').trim().toUpperCase();
+  const pickedRaw = (document.getElementById('al-picked')?.value || '');
+
+  // Merge manually typed picks with the persistent set
+  pickedRaw.split(',').map(t => t.trim().toUpperCase()).filter(Boolean).forEach(t => _alPickedSet.add(t));
+  alSavePicked();
+
+  if (!allTeams || !allTeams.length) {
+    document.getElementById('al-status').textContent = 'Loading data…';
+    return;
+  }
+
+  const excluded = new Set([..._alPickedSet, myTeam].filter(Boolean));
+  const available = allTeams.filter(t => !excluded.has(t.team));
+  const sorted = available.slice().sort((a, b) => alScore(b) - alScore(a));
+  const maxScore = alScore(sorted[0] || {avg_pins:0}) || 1;
+
+  // Top 3 suggestions
+  const topN = sorted.slice(0, 3);
+  const sugEl = document.getElementById('al-suggestions');
+  const medals = ['🥇', '🥈', '🥉'];
+  sugEl.innerHTML = topN.length
+    ? topN.map((t, i) => {
+        const sc = alScore(t);
+        const pct = Math.round(sc / maxScore * 100);
+        const tsInfo = tsGet ? tsGet(t.team) : null;
+        const pitInfo = getPitDataForTeam(t.team);
+        return `<div class="al-suggestion-card rank-${i+1}">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <span class="al-rank-badge">${medals[i]}</span>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <span class="al-team-num">${esc(t.team)}</span>
+                ${tsInfo?.qualified ? '<span class="badge b-awp" style="font-size:9px">Worlds Qual</span>' : ''}
+                ${pitInfo ? '<span class="badge" style="background:var(--blue-bg);color:var(--blue);border:1px solid rgba(61,142,240,.3);font-size:9px">🤖 Pit data</span>' : ''}
+              </div>
+              <div style="font-size:10px;color:var(--ink3);font-family:var(--mono);margin-top:2px">
+                ${t.count} matches · Avg ${parseFloat(t.avg_pins).toFixed(1)} pins · AWP ${(parseFloat(t.awp_pct)||0).toFixed(0)}%
+                ${tsInfo ? '· TS '+tsInfo.ts.toFixed(1) : ''}
+              </div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-size:16px;font-weight:700;font-family:var(--mono)">${pct}<span style="font-size:11px;color:var(--ink3)">%</span></div>
+              <div style="font-size:9px;color:var(--ink3);font-family:var(--mono)">score</div>
+            </div>
+          </div>
+          <div class="al-score-bar"><div class="al-score-fill" style="width:${pct}%"></div></div>
+          ${pitInfo && pitInfo.routes ? '<div style="font-size:11px;color:var(--ink2);margin-top:6px;font-family:var(--mono)">🔧 '+esc(pitInfo.routes)+'</div>' : ''}
+          <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn btn-sm" onclick="window.shareTeam('${esc(t.team)}')" title="Share team link">🔗 Share</button>
+            <button class="btn btn-sm btn-d" onclick="alMarkPicked('${esc(t.team)}')" title="Mark as picked">✕ Mark picked</button>
+          </div>
+        </div>`;
+      }).join('')
+    : '<div class="empty">No available teams left.</div>';
+
+  // Full table
+  const tableEl = document.getElementById('al-full-table');
+  tableEl.innerHTML = `<div style="border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+    <div style="display:grid;grid-template-columns:auto 1fr auto auto auto auto auto;gap:8px;padding:7px 10px;background:var(--paper3);font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.7px;color:var(--ink3)">
+      <div>#</div><div>Team</div><div>Matches</div><div>Avg Pins</div><div>AWP%</div><div>Succ%</div><div>Score</div>
+    </div>
+    ${allTeams.slice().sort((a,b)=>alScore(b)-alScore(a)).map((t, i) => {
+      const isPicked = excluded.has(t.team);
+      const isMine   = t.team === myTeam;
+      const sc = alScore(t);
+      const pct = Math.round(sc / maxScore * 100);
+      return `<div class="al-full-row${isPicked?' al-picked':''}${isMine?' al-mine':''}" onclick="alTogglePicked('${esc(t.team)}')" title="${isPicked?'Click to unmark':'Click to mark as picked'}">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--ink3)">${i+1}</div>
+        <div style="font-family:var(--mono);font-weight:700">${esc(t.team)}${isMine?' <span style="font-size:9px;color:var(--amber)">YOU</span>':''}</div>
+        <div style="font-family:var(--mono)">${t.count}</div>
+        <div style="font-family:var(--mono);font-weight:600">${parseFloat(t.avg_pins).toFixed(1)}</div>
+        <div style="font-family:var(--mono)">${(parseFloat(t.awp_pct)||0).toFixed(0)}%</div>
+        <div style="font-family:var(--mono)">${(parseFloat(t.success_pct)||0).toFixed(0)}%</div>
+        <div style="font-family:var(--mono);color:${pct>=70?'var(--green)':pct>=40?'var(--amber)':'var(--ink3)'}">${pct}</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+
+  const avail = allTeams.length - excluded.size;
+  document.getElementById('al-status').textContent = avail + ' teams available, ' + _alPickedSet.size + ' picked/excluded';
+}
+
+function alMarkPicked(team) {
+  _alPickedSet.add(team);
+  alSavePicked();
+  runAlliance();
+}
+
+function alTogglePicked(team) {
+  if (_alPickedSet.has(team)) _alPickedSet.delete(team);
+  else _alPickedSet.add(team);
+  alSavePicked();
+  runAlliance();
+}
+
+// Re-run alliance when data loads
+const _origSetAllTeams = window.setAllTeams;
+if (typeof setAllTeams === 'function') {
+  window.setAllTeams = function(teams) {
+    _origSetAllTeams(teams);
+    if (_isTabActive && _isTabActive('alliance')) runAlliance();
+  };
+}
+
+/* ── Pin tabs bar (restore original behaviour) ── */
 (function() {
   function pinTabs() {
     var shell = document.getElementById('appShell');
     var topbar = shell.querySelector('.topbar');
     var tabsWrap = shell.querySelector('.tabs-wrap');
     var shellRect = shell.getBoundingClientRect();
-
     topbar.style.position = 'fixed';
     topbar.style.top = '0';
     topbar.style.left = shellRect.left + 'px';
     topbar.style.right = '0';
     topbar.style.zIndex = '50';
     topbar.style.width = 'auto';
-
     var topbarH = topbar.offsetHeight;
-
     tabsWrap.style.position = 'fixed';
     tabsWrap.style.top = topbarH + 'px';
     tabsWrap.style.left = shellRect.left + 'px';
     tabsWrap.style.right = '0';
     tabsWrap.style.zIndex = '40';
     tabsWrap.style.width = 'auto';
-
     var tabsH = tabsWrap.offsetHeight;
     shell.style.paddingTop = (topbarH + tabsH) + 'px';
   }
-
   document.addEventListener('DOMContentLoaded', function() {
     pinTabs();
     window.addEventListener('resize', pinTabs);
-    // Re-pin when sidebar toggles (which changes shellRect.left)
     document.addEventListener('tabchange', pinTabs);
     document.addEventListener('sidebarToggle', pinTabs);
+    // Also render pit log and alliance on load
+    renderPitLog();
   });
 })();
 </script>
