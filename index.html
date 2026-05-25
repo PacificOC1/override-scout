@@ -201,7 +201,38 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 .sb-link-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;opacity:.75}
 .sb-link.active .sb-link-icon{opacity:1}
 .sb-link-ext{font-size:9px;font-family:var(--mono);color:var(--ink3);margin-left:auto;opacity:.6}
-.about-hero{display:flex;align-items:center;gap:1.25rem;margin-bottom:1.5rem;flex-wrap:wrap}
+/* ── LEADERBOARD IMPROVEMENTS ── */
+.lb-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:.75rem}
+.lb-wrap{border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:var(--surface)}
+.lb-wrap table{width:100%;border-collapse:collapse}
+.lb-wrap thead tr{background:var(--paper2);border-bottom:1px solid var(--border)}
+.lb-wrap thead th{padding:9px 12px;font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.7px;color:var(--ink3);font-weight:600;text-align:left;white-space:nowrap;cursor:pointer;user-select:none;transition:color .12s}
+.lb-wrap thead th:hover{color:var(--ink)}
+.lb-wrap thead th.sorted{color:var(--amber)}
+.lb-wrap thead th.sorted::after{content:' ↕';opacity:.7}
+.lb-wrap tbody tr{border-bottom:1px solid var(--border);transition:background .1s;cursor:pointer}
+.lb-wrap tbody tr:last-child{border-bottom:none}
+.lb-wrap tbody tr:hover{background:var(--paper3)}
+.lb-wrap tbody tr.lb-row-me{background:rgba(255,210,0,.06)!important;border-left:2px solid var(--amber)}
+.lb-wrap tbody tr.lb-row-rival{background:rgba(255,77,26,.05)!important;border-left:2px solid var(--red)}
+.lb-wrap td{padding:9px 12px;vertical-align:middle}
+.lb-rank{font-family:var(--mono);font-size:11px;color:var(--ink3);width:36px;text-align:center}
+.lb-medal{font-size:15px;line-height:1}
+.lb-team-cell{display:flex;flex-direction:column;gap:2px}
+.lb-team-num{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--ink)}
+.lb-team-type{font-size:10px;color:var(--ink3);font-family:var(--mono)}
+.lb-pins-cell{display:flex;flex-direction:column;gap:3px}
+.lb-pins-val{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--ink)}
+.lb-pins-bar-wrap{height:3px;background:var(--border);border-radius:2px;width:60px;overflow:hidden}
+.lb-pins-bar{height:3px;background:var(--red);border-radius:2px;transition:width .3s}
+.lb-awp-cell{display:flex;align-items:center;gap:7px}
+.lb-awp-val{font-family:var(--mono);font-size:12px;min-width:32px}
+.lb-awp-track{height:4px;background:var(--border);border-radius:2px;width:50px;overflow:hidden;flex-shrink:0}
+.lb-awp-fill{height:100%;background:var(--green);border-radius:2px}
+.lb-success-cell{font-family:var(--mono);font-size:12px}
+.lb-badge{display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;font-family:var(--mono);padding:1px 5px;border-radius:3px;margin-left:4px;vertical-align:middle}
+.lb-badge-awp{background:rgba(61,189,110,.15);color:var(--green);border:1px solid rgba(61,189,110,.3)}
+.lb-badge-sig{background:rgba(61,142,240,.12);color:var(--blue);border:1px solid rgba(61,142,240,.25)}
 .about-logo{width:90px;height:auto;flex-shrink:0;filter:brightness(0) invert(1);opacity:.9;mix-blend-mode:screen}
 .about-title{font-family:var(--barlow);font-size:28px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
 .about-title span{color:var(--red)}
@@ -389,6 +420,128 @@ code{font-family:var(--mono);font-size:11px;background:var(--paper3);color:var(-
 .b-sig{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,192,48,.3)}
 .cal-event-sig{border:1px solid rgba(240,192,48,.4)!important;box-shadow:0 0 0 1px rgba(240,192,48,.15),0 2px 12px rgba(0,0,0,.3)!important;background:linear-gradient(135deg,rgba(240,192,48,.06) 0%,var(--surface) 60%)!important}
 .cal-sig-crown{font-size:13px;line-height:1;filter:drop-shadow(0 1px 4px rgba(240,192,48,.5))}
+
+/* ── EVENTS TAB REDESIGN ── */
+.cal-events-grid{display:flex;flex-direction:column;gap:10px}
+.cal-event-card{
+  position:relative;overflow:hidden;
+  border-radius:10px;
+  transition:box-shadow .18s,transform .13s,border-color .18s;
+  cursor:default;
+  border:1px solid rgba(204,61,20,.32);
+  background:var(--surface);
+}
+.cal-event-card:hover{
+  box-shadow:0 6px 28px rgba(0,0,0,.4),0 0 0 1px rgba(204,61,20,.45),var(--glow-red);
+  transform:translateY(-2px);
+}
+/* sig — amber/gold */
+.cal-event-card.is-sig{
+  border-color:rgba(240,192,48,.55)!important;
+  background:linear-gradient(135deg,rgba(240,192,48,.13) 0%,rgba(240,192,48,.04) 50%,var(--surface) 80%)!important;
+  box-shadow:0 0 0 1px rgba(240,192,48,.2),0 4px 22px rgba(0,0,0,.28)!important;
+}
+.cal-event-card.is-sig:hover{box-shadow:0 0 0 1px rgba(240,192,48,.5),0 8px 32px rgba(240,192,48,.14),0 6px 28px rgba(0,0,0,.32)!important;transform:translateY(-2px)}
+/* live — green */
+.cal-event-card.is-live{
+  border-color:rgba(61,189,110,.65)!important;
+  background:linear-gradient(135deg,rgba(61,189,110,.13) 0%,rgba(61,189,110,.04) 55%,var(--surface) 80%)!important;
+  box-shadow:0 0 0 1px rgba(61,189,110,.22),0 4px 22px rgba(0,0,0,.28),0 0 30px rgba(61,189,110,.1)!important;
+}
+.cal-event-card.is-live:hover{box-shadow:0 0 0 1px rgba(61,189,110,.5),0 8px 32px rgba(61,189,110,.18),0 6px 28px rgba(0,0,0,.32)!important;transform:translateY(-2px)}
+/* past — desaturated */
+.cal-event-card.is-past{opacity:.55;filter:saturate(.5);border-color:var(--border)!important;background:var(--surface)!important;box-shadow:none!important}
+
+/* left accent stripe */
+.cal-event-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:10px 0 0 10px;
+  background:linear-gradient(180deg,var(--red) 0%,rgba(200,255,0,.6) 100%);
+}
+.cal-event-card.is-sig::before{background:linear-gradient(180deg,#f0c030 0%,rgba(240,150,0,.35) 100%)}
+.cal-event-card.is-live::before{background:linear-gradient(180deg,#3dbd6e 0%,rgba(61,189,110,.3) 100%)}
+.cal-event-card.is-past::before{background:var(--border)}
+
+/* date column pill — red-tinted for upcoming, themed for others */
+.cal-event-inner{padding:14px 16px 14px 20px;display:flex;gap:14px;align-items:flex-start}
+.cal-event-datecol{
+  flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  width:52px;text-align:center;padding:8px 6px;border-radius:8px;
+  background:var(--paper3);border:1px solid var(--border2);
+}
+.cal-event-card.is-sig .cal-event-datecol{background:rgba(240,192,48,.15);border-color:rgba(240,192,48,.32)}
+.cal-event-card.is-live .cal-event-datecol{background:rgba(61,189,110,.14);border-color:rgba(61,189,110,.32)}
+.cal-event-card.is-past .cal-event-datecol{background:var(--paper3);border-color:var(--border)}
+
+.cal-event-month{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1.1px;font-weight:700;line-height:1;margin-bottom:2px;
+  color:var(--ink3)}
+.cal-event-card.is-sig .cal-event-month{color:var(--amber)}
+.cal-event-card.is-live .cal-event-month{color:var(--green)}
+.cal-event-card.is-past .cal-event-month{color:var(--ink3)}
+
+.cal-event-day{font-size:26px;font-weight:800;font-family:var(--barlow);color:var(--ink);line-height:1}
+.cal-event-dayend{font-size:9px;font-family:var(--mono);color:var(--ink3);margin-top:3px}
+.cal-event-sep{width:28px;height:1px;margin:5px auto 0;background:var(--border2)}
+.cal-event-card.is-sig .cal-event-sep{background:rgba(240,192,48,.35)}
+.cal-event-card.is-live .cal-event-sep{background:rgba(61,189,110,.35)}
+.cal-event-card.is-past .cal-event-sep{background:var(--border)}
+
+.cal-event-body{flex:1;min-width:0}
+.cal-event-title-row{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.cal-event-title{font-size:14px;font-weight:700;font-family:var(--display);color:var(--ink);line-height:1.3;flex:1;min-width:0}
+.cal-event-meta{display:flex;flex-wrap:wrap;gap:5px 14px;margin-bottom:8px}
+.cal-event-meta-item{display:flex;align-items:center;gap:4px;font-size:11px;font-family:var(--mono);color:var(--ink2)}
+.cal-event-meta-item .mi-icon{font-size:12px;flex-shrink:0}
+.cal-event-meta-link{color:var(--blue);text-decoration:none;font-size:11px;font-family:var(--mono);transition:color .12s}
+.cal-event-meta-link:hover{color:var(--ink)}
+/* site-palette meta icons */
+.mi-loc{color:var(--red-text)}
+.mi-globe{color:var(--amber)}
+.mi-scout{color:var(--volt)}
+
+.cal-event-notes{
+  font-size:12px;color:var(--ink2);margin-bottom:8px;
+  padding:6px 10px;border-radius:6px;
+  background:var(--paper2);
+  border-left:2px solid var(--border2);
+}
+.cal-event-card.is-sig .cal-event-notes{background:rgba(240,192,48,.07);border-left-color:rgba(240,192,48,.5)}
+.cal-event-card.is-live .cal-event-notes{background:rgba(61,189,110,.07);border-left-color:rgba(61,189,110,.5)}
+
+.cal-event-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* countdown chips */
+.cal-event-countdown{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-family:var(--mono);font-weight:700;
+  padding:3px 9px;border-radius:20px;
+  background:var(--paper3);border:1px solid var(--border2);color:var(--ink3);
+}
+.cal-event-countdown.soon{background:rgba(240,192,48,.15);border-color:rgba(240,192,48,.45);color:var(--amber)}
+.cal-event-countdown.live{background:rgba(61,189,110,.15);border-color:rgba(61,189,110,.45);color:var(--green);animation:pulse-live 2s infinite}
+@keyframes pulse-live{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* Filter strip — neutral */
+.cal-filter-strip{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding:10px 14px;
+  background:var(--paper2);
+  border-radius:var(--radius-lg);
+  border:1px solid var(--border);
+  margin-bottom:14px;
+}
+.cal-filter-sep{width:1px;height:20px;background:var(--border2);flex-shrink:0}
+.cal-section-header{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  margin-bottom:14px;
+}
+.cal-section-title{font-family:var(--barlow);font-size:17px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--ink)}
+.cal-section-count{
+  font-size:11px;font-family:var(--mono);font-weight:700;
+  color:var(--ink3);padding:3px 12px;
+  background:var(--paper3);border-radius:20px;
+  border:1px solid var(--border2);
+}
+
 .b-q{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(61,142,240,.3)}
 .b-no{background:var(--paper3);color:var(--ink3);border:1px solid var(--border)}
 
@@ -569,6 +722,62 @@ body.compact-mode .awp-wrap { display:none; }
 .sched-modal-close{background:var(--paper3);border:1px solid var(--border);width:28px;height:28px;border-radius:var(--radius);
   display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;color:var(--ink2);transition:all .12s}
 .sched-modal-close:hover{background:var(--red-bg);color:var(--red-text)}
+
+/* ── Pit Scout Modal ── */
+.pit-modal-bg{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:620;
+  align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(6px);
+}
+.pit-modal-bg.open{display:flex}
+.pit-modal{
+  background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);
+  width:100%;max-width:700px;max-height:90vh;display:flex;flex-direction:column;
+  box-shadow:0 24px 64px rgba(0,0,0,.7);position:relative;overflow:hidden;
+  animation:modalIn .2s cubic-bezier(.34,1.56,.64,1);
+}
+.pit-modal-head{
+  padding:.875rem 1.25rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;
+  background:var(--paper2);
+}
+.pit-modal-title{font-family:var(--display);font-size:15px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
+.pit-modal-close{background:var(--paper3);border:1px solid var(--border);width:28px;height:28px;border-radius:var(--radius);
+  display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;color:var(--ink2);transition:all .12s}
+.pit-modal-close:hover{background:var(--red-bg);color:var(--red-text)}
+.pit-modal-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--paper2)}
+.pit-modal-tab{
+  padding:8px 16px;font-size:10px;cursor:pointer;border:none;background:transparent;
+  color:var(--ink3);border-bottom:2px solid transparent;margin-bottom:-1px;
+  font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;transition:all .12s;
+}
+.pit-modal-tab.active{color:var(--red-text);font-weight:700;border-bottom-color:var(--red);background:var(--surface)}
+.pit-modal-tab:hover:not(.active){color:var(--ink2);background:var(--paper3)}
+.pit-modal-body{flex:1;overflow-y:auto;padding:1rem 1.25rem}
+.pit-modal-panel{display:none}.pit-modal-panel.active{display:block}
+
+/* ── Alliance Modal ── */
+.al-modal-bg{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:620;
+  align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(6px);
+}
+.al-modal-bg.open{display:flex}
+.al-modal{
+  background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);
+  width:100%;max-width:860px;max-height:90vh;display:flex;flex-direction:column;
+  box-shadow:0 24px 64px rgba(0,0,0,.7);position:relative;overflow:hidden;
+  animation:modalIn .2s cubic-bezier(.34,1.56,.64,1);
+}
+.al-modal-head{
+  padding:.875rem 1.25rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;
+  background:var(--paper2);
+}
+.al-modal-title{font-family:var(--display);font-size:15px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
+.al-modal-close{background:var(--paper3);border:1px solid var(--border);width:28px;height:28px;border-radius:var(--radius);
+  display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;color:var(--ink2);transition:all .12s}
+.al-modal-close:hover{background:var(--red-bg);color:var(--red-text)}
+.al-modal-body{flex:1;overflow-y:auto;padding:1rem 1.25rem}
+
 .sched-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--paper2)}
 .sched-tab{
   padding:8px 16px;font-size:10px;cursor:pointer;border:none;background:transparent;
@@ -1427,18 +1636,15 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
   <div class="tabs-wrap">
     <div class="tabs">
       <button class="tab active" data-tab="leaderboard" onclick="switchTab('leaderboard',this)">Leaderboard</button>
-      <button class="tab" data-tab="search" onclick="switchTab('search',this)">Search</button>
       <button class="tab" data-tab="calendar" onclick="switchTab('calendar',this)">📅 Events</button>
       <button class="tab" data-tab="about" onclick="switchTab('about',this)">About</button>
       <button class="tab admin-only" data-tab="add" onclick="switchTab('add',this)">+ Add Entry</button>
-      <button class="tab admin-only" data-tab="pit" onclick="switchTab('pit',this)">🤖 Pit Scout</button>
+      
       <button class="tab admin-only" data-tab="log" onclick="switchTab('log',this)">Scout Log</button>
-      <button class="tab" data-tab="alliance" onclick="switchTab('alliance',this)">🤝 Alliance</button>
       <button class="tab admin-only" data-tab="predict" onclick="switchTab('predict',this)">Win Probability</button>
       <button class="tab admin-only" data-tab="routes" onclick="switchTab('routes',this)">Routes</button>
       <button class="tab admin-only" data-tab="formulas" onclick="switchTab('formulas',this)">Formulas</button>
       <button class="tab" data-tab="skills" onclick="switchTab('skills',this)">🎯 Skills</button>
-      <button class="tab" data-tab="resources" onclick="switchTab('resources',this)">📚 Resources</button>
       <button class="tab" data-tab="ts-rankings" onclick="switchTab('ts-rankings',this)">⚡ TS Rankings</button>
       <button class="tab" data-tab="roadmap" onclick="switchTab('roadmap',this)">🗺️ Roadmap</button>
       <button class="tab" data-tab="updates" onclick="switchTab('updates',this)">📋 Changelog</button>
@@ -1452,45 +1658,113 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
     <button onclick="applyRefreshNow()" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:var(--radius);padding:3px 12px;font-size:11px;cursor:pointer;font-family:var(--mono)">Reload leaderboard</button>
     <button onclick="document.getElementById('refreshBanner').style.display='none'" style="background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:18px;line-height:1;padding:0 4px">×</button>
   </div>
-  <div id="tab-search" class="panel">
-    <div class="page">
-      <div class="search-zone">
-        <input class="si" id="pubSearch" type="text" placeholder="Search team number (e.g. 97230F)…"
-          onkeydown="if(event.key==='Enter')pubDoSearch()" oninput="shInput(this.value)" onfocus="shShowDrop()" onblur="setTimeout(shHideDrop,200)">
-        <button class="sb" onclick="pubDoSearch()">Search</button>
-        <div id="search-history-drop" style="display:none"></div>
-      </div>
-      <div id="pubResult">
-        <div class="empty"><span class="spin"></span><br><br>Loading database…</div>
-      </div>
-    </div>
-  </div>
+  <!-- ── SEARCH tab removed — search bubble is now in the Leaderboard tab ── -->
+  <div id="tab-search" class="panel" style="display:none!important"></div>
 
   <!-- ── LEADERBOARD (public) ── -->
   <div id="tab-leaderboard" class="panel active">
-    <div class="page">
-      <!-- Starred teams quick-access -->
+
+    <!-- ── HERO BANNER (matches Skills page style) ── -->
+    <div id="lb-hero" style="
+      background:linear-gradient(160deg,var(--paper2) 0%,var(--paper) 60%);
+      border-bottom:1px solid var(--border);
+      padding:2rem 1.5rem 0;
+      position:relative;overflow:hidden;">
+      <!-- Decorative glow blobs -->
+      <div style="position:absolute;top:-40px;left:-40px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(204,61,20,.18) 0%,transparent 70%);pointer-events:none"></div>
+      <div style="position:absolute;top:-20px;right:-20px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(61,142,240,.12) 0%,transparent 70%);pointer-events:none"></div>
+
+      <div style="max-width:1100px;margin:0 auto;position:relative">
+
+        <!-- Title -->
+        <div style="text-align:center;margin-bottom:1.75rem">
+          <div style="font-family:var(--barlow);font-size:clamp(22px,4vw,38px);font-weight:800;letter-spacing:1px;text-transform:uppercase;line-height:1.1;color:var(--ink)">
+            V5RC 2026-27 <span style="color:var(--red)">Autonomous</span> Leaderboard
+          </div>
+          <div style="font-size:10px;font-family:var(--mono);color:var(--ink3);letter-spacing:1.5px;text-transform:uppercase;margin-top:6px">Override Scout · by 97230F Bot Go Brrr</div>
+        </div>
+
+        <!-- Spotlight stat cards -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:0;max-width:720px;margin-left:auto;margin-right:auto" id="lbCards">
+          <!-- Teams -->
+          <div style="background:linear-gradient(135deg,rgba(204,61,20,.08) 0%,var(--surface) 60%);border:1px solid rgba(204,61,20,.22);border-radius:var(--radius-lg);padding:.875rem 1rem;text-align:center;position:relative;overflow:hidden">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--red),transparent)"></div>
+            <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1.2px;color:var(--red);font-weight:700;margin-bottom:6px">Teams</div>
+            <div style="font-size:32px;font-weight:800;font-family:var(--barlow);color:var(--ink);line-height:1" id="lbT">—</div>
+          </div>
+          <!-- Entries -->
+          <div style="background:linear-gradient(135deg,rgba(61,142,240,.08) 0%,var(--surface) 60%);border:1px solid rgba(61,142,240,.22);border-radius:var(--radius-lg);padding:.875rem 1rem;text-align:center;position:relative;overflow:hidden">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--blue),transparent)"></div>
+            <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1.2px;color:var(--blue);font-weight:700;margin-bottom:6px">Entries</div>
+            <div style="font-size:32px;font-weight:800;font-family:var(--barlow);color:var(--ink);line-height:1" id="lbE">—</div>
+          </div>
+          <!-- Avg Pins -->
+          <div style="background:linear-gradient(135deg,rgba(61,189,110,.08) 0%,var(--surface) 60%);border:1px solid rgba(61,189,110,.22);border-radius:var(--radius-lg);padding:.875rem 1rem;text-align:center;position:relative;overflow:hidden">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--green),transparent)"></div>
+            <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1.2px;color:var(--green);font-weight:700;margin-bottom:6px">Avg Pins</div>
+            <div style="font-size:32px;font-weight:800;font-family:var(--barlow);color:var(--ink);line-height:1" id="lbP">—</div>
+          </div>
+          <!-- AWP Rate -->
+          <div style="background:linear-gradient(135deg,rgba(240,192,48,.08) 0%,var(--surface) 60%);border:1px solid rgba(240,192,48,.22);border-radius:var(--radius-lg);padding:.875rem 1rem;text-align:center;position:relative;overflow:hidden">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--amber),transparent)"></div>
+            <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1.2px;color:var(--amber);font-weight:700;margin-bottom:6px">AWP Rate</div>
+            <div style="font-size:32px;font-weight:800;font-family:var(--barlow);color:var(--ink);line-height:1" id="lbA">—</div>
+          </div>
+        </div>
+
+        <!-- Filter tab bar (matches Skills page style) -->
+        <div style="display:flex;gap:0;margin-top:1.5rem;border-bottom:none;justify-content:center">
+          <span class="chip on" onclick="lbFilter('all',this)"
+            style="border-radius:var(--radius) 0 0 var(--radius);border-right:none;padding:9px 22px;font-size:11px;font-weight:700;letter-spacing:.8px">All Teams</span>
+          <span class="chip"    onclick="lbFilter('sig',this)"
+            style="border-radius:0;border-right:none;padding:9px 22px;font-size:11px;font-weight:700;letter-spacing:.8px">Sig Events</span>
+          <span class="chip"    onclick="lbFilter('awp',this)"
+            style="border-radius:0;border-right:none;padding:9px 22px;font-size:11px;font-weight:700;letter-spacing:.8px">AWP</span>
+          <span class="chip"    onclick="lbFilter('top',this)"
+            style="border-radius:0 var(--radius) var(--radius) 0;padding:9px 22px;font-size:11px;font-weight:700;letter-spacing:.8px">Top Pins</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── MAIN CONTENT ── -->
+    <div class="page" style="padding-top:1.25rem">
+
+      <!-- Starred strip -->
       <div id="starred-section">
         <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin-bottom:4px">⭐ Starred Teams</div>
         <div class="starred-row" id="starred-chips"></div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:.5rem">
-      <div class="filters" style="margin-bottom:0;flex:1">
-        <span class="fl">Filter:</span>
-        <span class="chip on" onclick="lbFilter('all',this)">All teams</span>
-        <span class="chip"    onclick="lbFilter('sig',this)">Sig events</span>
-        <span class="chip"    onclick="lbFilter('awp',this)">AWP achieved</span>
-        <span class="chip"    onclick="lbFilter('top',this)">Top pins</span>
+
+      <!-- Actions bar -->
+      <div class="lb-toolbar" style="margin-bottom:.75rem">
+        <!-- Inline search bubble -->
+        <div id="lb-search-bubble" style="flex:1;max-width:360px;position:relative">
+          <div style="display:flex;align-items:center;border:1px solid var(--border2);border-radius:var(--radius-lg);overflow:visible;background:var(--surface);transition:border-color .15s,box-shadow .15s"
+               id="lb-search-wrap"
+               onfocusin="this.style.borderColor='var(--red)';this.style.boxShadow='0 0 0 2px rgba(204,61,20,.15)'"
+               onfocusout="this.style.borderColor='var(--border2)';this.style.boxShadow='none'">
+            <span style="padding:0 10px 0 12px;font-size:14px;color:var(--ink3);flex-shrink:0;pointer-events:none">🔍</span>
+            <input id="pubSearch" type="text" placeholder="Search team… (e.g. 97230F)"
+              style="flex:1;border:none;outline:none;padding:9px 4px;font-size:13px;font-family:var(--mono);background:transparent;color:var(--ink);min-width:0"
+              onkeydown="if(event.key==='Enter')lbDoSearch();if(event.key==='Escape')lbClearSearch()"
+              oninput="shInput(this.value);if(!this.value.trim())lbClearSearch()"
+              onfocus="shShowDrop()" onblur="setTimeout(shHideDrop,200)" autocomplete="off">
+            <button id="lb-search-clear" onclick="lbClearSearch()" title="Clear search" style="display:none;padding:8px 8px;background:transparent;color:var(--ink3);border:none;cursor:pointer;font-size:14px;line-height:1;flex-shrink:0" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink3)'">✕</button>
+            <button onclick="lbDoSearch()" style="padding:8px 14px;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:11px;font-weight:700;font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase;transition:background .12s;flex-shrink:0;border-radius:0 var(--radius-lg) var(--radius-lg) 0" onmouseover="this.style.background='var(--red-dim)'" onmouseout="this.style.background='var(--red)'">Search</button>
+          </div>
+          <div id="search-history-drop" style="display:none"></div>
+        </div>
+        <button onclick="openCompareModal()" class="btn-sm" title="Compare teams side by side [C]" style="white-space:nowrap;flex-shrink:0">⚖️ Compare <span class="kbd-hint">C</span></button>
       </div>
-      <button onclick="openCompareModal()" class="btn-sm" title="Compare teams side by side [C]" style="white-space:nowrap">⚖️ Compare <span class="kbd-hint">C</span></button>
-      </div>
-      <div class="g4" id="lbCards" style="margin-bottom:1rem;display:none">
-        <div class="mc"><div class="mc-l">Teams</div><div class="mc-v" id="lbT">—</div></div>
-        <div class="mc"><div class="mc-l">Entries</div><div class="mc-v" id="lbE">—</div></div>
-        <div class="mc"><div class="mc-l">Avg pins</div><div class="mc-v" id="lbP">—</div></div>
-        <div class="mc"><div class="mc-l">AWP rate</div><div class="mc-v" id="lbA">—</div></div>
-      </div>
+
+      <!-- Search result area (shown when a search is active) -->
+      <div id="pubResult" style="display:none;margin-bottom:1rem"></div>
+
+      <!-- Table -->
       <div id="lbMain"><div class="empty"><span class="spin"></span><br><br>Loading…</div></div>
+
+      <!-- Pager -->
       <div class="pager" id="lbPager" style="display:none">
         <button class="pb" id="lbPrev" onclick="lbPage(-1)" disabled>← Prev</button>
         <span class="pi" id="lbPi"></span>
@@ -1638,159 +1912,11 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
         <!-- Status message shown after save attempt -->
         <div id="add-msg"></div>
       </div>
-
-      <!-- ── LOG SKILLS RUN (admin) ── -->
-      <div class="card admin-only" id="skills-add-card" style="border-left:3px solid var(--red);margin-top:1rem">
-        <p class="sec">🎯 Log Skills Run</p>
-        <div class="g3" style="margin-bottom:12px">
-          <div><label>Team #</label><input id="sk-team" placeholder="e.g. 97230F" oninput="this.value=this.value.toUpperCase()"></div>
-          <div><label>Event</label><input id="sk-event" placeholder="e.g. Mall of America"></div>
-          <div><label>Run Type</label>
-            <select id="sk-type">
-              <option value="auton">Autonomous Skills</option>
-              <option value="driver">Driver Skills</option>
-            </select>
-          </div>
-        </div>
-        <div class="g3" style="margin-bottom:12px">
-          <div><label>Score</label><input id="sk-score" type="number" min="0" step="1" placeholder="e.g. 42"></div>
-          <div><label>Attempt #</label><input id="sk-attempt" type="number" min="1" step="1" placeholder="1" value="1"></div>
-          <div><label>Notes (optional)</label><input id="sk-notes" placeholder="e.g. missed post 3"></div>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <button class="btn btn-p" onclick="saveSkillsRun()">+ Log Run</button>
-          <span id="sk-msg" style="font-size:12px;font-family:var(--mono);color:var(--green)"></span>
-        </div>
-      </div>
     </div>
   </div>
 
   <!-- ── PIT SCOUT (admin) ── -->
-  <div id="tab-pit" class="panel">
-    <div class="page">
-      <div class="card">
-        <p class="sec">🤖 Pit Scouting Form</p>
-        <p class="hint" style="margin-bottom:14px">Record robot specs, drive train, and autonomous capabilities from the pit. Data is saved per team and available in team profiles.</p>
-        <div class="g3" style="margin-bottom:12px">
-          <div><label>Team #</label><input id="pit-team" placeholder="e.g. 97230F" oninput="this.value=this.value.toUpperCase()"></div>
-          <div><label>Team Name (optional)</label><input id="pit-name" placeholder="e.g. Bot Go Brrr"></div>
-          <div><label>Event</label><input id="pit-event" placeholder="e.g. Mall of America"></div>
-        </div>
-        <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin:14px 0 10px">Drive Train</div>
-        <div class="g3" style="margin-bottom:12px">
-          <div><label>Drive Type</label>
-            <select id="pit-drive">
-              <option value="">— select —</option>
-              <option>Tank Drive</option>
-              <option>X-Drive (Holonomic)</option>
-              <option>H-Drive</option>
-              <option>Mecanum</option>
-              <option>Other</option>
-            </select>
-          </div>
-          <div><label>Motor Count</label>
-            <select id="pit-motors">
-              <option value="">— select —</option>
-              <option>4 motors</option>
-              <option>6 motors</option>
-              <option>8 motors</option>
-            </select>
-          </div>
-          <div><label>Drive Ratio / RPM (optional)</label><input id="pit-ratio" placeholder="e.g. 360 rpm"></div>
-        </div>
-        <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin:14px 0 10px">Robot Specs</div>
-        <div class="g3" style="margin-bottom:12px">
-          <div><label>Robot Type</label>
-            <select id="pit-type">
-              <option value="">— select —</option>
-              <option>Claw Bot</option>
-              <option>Puncher</option>
-              <option>Catapult</option>
-              <option>Flywheel</option>
-              <option>Other</option>
-            </select>
-          </div>
-          <div><label>Lift / Mechanism</label><input id="pit-lift" placeholder="e.g. 4-bar, no lift"></div>
-          <div><label>Weight (approx kg)</label><input id="pit-weight" type="number" min="0" step="0.1" placeholder="e.g. 8.5"></div>
-        </div>
-        <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin:14px 0 10px">Autonomous Capabilities</div>
-        <div class="g2" style="margin-bottom:12px">
-          <div><label>Auton Routes Available</label><input id="pit-routes" placeholder="e.g. Left AWP, Right 5-pin, SAWP"></div>
-          <div><label>Best Auton (claimed)</label><input id="pit-best-auton" placeholder="e.g. 6 pins consistently"></div>
-        </div>
-        <div class="g2" style="margin-bottom:12px">
-          <div><label>Can run SAWP?</label>
-            <select id="pit-sawp">
-              <option value="">Unknown</option>
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-              <option value="sometimes">Sometimes / practicing</option>
-            </select>
-          </div>
-          <div><label>Programming Language</label>
-            <select id="pit-lang">
-              <option value="">— select —</option>
-              <option>VEXcode Blocks</option>
-              <option>VEXcode C++</option>
-              <option>PROS (C++)</option>
-              <option>VEXcode Python</option>
-            </select>
-          </div>
-        </div>
-        <div style="margin-bottom:12px">
-          <label>Pit Notes <span style="font-weight:400;color:var(--ink3)">(general observations, strategy, team vibe)</span></label>
-          <textarea id="pit-notes" rows="3" placeholder="e.g. Very consistent auton, friendly team, looking to be picked…"></textarea>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-p" onclick="savePitEntry()">Save Pit Entry</button>
-          <button class="btn" onclick="clearPitForm()">Clear</button>
-        </div>
-        <div id="pit-msg"></div>
-      </div>
-      <div class="card" style="margin-top:1rem">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
-          <p class="sec" style="margin-bottom:0">Pit Scout Log</p>
-          <input id="pit-log-q" placeholder="Filter by team…" oninput="renderPitLog()" style="max-width:180px;font-size:12px;padding:5px 10px">
-          <button class="btn btn-sm" onclick="exportPitCSV()" style="margin-left:auto">⬇ Export CSV</button>
-        </div>
-        <div id="pit-log-body">
-          <div class="empty" style="padding:24px 0">No pit entries yet.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- ── ALLIANCE SELECTION HELPER (public) ── -->
-  <div id="tab-alliance" class="panel">
-    <div class="page">
-      <div class="card">
-        <p class="sec">🤝 Alliance Selection Helper</p>
-        <p class="hint" style="margin-bottom:14px">Enter your team number and mark teams as picked or unavailable. The helper ranks remaining teams by scouting strength and suggests your best alliance partners.</p>
-        <div class="g2" style="margin-bottom:14px">
-          <div>
-            <label>Your Team #</label>
-            <input id="al-my-team" placeholder="e.g. 97230F" oninput="this.value=this.value.toUpperCase();runAlliance()" style="font-size:14px;font-weight:700">
-          </div>
-          <div>
-            <label>Picked / Unavailable Teams <span style="font-weight:400;color:var(--ink3)">(comma-separated)</span></label>
-            <input id="al-picked" placeholder="e.g. 1234A,5678B" oninput="runAlliance()">
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
-          <button class="btn btn-p" onclick="runAlliance()">🔄 Refresh</button>
-          <button class="btn" onclick="alResetPicked()">Clear picked list</button>
-          <span id="al-status" style="font-size:11px;font-family:var(--mono);color:var(--ink3)"></span>
-        </div>
-        <div id="al-suggestions"></div>
-      </div>
-      <div class="card" style="margin-top:1rem">
-        <p class="sec">📋 All Available Teams</p>
-        <p class="hint" style="margin-bottom:10px">Click a team row to mark them as picked/unavailable.</p>
-        <div id="al-full-table"><div class="empty">Loading data…</div></div>
-      </div>
-    </div>
-  </div>
-
   <!-- ── SCOUT LOG (admin) ── -->
   <div id="tab-log" class="panel">
     <div class="page">
@@ -2501,6 +2627,30 @@ With 0% fail rates → P(both succeed) = 100%
     <!-- ── MAIN CONTENT ── -->
     <div class="page" style="padding-top:1.25rem">
 
+      <!-- Admin log form -->
+      <div class="card admin-only" id="skills-add-card" style="border-left:3px solid var(--red)">
+        <p class="sec">+ Log Skills Run</p>
+        <div class="g3" style="margin-bottom:12px">
+          <div><label>Team #</label><input id="sk-team" placeholder="e.g. 97230F" oninput="this.value=this.value.toUpperCase()"></div>
+          <div><label>Event</label><input id="sk-event" placeholder="e.g. Mall of America"></div>
+          <div><label>Run Type</label>
+            <select id="sk-type">
+              <option value="auton">Autonomous Skills</option>
+              <option value="driver">Driver Skills</option>
+            </select>
+          </div>
+        </div>
+        <div class="g3" style="margin-bottom:12px">
+          <div><label>Score</label><input id="sk-score" type="number" min="0" step="1" placeholder="e.g. 42"></div>
+          <div><label>Attempt #</label><input id="sk-attempt" type="number" min="1" step="1" placeholder="1" value="1"></div>
+          <div><label>Notes (optional)</label><input id="sk-notes" placeholder="e.g. missed post 3"></div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-p" onclick="saveSkillsRun()">+ Log Run</button>
+          <span id="sk-msg" style="font-size:12px;font-family:var(--mono);color:var(--green)"></span>
+        </div>
+      </div>
+
       <!-- Search + export bar -->
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:.75rem">
         <div style="flex:1;min-width:160px;max-width:280px;display:flex;border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden;transition:border-color .15s;box-shadow:none"
@@ -2519,77 +2669,6 @@ With 0% fail rates → P(both succeed) = 100%
       <!-- Leaderboard table -->
       <div id="sk-lb-wrap">
         <div class="empty" style="padding:48px 0">No skills runs logged yet.</div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ── RESOURCES (public) ── -->
-  <div id="tab-resources" class="panel">
-    <div class="page">
-
-      <div class="card" style="margin-bottom:1rem">
-        <p class="sec">📚 VEX V5RC Resources</p>
-        <p class="hint" style="margin-bottom:1rem">Useful links and references for the 2026–27 Push Back season. Click any card to open.</p>
-        <div class="g2" style="margin-bottom:1rem">
-
-          <a href="https://www.robotevents.com/" target="_blank" rel="noopener" style="text-decoration:none">
-            <div class="card" style="cursor:pointer;border-left:3px solid var(--red);margin-bottom:0;transition:border-color .15s,background .15s" onmouseover="this.style.background='var(--paper3)'" onmouseout="this.style.background=''">
-              <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px">🏆 RobotEvents</div>
-              <div style="font-size:11px;font-family:var(--mono);color:var(--ink3)">Official event registrations, team profiles, rankings, and results for all VEX competitions.</div>
-            </div>
-          </a>
-
-          <a href="https://www.vexrobotics.com/v5/competition/vrc-current-game" target="_blank" rel="noopener" style="text-decoration:none">
-            <div class="card" style="cursor:pointer;border-left:3px solid var(--blue);margin-bottom:0;transition:background .15s" onmouseover="this.style.background='var(--paper3)'" onmouseout="this.style.background=''">
-              <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px">📖 Game Manual</div>
-              <div style="font-size:11px;font-family:var(--mono);color:var(--ink3)">Official Push Back game manual and rules on VEX Robotics.</div>
-            </div>
-          </a>
-
-          <a href="https://vrc-data-analysis.com/" target="_blank" rel="noopener" style="text-decoration:none">
-            <div class="card" style="cursor:pointer;border-left:3px solid var(--green);margin-bottom:0;transition:background .15s" onmouseover="this.style.background='var(--paper3)'" onmouseout="this.style.background=''">
-              <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px">⚡ VRC Data Analysis</div>
-              <div style="font-size:11px;font-family:var(--mono);color:var(--ink3)">Source of TrueSkill rankings integrated into Override Scout. Browse Worlds-level team stats.</div>
-            </div>
-          </a>
-
-          <a href="https://www.vexforum.com/" target="_blank" rel="noopener" style="text-decoration:none">
-            <div class="card" style="cursor:pointer;border-left:3px solid var(--amber);margin-bottom:0;transition:background .15s" onmouseover="this.style.background='var(--paper3)'" onmouseout="this.style.background=''">
-              <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px">💬 VEX Forum</div>
-              <div style="font-size:11px;font-family:var(--mono);color:var(--ink3)">Official Q&amp;A, game rules clarifications, strategy threads, and the VEX community hub.</div>
-            </div>
-          </a>
-
-          <a href="https://github.com/johnholbrook/vf-qna" target="_blank" rel="noopener" style="text-decoration:none">
-            <div class="card" style="cursor:pointer;border-left:3px solid var(--volt);margin-bottom:0;transition:background .15s" onmouseover="this.style.background='var(--paper3)'" onmouseout="this.style.background=''">
-              <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px">📋 Game Q&amp;A Archive</div>
-              <div style="font-size:11px;font-family:var(--mono);color:var(--ink3)">Searchable archive of official VEX game Q&amp;A rulings — useful for rules edge cases.</div>
-            </div>
-          </a>
-
-          <a href="https://www.youtube.com/@VEXRobotics" target="_blank" rel="noopener" style="text-decoration:none">
-            <div class="card" style="cursor:pointer;border-left:3px solid var(--red);margin-bottom:0;transition:background .15s" onmouseover="this.style.background='var(--paper3)'" onmouseout="this.style.background=''">
-              <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px">▶ VEX YouTube</div>
-              <div style="font-size:11px;font-family:var(--mono);color:var(--ink3)">Official VEX Robotics YouTube channel — game reveal, tutorials, and competition streams.</div>
-            </div>
-          </a>
-
-        </div>
-      </div>
-
-      <div class="card">
-        <p class="sec">🗓 Season Key Dates</p>
-        <div class="tw">
-          <table>
-            <thead><tr><th>Date</th><th>Milestone</th></tr></thead>
-            <tbody>
-              <tr><td style="font-family:var(--mono)">Sep 3, 2026</td><td>Sig event AWP criteria tightens</td></tr>
-              <tr><td style="font-family:var(--mono)">TBD</td><td>Worlds 2026–27 qualifier cutoff</td></tr>
-              <tr><td style="font-family:var(--mono)">TBD</td><td>VEX World Championship 2027</td></tr>
-            </tbody>
-          </table>
-        </div>
       </div>
 
     </div>
@@ -2901,24 +2980,29 @@ With 0% fail rates → P(both succeed) = 100%
         <div id="cal-filter-status" style="font-size:13px;color:var(--ink3);font-family:var(--mono)"></div>
       </div>
 
+
+
       <!-- Event list -->
       <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
-          <p class="sec" style="margin-bottom:0">Scheduled Sig events</p>
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            <button class="chip" id="cal-show-past-chip" onclick="calTogglePast()" title="Past events are hidden by default">Show past</button>
-            <span style="font-size:11px;font-family:var(--mono);color:var(--ink3)">Country:</span>
-            <select id="cal-country-filter" onchange="calCountryFilterChange()" style="font-size:12px;padding:4px 8px;font-family:var(--mono);border:.5px solid var(--paper3);border-radius:var(--radius);background:var(--paper);color:var(--ink)">
-              <option value="">All countries</option>
-            </select>
-            <select id="cal-state-filter" onchange="renderCalList()" style="display:none;font-size:12px;padding:4px 8px;width:auto;font-family:var(--mono)">
-              <option value="">All states</option>
-            </select>
-            <span style="font-size:11px;font-family:var(--mono);color:var(--ink3)" id="cal-event-count"></span>
-          </div>
+        <div class="cal-section-header">
+          <div class="cal-section-title">&#128197; Scheduled Events</div>
+          <span class="cal-section-count" id="cal-event-count"></span>
+        </div>
+        <div class="cal-filter-strip">
+          <button class="chip" id="cal-show-past-chip" onclick="calTogglePast()" title="Past events are hidden by default">Show past</button>
+          <div class="cal-filter-sep"></div>
+          <span style="font-size:10px;font-family:var(--mono);color:var(--ink3);text-transform:uppercase;letter-spacing:.6px">Country</span>
+          <select id="cal-country-filter" onchange="calCountryFilterChange()" style="font-size:12px;padding:4px 8px;font-family:var(--mono);border:1px solid var(--border2);border-radius:var(--radius);background:var(--paper2);color:var(--ink);min-width:120px">
+            <option value="">All countries</option>
+          </select>
+          <select id="cal-state-filter" onchange="renderCalList()" style="display:none;font-size:12px;padding:4px 8px;width:auto;font-family:var(--mono);border:1px solid var(--border2);border-radius:var(--radius);background:var(--paper2);color:var(--ink)">
+            <option value="">All states</option>
+          </select>
         </div>
         <div id="calList"><div class="empty" style="padding:1.5rem">No events added yet.</div></div>
       </div>
+
+
 
     </div>
   </div>
@@ -3064,7 +3148,7 @@ With 0% fail rates → P(both succeed) = 100%
   <div class="sb-block">
     <div class="sb-nav-title">Navigation</div>
     <!-- These call switchTab() to navigate within the app -->
-    <a class="sb-link" href="#" data-sbnav="search" onclick="sidebarNav('search');return false;">
+    <a class="sb-link" href="#" data-sbnav="leaderboard" onclick="sidebarNav('leaderboard');setTimeout(()=>document.getElementById('pubSearch')?.focus(),120);return false;">
       <span class="sb-link-icon">🔍</span> Search teams
     </a>
     <a class="sb-link" href="#" data-sbnav="leaderboard" onclick="sidebarNav('leaderboard');return false;">
@@ -3082,7 +3166,7 @@ With 0% fail rates → P(both succeed) = 100%
     <a class="sb-link" href="#" data-sbnav="roadmap" onclick="sidebarNav('roadmap');return false;">
       <span class="sb-link-icon">🗺️</span> Roadmap
     </a>
-    <a class="sb-link" href="#" data-sbnav="alliance" onclick="sidebarNav('alliance');return false;">
+    <a class="sb-link" href="#" data-sbnav="calendar" onclick="sidebarNav('calendar');return false;">
       <span class="sb-link-icon">🤝</span> Alliance Helper
     </a>
     <a class="sb-link" href="#" data-sbnav="updates" onclick="sidebarNav('updates');return false;">
@@ -3568,10 +3652,50 @@ function ulSeedNewVersions() {
     { id: 'e_seed_3130_7', tag: 'ux',  text: 'Your team (from settings) highlighted in gold on the skills leaderboard; medal emoji for top-3 ranks; proportional score bar under each team name for quick visual comparison', versionId: 'v_seed_3130' },
   ]);
 
-  // ── v3.14.0 — Resources Tab &amp; Add Entry Consolidation ──
-  addVersion('v_seed_3140', 'v3.14.0', 'Resources Tab &amp; Add Entry Consolidation', [
-    { id: 'e_seed_3140_1', tag: 'feat', text: '📚 New Resources tab — public tab with curated links (RobotEvents, Game Manual, VRC Data Analysis, VEX Forum, Q&amp;A Archive, VEX YouTube) and a season key dates table for quick reference during competition', versionId: 'v_seed_3140' },
-    { id: 'e_seed_3140_2', tag: 'ux',  text: 'Log Skills Run form moved from the Skills tab into the Add Entry tab — all admin data-entry forms now live in one place; the Skills tab focuses purely on the leaderboard view', versionId: 'v_seed_3140' },
+  // ── v3.14.0 — Events Tab UI Redesign ──
+  addVersion('v_seed_3140', 'v3.14.0', 'Events Tab UI Redesign', [
+    { id: 'e_seed_3140_1', tag: 'ux',  text: '&#128197; Events tab cards redesigned — each event now renders as a standalone card with a coloured left-accent stripe (amber for Sig events, green for live), left-aligned date column showing month abbreviation and day number, and a clean body section with title, meta row, optional notes block, and action buttons', versionId: 'v_seed_3140' },
+    { id: 'e_seed_3140_2', tag: 'ux',  text: 'Countdown indicators — upcoming events show a days-away chip (orange when &le;7 days); live events show a pulsing green &ldquo;In progress&rdquo; chip; no chip displayed for far-future or past events', versionId: 'v_seed_3140' },
+    { id: 'e_seed_3140_3', tag: 'ux',  text: 'Polished filter strip — country and state selects moved into a unified pill-row with a separator and uppercase labels; event count badge rendered as a rounded pill in the section header rather than plain text', versionId: 'v_seed_3140' },
+    { id: 'e_seed_3140_4', tag: 'ux',  text: 'Multi-day date range displayed as e.g. &ldquo;14 &ndash; AUG 17&rdquo; in the date column; single-day events show just the day and month', versionId: 'v_seed_3140' },
+  ]);
+
+  // ── v3.14.1 — Events Tab Colour Pass ──
+  addVersion('v_seed_3141', 'v3.14.1', 'Events Tab Colour Pass', [
+    { id: 'e_seed_3141_1', tag: 'ux', text: 'Upcoming event cards now have a blue-tinted background gradient and blue border by default; Sig/qualifier cards use rich amber tones; live events use vivid green — all three states are immediately distinguishable at a glance', versionId: 'v_seed_3141' },
+    { id: 'e_seed_3141_2', tag: 'ux', text: 'Date column redesigned as a coloured pill that inherits the card accent colour (blue/amber/green) rather than a plain separator — month label is now bold and colour-matched', versionId: 'v_seed_3141' },
+    { id: 'e_seed_3141_3', tag: 'ux', text: 'Meta-row icons now individually coloured: red pin for location, blue globe for country, purple clipboard for scout entry count; notes block border and background tint also matches the card state colour', versionId: 'v_seed_3141' },
+    { id: 'e_seed_3141_4', tag: 'ux', text: 'Filter strip uses a blue gradient wash; event count badge is now blue-tinted; countdown chips use pill border-radius and bolder typography for improved readability', versionId: 'v_seed_3141' },
+  ]);
+
+  // ── v3.14.2 — Events Tab Site-Palette Colour Pass ──
+  addVersion('v_seed_3142', 'v3.14.2', 'Events Tab Site-Palette Colours', [
+    { id: 'e_seed_3142_1', tag: 'ux', text: 'Replaced all blue event card accents with the site\'s native red/volt/amber/green mission-control palette — upcoming events now use a red-volt gradient background and red border matching the scrollbar and primary buttons', versionId: 'v_seed_3142' },
+    { id: 'e_seed_3142_2', tag: 'ux', text: 'Left accent stripe on upcoming cards is a red-to-volt gradient; date column pill is red-tinted; month label uses <code>--red-text</code>; filter strip uses a red gradient wash; event count badge is red-tinted', versionId: 'v_seed_3142' },
+    { id: 'e_seed_3142_3', tag: 'ux', text: 'Meta icons now use site colours: red pin for location, amber globe for country, volt clipboard for scout count — all consistent with the broader Override Scout design language', versionId: 'v_seed_3142' },
+  ]);
+
+  // ── v3.15.0 — Alliance Helper moved into Events tab ──
+  addVersion('v_seed_3150', 'v3.15.0', 'Alliance Helper Moved to Events Tab', [
+    { id: 'e_seed_3150_1', tag: 'ux', text: '🤝 Alliance Selection Helper relocated from its own top-level tab into the Events tab — appears below the event list and alliance filter cards, keeping competition tooling in one place', versionId: 'v_seed_3150' },
+    { id: 'e_seed_3150_2', tag: 'arch', text: 'Standalone Alliance tab and tab button removed; sidebar Alliance Helper nav link now navigates to the Events tab; <code>runAlliance()</code> fires automatically when the Events tab is activated', versionId: 'v_seed_3150' },
+  ]);
+
+  addVersion('v_seed_3160', 'v3.16.0', 'Alliance Button on Event Cards', [
+    { id: 'e_seed_3160_1', tag: 'ux', text: '🤝 Alliance button added to each event card footer (next to Filter LB) — clicking it scrolls to the Alliance Selection Helper and contextually labels it with the event name, ready to become fully event-specific once match schedules are integrated', versionId: 'v_seed_3160' },
+  ]);
+
+  // ── v3.17.0 — TrueSkill Tab UI Consistency ──
+  addVersion('v_seed_3170', 'v3.17.0', 'TrueSkill Tab UI Consistency', [
+    { id: 'e_seed_3170_1', tag: 'ux', text: '⚡ TrueSkill Rankings tab redesigned to match the Leaderboard hero banner — gradient background with decorative radial glow blobs, Barlow Condensed display title, blue/red/green accent stat cards with top-edge highlight stripes', versionId: 'v_seed_3170' },
+    { id: 'e_seed_3170_2', tag: 'ux', text: 'Filter chips (All / ✅ Worlds / Top 100) restyled as a joined pill-group matching the Leaderboard filter bar; search input upgraded to the same focus-ring pill with 🔍 icon and blue focus glow', versionId: 'v_seed_3170' },
+  ]);
+
+  // ── v3.18.0 — Pit Scout &amp; Alliance as per-event modals ──
+  addVersion('v_seed_3180', 'v3.18.0', 'Pit Scout &amp; Alliance as per-event modals', [
+    { id: 'e_seed_3180_1', tag: 'ux', text: '🤖 Pit Scout converted to a modal — opens via a new &#129302; Pit Scout button on each event card footer; automatically labels the modal with the event name and pre-fills the Event field; modal has Form and Log tabs with CSV export', versionId: 'v_seed_3180' },
+    { id: 'e_seed_3180_2', tag: 'fix', text: '🤝 Alliance Selection converted to a modal — previously the al-my-team / al-suggestions / al-full-table / al-status elements had no corresponding HTML so runAlliance() was non-functional; both modals share the same dismiss-on-backdrop pattern and modalIn spring animation', versionId: 'v_seed_3180' },
+    { id: 'e_seed_3180_3', tag: 'arch', text: 'Standalone Pit Scout tab and tab button removed; edit-entry flow opens the Pit Scout modal directly; <code>renderPitLog()</code> deferred to modal open rather than called at DOMContentLoaded', versionId: 'v_seed_3180' },
   ]);
 
   if (changed) {
@@ -3824,7 +3948,7 @@ async function loadData() {
     document.getElementById('lbE').textContent = allEntries.length;
     document.getElementById('lbP').textContent = avgP;
     document.getElementById('lbA').textContent = awpR + '%';
-    document.getElementById('lbCards').style.display = 'grid';
+    // lbCards always visible in hero banner
 
     // Render
     lbApplyFilter(lbActiveF);
@@ -4948,17 +5072,15 @@ function buildStats(entries) {
 }
 
 /* ═══════════════════════════════════════════════════════
-   PUBLIC SEARCH TAB
+   PUBLIC SEARCH (embedded in leaderboard tab)
 ════════════════════════════════════════════════════════ */
 function pubRenderAll() {
-  if(!allTeams.length) {
-    document.getElementById('pubResult').innerHTML = '<div class="empty">No teams in database yet.</div>';
-    return;
-  }
-  document.getElementById('pubResult').innerHTML = '<div class="empty" style="color:var(--ink3)">Type a team number above and press Search.<br><br>Or switch to the <strong>Leaderboard</strong> tab to browse all teams.</div>';
+  // Search result panel is hidden by default; shown on search
 }
 
 function pubDoSearch() {
+  const resultEl = document.getElementById('pubResult');
+  if (resultEl) resultEl.style.display = 'block';
   const q = document.getElementById('pubSearch')?.value.trim().toUpperCase();
   if(!q) { pubRenderAll(); return; }
   const res = allTeams.filter(t => t.team.includes(q));
@@ -5064,29 +5186,77 @@ function lbRender() {
       : '<div class="empty">No teams match this filter.</div>';
     return; 
   }
+  const medals = ['🥇','🥈','🥉'];
+  const myTeam = (localStorage.getItem('os_my_team')||'').toUpperCase().trim();
+  const rival   = (localStorage.getItem('os_rival_team')||'').toUpperCase().trim();
+  const maxPins = Math.max(...sl.map(t=>parseFloat(t.avg_pins)||0), 1);
+  const sortArrow = col => lbSortC===col ? (lbSortD===1?'↓':'↑') : '';
+
   document.getElementById('lbMain').innerHTML=`
-    <div style="border:1.5px solid var(--ink);border-radius:var(--radius-lg);overflow:hidden">
-    <div class="tw"><table>
-      <thead><tr>
-        <th style="width:24px;font-family:var(--mono);font-size:11px;color:var(--ink3)">#</th>
-        <th onclick="lbSortBy('team')" id="lbth-team">Team</th>
-        <th onclick="lbSortBy('count')" id="lbth-count">Matches</th>
-        <th onclick="lbSortBy('avg_pins')" id="lbth-avg_pins" class="sorted">Avg Pins ↕</th>
-        <th onclick="lbSortBy('awp_pct')" id="lbth-awp_pct">AWP Rate</th>
-        <th>Robot Type</th>
-      </tr></thead><tbody>
-      ${sl.map((t,i)=>`<tr data-team="${esc(t.team)}" style="cursor:pointer">
-        <td style="font-family:var(--mono);font-size:11px;color:var(--ink3)">${start+i+1}</td>
-        <td><span class="tn">${esc(t.team)}</span></td>
-        <td style="font-family:var(--mono)">${t.count}</td>
-        <td style="font-family:var(--mono);font-weight:600">${parseFloat(t.avg_pins).toFixed(1)}</td>
-        <td><div style="display:flex;align-items:center;gap:6px">
-          <span style="font-family:var(--mono);min-width:34px">${(parseFloat(t.awp_pct)||0).toFixed(0)}%</span>
-          <div class="awp-wrap"><div class="awp-fill" style="width:${Math.min(parseFloat(t.awp_pct)||0,100)}%"></div></div>
-        </div></td>
-        <td style="font-size:12px;color:var(--ink2)">${esc(t.types)}</td>
-      </tr>`).join('')}
-      </tbody></table></div></div>`;
+    <div style="border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:var(--surface)">
+      <!-- Header -->
+      <div style="display:grid;grid-template-columns:56px 1fr 80px 120px 120px 1fr;gap:0;background:var(--paper2);border-bottom:1px solid var(--border2)">
+        <div style="padding:10px 12px;font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);font-weight:600">#</div>
+        <div onclick="lbSortBy('team')" id="lbth-team"   style="padding:10px 12px;font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:${lbSortC==='team'?'var(--amber)':'var(--ink3)'};font-weight:600;cursor:pointer;user-select:none;transition:color .12s" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='${lbSortC==='team'?'var(--amber)':'var(--ink3)'}'">Team ${sortArrow('team')}</div>
+        <div onclick="lbSortBy('count')" id="lbth-count" style="padding:10px 12px;font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:${lbSortC==='count'?'var(--amber)':'var(--ink3)'};font-weight:600;cursor:pointer;user-select:none;transition:color .12s" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='${lbSortC==='count'?'var(--amber)':'var(--ink3)'}'">Matches ${sortArrow('count')}</div>
+        <div onclick="lbSortBy('avg_pins')" id="lbth-avg_pins" style="padding:10px 12px;font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:${lbSortC==='avg_pins'?'var(--amber)':'var(--ink3)'};font-weight:600;cursor:pointer;user-select:none;transition:color .12s" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='${lbSortC==='avg_pins'?'var(--amber)':'var(--ink3)'}'">Avg Pins ${sortArrow('avg_pins')}</div>
+        <div onclick="lbSortBy('awp_pct')" id="lbth-awp_pct" style="padding:10px 12px;font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:${lbSortC==='awp_pct'?'var(--amber)':'var(--ink3)'};font-weight:600;cursor:pointer;user-select:none;transition:color .12s" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='${lbSortC==='awp_pct'?'var(--amber)':'var(--ink3)'}'">AWP Rate ${sortArrow('awp_pct')}</div>
+        <div style="padding:10px 12px;font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);font-weight:600">Robot</div>
+      </div>
+      <!-- Rows -->
+      ${sl.map((t,i)=>{
+        const rank = start+i+1;
+        const medal = rank<=3 ? `<span style="font-size:15px;line-height:1">${medals[rank-1]}</span>` : '';
+        const isMe = myTeam && t.team===myTeam;
+        const isRival = rival && t.team===rival;
+        const rowBg = isMe ? 'background:rgba(240,192,48,.06);border-left:2px solid var(--amber);'
+                    : isRival ? 'background:rgba(204,61,20,.05);border-left:2px solid var(--red);'
+                    : 'border-left:2px solid transparent;';
+        const avgPins = parseFloat(t.avg_pins)||0;
+        const awpPct  = parseFloat(t.awp_pct)||0;
+        const pinPct  = Math.round(avgPins/maxPins*100);
+        const pinColor = avgPins>=6?'var(--green)':avgPins>=3?'var(--amber)':'var(--red)';
+        const tsInfo = typeof tsGet==='function' ? tsGet(t.team) : null;
+        const worldsBadge = tsInfo?.qualified ? '<span style="display:inline-flex;align-items:center;font-size:8px;font-weight:700;font-family:var(--mono);padding:1px 5px;border-radius:3px;background:rgba(61,189,110,.15);color:var(--green);border:1px solid rgba(61,189,110,.3);margin-left:5px;vertical-align:middle">✅ WQ</span>' : '';
+        return `<div onclick="openDetail(${JSON.stringify(JSON.stringify(t))})" style="display:grid;grid-template-columns:56px 1fr 80px 120px 120px 1fr;gap:0;${rowBg}border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s" onmouseover="this.style.background='var(--paper3)'" onmouseout="this.style.background='${isMe?'rgba(240,192,48,.06)':isRival?'rgba(204,61,20,.05)':'transparent'}'">
+          <!-- Rank -->
+          <div style="padding:13px 12px;display:flex;align-items:center;justify-content:center;gap:4px;flex-direction:column">
+            ${medal || `<span style="font-family:var(--mono);font-size:11px;color:var(--ink3)">${rank}</span>`}
+          </div>
+          <!-- Team -->
+          <div style="padding:13px 12px;display:flex;flex-direction:column;justify-content:center;gap:3px">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <span style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--ink)">${esc(t.team)}</span>
+              ${isMe ? '<span style="font-size:8px;font-weight:700;font-family:var(--mono);padding:1px 5px;border-radius:3px;background:rgba(240,192,48,.15);color:var(--amber);border:1px solid rgba(240,192,48,.3)">YOU</span>' : ''}
+              ${worldsBadge}
+            </div>
+            <div style="font-size:10px;color:var(--ink3);font-family:var(--mono)">${esc(t.types||'—')}</div>
+          </div>
+          <!-- Matches -->
+          <div style="padding:13px 12px;display:flex;align-items:center">
+            <span style="font-family:var(--mono);font-size:13px;color:var(--ink2)">${t.count}</span>
+          </div>
+          <!-- Avg Pins -->
+          <div style="padding:13px 12px;display:flex;flex-direction:column;justify-content:center;gap:5px">
+            <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:${pinColor}">${avgPins.toFixed(1)}</span>
+            <div style="height:3px;background:var(--border2);border-radius:2px;width:70px;overflow:hidden">
+              <div style="height:3px;background:${pinColor};border-radius:2px;width:${pinPct}%;transition:width .3s"></div>
+            </div>
+          </div>
+          <!-- AWP Rate -->
+          <div style="padding:13px 12px;display:flex;flex-direction:column;justify-content:center;gap:5px">
+            <span style="font-family:var(--mono);font-size:13px;color:${awpPct>=50?'var(--green)':awpPct>=20?'var(--amber)':'var(--ink2)'};font-weight:600">${awpPct.toFixed(0)}%</span>
+            <div style="height:3px;background:var(--border2);border-radius:2px;width:70px;overflow:hidden">
+              <div style="height:3px;background:var(--green);border-radius:2px;width:${Math.min(awpPct,100)}%;transition:width .3s"></div>
+            </div>
+          </div>
+          <!-- Robot type -->
+          <div style="padding:13px 12px;display:flex;align-items:center">
+            <span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">${esc(t.types||'—')}</span>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
   const pg=document.getElementById('lbPager');
   if(pages>1){
     pg.style.display='flex';
@@ -5095,7 +5265,22 @@ function lbRender() {
     document.getElementById('lbNext').disabled=lbPg===pages;
   } else pg.style.display='none';
 }
-function lbPage(d){ lbPg+=d; lbRender(); window.scrollTo(0,0); }
+function lbDoSearch() {
+  const res = document.getElementById('pubResult');
+  if (res) res.style.display = 'block';
+  const clr = document.getElementById('lb-search-clear');
+  if (clr) clr.style.display = 'block';
+  pubDoSearch();
+}
+function lbClearSearch() {
+  const inp = document.getElementById('pubSearch');
+  if (inp) inp.value = '';
+  const res = document.getElementById('pubResult');
+  if (res) { res.style.display = 'none'; res.innerHTML = ''; }
+  const clr = document.getElementById('lb-search-clear');
+  if (clr) clr.style.display = 'none';
+}
+
 
 /* ═══════════════════════════════════════════════════════
    DETAIL OVERLAY (shared)
@@ -6585,10 +6770,8 @@ function switchTab(t, el) {
     if(t==='leaderboard' && _lbDirty) { _lbDirty = false; lbSortRender(); }
     if(t==='updates'||t==='roadmap') loadUpdates();
     if(t==='ts-rankings') tsApply();
-    if(t==='alliance') { setTimeout(runAlliance, 50); }
-    if(t==='pit') { renderPitLog(); }
     if(t==='skills') { skRender(); }
-    if(t==='calendar') { loadCalEvents(); }
+    if(t==='calendar') { loadCalEvents(); setTimeout(runAlliance, 100); }
     document.dispatchEvent(new CustomEvent('tabchange', { detail: { tab: t } }));
   }
 
@@ -6934,61 +7117,92 @@ function renderCalList() {
       <button class="btn btn-sm danger" onclick="calDeleteSelected()" style="margin-left:auto">\uD83D\uDDD1 Delete selected</button>
     </div>` : '';
 
-  el.innerHTML = massToolbar + filtered2.map(e => {
+  const MONTH_ABBR = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+
+  el.innerHTML = massToolbar + '<div class="cal-events-grid">' + filtered2.map(e => {
     const isPast    = e.end_date < now;
     const isCurrent = e.start_date <= now && e.end_date >= now;
-    const status    = isCurrent
-      ? '<span class="badge b-awp">LIVE</span>'
-      : isPast
-        ? '<span class="badge b-no">Past</span>'
-        : '<span class="badge b-sig">Upcoming</span>';
-    const entryCount = allEntries.filter(en => {
-      const d = (en.created_at||en.ts||'').slice(0,10);
-      return d >= e.start_date && d <= e.end_date;
-    }).length;
+
+    // Status badge + countdown
+    let statusBadge, countdownHtml = '';
+    if(isCurrent) {
+      statusBadge = '<span class="badge b-awp" style="font-size:9px;padding:2px 7px;letter-spacing:.5px">&#9679; LIVE NOW</span>';
+      countdownHtml = '<span class="cal-event-countdown live">&#9679; In progress</span>';
+    } else if(isPast) {
+      statusBadge = '<span class="badge b-no" style="font-size:9px">PAST</span>';
+    } else {
+      statusBadge = '<span class="badge b-sig" style="font-size:9px">UPCOMING</span>';
+      // Days until
+      const msUntil = new Date(e.start_date) - new Date(now);
+      const daysUntil = Math.ceil(msUntil / 86400000);
+      if(daysUntil <= 7) {
+        countdownHtml = `<span class="cal-event-countdown soon">&#9677; ${daysUntil}d away</span>`;
+      } else if(daysUntil <= 30) {
+        countdownHtml = `<span class="cal-event-countdown">${daysUntil}d away</span>`;
+      }
+    }
+
+    // Date column
+    const startParts = e.start_date ? e.start_date.split('-') : [];
+    const startDay   = startParts[2] ? parseInt(startParts[2],10) : '?';
+    const startMonth = startParts[1] ? MONTH_ABBR[parseInt(startParts[1],10)-1] : '';
+    const endParts   = e.end_date && e.end_date !== e.start_date ? e.end_date.split('-') : null;
+    const endDay     = endParts ? parseInt(endParts[2],10) : null;
+    const endMonth   = endParts ? MONTH_ABBR[parseInt(endParts[1],10)-1] : null;
 
     let mapsUrl = e.maps_url || '';
     if(!mapsUrl && e.location) {
       mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(e.location);
     }
 
+    const entryCount = allEntries.filter(en => {
+      const d = (en.created_at||en.ts||'').slice(0,10);
+      return d >= e.start_date && d <= e.end_date;
+    }).length;
+
     const checkbox = isAdmin
-      ? `<input type="checkbox" class="cal-evt-cb" data-id="${e.id}" onchange="calUpdateSelectedCount()" style="width:auto;margin:0;flex-shrink:0;margin-top:2px">`
+      ? `<input type="checkbox" class="cal-evt-cb" data-id="${e.id}" onchange="calUpdateSelectedCount()" style="position:absolute;top:14px;right:14px;width:auto;margin:0;accent-color:var(--red)">`
       : '';
 
-    return `
-    <div class="${e.is_sig ? 'cal-event-sig' : ''}" style="display:flex;justify-content:space-between;align-items:flex-start;padding:14px;border-bottom:.5px solid var(--paper3);gap:12px;flex-wrap:wrap;border-radius:var(--radius);margin-bottom:6px">
+    const cardClasses = [
+      'cal-event-card',
+      e.is_sig ? 'is-sig' : '',
+      isCurrent ? 'is-live' : '',
+      isPast ? 'is-past' : ''
+    ].filter(Boolean).join(' ');
+
+    return `<div class="${cardClasses}">
       ${checkbox}
-      <div style="flex:1;min-width:200px">
-        <div style="font-weight:600;font-size:14px;margin-bottom:4px;display:flex;flex-wrap:wrap;align-items:center;gap:6px">
-          ${e.is_sig ? '<span class="cal-sig-crown">⭐</span>' : ''}${esc(e.name)} ${status}
-          ${e.country ? `<span style="font-size:11px;font-family:var(--mono);color:var(--ink3);font-weight:400">${esc(e.country)}${e.region ? ' \u00B7 '+esc(e.region) : ''}</span>` : ''}
+      <div class="cal-event-inner">
+        <div class="cal-event-datecol">
+          <div class="cal-event-month">${startMonth}</div>
+          <div class="cal-event-day">${startDay}</div>
+          ${endDay ? `<div class="cal-event-dayend">&ndash; ${endMonth !== startMonth ? endMonth+' ' : ''}${endDay}</div>` : ''}
+          <div class="cal-event-sep"></div>
         </div>
-        <div style="font-size:12px;font-family:var(--mono);color:var(--ink3);margin-bottom:3px">
-          ${esc(e.start_date)}${e.end_date!==e.start_date?' \u2192 '+esc(e.end_date):''}
+        <div class="cal-event-body">
+          <div class="cal-event-title-row">
+            <div class="cal-event-title">${e.is_sig ? '<span class="cal-sig-crown" style="margin-right:4px">&#11088;</span>' : ''}${esc(e.name)}</div>
+            <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;flex-wrap:wrap">${statusBadge}${countdownHtml}</div>
+          </div>
+          <div class="cal-event-meta">
+            ${e.location ? `<span class="cal-event-meta-item"><span class="mi-icon mi-loc">&#128205;</span> ${mapsUrl ? `<a href="${esc(mapsUrl)}" target="_blank" rel="noopener" class="cal-event-meta-link">${esc(e.location)} &#8599;</a>` : esc(e.location)}</span>` : ''}
+            ${e.country ? `<span class="cal-event-meta-item"><span class="mi-icon mi-globe">&#127758;</span> ${esc(e.country)}${e.region ? ' &middot; '+esc(e.region) : ''}</span>` : ''}
+            <span class="cal-event-meta-item"><span class="mi-icon mi-scout">&#128203;</span> ${entryCount} scout entr${entryCount!==1?'ies':'y'}</span>
+          </div>
+          ${e.notes ? `<div class="cal-event-notes">${esc(e.notes)}</div>` : ''}
+          <div class="cal-event-footer">
+            <button class="btn btn-sm" onclick="openSchedModal('${e.id}')">&#128203; Schedule</button>
+            <button class="btn btn-sm" onclick="filterByEvent('${e.id}')">&#128202; Filter LB</button>
+            <button class="btn btn-sm" onclick="openAllianceForEvent('${e.id}')">&#129309; Alliance</button>
+            <button class="btn btn-sm" onclick="openPitForEvent('${e.id}')">&#129302; Pit Scout</button>
+            ${isAdmin ? `<button class="btn btn-sm" onclick="openEditCalById('${e.id}')">&#9998; Edit</button>` : ''}
+            ${isAdmin ? `<button class="btn btn-sm btn-d" onclick="deleteCalEvent('${e.id}')" title="Delete event">&#215;</button>` : ''}
+          </div>
         </div>
-        ${e.location ? `
-        <div style="font-size:12px;color:var(--ink2);display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px">
-          <span>\uD83D\uDCCD ${esc(e.location)}</span>
-          ${mapsUrl ? `<a href="${esc(mapsUrl)}" target="_blank" rel="noopener"
-            style="color:var(--blue);text-decoration:none;font-family:var(--mono);font-size:11px;white-space:nowrap">
-            View on Maps \u2197</a>` : ''}
-        </div>` : mapsUrl ? `<a href="${esc(mapsUrl)}" target="_blank" rel="noopener"
-            style="display:inline-block;margin-bottom:3px;color:var(--blue);text-decoration:none;font-family:var(--mono);font-size:11px">
-            \uD83D\uDCCD View on Maps \u2197</a>` : ''}
-        ${e.notes ? `<div style="font-size:12px;color:var(--ink2);margin-bottom:3px">${esc(e.notes)}</div>` : ''}
-        <div style="font-size:11px;font-family:var(--mono);color:var(--ink3)">
-          ${entryCount} scouting entr${entryCount!==1?'ies':'y'} in this window
-        </div>
-      </div>
-      <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap">
-        <button class="btn btn-sm" onclick="openSchedModal('${e.id}')">📋 Schedule</button>
-        <button class="btn btn-sm" onclick="filterByEvent('${e.id}')">Filter leaderboard</button>
-        ${isAdmin ? `<button class="btn btn-sm" onclick="openEditCalById('${e.id}')">✏ Edit</button>` : ''}
-        ${isAdmin ? `<button class="btn btn-sm btn-d" onclick="deleteCalEvent('${e.id}')">\u2715</button>` : ''}
       </div>
     </div>`;
-  }).join('');
+  }).join('') + '</div>';
 }
 
 function calToggleAll(checked) {
@@ -7046,6 +7260,42 @@ function filterByEvent(id) {
   if(!ev) return;
   activeCalFilter = ev;
   applyCalFilterToLeaderboard(ev);
+}
+
+function openAllianceForEvent(id) {
+  const ev = calEvents.find(e => String(e.id) === String(id));
+  const labelEl = document.getElementById('al-modal-event-label');
+  if(ev && labelEl) labelEl.textContent = ev.name;
+  document.getElementById('al-modal-bg').classList.add('open');
+  runAlliance();
+}
+
+function closeAlModal() {
+  document.getElementById('al-modal-bg').classList.remove('open');
+}
+
+function openPitForEvent(id) {
+  const ev = id ? calEvents.find(e => String(e.id) === String(id)) : null;
+  const labelEl = document.getElementById('pit-modal-event-label');
+  if(labelEl) labelEl.textContent = ev ? ev.name : '';
+  // Pre-fill event field if event context is known and field is empty
+  const pitEventEl = document.getElementById('pit-event');
+  if(ev && pitEventEl && !pitEventEl.value) pitEventEl.value = ev.name;
+  pitModalTab('form', document.querySelector('.pit-modal-tab'));
+  document.getElementById('pit-modal-bg').classList.add('open');
+  renderPitLog();
+}
+
+function closePitModal() {
+  document.getElementById('pit-modal-bg').classList.remove('open');
+}
+
+function pitModalTab(name, btn) {
+  document.querySelectorAll('.pit-modal-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.pit-modal-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('pit-modal-panel-' + name)?.classList.add('active');
+  if(name === 'log') renderPitLog();
 }
 
 function applyCalFilter() {
@@ -8794,7 +9044,7 @@ function applyPerPage(val) {
   lbApplyFilter(lbActiveF);
 }
 
-// Patch lbRender to respect LB_PG_OVERRIDE
+// Patch lbRender to respect LB_PG_OVERRIDE — redesigned to match Skills page aesthetic
 const _origLbRender = lbRender;
 window.lbRender = function() {
   const pg = LB_PG_OVERRIDE || LB_PG;
@@ -8809,51 +9059,102 @@ window.lbRender = function() {
   }
   const myTeam = (localStorage.getItem('os_my_team') || '').trim().toUpperCase();
   const rivals = (localStorage.getItem('os_rivals') || '').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+  const medals = ['🥇','🥈','🥉'];
+  const maxPins = Math.max(...sl.map(t => parseFloat(t.avg_pins)||0), 1);
+  const sa = col => lbSortC === col ? (lbSortD === 1 ? ' ↓' : ' ↑') : '';
+  const sc = col => lbSortC === col ? 'var(--amber)' : 'var(--ink3)';
+
   document.getElementById('lbMain').innerHTML = `
-    <div style="border:1.5px solid var(--ink);border-radius:var(--radius-lg);overflow:hidden">
-    <div class="tw"><table>
-      <thead><tr>
-        <th style="width:24px;font-family:var(--mono);font-size:11px;color:var(--ink3)">#</th>
-        <th onclick="lbSortBy('team')" id="lbth-team">Team</th>
-        <th onclick="lbSortBy('count')" id="lbth-count">Matches</th>
-        <th onclick="lbSortBy('avg_pins')" id="lbth-avg_pins" class="sorted">Avg Pins ↕</th>
-        <th onclick="lbSortBy('awp_pct')" id="lbth-awp_pct">AWP Rate</th>
-        <th>Robot Type</th>
-      </tr></thead><tbody>
+    <div style="border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:var(--surface)">
+
+      <!-- Header row -->
+      <div style="display:grid;grid-template-columns:52px 1fr 72px 140px 140px 120px;background:var(--paper2);border-bottom:2px solid var(--border2)">
+        <div style="padding:10px 14px;font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);font-weight:600">#</div>
+        <div onclick="lbSortBy('team')" style="padding:10px 14px;font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:${sc('team')};font-weight:600;cursor:pointer;user-select:none;transition:color .12s">Team${sa('team')}</div>
+        <div onclick="lbSortBy('count')" style="padding:10px 14px;font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:${sc('count')};font-weight:600;cursor:pointer;user-select:none;transition:color .12s">Mtchs${sa('count')}</div>
+        <div onclick="lbSortBy('avg_pins')" style="padding:10px 14px;font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:${sc('avg_pins')};font-weight:600;cursor:pointer;user-select:none;transition:color .12s">Avg Pins${sa('avg_pins')}</div>
+        <div onclick="lbSortBy('awp_pct')" style="padding:10px 14px;font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:${sc('awp_pct')};font-weight:600;cursor:pointer;user-select:none;transition:color .12s">AWP Rate${sa('awp_pct')}</div>
+        <div style="padding:10px 14px;font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);font-weight:600">Robot</div>
+      </div>
+
+      <!-- Data rows -->
       ${sl.map((t, i) => {
+        const rank = start + i + 1;
         const isMe = myTeam && t.team === myTeam;
         const isRival = rivals.includes(t.team);
-        const rowStyle = isMe
-          ? 'cursor:pointer;background:rgba(255,210,0,.08);outline:1px solid rgba(255,210,0,.3)'
-          : isRival
-          ? 'cursor:pointer;background:rgba(255,77,26,.07);outline:1px solid rgba(255,77,26,.25)'
-          : 'cursor:pointer';
-        const badge = isMe ? ' 🏠' : isRival ? ' ⚔' : '';
-        return `<tr data-team="${t.team.replace(/"/g,'&quot;')}" style="${rowStyle}">
-          <td style="font-family:var(--mono);font-size:11px;color:var(--ink3)">${start+i+1}</td>
-          <td><span class="tn">${t.team.replace(/</g,'&lt;')}</span>${badge}</td>
-          <td style="font-family:var(--mono)">${t.count}</td>
-          <td style="font-family:var(--mono);font-weight:600">${parseFloat(t.avg_pins).toFixed(1)}</td>
-          <td><div style="display:flex;align-items:center;gap:6px">
-            <span style="font-family:var(--mono);min-width:34px">${(parseFloat(t.awp_pct)||0).toFixed(0)}%</span>
-            <div class="awp-wrap"><div class="awp-fill" style="width:${Math.min(parseFloat(t.awp_pct)||0,100)}%"></div></div>
-          </div></td>
-          <td style="font-size:12px;color:var(--ink2)">${t.types ? t.types.replace(/</g,'&lt;') : ''}</td>
-        </tr>`;
+        const avgPins = parseFloat(t.avg_pins) || 0;
+        const awpPct  = parseFloat(t.awp_pct)  || 0;
+        const pinPct  = Math.round(avgPins / maxPins * 100);
+        const pinColor = avgPins >= 6 ? 'var(--green)' : avgPins >= 3 ? 'var(--amber)' : 'var(--red)';
+        const awpColor = awpPct >= 50 ? 'var(--green)' : awpPct >= 20 ? 'var(--amber)' : 'var(--ink3)';
+        const tsInfo = typeof tsGet === 'function' ? tsGet(t.team) : null;
+        const leftBorder = isMe ? '3px solid var(--amber)' : isRival ? '3px solid var(--red)' : '3px solid transparent';
+        const rowBg = isMe ? 'rgba(240,192,48,.05)' : isRival ? 'rgba(204,61,20,.05)' : 'transparent';
+        const medal = rank <= 3 ? medals[rank-1] : `<span style="font-family:var(--mono);font-size:11px;color:var(--ink3)">${rank}</span>`;
+        const teamEsc = t.team.replace(/"/g,'&quot;').replace(/</g,'&lt;');
+        const typesEsc = (t.types||'—').replace(/</g,'&lt;');
+        return `<div data-team="${teamEsc}" onclick="openDetail('${t.team.replace(/'/g,"\\'")}')" style="display:grid;grid-template-columns:52px 1fr 72px 140px 140px 120px;border-bottom:1px solid var(--border);border-left:${leftBorder};background:${rowBg};cursor:pointer;transition:background .1s"
+          onmouseover="this.style.background='var(--paper3)'" onmouseout="this.style.background='${rowBg}'">
+
+          <!-- Rank -->
+          <div style="padding:14px 0;display:flex;align-items:center;justify-content:center;font-size:16px">${medal}</div>
+
+          <!-- Team -->
+          <div style="padding:12px 14px;display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:0">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <span style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--ink)">${teamEsc}</span>
+              ${isMe ? '<span style="font-size:8px;font-weight:700;font-family:var(--mono);padding:1px 6px;border-radius:3px;background:rgba(240,192,48,.18);color:var(--amber);border:1px solid rgba(240,192,48,.35)">YOU</span>' : ''}
+              ${isRival ? '<span style="font-size:8px;font-weight:700;font-family:var(--mono);padding:1px 6px;border-radius:3px;background:rgba(204,61,20,.15);color:var(--red);border:1px solid rgba(204,61,20,.3)">RIVAL</span>' : ''}
+              ${tsInfo?.qualified ? '<span style="font-size:8px;font-weight:700;font-family:var(--mono);padding:1px 6px;border-radius:3px;background:rgba(61,189,110,.15);color:var(--green);border:1px solid rgba(61,189,110,.3)">✅ WQ</span>' : ''}
+            </div>
+            <div style="font-size:10px;color:var(--ink3);font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${typesEsc}</div>
+          </div>
+
+          <!-- Matches -->
+          <div style="padding:12px 14px;display:flex;align-items:center">
+            <span style="font-family:var(--mono);font-size:13px;color:var(--ink2)">${t.count}</span>
+          </div>
+
+          <!-- Avg Pins -->
+          <div style="padding:12px 14px;display:flex;flex-direction:column;justify-content:center;gap:6px">
+            <div style="display:flex;align-items:baseline;gap:5px">
+              <span style="font-family:var(--mono);font-size:17px;font-weight:700;color:${pinColor};line-height:1">${avgPins.toFixed(1)}</span>
+              <span style="font-size:9px;font-family:var(--mono);color:var(--ink3)">pins</span>
+            </div>
+            <div style="height:3px;width:80px;background:var(--border2);border-radius:2px;overflow:hidden">
+              <div style="height:3px;width:${pinPct}%;background:${pinColor};border-radius:2px"></div>
+            </div>
+          </div>
+
+          <!-- AWP Rate -->
+          <div style="padding:12px 14px;display:flex;flex-direction:column;justify-content:center;gap:6px">
+            <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:${awpColor};line-height:1">${awpPct.toFixed(0)}%</span>
+            <div style="height:3px;width:80px;background:var(--border2);border-radius:2px;overflow:hidden">
+              <div style="height:3px;width:${Math.min(awpPct,100)}%;background:var(--green);border-radius:2px"></div>
+            </div>
+          </div>
+
+          <!-- Robot type -->
+          <div style="padding:12px 14px;display:flex;align-items:center">
+            <span style="font-size:11px;color:var(--ink3);font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${typesEsc}</span>
+          </div>
+        </div>`;
       }).join('')}
-      </tbody></table></div></div>
+    </div>
+
+    <!-- Mobile cards (unchanged, shown on small screens) -->
     <div class="lb-card-list">
       ${sl.map((t, i) => {
         const isMe = myTeam && t.team === myTeam;
         const isRival = rivals.includes(t.team);
-        const badge = isMe ? ' 🏠' : isRival ? ' ⚔' : '';
         const cardClass = isMe ? 'lb-card lb-card-me' : isRival ? 'lb-card lb-card-rival' : 'lb-card';
         const awp = Math.min(parseFloat(t.awp_pct)||0, 100);
-        return `<div class="${cardClass}" data-team="${t.team.replace(/"/g,'&quot;')}" onclick="openDetail('${t.team.replace(/'/g,"\\'")}')">
+        const teamEsc = t.team.replace(/"/g,'&quot;').replace(/</g,'&lt;');
+        return `<div class="${cardClass}" data-team="${teamEsc}" onclick="openDetail('${t.team.replace(/'/g,"\\'")}')">
           <div class="lb-card-rank">${start+i+1}</div>
           <div class="lb-card-body">
-            <div class="lb-card-team">${t.team.replace(/</g,'&lt;')}${badge}</div>
-            <div class="lb-card-meta">${t.types ? t.types.replace(/</g,'&lt;') : '—'}</div>
+            <div class="lb-card-team">${teamEsc}${isMe?' 🏠':isRival?' ⚔':''}</div>
+            <div class="lb-card-meta">${(t.types||'—').replace(/</g,'&lt;')}</div>
             <div class="lb-card-stats">
               <div class="lb-card-stat"><div class="lb-card-stat-v">${t.count}</div><div class="lb-card-stat-l">Matches</div></div>
               <div class="lb-card-stat"><div class="lb-card-stat-v">${parseFloat(t.avg_pins).toFixed(1)}</div><div class="lb-card-stat-l">Avg Pins</div></div>
@@ -8869,6 +9170,7 @@ window.lbRender = function() {
         </div>`;
       }).join('')}
     </div>`;
+
   const pgEl = document.getElementById('lbPager');
   if (pages > 1) {
     pgEl.style.display = 'flex';
@@ -9211,13 +9513,14 @@ function qsHighlight(items) {
 }
 function qsGo(team) {
   closeQuickSearch();
-  // Switch to search tab and populate
-  const tab = document.querySelector('[data-tab="search"]');
+  // Switch to leaderboard tab (search bubble is embedded there)
+  const tab = document.querySelector('[data-tab="leaderboard"]');
   if (tab) tab.click();
   setTimeout(() => {
     const inp = document.getElementById('pubSearch');
     if (inp) { inp.value = team; }
-    if (typeof pubDoSearch === 'function') pubDoSearch();
+    if (typeof lbDoSearch === 'function') lbDoSearch();
+    else if (typeof pubDoSearch === 'function') pubDoSearch();
   }, 80);
   shAddHistory(team);
 }
@@ -9340,39 +9643,41 @@ function showToastNew(msg, dur=2200) {
 const _origLbRenderNew = window.lbRender;
 window.lbRender = function() {
   _origLbRenderNew.apply(this, arguments);
-  // After lbRender, inject star buttons into every row
+  // After lbRender, inject star buttons + sparklines into every row
   setTimeout(() => {
     const stars = getStarred();
-    document.querySelectorAll('#lbMain tr[data-team]').forEach(row => {
+    document.querySelectorAll('#lbMain [data-team]').forEach(row => {
       const team = row.dataset.team;
       if (!team) return;
-      // Star button
+      // Star button — inject into the team name cell (2nd grid child)
       if (!row.querySelector('.star-btn')) {
-        const td = row.querySelector('td:nth-child(2)');
-        if (td) {
-          const btn = document.createElement('button');
-          btn.className = 'star-btn' + (stars.includes(team) ? ' starred' : '');
-          btn.dataset.team = team;
-          btn.title = 'Star this team';
-          btn.textContent = '★';
-          btn.onclick = function(e) { e.stopPropagation(); toggleStar(team); };
-          td.appendChild(btn);
+        const teamCell = row.children[1]; // 2nd column = team info div
+        if (teamCell) {
+          const nameRow = teamCell.querySelector('div');
+          if (nameRow) {
+            const btn = document.createElement('button');
+            btn.className = 'star-btn' + (stars.includes(team) ? ' starred' : '');
+            btn.dataset.team = team;
+            btn.title = 'Star this team';
+            btn.textContent = '★';
+            btn.onclick = function(e) { e.stopPropagation(); toggleStar(team); };
+            nameRow.appendChild(btn);
+          }
         }
       }
-      // Sparkline
+      // Sparkline — inject into the avg pins cell (4th grid child)
       if (!row.querySelector('.sparkline-canvas')) {
-        const pinsTd = row.querySelector('td:nth-child(4)');
-        if (pinsTd && window.allEntries) {
+        const pinsCell = row.children[3]; // 4th column = avg pins
+        if (pinsCell && window.allEntries) {
           const teamEntries = allEntries.filter(en => (en.team||'').toUpperCase() === team.toUpperCase());
           if (teamEntries.length >= 3) {
             const recent = [...teamEntries].sort((a,b)=>(b.ts||b.created_at||'').localeCompare(a.ts||a.created_at||'')).slice(0,10).reverse();
             const vals = recent.map(en => { const p=(en.pins||'0+0').split('+'); return (parseInt(p[0])||0)+(parseInt(p[1])||0); });
             const canvas = document.createElement('canvas');
             canvas.className = 'sparkline-canvas';
-            canvas.width = 60; canvas.height = 20;
+            canvas.width = 60; canvas.height = 16;
             drawSparkline(canvas, vals);
-            pinsTd.appendChild(document.createElement('br'));
-            pinsTd.appendChild(canvas);
+            pinsCell.appendChild(canvas);
           }
         }
       }
@@ -9929,8 +10234,10 @@ self.addEventListener('fetch', e => {
         const inp = document.getElementById('pubSearch');
         if (inp) {
           inp.value = teamParam.toUpperCase();
-          switchTab('search', document.querySelector('[data-tab="search"]'));
-          pubDoSearch();
+          // Always show leaderboard tab with search bubble
+          switchTab('leaderboard', document.querySelector('[data-tab="leaderboard"]'));
+          if (typeof lbDoSearch === 'function') lbDoSearch();
+          else pubDoSearch();
         }
       };
       // Try immediately, then again after data loads
@@ -10330,7 +10637,8 @@ function pitPrefill(id) {
   set('pit-type', e.type); set('pit-lift', e.lift); set('pit-weight', e.weight);
   set('pit-routes', e.routes); set('pit-best-auton', e.best_auton);
   set('pit-sawp', e.sawp); set('pit-lang', e.lang); set('pit-notes', e.notes);
-  switchTab('pit', document.querySelector('[data-tab="pit"]'));
+  switchTab('calendar', document.querySelector('[data-tab="calendar"]'));
+  setTimeout(() => openPitForEvent(null), 150);
 }
 
 function deletePitEntry(id) {
@@ -10489,7 +10797,7 @@ const _origSetAllTeams = window.setAllTeams;
 if (typeof setAllTeams === 'function') {
   window.setAllTeams = function(teams) {
     _origSetAllTeams(teams);
-    if (_isTabActive && _isTabActive('alliance')) runAlliance();
+    if (_isTabActive && _isTabActive('calendar')) runAlliance();
   };
 }
 
@@ -10521,10 +10829,129 @@ if (typeof setAllTeams === 'function') {
     window.addEventListener('resize', pinTabs);
     document.addEventListener('tabchange', pinTabs);
     document.addEventListener('sidebarToggle', pinTabs);
-    // Also render pit log and alliance on load
-    renderPitLog();
+    // Also render alliance on load
+    if(typeof runAlliance === 'function') setTimeout(runAlliance, 200);
   });
 })();
 </script>
+<!-- ── PIT SCOUT MODAL ── -->
+<div class="pit-modal-bg" id="pit-modal-bg" onclick="if(event.target===this)closePitModal()">
+  <div class="pit-modal">
+    <div class="pit-modal-head">
+      <div>
+        <div class="pit-modal-title">🤖 Pit Scouting</div>
+        <div id="pit-modal-event-label" style="font-size:10px;font-family:var(--mono);color:var(--ink3);margin-top:2px"></div>
+      </div>
+      <button class="pit-modal-close" onclick="closePitModal()">✕</button>
+    </div>
+    <div class="pit-modal-tabs">
+      <button class="pit-modal-tab active" onclick="pitModalTab('form',this)">📋 Form</button>
+      <button class="pit-modal-tab" onclick="pitModalTab('log',this)">📒 Log</button>
+    </div>
+    <div class="pit-modal-body">
+      <!-- Form panel -->
+      <div class="pit-modal-panel active" id="pit-modal-panel-form">
+        <div class="g3" style="margin-bottom:12px">
+          <div><label>Team #</label><input id="pit-team" placeholder="e.g. 97230F" oninput="this.value=this.value.toUpperCase()"></div>
+          <div><label>Team Name (optional)</label><input id="pit-name" placeholder="e.g. Bot Go Brrr"></div>
+          <div><label>Event</label><input id="pit-event" placeholder="e.g. Mall of America"></div>
+        </div>
+        <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin:14px 0 10px">Drive Train</div>
+        <div class="g3" style="margin-bottom:12px">
+          <div><label>Drive Type</label>
+            <select id="pit-drive">
+              <option value="">— select —</option>
+              <option>Tank Drive</option><option>X-Drive (Holonomic)</option>
+              <option>H-Drive</option><option>Mecanum</option><option>Other</option>
+            </select>
+          </div>
+          <div><label>Motor Count</label>
+            <select id="pit-motors">
+              <option value="">— select —</option>
+              <option>4 motors</option><option>6 motors</option><option>8 motors</option>
+            </select>
+          </div>
+          <div><label>Drive Ratio / RPM (optional)</label><input id="pit-ratio" placeholder="e.g. 360 rpm"></div>
+        </div>
+        <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin:14px 0 10px">Robot Specs</div>
+        <div class="g3" style="margin-bottom:12px">
+          <div><label>Robot Type</label>
+            <select id="pit-type">
+              <option value="">— select —</option>
+              <option>Claw Bot</option><option>Puncher</option><option>Catapult</option>
+              <option>Flywheel</option><option>Other</option>
+            </select>
+          </div>
+          <div><label>Lift / Mechanism</label><input id="pit-lift" placeholder="e.g. 4-bar, no lift"></div>
+          <div><label>Weight (approx kg)</label><input id="pit-weight" type="number" min="0" step="0.1" placeholder="e.g. 8.5"></div>
+        </div>
+        <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin:14px 0 10px">Autonomous Capabilities</div>
+        <div class="g2" style="margin-bottom:12px">
+          <div><label>Auton Routes Available</label><input id="pit-routes" placeholder="e.g. Left AWP, Right 5-pin, SAWP"></div>
+          <div><label>Best Auton (claimed)</label><input id="pit-best-auton" placeholder="e.g. 6 pins consistently"></div>
+        </div>
+        <div class="g2" style="margin-bottom:12px">
+          <div><label>Can run SAWP?</label>
+            <select id="pit-sawp">
+              <option value="">Unknown</option><option value="yes">Yes</option>
+              <option value="no">No</option><option value="sometimes">Sometimes / practicing</option>
+            </select>
+          </div>
+          <div><label>Programming Language</label>
+            <select id="pit-lang">
+              <option value="">— select —</option>
+              <option>VEXcode Blocks</option><option>VEXcode C++</option>
+              <option>PROS (C++)</option><option>VEXcode Python</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:12px">
+          <label>Pit Notes <span style="font-weight:400;color:var(--ink3)">(general observations, strategy, team vibe)</span></label>
+          <textarea id="pit-notes" rows="3" placeholder="e.g. Very consistent auton, friendly team, looking to be picked…"></textarea>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-p" onclick="savePitEntry()">Save Pit Entry</button>
+          <button class="btn" onclick="clearPitForm()">Clear</button>
+        </div>
+        <div id="pit-msg"></div>
+      </div>
+      <!-- Log panel -->
+      <div class="pit-modal-panel" id="pit-modal-panel-log">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+          <input id="pit-log-q" placeholder="Filter by team…" oninput="renderPitLog()" style="max-width:200px;font-size:12px;padding:5px 10px">
+          <button class="btn btn-sm" onclick="exportPitCSV()" style="margin-left:auto">⬇ Export CSV</button>
+        </div>
+        <div id="pit-log-body"><div class="empty" style="padding:24px 0">No pit entries yet.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── ALLIANCE MODAL ── -->
+<div class="al-modal-bg" id="al-modal-bg" onclick="if(event.target===this)closeAlModal()">
+  <div class="al-modal">
+    <div class="al-modal-head">
+      <div>
+        <div class="al-modal-title">🤝 Alliance Selection</div>
+        <div id="al-modal-event-label" style="font-size:10px;font-family:var(--mono);color:var(--ink3);margin-top:2px"></div>
+      </div>
+      <button class="al-modal-close" onclick="closeAlModal()">✕</button>
+    </div>
+    <div class="al-modal-body">
+      <div class="g2" style="margin-bottom:10px">
+        <div><label>My Team #</label><input id="al-my-team" placeholder="e.g. 97230F" oninput="runAlliance()"></div>
+        <div><label>Teams Already Picked</label><input id="al-picked" placeholder="e.g. 1234A, 5678B"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="btn btn-p btn-sm" onclick="runAlliance()">Update</button>
+        <button class="btn btn-sm btn-d" onclick="alResetPicked()">Reset Picks</button>
+        <span id="al-status" style="font-size:11px;font-family:var(--mono);color:var(--ink3);align-self:center"></span>
+      </div>
+      <div id="al-suggestions" style="margin-bottom:10px"></div>
+      <div id="al-full-table"></div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
