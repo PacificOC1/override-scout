@@ -12697,7 +12697,8 @@ async function reProxyFetch(path, params, token) {
       're-token': token,
       're-path': path,
       're-params': qs
-    }
+    },
+    body: JSON.stringify({})
   });
   if (r.status === 401) throw new Error('Invalid API token — check your RobotEvents token in Settings.');
   if (!r.ok) {
