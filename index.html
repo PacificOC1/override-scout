@@ -12689,8 +12689,10 @@ async function reProxyFetch(path, params, token) {
   let qs = '';
   if (params) Object.entries(params).forEach(([k, v]) => { qs += (qs ? '&' : '') + encodeURIComponent(k) + '=' + encodeURIComponent(String(v)); });
   const r = await fetch(RE_PROXY, {
+    method: 'POST',
     headers: {
       'apikey': SB_KEY,
+      'Content-Type': 'application/json',
       're-token': token,
       're-path': path,
       're-params': qs
