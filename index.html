@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -656,6 +656,29 @@ body.compact-mode #tab-leaderboard table td,
 body.compact-mode #tab-leaderboard table th { padding:4px 8px; }
 body.compact-mode #tab-leaderboard table { font-size:12px; }
 body.compact-mode .awp-wrap { display:none; }
+body.compact-mode #lb-hero { padding: .9rem 1rem 0 !important; }
+body.compact-mode #lb-hero > div { max-width: 980px !important; }
+body.compact-mode #lb-hero [style*="text-align:center"] { margin-bottom: .8rem !important; }
+body.compact-mode #lbCards { gap: 6px !important; max-width: 620px !important; }
+body.compact-mode #lbCards > div { padding: .5rem .65rem !important; border-radius: var(--radius) !important; }
+body.compact-mode #lbCards > div > div:last-child { font-size: 22px !important; }
+body.compact-mode #lb-hero .chip { padding: 6px 14px !important; font-size: 10px !important; }
+body.compact-mode #starred-section { padding: 6px 10px !important; margin-bottom: .5rem !important; }
+body.compact-mode #tab-leaderboard .page { padding-top: .75rem !important; }
+body.compact-mode .lb-toolbar { margin-bottom: .5rem !important; }
+body.compact-mode .lb-grid-wrap { border-radius: var(--radius) !important; }
+body.compact-mode .lb-grid-head,
+body.compact-mode .lb-grid-row { grid-template-columns: 42px minmax(130px,1fr) 56px 104px 96px 92px !important; }
+body.compact-mode .lb-grid-head > div { padding: 6px 8px !important; font-size: 8px !important; }
+body.compact-mode .lb-grid-cell { padding: 7px 8px !important; }
+body.compact-mode .lb-grid-rank { padding: 7px 0 !important; font-size: 13px !important; }
+body.compact-mode .lb-grid-team { gap: 2px !important; }
+body.compact-mode .lb-grid-team-num { font-size: 12px !important; }
+body.compact-mode .lb-grid-team-meta,
+body.compact-mode .lb-grid-robot { font-size: 9px !important; }
+body.compact-mode .lb-grid-bar { display: none !important; }
+body.compact-mode .lb-grid-value { font-size: 13px !important; }
+body.compact-mode .lb-grid-unit { display: none !important; }
 body.compact-mode .lb-card-list { gap:4px; }
 body.compact-mode .lb-card { padding:6px 10px; gap:8px; border-radius:var(--radius); min-height:48px; }
 body.compact-mode .lb-card .stat-pill { padding:2px 4px; font-size:9px; }
@@ -1671,12 +1694,6 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
     <div class="tabs">
       <button class="tab active" data-tab="leaderboard" onclick="switchTab('leaderboard',this)">Leaderboard</button>
       <button class="tab" data-tab="calendar" onclick="switchTab('calendar',this)">📅 Events</button>
-      <button class="tab admin-only" data-tab="add" onclick="switchTab('add',this)">+ Add Entry</button>
-      
-      <button class="tab admin-only" data-tab="log" onclick="switchTab('log',this)">Scout Log</button>
-      <button class="tab admin-only" data-tab="predict" onclick="switchTab('predict',this)">Win Probability</button>
-      <button class="tab admin-only" data-tab="routes" onclick="switchTab('routes',this)">Routes</button>
-      <button class="tab admin-only" data-tab="formulas" onclick="switchTab('formulas',this)">Formulas</button>
       <button class="tab" data-tab="skills" onclick="switchTab('skills',this)">🎯 Skills</button>
       <button class="tab" data-tab="ts-rankings" onclick="switchTab('ts-rankings',this)">🌎 TS Rankings</button>
       <button class="tab" data-tab="roadmap" onclick="switchTab('roadmap',this)">🗺️ Roadmap</button>
@@ -1685,6 +1702,11 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
       <button class="tab" data-tab="settings" onclick="switchTab('settings',this)">⚙️ Settings</button>
       <button class="tab" data-tab="experimental" onclick="switchTab('experimental',this)">🧪 Lab</button>
       <button class="tab" data-tab="about" onclick="switchTab('about',this)">About</button>
+      <button class="tab admin-only" data-tab="add" onclick="switchTab('add',this)">+ Add Entry</button>
+      <button class="tab admin-only" data-tab="log" onclick="switchTab('log',this)">Scout Log</button>
+      <button class="tab admin-only" data-tab="predict" onclick="switchTab('predict',this)">Win Probability</button>
+      <button class="tab admin-only" data-tab="routes" onclick="switchTab('routes',this)">Routes</button>
+      <button class="tab admin-only" data-tab="formulas" onclick="switchTab('formulas',this)">Formulas</button>
     </div>
   </div>
 
@@ -1806,6 +1828,32 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
         <span class="pi" id="lbPi"></span>
         <button class="pb" id="lbNext" onclick="lbPage(1)">Next →</button>
       </div>
+
+      <!-- ── ROBOTEVENTS MATCH IMPORT (admin only) ── -->
+      <div class="card admin-only" id="lb-re-import-card" style="margin-top:1.5rem">
+        <p class="sec">⬇ Import Match Results from RobotEvents</p>
+        <p class="hint" style="margin-bottom:12px">Pull scored match data from a RobotEvents event and create leaderboard entries automatically. Each team gets one entry per played match using alliance score. Duplicates are skipped.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px">
+          <div style="flex:1;min-width:200px">
+            <label>Event (must have a RobotEvents ID)</label>
+            <select id="lb-re-import-event" style="font-family:var(--mono);font-size:12px">
+              <option value="">— select event —</option>
+            </select>
+          </div>
+          <div style="flex:1;min-width:160px">
+            <label>RobotEvents API Token</label>
+            <input type="password" id="lb-re-import-token" placeholder="Paste token…" style="font-family:var(--mono);font-size:12px" oninput="saveRobotEventsToken(this.value)">
+          </div>
+          <button class="btn btn-p" onclick="importMatchesFromRE()">⬇ Import Matches</button>
+        </div>
+        <div id="lb-re-import-msg" style="font-size:12px;font-family:var(--mono);color:var(--ink3)"></div>
+        <div id="lb-re-import-preview" style="display:none;margin-top:10px">
+          <div id="lb-re-import-preview-text" style="font-size:12px;font-family:var(--mono);color:var(--ink2);margin-bottom:8px"></div>
+          <button class="btn btn-p" onclick="confirmImportMatches()">✓ Confirm import</button>
+          <button class="btn" onclick="document.getElementById('lb-re-import-preview').style.display='none'" style="margin-left:6px">Cancel</button>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -2434,6 +2482,75 @@ Final: Red 35 pts, Blue 62 pts
 
 With 0% fail rates → P(both succeed) = 100%
 → Blue wins probability = 100% in this outcome</div>
+
+        <p class="sec" style="margin-top:1rem">RFORCE-style rankings</p>
+        <div class="formula-box">Local scouting approximation of the RFORCE Index formula.
+Not official — no judge awards or full RobotEvents ranking data.
+
+Per event, three per-team rank points are computed:
+  RANK_EP(rank, total) = ((1 + total − rank) / total) × 10
+
+  EP = Avg Pins RANK + AWP Rate RANK + Success Rate RANK
+
+Event caliber (avg pins across all teams at that event):
+  RFER = 1 + log₁₀(EventCaliber + 1) × EventLevel × EventBonus
+
+  EventLevel: Local=1.0 · Sig/Regional=1.25 · National=1.5 · World=2.0
+  EventBonus = 1 + (n² − 1) / max(1, N²)
+               where n = events this team attended, N = max events by any team
+
+  EventScore = EP × RFER
+  RFORCE     = Σ(EventScores) ÷ events attended
+
+Combined score = 60% × normalised(RFORCE) + 40% × normalised(TrueSkill)</div>
+
+        <p class="sec" style="margin-top:1rem">OPR · DPR · CCWM (Test Rankings)</p>
+        <div class="formula-box">Computed from scouted match entries; each entry = one robot in one match.
+
+OPR (Offensive Power Rating)
+  = avg pins scored per entry
+  Measures raw offensive output per appearance.
+
+DPR (Defensive Power Rating)
+  = avg of max(0, EventAvg − pins_scored) per entry
+  Represents how much below the event average a team performs —
+  a proxy for how much defensive pressure opponents imposed.
+  Lower DPR = better relative performance under pressure.
+
+CCWM (Calculated Contribution to Winning Margin)
+  = OPR − DPR
+  Net contribution: positive = adds more than it concedes.
+
+EventAvg = mean pins across all entries at that event.</div>
+
+        <p class="sec" style="margin-top:1rem">OpenSkill — Weng-Lin Bradley-Terry Full</p>
+        <div class="formula-box">Source: Weng &amp; Lin, JMLR 2011 §3.1 — same model as openskill.js v4.
+
+Parameters (openskill.js defaults):
+  μ₀ = 25       (initial mean)
+  σ₀ = 25/3     (initial uncertainty ≈ 8.333)
+  β  = 25/6     (performance noise ≈ 4.167)
+  τ  = 25/300   (dynamic factor ≈ 0.0833)
+  κ  = 0.0001   (σ floor multiplier)
+
+Each scouted entry = 1-v-1 vs a fixed "field" opponent (μ=25, σ=σ₀/2).
+Win condition: team pins ≥ event average for that entry.
+
+Update equations (Bradley-Terry Full, §3.1):
+  c    = √(σᵢ² + σq² + 2β²)
+  p_iq = Φ((μᵢ − μq) / c)          — win probability
+  s    = 1 (win) or 0 (loss)
+
+  Ω    = (σᵢ²/c) × (s − p_iq)      — mean update
+  Δ    = (σᵢ²/c²) × p_iq × (1−p_iq) — variance update
+
+  μᵢ'  = μᵢ + Ω
+  σᵢ'  = √( max(σᵢ²(1−Δ) + τ², (κσ₀)²) )
+
+Φ(x) = standard normal CDF (Abramowitz &amp; Stegun polynomial, max error &lt; 1.5×10⁻⁷)
+
+Ordinal = μ − 3σ  (99.7% lower bound — conservative display rating)
+Entries processed in chronological order (created_at ascending).</div>
       </div>
     </div>
   </div>
@@ -2569,6 +2686,7 @@ With 0% fail rates → P(both succeed) = 100%
     </div>
   </div>
 
+  <!-- ── RFORCE-STYLE RANKINGS (public) ── -->
     <!-- ── ROADMAP (public read, admin edit) ── -->
   <div id="tab-roadmap" class="panel">
     <div class="page">
@@ -2918,6 +3036,18 @@ With 0% fail rates → P(both succeed) = 100%
               <div class="toggle-thumb"></div>
             </label>
           </div>
+          <div class="settings-row">
+            <div class="settings-row-info">
+              <div class="settings-row-label">RobotEvents API token</div>
+              <div class="settings-row-hint">Paste once for event imports, match schedules, team profiles, and Quick-Scout. Saved in this browser only.</div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;flex:1;max-width:360px">
+              <input type="password" id="settings-re-token" placeholder="Paste token..." autocomplete="off"
+                style="min-width:0;width:100%;font-size:12px;padding:5px 10px;background:var(--paper3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--ink);font-family:var(--mono)"
+                oninput="saveSettingsReToken()">
+              <button class="btn btn-sm" onclick="clearSettingsReToken()" style="flex-shrink:0">Clear</button>
+            </div>
+          </div>
         </div>
 
         <!-- ── DATA ── -->
@@ -3011,6 +3141,8 @@ With 0% fail rates → P(both succeed) = 100%
         <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
           <div style="background:rgba(200,255,0,.06);border:1px solid rgba(200,255,0,.2);border-radius:var(--radius-lg);padding:.5rem .875rem;font-size:11px;font-family:var(--mono);color:var(--volt)">⚡ Quick-Scout Mode</div>
           <div style="background:var(--blue-bg);border:1px solid rgba(61,142,240,.2);border-radius:var(--radius-lg);padding:.5rem .875rem;font-size:11px;font-family:var(--mono);color:var(--blue)">🤝 Alliance Draft Simulator</div>
+          <div style="background:var(--amber-bg);border:1px solid rgba(240,192,48,.2);border-radius:var(--radius-lg);padding:.5rem .875rem;font-size:11px;font-family:var(--mono);color:var(--amber)">⚡ RFORCE Rankings</div>
+          <div style="background:var(--green-bg);border:1px solid rgba(61,189,110,.2);border-radius:var(--radius-lg);padding:.5rem .875rem;font-size:11px;font-family:var(--mono);color:var(--green)">📊 Test Rankings</div>
         </div>
       </div>
     </div>
@@ -3224,10 +3356,138 @@ With 0% fail rates → P(both succeed) = 100%
         </div>
       </div>
 
+      <!-- ══════════════════════════════════════
+           FEATURE 3: RFORCE-STYLE RANKINGS
+      ═══════════════════════════════════════ -->
+      <div class="card" style="border-left:3px solid var(--amber)">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:1rem">
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+              <span style="font-size:18px">⚡</span>
+              <p class="sec" style="margin:0">RFORCE-style Rankings</p>
+            </div>
+            <p class="hint">A local scouting version of the RFORCE Index — event points, event rating, event score, season average. Not the official score (no judge awards or full RobotEvents data).</p>
+          </div>
+          <a class="btn btn-sm" href="https://rforce.vision/rforce-index/" target="_blank" rel="noopener">Formula Source ↗</a>
+        </div>
+
+        <div class="g4" style="margin-bottom:1rem">
+          <div class="mc"><div class="mc-l">Ranked Teams</div><div class="mc-v" id="rf-stat-teams">—</div></div>
+          <div class="mc"><div class="mc-l">Events Used</div><div class="mc-v" id="rf-stat-events">—</div></div>
+          <div class="mc"><div class="mc-l">Top RFORCE</div><div class="mc-v" id="rf-stat-top">—</div></div>
+          <div class="mc"><div class="mc-l">Avg RFORCE</div><div class="mc-v" id="rf-stat-avg">—</div></div>
+        </div>
+
+        <div class="lb-toolbar" style="margin-bottom:.75rem">
+          <input id="rf-search" placeholder="Search team..." oninput="renderRforce()" style="max-width:220px">
+          <select id="rf-sort" onchange="renderRforce()" style="max-width:220px">
+            <option value="combined">Sort: Combined</option>
+            <option value="rforce">Sort: RFORCE</option>
+            <option value="ts">Sort: TrueSkill</option>
+            <option value="events">Sort: Events</option>
+            <option value="avgEp">Sort: Avg EP</option>
+            <option value="bestEs">Sort: Best Event</option>
+            <option value="team">Sort: Team</option>
+          </select>
+          <select id="rf-platform" onchange="renderRforce()" style="max-width:220px">
+            <option value="all">All event levels</option>
+            <option value="local">Treat all as Local</option>
+            <option value="regional">Treat all as Regional</option>
+            <option value="national">Treat all as National</option>
+          </select>
+        </div>
+
+        <div class="formula-box" style="margin-bottom:1rem">
+Local RFORCE-style score:
+RANK EP = ((1 + (T - R)) / T) × 10
+EP = Avg Pins RANK + AWP Rate RANK + Success Rate RANK
+RFER = 1 + log10(Event Caliber + 1) × Event Level × Event Number Bonus
+Event Score = EP × RFER
+RFORCE = Sum(Event Scores) ÷ Events
+
+Combined score = 60% normalized RFORCE + 40% normalized TrueSkill
+        </div>
+
+        <div class="lb-wrap">
+          <table id="rf-table">
+            <thead>
+              <tr>
+                <th>Rank</th><th>Team</th><th>Combined</th><th>RFORCE</th>
+                <th>TrueSkill</th><th>Events</th><th>Avg EP</th><th>Best ES</th>
+                <th>Avg Pins</th><th>AWP</th><th>Success</th>
+              </tr>
+            </thead>
+            <tbody id="rf-tbody">
+              <tr><td colspan="11" class="empty"><span class="spin"></span>&nbsp; Building combined rankings...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           FEATURE 4: TEST RANKINGS (OPR/DPR/CCWM/OpenSkill)
+      ═══════════════════════════════════════ -->
+      <div class="card" style="border-left:3px solid var(--green)">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:.75rem">
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+              <span style="font-size:18px">📊</span>
+              <p class="sec" style="margin:0">Test Rankings</p>
+              <span style="font-size:10px;font-family:var(--mono);font-weight:700;color:var(--green);background:var(--green-bg);border:1px solid rgba(61,189,110,.2);border-radius:99px;padding:1px 8px;letter-spacing:.3px;text-transform:uppercase">Experimental</span>
+            </div>
+            <p class="hint">GaelScout-style metrics computed from scouted entries. OPR = offensive output, DPR = defensive pressure allowed, CCWM = net margin contribution. OpenSkill updates via win/loss vs field average.</p>
+          </div>
+          <button class="btn btn-sm" onclick="trBuild()">↻ Recalculate</button>
+        </div>
+
+        <div class="g4" style="margin-bottom:1rem">
+          <div class="mc"><div class="mc-l">Teams Ranked</div><div class="mc-v" id="tr-stat-teams">—</div></div>
+          <div class="mc"><div class="mc-l">Top OPR</div><div class="mc-v" id="tr-stat-opr">—</div></div>
+          <div class="mc"><div class="mc-l">Top OpenSkill</div><div class="mc-v" id="tr-stat-os">—</div></div>
+          <div class="mc"><div class="mc-l">Entries Used</div><div class="mc-v" id="tr-stat-entries">—</div></div>
+        </div>
+
+        <div class="lb-toolbar" style="margin-bottom:.75rem">
+          <input id="tr-search" placeholder="Search team…" oninput="trRender()" style="max-width:220px">
+          <select id="tr-sort" onchange="trRender()" style="max-width:220px">
+            <option value="ordinal">Sort: OpenSkill Ordinal</option>
+            <option value="opr">Sort: OPR</option>
+            <option value="dpr">Sort: DPR</option>
+            <option value="ccwm">Sort: CCWM</option>
+          </select>
+        </div>
+
+        <div class="formula-box" style="margin-bottom:1rem">
+OPR  = avg pins scored per entry (offensive output)
+DPR  = avg field-average advantage conceded (lower = better defense)
+CCWM = OPR − DPR  (net margin contribution)
+OpenSkill: Weng-Lin Bradley-Terry Full (JMLR 2011 §3.1)
+  μ₀=25  σ₀=25/3  β=25/6  τ=25/300  κ=0.0001
+  Each entry = 1v1 vs fixed field opponent (μ=25)
+  Win: pins ≥ event avg · Ordinal = μ − 3σ
+        </div>
+
+        <div class="lb-wrap">
+          <table id="tr-table">
+            <thead>
+              <tr>
+                <th>Rank</th><th>Team</th>
+                <th title="OpenSkill rating">OpenSkill</th>
+                <th title="Offensive Power Rating">OPR</th>
+                <th title="Defensive Power Rating">DPR</th>
+                <th title="Calculated Contribution to Winning Margin">CCWM</th>
+                <th>Matches</th>
+              </tr>
+            </thead>
+            <tbody id="tr-tbody">
+              <tr><td colspan="7" class="empty">Load data to calculate rankings.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   </div>
-
-  <!-- ��� SIG CALENDAR (public, add/filter admin-only) ��� -->
   <div id="tab-calendar" class="panel">
 
     <!-- -- HERO BANNER -- -->
@@ -3303,6 +3563,7 @@ With 0% fail rates → P(both succeed) = 100%
           </select>
         </div>
         <div id="calList"><div class="empty" style="padding:1.5rem">No events added yet.</div></div>
+      </div>
   
       <!-- Admin Tools Header -->
       <div class="admin-only" style="margin-top:2rem;margin-bottom:1rem;display:flex;align-items:center;gap:12px">
@@ -3413,112 +3674,6 @@ With 0% fail rates → P(both succeed) = 100%
         </div>
         <div id="cal-msg"></div>
       </div>
-
-
-    </div>
-  </div><!-- Add event form (admin only) -->
-      <div class="card admin-only" id="cal-add-card">
-        <p class="sec">Add Event Manually</p>
-        <div class="g3" style="margin-bottom:12px">
-          <div><label>Event Name</label><input id="cal-name" placeholder="e.g. Mall of America"></div>
-          <div><label>Start Date</label><input type="date" id="cal-start"></div>
-          <div><label>End Date</label><input type="date" id="cal-end"></div>
-        </div>
-        <div class="g2" style="margin-bottom:12px">
-          <div><label>Location (optional)</label><input id="cal-loc" placeholder="e.g. Minneapolis, MN"></div>
-          <div><label>Notes (optional)</label><input id="cal-notes" placeholder="e.g. Worlds qualifying event"></div>
-        </div>
-        <div class="g2" style="margin-bottom:12px">
-          <div>
-            <label>Country</label>
-            <input id="cal-country" list="cal-country-list" placeholder="e.g. Australia" autocomplete="off" oninput="toggleCalRegion(this.value)">
-            <datalist id="cal-country-list">
-              <option value="Australia">
-              <option value="Brazil">
-              <option value="Canada">
-              <option value="China">
-              <option value="Colombia">
-              <option value="Egypt">
-              <option value="Germany">
-              <option value="India">
-              <option value="Indonesia">
-              <option value="Israel">
-              <option value="Japan">
-              <option value="Jordan">
-              <option value="Kazakhstan">
-              <option value="Malaysia">
-              <option value="Mexico">
-              <option value="New Zealand">
-              <option value="Peru">
-              <option value="Philippines">
-              <option value="Qatar">
-              <option value="Saudi Arabia">
-              <option value="Singapore">
-              <option value="South Korea">
-              <option value="Taiwan">
-              <option value="Thailand">
-              <option value="Turkey">
-              <option value="UAE">
-              <option value="UK">
-              <option value="USA">
-            </datalist>
-          </div>
-          <div id="cal-region-wrap" style="display:none">
-            <label>State / Province</label>
-            <input id="cal-region" list="cal-region-list" placeholder="e.g. Victoria" autocomplete="off">
-            <datalist id="cal-region-list"></datalist>
-          </div>
-        </div>
-        <div style="margin-bottom:12px">
-          <label>Google Maps Link <span style="font-weight:400;color:var(--ink3)">(optional)</span></label>
-          <input id="cal-maps" placeholder="e.g. https://maps.google.com/…" type="url">
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-p" onclick="addCalEvent()">Add Event</button>
-          <button class="btn" onclick="clearCalForm()">Clear</button>
-          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink2);cursor:pointer;margin:0;font-weight:500">
-            <input type="checkbox" id="cal-is-sig" style="width:auto;margin:0;accent-color:#d4a017">
-            ⭐ Worlds qualifier
-          </label>
-        </div>
-        <div id="cal-msg"></div>
-      </div>
-
-      <!-- Filter leaderboard by event period -->
-      <div class="card" id="cal-filter-card">
-        <p class="sec">Filter leaderboard by event period</p>
-        <p class="hint" style="margin-bottom:12px">Select a Sig event below to see the leaderboard using only entries from that time window.</p>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
-          <select id="cal-filter-select" onchange="applyCalFilter()" style="max-width:320px">
-            <option value="">— Show all entries (no filter) —</option>
-          </select>
-          <button class="btn btn-sm" onclick="clearCalFilter()">Clear Filter</button>
-        </div>
-        <div id="cal-filter-status" style="font-size:13px;color:var(--ink3);font-family:var(--mono)"></div>
-      </div>
-
-
-
-      <!-- Event list -->
-      <div class="card">
-        <div class="cal-section-header">
-          <div class="cal-section-title">&#128197; Scheduled Events</div>
-          <span class="cal-section-count" id="cal-event-count"></span>
-        </div>
-        <div class="cal-filter-strip">
-          <button class="chip" id="cal-show-past-chip" onclick="calTogglePast()" title="Past events are hidden by default">Show past</button>
-          <div class="cal-filter-sep"></div>
-          <span style="font-size:10px;font-family:var(--mono);color:var(--ink3);text-transform:uppercase;letter-spacing:.6px">Country</span>
-          <select id="cal-country-filter" onchange="calCountryFilterChange()" style="font-size:12px;padding:4px 8px;font-family:var(--mono);border:1px solid var(--border2);border-radius:var(--radius);background:var(--paper2);color:var(--ink);min-width:120px">
-            <option value="">All countries</option>
-          </select>
-          <select id="cal-state-filter" onchange="renderCalList()" style="display:none;font-size:12px;padding:4px 8px;width:auto;font-family:var(--mono);border:1px solid var(--border2);border-radius:var(--radius);background:var(--paper2);color:var(--ink)">
-            <option value="">All states</option>
-          </select>
-        </div>
-        <div id="calList"><div class="empty" style="padding:1.5rem">No events added yet.</div></div>
-      </div>
-
 
 
     </div>
@@ -3794,6 +3949,9 @@ With 0% fail rates → P(both succeed) = 100%
     </a>
     <a class="sb-link" href="#" data-sbnav="ts-rankings" onclick="sidebarNav('ts-rankings');return false;">
       <span class="sb-link-icon">⚡</span> TS Rankings
+    </a>
+    <a class="sb-link" href="#" data-sbnav="experimental" onclick="sidebarNav('experimental');return false;">
+      <span class="sb-link-icon">⚡</span> RFORCE
     </a>
     <a class="sb-link" href="#" data-sbnav="about" onclick="sidebarNav('about');return false;">
       <span class="sb-link-icon">ℹ️</span> About us
@@ -4364,6 +4522,36 @@ function ulSeedNewVersions() {
     { id: 'e_seed_3220_4', tag: 'ux', text: 'Preferences note ("saved in your browser — no account required") promoted from the footer of the About section card into the hero banner subtitle for immediate visibility; redundant footer note removed from the section card', versionId: 'v_seed_3220' },
   ]);
 
+  // ── v3.24.0 — RFORCE moved to Lab ──
+  addVersion('v_seed_3240', 'v3.24.0', 'RFORCE Rankings Moved to Lab', [
+    { id: 'e_seed_3240_1', tag: 'ux', text: '⚡ RFORCE-style rankings section moved from its own top-level tab into the 🧪 Lab tab — consolidates experimental/analytical features in one place', versionId: 'v_seed_3240' },
+    { id: 'e_seed_3240_2', tag: 'ux', text: 'RFORCE pill added to the Lab hero banner; sidebar RFORCE link now navigates to the Lab tab', versionId: 'v_seed_3240' },
+    { id: 'e_seed_3240_3', tag: 'fix', text: 'Tab-active render trigger updated — RFORCE table now rebuilds correctly when the Lab tab is opened', versionId: 'v_seed_3240' },
+  ]);
+
+  // ── v3.25.0 — Test Rankings (OPR/DPR/CCWM/OpenSkill) ──
+  addVersion('v_seed_3250', 'v3.25.0', 'Test Rankings — OPR, DPR, CCWM &amp; OpenSkill', [
+    { id: 'e_seed_3250_1', tag: 'feat', text: '📊 New "Test Rankings" section added to the Lab tab — computes GaelScout-style metrics (OPR, DPR, CCWM, OpenSkill) from scouted match entries', versionId: 'v_seed_3250' },
+    { id: 'e_seed_3250_2', tag: 'feat', text: 'OPR (Offensive Power Rating) = avg pins per entry; DPR (Defensive Power Rating) = avg field output advantage team concedes vs event avg; CCWM = OPR − DPR', versionId: 'v_seed_3250' },
+    { id: 'e_seed_3250_3', tag: 'feat', text: 'OpenSkill implemented as a simplified Glicko-style rating (μ=25, σ=8.33) — each entry updates μ based on whether team scored above/below their event average, with σ decaying over time', versionId: 'v_seed_3250' },
+    { id: 'e_seed_3250_4', tag: 'ux', text: 'Sortable by any column (OpenSkill default, DPR sorts ascending since lower = better); inline mini-bars on OpenSkill and OPR columns; CCWM colour-coded green/red; recalculate button for manual refresh', versionId: 'v_seed_3250' },
+  ]);
+
+  addVersion('v_seed_3260', 'v3.26.0', 'RobotEvents Match Import → Leaderboard', [
+    { id: 'e_seed_3260_1', tag: 'feat', text: '⬇ RobotEvents match import — new admin card on the Leaderboard tab fetches all scored matches for a chosen event and bulk-inserts one entry per team per match; leaderboard and OpenSkill ratings update immediately', versionId: 'v_seed_3260' },
+    { id: 'e_seed_3260_2b', tag: 'arch', text: 'CORS workaround via Supabase Edge Function (<code>re-proxy</code>) — all RobotEvents API calls route server-side through a Deno proxy deployed to the same Supabase project; token sent in a custom header, never stored', versionId: 'v_seed_3260' },
+    { id: 'e_seed_3260_2', tag: 'feat', text: 'Duplicate prevention — each imported entry carries a stable <code>re_import_id</code> (<code>re_match_{eventId}_{matchId}_{team}</code>); re-running the import skips already-present IDs so the same event can be safely re-imported after more matches are scored', versionId: 'v_seed_3260' },
+    { id: 'e_seed_3260_3', tag: 'ux', text: 'Two-step confirm flow — import first shows a preview (match count, new entry count, unique teams) then requires explicit confirmation before writing to the database', versionId: 'v_seed_3260' },
+    { id: 'e_seed_3260_4', tag: 'arch', text: 'Token field synced via the shared <code>syncReTokenInputs</code> helper — token entered anywhere (Settings, Schedule, Quick Scout, or the new import card) propagates to all inputs automatically', versionId: 'v_seed_3260' },
+  ]);
+
+  addVersion('v_seed_3270', 'v3.27.0', 'CORS Fix — All RobotEvents Calls Via Proxy', [
+    { id: 'e_seed_3270_1', tag: 'fix', text: '🐛 Fixed CORS failure on all RobotEvents API calls made directly from the browser — <code>syncFromRobotEvents</code> (Events tab sync), <code>reApiFetch</code> (team profiles/rankings/awards/skills), <code>fetchSchedule</code> (event schedule modal), and <code>qsFetchMatches</code> (Quick Scout schedule load) were all hitting <code>robotevents.com</code> directly and being blocked by the browser; these now route through the Supabase <code>re-proxy</code> Edge Function introduced in v3.26.0', versionId: 'v_seed_3270' },
+    { id: 'e_seed_3270_2', tag: 'fix', text: 'Fixed <code>reProxyFetch</code> missing the Supabase <code>apikey</code> header — Supabase Edge Functions require the anon key in every request or they return 401 before the function runs; <code>SB_KEY</code> is now included alongside <code>re-token</code>', versionId: 'v_seed_3270' },
+    { id: 'e_seed_3270_3', tag: 'fix', text: 'Fixed <code>reProxyFetch</code> double-encoding path slashes — <code>URL.searchParams.set</code> percent-encodes slashes in the path value so the Edge Function received <code>%2Fevents%2F123</code> instead of <code>/events/123</code>, causing HTTP 404 from RobotEvents; query string now built manually with <code>encodeURIComponent</code>', versionId: 'v_seed_3270' },
+    { id: 'e_seed_3270_4', tag: 'arch', text: 'All RobotEvents browser calls now route through <code>reProxyFetch</code> — token forwarded in <code>re-token</code> header, never in a URL query string; 401/non-ok error handling centralised in the shared proxy helper', versionId: 'v_seed_3270' },
+  ]);
+
   if (changed) {
     state.edits       = edits;
     state.vblock_edits = vblocks;
@@ -4546,7 +4734,7 @@ function launchApp(admin) {
   });
   document.getElementById('modeBadge').textContent = admin ? 'Admin' : 'Viewer';
   // Start donation popup now that user is in the app (viewers only - team members know the app)
-  if (window._startDonation) window._startDonation();
+  if (!admin && window._startDonation) window._startDonation();
   document.getElementById('modeBadge').className = 'mode-badge ' + (admin ? 'mode-admin' : 'mode-pub');
   document.getElementById('logoutBtn').style.display = admin ? '' : 'none';
   document.getElementById('adminLoginBtn').style.display = admin ? 'none' : '';
@@ -4617,6 +4805,7 @@ async function loadData() {
     // Render
     lbApplyFilter(lbActiveF);
     pubRenderAll();
+    if (_isTabActive('experimental')) { renderRforce(); trBuild(); }
     if(isAdmin) { renderLog(); renderRoutes(); }
   } catch(err) {
     setSyncStatus('err', 'Connection failed');
@@ -5736,6 +5925,359 @@ function buildStats(entries) {
 }
 
 /* ═══════════════════════════════════════════════════════
+   RFORCE-STYLE RANKINGS
+════════════════════════════════════════════════════════ */
+function rfRankPoints(rank, total, scale) {
+  total = Math.max(1, total || 1);
+  scale = scale || 10;
+  return Math.round((((1 + (total - rank)) / total) * scale) * 100) / 100;
+}
+
+function rfEventLevelMultiplier(eventName, rows) {
+  const forced = document.getElementById('rf-platform')?.value || 'all';
+  if (forced === 'local') return 1;
+  if (forced === 'regional') return 1.25;
+  if (forced === 'national') return 1.5;
+
+  const name = String(eventName || '').toLowerCase();
+  const sig = rows.some(e => String(e.sig || '').toLowerCase() === 'yes');
+  if (name.includes('world')) return 2;
+  if (name.includes('national') || name.includes('championship')) return 1.5;
+  if (sig || name.includes('signature') || name.includes('regional')) return 1.25;
+  return 1;
+}
+
+function rfBuildRows() {
+  const eventMap = {};
+  (allEntries || []).forEach(e => {
+    const team = (e.team || '').toUpperCase().trim();
+    if (!team) return;
+    const eventName = (e.event || 'Unlisted event').trim() || 'Unlisted event';
+    const key = eventName.toLowerCase();
+    if (!eventMap[key]) eventMap[key] = { name: eventName, rows: [], teams: {} };
+    eventMap[key].rows.push(e);
+    if (!eventMap[key].teams[team]) eventMap[key].teams[team] = [];
+    eventMap[key].teams[team].push(e);
+  });
+
+  const teamEventCounts = {};
+  Object.values(eventMap).forEach(ev => {
+    Object.keys(ev.teams).forEach(team => {
+      teamEventCounts[team] = (teamEventCounts[team] || 0) + 1;
+    });
+  });
+  const maxEvents = Math.max(1, ...Object.values(teamEventCounts));
+
+  const teamMap = {};
+  Object.values(eventMap).forEach(ev => {
+    const eventTeams = Object.keys(ev.teams).map(team => {
+      const rows = ev.teams[team];
+      const n = rows.length || 1;
+      const avgPins = rows.reduce((s, e) => s + pins(e), 0) / n;
+      const awp = rows.filter(e => e.awp === 'Y').length / n * 100;
+      const success = rows.filter(e => e.failed === 'N').length / n * 100;
+      return { team, rows, avgPins, awp, success };
+    });
+
+    const rankBy = key => {
+      const sorted = eventTeams.slice().sort((a, b) => b[key] - a[key] || a.team.localeCompare(b.team));
+      const out = {};
+      sorted.forEach((t, i) => { out[t.team] = rfRankPoints(i + 1, sorted.length, 10); });
+      return out;
+    };
+
+    const pinsRank = rankBy('avgPins');
+    const awpRank = rankBy('awp');
+    const successRank = rankBy('success');
+    const eventCaliber = eventTeams.reduce((s, t) => s + t.avgPins, 0) / Math.max(1, eventTeams.length);
+    const level = rfEventLevelMultiplier(ev.name, ev.rows);
+
+    eventTeams.forEach(t => {
+      const ep = pinsRank[t.team] + awpRank[t.team] + successRank[t.team];
+      const en = teamEventCounts[t.team] || 1;
+      const enb = 1 + (((en * en) - 1) / Math.max(1, maxEvents * maxEvents));
+      const rfer = 1 + (Math.log10(eventCaliber + 1) * level * enb);
+      const es = ep * rfer;
+      if (!teamMap[t.team]) {
+        teamMap[t.team] = { team: t.team, events: [], totalEs: 0, totalEp: 0, bestEs: 0, avgPins: 0, awp: 0, success: 0 };
+      }
+      teamMap[t.team].events.push({ event: ev.name, ep, rfer, es });
+      teamMap[t.team].totalEs += es;
+      teamMap[t.team].totalEp += ep;
+      teamMap[t.team].bestEs = Math.max(teamMap[t.team].bestEs, es);
+      teamMap[t.team].avgPins += t.avgPins;
+      teamMap[t.team].awp += t.awp;
+      teamMap[t.team].success += t.success;
+    });
+  });
+
+  return Object.values(teamMap).map(t => {
+    const n = Math.max(1, t.events.length);
+    return {
+      team: t.team,
+      events: n,
+      rforce: t.totalEs / n,
+      avgEp: t.totalEp / n,
+      bestEs: t.bestEs,
+      avgPins: t.avgPins / n,
+      awp: t.awp / n,
+      success: t.success / n
+    };
+  });
+}
+
+function rfAddCombinedScores(rows) {
+  const rfMax = Math.max(1, ...rows.map(r => r.rforce || 0));
+  return rows.map(r => {
+    const ts = typeof tsGet === 'function' ? tsGet(r.team) : null;
+    const rfNorm = Math.min(100, ((r.rforce || 0) / rfMax) * 100);
+    const tsNorm = ts ? Math.max(0, Math.min(100, ((ts.ts || 0) / 50) * 100)) : 0;
+    return {
+      ...r,
+      ts,
+      tsScore: ts ? ts.ts : null,
+      tsRank: ts ? ts.ts_rank : null,
+      rfNorm,
+      tsNorm,
+      combined: (rfNorm * 0.6) + (tsNorm * 0.4)
+    };
+  });
+}
+
+function renderRforce() {
+  const body = document.getElementById('rf-tbody');
+  if (!body) return;
+  const q = (document.getElementById('rf-search')?.value || '').trim().toUpperCase();
+  const sort = document.getElementById('rf-sort')?.value || 'combined';
+  let rows = rfAddCombinedScores(rfBuildRows());
+  if (q) rows = rows.filter(r => r.team.includes(q));
+
+  rows.sort((a, b) => {
+    if (sort === 'team') return a.team.localeCompare(b.team);
+    if (sort === 'ts') return (b.tsScore || -1) - (a.tsScore || -1) || a.team.localeCompare(b.team);
+    return (b[sort] || 0) - (a[sort] || 0) || a.team.localeCompare(b.team);
+  });
+
+  const allRows = rfAddCombinedScores(rfBuildRows());
+  const top = allRows.length ? Math.max(...allRows.map(r => r.rforce)) : 0;
+  const avg = allRows.length ? allRows.reduce((s, r) => s + r.rforce, 0) / allRows.length : 0;
+  const events = new Set((allEntries || []).map(e => (e.event || 'Unlisted event').trim() || 'Unlisted event'));
+  const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+  setText('rf-stat-teams', allRows.length);
+  setText('rf-stat-events', events.size);
+  setText('rf-stat-top', top ? top.toFixed(2) : '—');
+  setText('rf-stat-avg', avg ? avg.toFixed(2) : '—');
+
+  if (!rows.length) {
+    body.innerHTML = '<tr><td colspan="11" class="empty">No combined rankings yet. Add scouting entries with team and event names first.</td></tr>';
+    return;
+  }
+
+  body.innerHTML = rows.map((r, i) => {
+    const color = i === 0 ? 'var(--amber)' : i === 1 ? 'var(--ink2)' : i === 2 ? '#cd7f32' : 'var(--ink3)';
+    const tsLabel = r.ts
+      ? `<span style="font-family:var(--mono);font-weight:700;color:var(--blue)">${r.tsScore.toFixed(1)}</span><div style="font-size:10px;color:var(--ink3);font-family:var(--mono)">#${Math.round(r.tsRank)}</div>`
+      : '<span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">No TS</span>';
+    return `<tr onclick="openDetail('${esc(r.team)}')" style="cursor:pointer">
+      <td style="font-family:var(--mono);font-weight:800;color:${color}">#${i + 1}</td>
+      <td><span class="tn">${esc(r.team)}</span></td>
+      <td style="font-family:var(--mono);font-weight:900;color:var(--green)">${r.combined.toFixed(1)}</td>
+      <td style="font-family:var(--mono);font-weight:800;color:var(--amber)">${r.rforce.toFixed(2)}</td>
+      <td>${tsLabel}</td>
+      <td style="font-family:var(--mono)">${r.events}</td>
+      <td style="font-family:var(--mono)">${r.avgEp.toFixed(2)}</td>
+      <td style="font-family:var(--mono)">${r.bestEs.toFixed(2)}</td>
+      <td style="font-family:var(--mono)">${r.avgPins.toFixed(1)}</td>
+      <td style="font-family:var(--mono)">${r.awp.toFixed(0)}%</td>
+      <td style="font-family:var(--mono)">${r.success.toFixed(0)}%</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════════════════
+   TEST RANKINGS — OPR / DPR / CCWM / OpenSkill
+   ─────────────────────────────────────────────────────
+   OPR  = avg pins per entry (offensive output)
+   DPR  = avg field advantage conceded vs event mean
+   CCWM = OPR − DPR
+
+   OpenSkill — Weng-Lin Bradley-Terry Full model
+   (Weng & Lin, JMLR 2011, §3.1)
+   μ₀=25, σ₀=25/3, β=25/6, κ=0.0001, τ=25/300
+
+   Per entry, team plays 1v1 vs "field" rating
+   (field = event avg pins mapped to a virtual player μ_f).
+   Win  = team pins > field μ_f
+   Loss = team pins ≤ field μ_f
+   Ordinal = μ − 3σ  (99.7% lower bound, same as openskill.js)
+════════════════════════════════════════════════════════ */
+
+// ── Weng-Lin helpers ──
+const _OS_MU    = 25;
+const _OS_SIG   = 25 / 3;          // ≈ 8.333
+const _OS_BETA  = 25 / 6;          // ≈ 4.167
+const _OS_TAU   = 25 / 300;        // dynamic factor (≈ 0.0833)
+const _OS_KAPPA = 0.0001;          // σ floor multiplier
+
+// Standard normal PDF and CDF (erf-based, matches Python NormalDist)
+function _osPhi(x) { return Math.exp(-x * x / 2) / Math.sqrt(2 * Math.PI); }
+function _osCDF(x) {
+  const t = 1 / (1 + 0.2316419 * Math.abs(x));
+  const poly = t * (0.319381530 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))));
+  const approx = 1 - _osPhi(Math.abs(x)) * poly;
+  return x >= 0 ? approx : 1 - approx;
+}
+
+// Bradley-Terry Full: update one player against one opponent
+// rank: 1=win, 2=loss (lower rank = better)
+function _osUpdate(player, opponent, rank_player, rank_opponent) {
+  const { mu: mu_i, sigma: sig_i } = player;
+  const { mu: mu_q, sigma: sig_q } = opponent;
+
+  const c = Math.sqrt(sig_i * sig_i + sig_q * sig_q + 2 * _OS_BETA * _OS_BETA);
+  const p_iq = _osCDF((mu_i - mu_q) / c);         // P(i beats q)
+
+  // s(i,q): 1 if i wins, 0 if i loses
+  const s = rank_player < rank_opponent ? 1 : 0;
+
+  const delta = (sig_i * sig_i / c) * (s - p_iq);
+  const eta   = (sig_i * sig_i / (c * c)) * p_iq * (1 - p_iq);
+
+  // Apply dynamic factor τ then floor σ at κ·σ₀
+  const sig_new = Math.sqrt(
+    Math.max(sig_i * sig_i * (1 - eta) + _OS_TAU * _OS_TAU, (_OS_KAPPA * _OS_SIG) ** 2)
+  );
+
+  return { mu: mu_i + delta, sigma: sig_new };
+}
+
+// Ordinal = μ − 3σ (conservative lower bound)
+function _osOrdinal(r) { return r.mu - 3 * r.sigma; }
+
+let _trRows = [];
+
+function trBuild() {
+  const entries = (allEntries || []).filter(e => (e.team||'').trim());
+
+  // ── per-event stats ──
+  const eventPinMap = {};
+  entries.forEach(e => {
+    const ev = (e.event || 'Unknown').trim();
+    if (!eventPinMap[ev]) eventPinMap[ev] = [];
+    eventPinMap[ev].push(pins(e));
+  });
+  const eventAvg = {};
+  Object.keys(eventPinMap).forEach(ev => {
+    const arr = eventPinMap[ev];
+    eventAvg[ev] = arr.reduce((a,b)=>a+b,0) / arr.length;
+  });
+
+  // ── per-team entry grouping ──
+  const teamMap = {};
+  entries.forEach(e => {
+    const t = (e.team||'').toUpperCase().trim();
+    if (!teamMap[t]) teamMap[t] = [];
+    teamMap[t].push(e);
+  });
+
+  // ── Weng-Lin state per team ──
+  const os = {};
+  Object.keys(teamMap).forEach(t => { os[t] = { mu: _OS_MU, sigma: _OS_SIG }; });
+
+  // "Field" virtual player: fixed at μ=25 (league-average opponent)
+  // Each entry: team's pins vs event average — rescale to [0, 50] rating space
+  // Win = pins >= event avg; field mu = 25 (neutral)
+  const sorted = entries.slice().sort((a,b)=>(a.created_at||'').localeCompare(b.created_at||''));
+  sorted.forEach(e => {
+    const t = (e.team||'').toUpperCase().trim();
+    if (!os[t]) return;
+    const ev    = (e.event || 'Unknown').trim();
+    const avg   = eventAvg[ev] || 0;
+    const score = pins(e);
+
+    // Field opponent: fixed at league average (mu=25, sigma=sigma₀/2 — somewhat known)
+    const field = { mu: _OS_MU, sigma: _OS_SIG / 2 };
+    const rank_team  = score >= avg ? 1 : 2;   // 1 = win, 2 = loss
+    const rank_field = 3 - rank_team;           // opposite
+
+    os[t] = _osUpdate(os[t], field, rank_team, rank_field);
+  });
+
+  // ── Build final rows ──
+  _trRows = Object.entries(teamMap).map(([team, rows]) => {
+    const n   = rows.length;
+    const opr = rows.reduce((s,e)=>s+pins(e),0) / n;
+
+    const dpr = rows.reduce((s,e) => {
+      const ev  = (e.event||'Unknown').trim();
+      const avg = eventAvg[ev] || 0;
+      return s + Math.max(0, avg - pins(e));
+    }, 0) / n;
+
+    const ccwm    = opr - dpr;
+    const rating  = os[team];
+    const ordinal = _osOrdinal(rating);
+    return { team, opr, dpr, ccwm, mu: rating.mu, sigma: rating.sigma, ordinal, matches: n };
+  });
+
+  if (_trRows.length) {
+    const topOpr = Math.max(..._trRows.map(r=>r.opr));
+    const topOs  = Math.max(..._trRows.map(r=>r.ordinal));
+    document.getElementById('tr-stat-teams').textContent   = _trRows.length;
+    document.getElementById('tr-stat-opr').textContent     = topOpr.toFixed(2);
+    document.getElementById('tr-stat-os').textContent      = topOs.toFixed(2);
+    document.getElementById('tr-stat-entries').textContent = entries.length;
+  }
+
+  trRender();
+}
+
+function trRender() {
+  const body = document.getElementById('tr-tbody');
+  if (!body) return;
+  if (!_trRows.length) {
+    body.innerHTML = '<tr><td colspan="7" class="empty">No data — entries needed to calculate rankings.</td></tr>';
+    return;
+  }
+  const q    = (document.getElementById('tr-search')?.value || '').trim().toUpperCase();
+  const sort = document.getElementById('tr-sort')?.value || 'ordinal';
+
+  let rows = q ? _trRows.filter(r => r.team.includes(q)) : _trRows.slice();
+  const dir = sort === 'dpr' ? 1 : -1;
+  rows.sort((a,b) => dir * (b[sort] - a[sort]));
+
+  const osMax  = Math.max(0.001, ...rows.map(r => Math.max(0, r.ordinal)));
+  const oprMax = Math.max(0.001, ...rows.map(r=>r.opr));
+
+  body.innerHTML = rows.map((r, i) => {
+    const ccwmColor = r.ccwm >= 0 ? 'var(--green)' : 'var(--red-text)';
+    const osBar  = Math.max(0, Math.round((Math.max(0, r.ordinal) / osMax) * 60));
+    const oprBar = Math.max(0, Math.round((r.opr / oprMax) * 60));
+    return `<tr>
+      <td style="font-family:var(--mono);color:var(--ink3)">${i+1}</td>
+      <td style="font-family:var(--mono);font-weight:700">${esc(r.team)}</td>
+      <td>
+        <div style="font-family:var(--mono);font-weight:800;color:var(--blue)">${r.ordinal.toFixed(2)}</div>
+        <div style="height:3px;background:var(--border);border-radius:2px;width:60px;margin-top:3px;overflow:hidden">
+          <div style="height:100%;width:${osBar}px;background:var(--blue);border-radius:2px"></div>
+        </div>
+        <div style="font-size:9px;font-family:var(--mono);color:var(--ink3);margin-top:2px">μ=${r.mu.toFixed(2)} σ=${r.sigma.toFixed(2)}</div>
+      </td>
+      <td>
+        <div style="font-family:var(--mono);font-weight:700;color:var(--amber)">${r.opr.toFixed(2)}</div>
+        <div style="height:3px;background:var(--border);border-radius:2px;width:60px;margin-top:3px;overflow:hidden">
+          <div style="height:100%;width:${oprBar}px;background:var(--amber);border-radius:2px"></div>
+        </div>
+      </td>
+      <td style="font-family:var(--mono);color:var(--ink2)">${r.dpr.toFixed(2)}</td>
+      <td style="font-family:var(--mono);font-weight:700;color:${ccwmColor}">${r.ccwm >= 0 ? '+' : ''}${r.ccwm.toFixed(2)}</td>
+      <td style="font-family:var(--mono);color:var(--ink3)">${r.matches}</td>
+    </tr>`;
+  }).join('');
+}
+
+
+/* ═══════════════════════════════════════════════════════
    PUBLIC SEARCH (embedded in leaderboard tab)
 ════════════════════════════════════════════════════════ */
 function pubRenderAll() {
@@ -5878,9 +6420,10 @@ async function flushGradesFetch() {
     const chunk = teams.slice(i, i + 40);
     const query = chunk.map(t => 'number[]=' + encodeURIComponent(t)).join('&');
     try {
-      const res = await fetch('https://www.robotevents.com/api/v2/teams?' + query + '&program[]=1', {
-        headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
-      }).then(r => r.json());
+      // Route through Supabase proxy to avoid CORS
+      const res = await reProxyFetch('/teams?' + query + '&program[]=1', {}, token).catch(() =>
+        reProxyFetch('/teams', Object.fromEntries([...chunk.map(t => ['number[]', t]), ['program[]', '1']]), token)
+      );
       
       const fetchedMap = {};
       if (res && res.data) {
@@ -5919,7 +6462,7 @@ function lbRender() {
   const sortArrow = col => lbSortC===col ? (lbSortD===1?'↓':'↑') : '';
 
   document.getElementById('lbMain').innerHTML=`
-    <div style="border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:var(--surface)">
+    <div class="lb-grid-wrap" style="border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:var(--surface)">
       <!-- Header -->
       <div style="display:grid;grid-template-columns:56px 1fr 80px 120px 120px 1fr;gap:0;background:var(--paper2);border-bottom:1px solid var(--border2)">
         <div style="padding:10px 12px;font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);font-weight:600">#</div>
@@ -6183,21 +6726,21 @@ function toggleREProfile(teamNum) {
 }
 
 function getREToken() {
-  // Try the token input in Settings tab first, then localStorage
-  const inputEl = document.getElementById('re-token');
-  if(inputEl && inputEl.value.trim()) return inputEl.value.trim();
+  // Prefer whichever RobotEvents token field the user last filled, then fall back to browser storage.
+  const inputToken = document.getElementById('settings-re-token')?.value.trim()
+    || document.getElementById('re-token')?.value.trim()
+    || document.getElementById('sched-re-token')?.value.trim()
+    || document.getElementById('qs-re-token')?.value.trim()
+    || '';
+  if(inputToken) return inputToken;
   try { return localStorage.getItem(RE_TOKEN_KEY) || ''; } catch(e) { return ''; }
 }
 
 async function reApiFetch(path) {
   const token = getREToken();
-  if(!token) throw new Error('No RobotEvents API token found. Go to the About tab → Settings and paste your token.');
-  const r = await fetch('https://www.robotevents.com/api/v2' + path, {
-    headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
-  });
-  if(r.status === 401) throw new Error('Invalid RobotEvents token. Please update it in Settings.');
-  if(!r.ok) throw new Error('RobotEvents API error: HTTP ' + r.status);
-  return r.json();
+  if(!token) throw new Error('No RobotEvents API token found. Go to Settings and paste your token.');
+  // Route through Supabase Edge Function proxy to avoid CORS
+  return reProxyFetch(path, {}, token);
 }
 
 async function loadRETeamProfile(teamNum) {
@@ -7474,42 +8017,57 @@ function renderRoutes() {
    TABS
 ════════════════════════════════════════════════════════ */
 function switchTab(t, el) {
+  const incoming = document.getElementById('tab-'+t);
+  if (!incoming) {
+    console.warn('Unknown tab:', t);
+    return false;
+  }
+  el = el || document.querySelector('.tab[data-tab="'+t+'"]');
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
+  if (el) el.classList.add('active');
   setSidebarActiveLink(t);
 
   // Update URL hash for deep linking
-  history.replaceState(null, '', '#' + t);
+  try { history.replaceState(null, '', '#' + t); } catch(e) {}
 
-  // Animate out current panel, then swap
+  // Swap panels synchronously so a tab-specific render error cannot leave panels stacked.
   const outgoing = document.querySelector('.panel.active');
-  const incoming = document.getElementById('tab-'+t);
-  if (!incoming || outgoing === incoming) return;
+  if (outgoing === incoming) return true;
 
-  function activateIncoming() {
-    incoming.style.display = 'block';
-    void incoming.offsetWidth; // force reflow so animation triggers
-    incoming.classList.add('active');
+  document.querySelectorAll('.panel').forEach(p => {
+    p.classList.remove('active');
+    p.style.display = 'none';
+  });
+  incoming.style.display = 'block';
+  void incoming.offsetWidth; // force reflow so animation triggers
+  incoming.classList.add('active');
+
+  try {
     if(t==='predict') { calcProb(); updateTsBadges(); }
     if(t==='routes') renderRoutes();
     if(t==='log') { logPg = _logDirty ? 1 : logPg; renderLog(); }
     if(t==='leaderboard' && _lbDirty) { _lbDirty = false; lbSortRender(); }
-    if(t==='updates'||t==='roadmap') loadUpdates();
+    if(t==='roadmap') loadUpdates().catch(e => console.warn('Roadmap load failed:', e));
     if(t==='ts-rankings') tsApply();
+    if(t==='experimental') { renderRforce(); trBuild(); }
     if(t==='skills') { skRender(); }
-    if(t==='calendar') { loadCalEvents(); setTimeout(runAlliance, 100); }
-    document.dispatchEvent(new CustomEvent('tabchange', { detail: { tab: t } }));
+    if(t==='calendar') {
+      loadCalEvents().catch(e => console.warn('Calendar load failed:', e));
+      setTimeout(function() {
+        try { runAlliance(); } catch(e) { console.warn('Alliance helper render failed:', e); }
+      }, 100);
+    }
+  } catch(e) {
+    console.error('Tab setup failed for "' + t + '":', e);
+    showToast('That tab hit a render error, but navigation recovered.', 'err', 3500);
   }
 
-  if (outgoing) {
-    outgoing.classList.remove('active');
-    outgoing.style.display = 'none';
-    activateIncoming();
-  } else {
-    // Clear any lingering inline display:none from previous manual tab switches
-    document.querySelectorAll('.panel').forEach(p => { if (!p.classList.contains('active')) p.style.display = ''; });
-    activateIncoming();
+  try {
+    document.dispatchEvent(new CustomEvent('tabchange', { detail: { tab: t } }));
+  } catch(e) {
+    console.warn('Tabchange listener failed for "' + t + '":', e);
   }
+  return true;
 }
 
 /* ── Auton Calculator panel toggle ── */
@@ -7600,6 +8158,7 @@ async function loadCalEvents() {
     calEventsMap = new Map(calEvents.map(e => [String(e.id), e]));
     renderCalList();
     updateCalSelect();
+    lbReImportPopulateEvents();
   } catch(e) {
     console.error('Could not load sig events:', e);
     document.getElementById('calList').innerHTML = '<div class="empty" style="color:var(--red-text)">Could not load events from database.</div>';
@@ -8113,25 +8672,43 @@ const RE_TOKEN_KEY = 'override_scout_re_token';
 const RE_VRC_PROGRAM = 1;
 
 /* ── Token persistence ── */
+function syncReTokenInputs(val) {
+  ['settings-re-token', 're-token', 'sched-re-token', 'qs-re-token', 'lb-re-import-token'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el && el.value !== val) el.value = val;
+  });
+}
+
+function saveRobotEventsToken(val) {
+  val = (val || '').trim();
+  try {
+    if(val) localStorage.setItem(RE_TOKEN_KEY, val);
+    else localStorage.removeItem(RE_TOKEN_KEY);
+  } catch(e) {}
+  syncReTokenInputs(val);
+}
+
 function saveReToken() {
   const val = document.getElementById('re-token')?.value.trim();
-  try { localStorage.setItem(RE_TOKEN_KEY, val); } catch(e) {}
+  saveRobotEventsToken(val);
 }
 function clearReToken() {
-  try { localStorage.removeItem(RE_TOKEN_KEY); } catch(e) {}
-  document.getElementById('re-token').value = '';
-  document.getElementById('re-msg').textContent = 'API key cleared.';
+  saveRobotEventsToken('');
+  const msg = document.getElementById('re-msg');
+  if(msg) msg.textContent = 'API key cleared.';
 }
 function loadReToken() {
   try {
-    const t = localStorage.getItem(RE_TOKEN_KEY);
-    if(t) document.getElementById('re-token').value = t;
+    const legacyQuickScoutToken = localStorage.getItem('os_qs_re_token') || '';
+    const t = localStorage.getItem(RE_TOKEN_KEY) || legacyQuickScoutToken;
+    if(t) saveRobotEventsToken(t);
+    else syncReTokenInputs('');
   } catch(e) {}
 }
 
 /* ── Main sync function ── */
 async function syncFromRobotEvents() {
-  const token = document.getElementById('re-token')?.value.trim();
+  const token = getREToken();
   if(!token) {
     setReMsg('⚠ Paste your RobotEvents API token first.', 'err');
     return;
@@ -8147,25 +8724,13 @@ async function syncFromRobotEvents() {
     let page = 1, allFetched = [], lastMeta;
 
     do {
-      const url = new URL(RE_API + '/events');
-      url.searchParams.set('program[]', RE_VRC_PROGRAM);
-      // No level filter — fetch Regional, Signature, Tournament, etc.
-      url.searchParams.set('start', today + 'T00:00:00.000Z');
-      url.searchParams.set('per_page', '250');
-      url.searchParams.set('page', page);
-
-      const r = await fetch(url.toString(), {
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Accept': 'application/json'
-        }
-      });
-
-      if(r.status === 401) throw new Error('Invalid API token — check your key and try again.');
-      if(r.status === 403) throw new Error('Access denied — your token may not have permission to read events.');
-      if(!r.ok) throw new Error('RobotEvents returned HTTP ' + r.status);
-
-      const data = await r.json();
+      // Route through Supabase Edge Function proxy to avoid CORS
+      const data = await reProxyFetch('/events', {
+        'program[]': RE_VRC_PROGRAM,
+        'start': today + 'T00:00:00.000Z',
+        'per_page': '250',
+        'page': String(page)
+      }, token);
       allFetched = allFetched.concat(data.data || []);
       lastMeta = data.meta;
       page++;
@@ -8375,12 +8940,12 @@ let _schedSelectedMatch = null;
 
 function saveSchedToken() {
   const v = document.getElementById('sched-re-token')?.value.trim();
-  try { if(v) localStorage.setItem(RE_TOKEN_KEY, v); } catch(e){}
+  saveRobotEventsToken(v);
 }
 function loadSchedToken() {
   try {
     const v = localStorage.getItem(RE_TOKEN_KEY) || '';
-    if(v) document.getElementById('sched-re-token').value = v;
+    syncReTokenInputs(v);
   } catch(e){}
 }
 
@@ -8446,7 +9011,7 @@ function switchSchedTab(name, el) {
 /* ── Fetch match schedule from RobotEvents ── */
 async function fetchSchedule() {
   if(!_schedEvent) return;
-  const token = document.getElementById('sched-re-token')?.value.trim();
+  const token = getREToken();
   if(!token) {
     document.getElementById('sched-status').textContent = '⚠ Paste your RobotEvents API token first.';
     document.getElementById('sched-status').style.color = 'var(--red-text)';
@@ -8463,14 +9028,11 @@ async function fetchSchedule() {
   document.getElementById('sched-list').innerHTML = '<div class="empty"><span class="spin"></span><br><br>Loading…</div>';
 
   try {
-    // Fetch qual + elim divisions
-    const headers = { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' };
+    // Route all RE calls through Supabase Edge Function proxy to avoid CORS
     const eid = _schedEvent.re_event_id;
 
     // Get divisions for this event
-    const divRes = await fetch(`${RE_API}/events/${eid}/divisions`, { headers });
-    if(!divRes.ok) throw new Error('HTTP ' + divRes.status + ' fetching divisions');
-    const divData = await divRes.json();
+    const divData = await reProxyFetch(`/events/${eid}/divisions`, {}, token);
     const divisions = divData.data || [];
 
     let allMatches = [];
@@ -8478,12 +9040,11 @@ async function fetchSchedule() {
       // Fetch all pages of matches for this division
       let page = 1, lastMeta;
       do {
-        const url = new URL(`${RE_API}/events/${eid}/divisions/${div.id}/matches`);
-        url.searchParams.set('per_page', '250');
-        url.searchParams.set('page', page);
-        const mRes = await fetch(url.toString(), { headers });
-        if(!mRes.ok) throw new Error('HTTP ' + mRes.status + ' fetching matches');
-        const mData = await mRes.json();
+        const mData = await reProxyFetch(
+          `/events/${eid}/divisions/${div.id}/matches`,
+          { per_page: '250', page: String(page) },
+          token
+        );
         const matches = (mData.data || []).map(m => ({ ...m, _divName: div.name }));
         allMatches = allMatches.concat(matches);
         lastMeta = mData.meta;
@@ -9818,10 +10379,10 @@ window.lbRender = function() {
   const sc = col => lbSortC === col ? 'var(--amber)' : 'var(--ink3)';
 
   document.getElementById('lbMain').innerHTML = `
-    <div style="border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:var(--surface)">
+    <div class="lb-grid-wrap" style="border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:var(--surface)">
 
       <!-- Header row -->
-      <div style="display:grid;grid-template-columns:52px 1fr 72px 140px 140px 120px;background:var(--paper2);border-bottom:2px solid var(--border2)">
+      <div class="lb-grid-head" style="display:grid;grid-template-columns:52px 1fr 72px 140px 140px 120px;background:var(--paper2);border-bottom:2px solid var(--border2)">
         <div style="padding:10px 14px;font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);font-weight:600">#</div>
         <div onclick="lbSortBy('team')" style="padding:10px 14px;font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:${sc('team')};font-weight:600;cursor:pointer;user-select:none;transition:color .12s">Team${sa('team')}</div>
         <div onclick="lbSortBy('count')" style="padding:10px 14px;font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:${sc('count')};font-weight:600;cursor:pointer;user-select:none;transition:color .12s">Mtchs${sa('count')}</div>
@@ -9846,50 +10407,50 @@ window.lbRender = function() {
         const medal = rank <= 3 ? medals[rank-1] : `<span style="font-family:var(--mono);font-size:11px;color:var(--ink3)">${rank}</span>`;
         const teamEsc = t.team.replace(/"/g,'&quot;').replace(/</g,'&lt;');
         const typesEsc = (t.types||'—').replace(/</g,'&lt;');
-        return `<div data-team="${teamEsc}" onclick="openDetail('${t.team.replace(/'/g,"\\'")}')" style="display:grid;grid-template-columns:52px 1fr 72px 140px 140px 120px;border-bottom:1px solid var(--border);border-left:${leftBorder};background:${rowBg};cursor:pointer;transition:background .1s"
+        return `<div class="lb-grid-row" data-team="${teamEsc}" onclick="openDetail('${t.team.replace(/'/g,"\\'")}')" style="display:grid;grid-template-columns:52px 1fr 72px 140px 140px 120px;border-bottom:1px solid var(--border);border-left:${leftBorder};background:${rowBg};cursor:pointer;transition:background .1s"
           onmouseover="this.style.background='var(--paper3)'" onmouseout="this.style.background='${rowBg}'">
 
           <!-- Rank -->
-          <div style="padding:14px 0;display:flex;align-items:center;justify-content:center;font-size:16px">${medal}</div>
+          <div class="lb-grid-rank" style="padding:14px 0;display:flex;align-items:center;justify-content:center;font-size:16px">${medal}</div>
 
           <!-- Team -->
-          <div style="padding:12px 14px;display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:0">
+          <div class="lb-grid-cell lb-grid-team" style="padding:12px 14px;display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:0">
             <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-              <span style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--ink)">${teamEsc}</span>
+              <span class="lb-grid-team-num" style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--ink)">${teamEsc}</span>
               ${isMe ? '<span style="font-size:8px;font-weight:700;font-family:var(--mono);padding:1px 6px;border-radius:3px;background:rgba(240,192,48,.18);color:var(--amber);border:1px solid rgba(240,192,48,.35)">YOU</span>' : ''}
               ${isRival ? '<span style="font-size:8px;font-weight:700;font-family:var(--mono);padding:1px 6px;border-radius:3px;background:rgba(204,61,20,.15);color:var(--red);border:1px solid rgba(204,61,20,.3)">RIVAL</span>' : ''}
               ${tsInfo?.qualified ? '<span style="font-size:8px;font-weight:700;font-family:var(--mono);padding:1px 6px;border-radius:3px;background:rgba(61,189,110,.15);color:var(--green);border:1px solid rgba(61,189,110,.3)">✅ WQ</span>' : ''}
             </div>
-            <div style="font-size:10px;color:var(--ink3);font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${typesEsc}</div>
+            <div class="lb-grid-team-meta" style="font-size:10px;color:var(--ink3);font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${typesEsc}</div>
           </div>
 
           <!-- Matches -->
-          <div style="padding:12px 14px;display:flex;align-items:center">
-            <span style="font-family:var(--mono);font-size:13px;color:var(--ink2)">${t.count}</span>
+          <div class="lb-grid-cell" style="padding:12px 14px;display:flex;align-items:center">
+            <span class="lb-grid-value" style="font-family:var(--mono);font-size:13px;color:var(--ink2)">${t.count}</span>
           </div>
 
           <!-- Avg Pins -->
-          <div style="padding:12px 14px;display:flex;flex-direction:column;justify-content:center;gap:6px">
+          <div class="lb-grid-cell" style="padding:12px 14px;display:flex;flex-direction:column;justify-content:center;gap:6px">
             <div style="display:flex;align-items:baseline;gap:5px">
-              <span style="font-family:var(--mono);font-size:17px;font-weight:700;color:${pinColor};line-height:1">${avgPins.toFixed(1)}</span>
-              <span style="font-size:9px;font-family:var(--mono);color:var(--ink3)">pins</span>
+              <span class="lb-grid-value" style="font-family:var(--mono);font-size:17px;font-weight:700;color:${pinColor};line-height:1">${avgPins.toFixed(1)}</span>
+              <span class="lb-grid-unit" style="font-size:9px;font-family:var(--mono);color:var(--ink3)">pins</span>
             </div>
-            <div style="height:3px;width:80px;background:var(--border2);border-radius:2px;overflow:hidden">
+            <div class="lb-grid-bar" style="height:3px;width:80px;background:var(--border2);border-radius:2px;overflow:hidden">
               <div style="height:3px;width:${pinPct}%;background:${pinColor};border-radius:2px"></div>
             </div>
           </div>
 
           <!-- AWP Rate -->
-          <div style="padding:12px 14px;display:flex;flex-direction:column;justify-content:center;gap:6px">
-            <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:${awpColor};line-height:1">${awpPct.toFixed(0)}%</span>
-            <div style="height:3px;width:80px;background:var(--border2);border-radius:2px;overflow:hidden">
+          <div class="lb-grid-cell" style="padding:12px 14px;display:flex;flex-direction:column;justify-content:center;gap:6px">
+            <span class="lb-grid-value" style="font-family:var(--mono);font-size:15px;font-weight:700;color:${awpColor};line-height:1">${awpPct.toFixed(0)}%</span>
+            <div class="lb-grid-bar" style="height:3px;width:80px;background:var(--border2);border-radius:2px;overflow:hidden">
               <div style="height:3px;width:${Math.min(awpPct,100)}%;background:var(--green);border-radius:2px"></div>
             </div>
           </div>
 
           <!-- Robot type -->
-          <div style="padding:12px 14px;display:flex;align-items:center">
-            <span style="font-size:11px;color:var(--ink3);font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${typesEsc}</span>
+          <div class="lb-grid-cell" style="padding:12px 14px;display:flex;align-items:center">
+            <span class="lb-grid-robot" style="font-size:11px;color:var(--ink3);font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${typesEsc}</span>
           </div>
         </div>`;
       }).join('')}
@@ -9993,7 +10554,7 @@ function applyShowSyncTime(on) {
 // ── Clear cache ──
 function clearLocalCache() {
   if (!confirm('Clear all local browser data for Override Scout? This cannot be undone.')) return;
-  const keys = ['override_scout_v3','ul_changelog_v1','ts_cache','os_theme','os_compact','os_per_page','os_my_team','os_rivals','os_refresh_interval','os_show_sync_time','os_refresh_banner','os_remember_admin','os_admin_token','os_admin_exp'];
+  const keys = ['override_scout_v3','ul_changelog_v1','ts_cache','os_theme','os_compact','os_per_page','os_my_team','os_rivals','os_refresh_interval','os_show_sync_time','os_refresh_banner','os_remember_admin','os_admin_token','os_admin_exp','override_scout_re_token','os_qs_re_token'];
   keys.forEach(k => { try { localStorage.removeItem(k); } catch(e) {} });
   showToast('Local cache cleared — reloading…', 'ok', 2000);
   setTimeout(() => location.reload(), 2000);
@@ -10012,6 +10573,8 @@ function resetAllSettings() {
   applyRefreshBanner(false);
   applyRememberAdmin(false);
   applyCalcSideBySide(false);
+  saveRobotEventsToken('');
+  try { localStorage.removeItem('os_qs_re_token'); } catch(e) {}
   loadSettingsFromStorage();
   showToast('Settings reset to defaults', 'ok', 2500);
 }
@@ -10088,6 +10651,16 @@ function applyRefreshNow() {
 }
 
 // ── Remember admin session ──
+function saveSettingsReToken() {
+  saveRobotEventsToken(document.getElementById('settings-re-token')?.value || '');
+}
+
+function clearSettingsReToken() {
+  saveRobotEventsToken('');
+  try { localStorage.removeItem('os_qs_re_token'); } catch(e) {}
+  if (typeof showToast === 'function') showToast('RobotEvents token cleared', 'ok', 1800);
+}
+
 function applyRememberAdmin(on) {
   try { localStorage.setItem('os_remember_admin', on ? '1' : '0'); } catch(e) {}
   const t = document.getElementById('rememberAdminToggle');
@@ -10142,6 +10715,9 @@ function loadSettingsFromStorage() {
   // Refresh banner
   const banner = localStorage.getItem('os_refresh_banner') === '1';
   applyRefreshBanner(banner);
+
+  // RobotEvents API token
+  loadReToken();
 
   // Remember admin
   const remEl = document.getElementById('rememberAdminToggle');
@@ -10874,12 +11450,16 @@ function syncTeamSlot(srcId) {
 
   // Donation popup is triggered after launchApp via window._startDonation()
   window._startDonation = function() {
+    if (typeof isAdmin !== 'undefined' && isAdmin) return;
     if (donationInterval) return; // already running
     setTimeout(() => {
       showDonation();
       donationInterval = setInterval(showDonation, 30000);
     }, 5000);
   };
+  if (document.getElementById('appShell')?.style.display !== 'none') {
+    window._startDonation();
+  }
 })();
 
 </script>
@@ -10906,10 +11486,19 @@ function syncTeamSlot(srcId) {
 <script>
 /* ── Mobile bottom nav ── */
 function mbnNav(tab, el) {
+  let target = tab;
+  if (tab === 'search') target = 'leaderboard';
+  if (tab === 'alliance') target = 'calendar';
+
+  const tabBtn = document.querySelector('[data-tab="'+target+'"]');
+  if (!tabBtn || !switchTab(target, tabBtn)) return;
+
   document.querySelectorAll('.mbn-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
-  const tabBtn = document.querySelector('[data-tab="'+tab+'"]');
-  if (tabBtn) switchTab(tab, tabBtn);
+  if (tab === 'search') setTimeout(() => document.getElementById('pubSearch')?.focus(), 80);
+  if (tab === 'alliance') setTimeout(() => {
+    document.querySelector('#tab-calendar [onclick^="openAllianceForEvent"]')?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }, 80);
 }
 // Keep bottom nav in sync when tabs are switched via other means
 document.addEventListener('tabchange', function(e) {
@@ -11450,6 +12039,11 @@ function alScore(team) {
 }
 
 function runAlliance() {
+  const statusEl = document.getElementById('al-status');
+  const sugEl = document.getElementById('al-suggestions');
+  const tableEl = document.getElementById('al-full-table');
+  if (!statusEl || !sugEl || !tableEl) return;
+
   const myTeam = (document.getElementById('al-my-team')?.value || '').trim().toUpperCase();
   const pickedRaw = (document.getElementById('al-picked')?.value || '');
 
@@ -11458,7 +12052,7 @@ function runAlliance() {
   alSavePicked();
 
   if (!allTeams || !allTeams.length) {
-    document.getElementById('al-status').textContent = 'Loading data…';
+    statusEl.textContent = 'Loading data…';
     return;
   }
 
@@ -11469,7 +12063,6 @@ function runAlliance() {
 
   // Top 3 suggestions
   const topN = sorted.slice(0, 3);
-  const sugEl = document.getElementById('al-suggestions');
   const medals = ['🥇', '🥈', '🥉'];
   sugEl.innerHTML = topN.length
     ? topN.map((t, i) => {
@@ -11507,7 +12100,6 @@ function runAlliance() {
     : '<div class="empty">No available teams left.</div>';
 
   // Full table
-  const tableEl = document.getElementById('al-full-table');
   tableEl.innerHTML = `<div style="border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
     <div style="display:grid;grid-template-columns:auto 1fr auto auto auto auto auto;gap:8px;padding:7px 10px;background:var(--paper3);font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.7px;color:var(--ink3)">
       <div>#</div><div>Team</div><div>Matches</div><div>Avg Pins</div><div>AWP%</div><div>Succ%</div><div>Score</div>
@@ -11530,7 +12122,7 @@ function runAlliance() {
   </div>`;
 
   const avail = allTeams.length - excluded.size;
-  document.getElementById('al-status').textContent = avail + ' teams available, ' + _alPickedSet.size + ' picked/excluded';
+  statusEl.textContent = avail + ' teams available, ' + _alPickedSet.size + ' picked/excluded';
 }
 
 function alMarkPicked(team) {
@@ -11608,11 +12200,7 @@ let _qsEventId  = null;     // RE event id for the selected event
       for (let i = 0; i <= 6; i++) el.innerHTML += `<option value="${i}">${i}</option>`;
     });
     // Restore saved RE token
-    const saved = localStorage.getItem('os_qs_re_token');
-    if (saved) {
-      const el = document.getElementById('qs-re-token');
-      if (el) el.value = saved;
-    }
+    loadReToken();
   });
 })();
 
@@ -11641,12 +12229,12 @@ function qsPopulateEvents() {
 
 function qsSaveToken() {
   const v = document.getElementById('qs-re-token')?.value.trim();
-  if (v) localStorage.setItem('os_qs_re_token', v);
+  saveRobotEventsToken(v);
 }
 
 async function qsFetchMatches() {
   const evId  = document.getElementById('qs-event-pick')?.value;
-  const token = document.getElementById('qs-re-token')?.value.trim();
+  const token = getREToken();
   const statusEl = document.getElementById('qs-status');
 
   if (!evId)  { statusEl.textContent = '⚠ Pick an event first.'; statusEl.style.color = 'var(--red-text)'; return; }
@@ -11660,22 +12248,19 @@ async function qsFetchMatches() {
   statusEl.style.color = 'var(--green)';
 
   try {
-    const headers = { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' };
-    const RE = 'https://www.robotevents.com/api/v2';
-
-    const divRes = await fetch(`${RE}/events/${_qsEventId}/divisions`, { headers });
-    if (!divRes.ok) throw new Error('HTTP ' + divRes.status);
-    const divData = await divRes.json();
+    // Route all RE calls through Supabase Edge Function proxy to avoid CORS
+    const divData = await reProxyFetch(`/events/${_qsEventId}/divisions`, {}, token);
     const divisions = divData.data || [];
 
     let allMatches = [];
     for (const div of divisions) {
       let page = 1, lastMeta;
       do {
-        const url = `${RE}/events/${_qsEventId}/divisions/${div.id}/matches?per_page=250&page=${page}`;
-        const mRes = await fetch(url, { headers });
-        if (!mRes.ok) throw new Error('HTTP ' + mRes.status);
-        const mData = await mRes.json();
+        const mData = await reProxyFetch(
+          `/events/${_qsEventId}/divisions/${div.id}/matches`,
+          { per_page: '250', page: String(page) },
+          token
+        );
         allMatches = allMatches.concat((mData.data || []).map(m => ({ ...m, _divName: div.name })));
         lastMeta = mData.meta;
         page++;
@@ -12060,6 +12645,263 @@ function adsUndoPick() {
   document.getElementById('ads-undo-btn').disabled = _adsPicked.length === 0;
   adsRenderBoard();
   adsAdvance();
+}
+
+/* ════════════════════════════════════════════════════════
+   ROBOTEVENTS MATCH IMPORT → OPENSKILL LEADERBOARD
+   Fetches scored matches for a chosen event and inserts
+   one entry per team per match into the Supabase entries
+   table. Duplicates are skipped via a generated stable ID.
+
+   ⚠ MIGRATION REQUIRED — run once in Supabase SQL editor:
+   alter table entries add column if not exists re_import_id text;
+   create unique index if not exists entries_re_import_id_idx on entries(re_import_id) where re_import_id is not null;
+════════════════════════════════════════════════════════ */
+
+// Populate the event dropdown with only events that have a re_event_id
+function lbReImportPopulateEvents() {
+  const sel = document.getElementById('lb-re-import-event');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— select event —</option>';
+  (calEvents || [])
+    .filter(e => e.re_event_id)
+    .sort((a, b) => (a.start_date || '').localeCompare(b.start_date || ''))
+    .forEach(e => {
+      const opt = document.createElement('option');
+      opt.value = String(e.re_event_id);
+      opt.dataset.name = e.name || '';
+      opt.textContent = (e.name || 'Unnamed') + ' (' + (e.start_date || '?') + ')';
+      sel.appendChild(opt);
+    });
+  // Also sync token field
+  const tok = getREToken();
+  const inp = document.getElementById('lb-re-import-token');
+  if (inp && tok) inp.value = tok;
+}
+
+// Proxy fetch — routes RobotEvents requests through the Supabase edge function
+// to avoid CORS. The token is sent in a custom header, never stored server-side.
+const RE_PROXY = SB_URL + '/functions/v1/re-proxy';
+
+async function reProxyFetch(path, params, token) {
+  // Build query string manually — URL.searchParams encodes slashes in 'path'
+  // which breaks the Edge Function's URL reconstruction.
+  let qs = 'path=' + encodeURIComponent(path);
+  if (params) Object.entries(params).forEach(([k, v]) => { qs += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(String(v)); });
+  const fullUrl = RE_PROXY + '?' + qs;
+  console.log('[reProxyFetch] URL:', fullUrl);
+  const r = await fetch(fullUrl, { headers: { 'apikey': SB_KEY, 're-token': token } });
+  console.log('[reProxyFetch] status:', r.status, 'path:', path);
+  if (!r.ok) {
+    const body = await r.text().catch(() => '');
+    console.error('[reProxyFetch] error body:', body);
+    if (r.status === 401) throw new Error('Invalid API token. Body: ' + body);
+    throw new Error('Proxy error HTTP ' + r.status + ' — ' + body.slice(0, 120));
+  }
+  return r.json();
+}
+
+// Called when user clicks "Import Matches"
+let _reImportPending = null; // { entries[], eventName }
+async function importMatchesFromRE() {
+  if (!isAdmin) return;
+  const sel  = document.getElementById('lb-re-import-event');
+  const eid  = sel?.value;
+  const ename = sel?.options[sel.selectedIndex]?.dataset.name || eid;
+  const msg  = document.getElementById('lb-re-import-msg');
+  const prev = document.getElementById('lb-re-import-preview');
+
+  function setMsg(t, type) {
+    if (!msg) return;
+    msg.textContent = t;
+    msg.style.color = type === 'err' ? 'var(--red-text)' : type === 'ok' ? 'var(--green)' : 'var(--ink3)';
+  }
+
+  if (!eid) { setMsg('\u26a0 Select an event first.', 'err'); return; }
+  const token = getREToken();
+  if (!token) { setMsg('\u26a0 Paste your RobotEvents API token first.', 'err'); return; }
+
+  prev.style.display = 'none';
+  setMsg('Fetching divisions…', '');
+
+  try {
+    // 1. Get divisions (via Supabase proxy — avoids CORS)
+    const divData = await reProxyFetch(`/events/${eid}/divisions`, {}, token);
+    const divisions = divData.data || [];
+    if (!divisions.length) { setMsg('No divisions found for this event.', 'err'); return; }
+
+    // 2. Fetch all matches across all divisions (via proxy)
+    let allMatches = [];
+    for (const div of divisions) {
+      let page = 1, lastMeta;
+      do {
+        setMsg(`Fetching matches — division "${div.name}", page ${page}…`, '');
+        const mData = await reProxyFetch(
+          `/events/${eid}/divisions/${div.id}/matches`,
+          { per_page: '250', page: String(page) },
+          token
+        );
+        allMatches = allMatches.concat((mData.data || []).map(m => ({ ...m, _divName: div.name })));
+        lastMeta = mData.meta;
+        page++;
+      } while (lastMeta && lastMeta.current_page < lastMeta.last_page);
+    }
+
+    // 3. Filter to scored matches only
+    const scored = allMatches.filter(m => m.scored === true || (m.alliances || []).some(a => a.score > 0));
+    if (!scored.length) {
+      setMsg(`Fetched ${allMatches.length} matches — none scored yet. Try again after the event.`, 'err');
+      return;
+    }
+
+    // 4. Build entries — one per team per match
+    // Stable dedup ID: "re_match_{event_id}_{match_id}_{teamName}"
+    const existingImportIds = new Set(
+      (allEntries || []).filter(e => e.re_import_id).map(e => e.re_import_id)
+    );
+
+    const newEntries = [];
+    for (const m of scored) {
+      const roundLabel = formatMatchLabel(m);
+      const redA  = (m.alliances || []).find(a => (a.color || '').toLowerCase() === 'red');
+      const blueA = (m.alliances || []).find(a => (a.color || '').toLowerCase() === 'blue');
+      if (!redA || !blueA) continue;
+
+      const redScore  = redA.score  || 0;
+      const blueScore = blueA.score || 0;
+      const redWon  = redScore  > blueScore;
+      const blueWon = blueScore > redScore;
+
+      // Red alliance teams
+      for (const t of (redA.teams || [])) {
+        const teamName = (t.team?.name || t.teamName || '').toUpperCase().trim();
+        if (!teamName) continue;
+        const rid = `re_match_${eid}_${m.id}_${teamName}`;
+        if (existingImportIds.has(rid)) continue;
+        newEntries.push({
+          id: crypto.randomUUID(),
+          re_import_id: rid,
+          team: teamName,
+          event: ename,
+          round: roundLabel,
+          side: 'R',
+          sig: 'no',
+          type: 'Unknown',
+          route: 'Normal',
+          pins: redScore + '+0',
+          maxpins: '',
+          bonuses: 0,
+          awp: redWon ? 'Y' : 'N',
+          failed: 'N',
+          notes: 'Auto-imported from RobotEvents',
+          ts: m.started || new Date().toISOString(),
+        });
+      }
+      // Blue alliance teams
+      for (const t of (blueA.teams || [])) {
+        const teamName = (t.team?.name || t.teamName || '').toUpperCase().trim();
+        if (!teamName) continue;
+        const rid = `re_match_${eid}_${m.id}_${teamName}`;
+        if (existingImportIds.has(rid)) continue;
+        newEntries.push({
+          id: crypto.randomUUID(),
+          re_import_id: rid,
+          team: teamName,
+          event: ename,
+          round: roundLabel,
+          side: 'B',
+          sig: 'no',
+          type: 'Unknown',
+          route: 'Normal',
+          pins: blueScore + '+0',
+          maxpins: '',
+          bonuses: 0,
+          awp: blueWon ? 'Y' : 'N',
+          failed: 'N',
+          notes: 'Auto-imported from RobotEvents',
+          ts: m.started || new Date().toISOString(),
+        });
+      }
+    }
+
+    if (!newEntries.length) {
+      setMsg(`✓ All ${scored.length} scored matches already imported — nothing new.`, 'ok');
+      return;
+    }
+
+    // Store pending and show preview
+    _reImportPending = { entries: newEntries, eventName: ename };
+    const prevText = document.getElementById('lb-re-import-preview-text');
+    if (prevText) {
+      prevText.textContent =
+        `Ready to import ${newEntries.length} new entries from ${scored.length} scored match${scored.length !== 1 ? 'es' : ''} ` +
+        `(${[...new Set(newEntries.map(e => e.team))].length} unique teams). ` +
+        `Existing entries are not modified.`;
+    }
+    prev.style.display = 'block';
+    setMsg(`Found ${scored.length} scored matches → ${newEntries.length} new entries to add.`, 'ok');
+
+  } catch (e) {
+    setMsg('Error: ' + e.message, 'err');
+    console.error('RE match import error:', e);
+  }
+}
+
+async function confirmImportMatches() {
+  if (!isAdmin || !_reImportPending) return;
+  const { entries } = _reImportPending;
+  const msg  = document.getElementById('lb-re-import-msg');
+  const prev = document.getElementById('lb-re-import-preview');
+
+  function setMsg(t, type) {
+    if (!msg) return;
+    msg.textContent = t;
+    msg.style.color = type === 'err' ? 'var(--red-text)' : type === 'ok' ? 'var(--green)' : 'var(--ink3)';
+  }
+
+  prev.style.display = 'none';
+  setMsg('Pushing ' + entries.length + ' entries to Supabase…', '');
+
+  // Batch in chunks of 100 (Supabase PostgREST handles array inserts fine)
+  const CHUNK = 100;
+  let pushed = 0, failed = 0;
+  try {
+    for (let i = 0; i < entries.length; i += CHUNK) {
+      const chunk = entries.slice(i, i + CHUNK);
+      setMsg(`Pushing ${Math.min(i + CHUNK, entries.length)} / ${entries.length}…`, '');
+      const r = await fetch(SB_URL + '/rest/v1/entries', {
+        method: 'POST',
+        headers: { ...adminHdrs(), 'Prefer': 'return=minimal' },
+        body: JSON.stringify(chunk),
+      });
+      if (r.ok) {
+        pushed += chunk.length;
+        // Add to local allEntries
+        chunk.forEach(e => allEntries.unshift(e));
+      } else {
+        failed += chunk.length;
+        console.warn('Chunk push failed:', r.status, await r.text());
+      }
+    }
+
+    setAllTeams(buildStats(allEntries));
+    setSyncStatus('ok', allTeams.length + ' teams · ' + allEntries.length + ' entries');
+    renderLog();
+    lbApplyFilter(lbActiveF);
+    _reImportPending = null;
+
+    const msg2 = failed
+      ? `✓ Imported ${pushed} entries (${failed} failed — check console).`
+      : `✓ Imported ${pushed} entries from ${_reImportPending?.eventName || 'event'}. Leaderboard updated.`;
+    setMsg(failed
+      ? `✓ Imported ${pushed} entries (${failed} failed — check console).`
+      : `✓ Imported ${pushed} entries. Leaderboard updated.`, failed ? 'err' : 'ok');
+    showToast('Imported ' + pushed + ' match entries', 'ok');
+
+  } catch (e) {
+    setMsg('Push error: ' + e.message, 'err');
+    console.error('RE import push error:', e);
+  }
 }
 
 function adsRenderBoard() {
