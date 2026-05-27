@@ -12692,6 +12692,7 @@ async function reProxyFetch(path, params, token) {
     method: 'POST',
     headers: {
       'apikey': SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY,
       'Content-Type': 'application/json',
       're-token': token,
       're-path': path,
