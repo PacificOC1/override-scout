@@ -12684,15 +12684,23 @@ function lbReImportPopulateEvents() {
 const RE_PROXY = SB_URL + '/functions/v1/re-proxy';
 
 async function reProxyFetch(path, params, token) {
-  // Direct fetch to RobotEvents — works from HTTP origins (CORS is allowed by RE for GET requests)
-  const url = new URL('https://www.robotevents.com/api/v2' + path);
-  if (params) Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, String(v)));
-  const r = await fetch(url.toString(), {
-    headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+  // Sends request to Supabase Edge Function which proxies to RobotEvents server-side (avoids CORS).
+  // Path is sent as a plain header to avoid any URL encoding issues.
+  let qs = '';
+  if (params) Object.entries(params).forEach(([k, v]) => { qs += (qs ? '&' : '') + encodeURIComponent(k) + '=' + encodeURIComponent(String(v)); });
+  const r = await fetch(RE_PROXY, {
+    headers: {
+      'apikey': SB_KEY,
+      're-token': token,
+      're-path': path,
+      're-params': qs
+    }
   });
   if (r.status === 401) throw new Error('Invalid API token — check your RobotEvents token in Settings.');
-  if (r.status === 403) throw new Error('Access denied — token may lack permission.');
-  if (!r.ok) throw new Error('RobotEvents error HTTP ' + r.status);
+  if (!r.ok) {
+    const txt = await r.text().catch(() => '');
+    throw new Error('Proxy error HTTP ' + r.status + (txt ? ': ' + txt.slice(0, 100) : ''));
+  }
   return r.json();
 }
 
