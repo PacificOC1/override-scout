@@ -4549,7 +4549,7 @@ function ulSeedNewVersions() {
     { id: 'e_seed_3270_1', tag: 'fix', text: '🐛 Fixed CORS failure on all RobotEvents API calls made directly from the browser — <code>syncFromRobotEvents</code> (Events tab sync), <code>reApiFetch</code> (team profiles/rankings/awards/skills), <code>fetchSchedule</code> (event schedule modal), and <code>qsFetchMatches</code> (Quick Scout schedule load) were all hitting <code>robotevents.com</code> directly and being blocked by the browser; these now route through the Supabase <code>re-proxy</code> Edge Function introduced in v3.26.0', versionId: 'v_seed_3270' },
     { id: 'e_seed_3270_2', tag: 'fix', text: 'Fixed <code>reProxyFetch</code> missing the Supabase <code>apikey</code> header — Supabase Edge Functions require the anon key in every request or they return 401 before the function runs; <code>SB_KEY</code> is now included alongside <code>re-token</code>', versionId: 'v_seed_3270' },
     { id: 'e_seed_3270_3', tag: 'fix', text: 'Fixed <code>reProxyFetch</code> double-encoding path slashes — <code>URL.searchParams.set</code> percent-encodes slashes in the path value so the Edge Function received <code>%2Fevents%2F123</code> instead of <code>/events/123</code>, causing HTTP 404 from RobotEvents; query string now built manually with <code>encodeURIComponent</code>', versionId: 'v_seed_3270' },
-    { id: 'e_seed_3270_4', tag: 'arch', text: 'All RobotEvents browser calls now route through <code>reProxyFetch</code> — token forwarded in <code>re-token</code> header, never in a URL query string; 401/non-ok error handling centralised in the shared proxy helper', versionId: 'v_seed_3270' },
+    { id: 'e_seed_3270_4', tag: 'arch', text: '<code>reProxyFetch</code> simplified to call RobotEvents directly — RobotEvents allows CORS GET requests from HTTP origins; the Supabase Edge Function proxy is no longer required and has been removed from the call path', versionId: 'v_seed_3270' },
   ]);
 
   if (changed) {
@@ -12684,20 +12684,15 @@ function lbReImportPopulateEvents() {
 const RE_PROXY = SB_URL + '/functions/v1/re-proxy';
 
 async function reProxyFetch(path, params, token) {
-  // Build query string manually — URL.searchParams encodes slashes in 'path'
-  // which breaks the Edge Function's URL reconstruction.
-  let qs = 'path=' + encodeURIComponent(path);
-  if (params) Object.entries(params).forEach(([k, v]) => { qs += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(String(v)); });
-  const fullUrl = RE_PROXY + '?' + qs;
-  console.log('[reProxyFetch] URL:', fullUrl);
-  const r = await fetch(fullUrl, { headers: { 'apikey': SB_KEY, 're-token': token } });
-  console.log('[reProxyFetch] status:', r.status, 'path:', path);
-  if (!r.ok) {
-    const body = await r.text().catch(() => '');
-    console.error('[reProxyFetch] error body:', body);
-    if (r.status === 401) throw new Error('Invalid API token. Body: ' + body);
-    throw new Error('Proxy error HTTP ' + r.status + ' — ' + body.slice(0, 120));
-  }
+  // Direct fetch to RobotEvents — works from HTTP origins (CORS is allowed by RE for GET requests)
+  const url = new URL('https://www.robotevents.com/api/v2' + path);
+  if (params) Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, String(v)));
+  const r = await fetch(url.toString(), {
+    headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+  });
+  if (r.status === 401) throw new Error('Invalid API token — check your RobotEvents token in Settings.');
+  if (r.status === 403) throw new Error('Access denied — token may lack permission.');
+  if (!r.ok) throw new Error('RobotEvents error HTTP ' + r.status);
   return r.json();
 }
 
