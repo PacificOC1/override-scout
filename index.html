@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Exo+2:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.5/purify.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -199,39 +200,136 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 
 /* ── SIDEBAR ── */
 #sidebar{
-  width:22%;min-width:200px;max-width:260px;
-  background:var(--paper2);border-right:1px solid var(--border);
-  position:sticky;top:0;height:100vh;overflow-y:auto;
+  width:52px;min-width:52px;max-width:52px;
+  background:var(--paper);border-right:1px solid var(--border);
+  position:sticky;top:0;height:100vh;overflow:visible;
   display:flex;flex-direction:column;flex-shrink:0;order:1;
+  z-index:200;
+}
+/* Floating expanded rail */
+.sb-rail{
+  display:flex;flex-direction:column;align-items:center;
+  width:52px;height:100vh;padding:10px 0;gap:2px;
+  position:absolute;top:0;left:0;
+  background:var(--paper);border-right:1px solid var(--border);
+  overflow:hidden;overflow-y:auto;
+  transition:width .28s cubic-bezier(.4,0,.2,1), box-shadow .28s ease;
+  will-change:width;
+}
+.sb-rail.is-open{
+  width:200px;
+  box-shadow:6px 0 28px rgba(0,0,0,.35);
 }
 #appShell{flex:1;min-width:0;order:2;overflow-x:hidden;overflow-y:scroll;scrollbar-gutter:stable;display:block}
 @media(max-width:768px){
   body{flex-direction:column}
-  #sidebar{width:100%;max-width:100%;height:auto;position:relative;
+  #sidebar{width:100%;max-width:100%!important;min-width:0!important;height:auto;position:relative;
     border-right:none;border-bottom:1px solid var(--border);order:1}
+  .sb-rail{position:relative;flex-direction:row;height:auto;width:100%!important;
+    padding:6px 8px;overflow-x:auto;box-shadow:none!important;border-right:none}
   #appShell{order:2}
 }
 
-.sb-block{padding:1rem .875rem;border-bottom:1px solid var(--border)}
-.sb-block:last-child{border-bottom:none}
-.sb-logo-wrap{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.5rem;padding:.25rem 0}
-.sb-logo{width:80%;max-width:140px;height:auto;display:block;margin:0 auto;opacity:.95}
-.sb-team-name{font-family:var(--barlow);font-size:16px;font-weight:700;letter-spacing:.3px;color:var(--ink);text-transform:uppercase}
-.sb-team-name span{color:var(--red)}
-.sb-tagline{font-size:9px;font-family:var(--mono);color:var(--ink3);text-transform:uppercase;letter-spacing:1.2px}
-.sb-dev-note{font-size:10px;color:var(--ink3);text-align:center;margin-top:.3rem;line-height:1.6;font-family:var(--mono)}
+/* ── Claude-style icon rail ── */
+.sb-toggle-bar{display:none}
 
-.sb-nav-title{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin-bottom:6px;font-weight:600;padding:0 2px}
-.sb-link{
-  display:flex;align-items:center;gap:9px;padding:6px 9px;border-radius:var(--radius);
-  text-decoration:none;color:var(--ink2);font-size:12px;margin-bottom:1px;
-  transition:background .1s,color .1s;border:1px solid transparent;
+/* Top section: branding + nav */
+.sb-rail-top{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;width:100%}
+
+/* Bottom section */
+.sb-rail-bottom{display:flex;flex-direction:column;align-items:center;gap:2px;padding-bottom:6px;width:100%}
+
+/* Logo / branding */
+.sb-brand{
+  width:36px;height:36px;border-radius:8px;margin-bottom:4px;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  background:var(--red);color:#fff;font-family:var(--barlow);
+  font-size:11px;font-weight:800;letter-spacing:.5px;cursor:default;
+  flex-shrink:0;user-select:none;
+  transition:width .3s cubic-bezier(.4,0,.2,1), border-radius .3s;
 }
-.sb-link:hover{background:var(--paper3);color:var(--ink);border-color:var(--border)}
-.sb-link.active{background:var(--red-bg);color:var(--red-text);border-color:rgba(255,77,26,.25);font-weight:600}
-.sb-link-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;opacity:.75}
-.sb-link.active .sb-link-icon{opacity:1}
-.sb-link-ext{font-size:9px;font-family:var(--mono);color:var(--ink3);margin-left:auto;opacity:.6}
+.sb-brand.team-mode{background:var(--blue)}
+.sb-rail.is-open .sb-brand{width:calc(200px - 16px);padding:0 9px}
+
+/* Icon button — uses a fixed 36px icon slot so the icon never moves */
+.sb-icon-btn{
+  position:relative;
+  width:36px;height:36px;border-radius:8px;
+  display:flex;align-items:center;
+  cursor:pointer;
+  color:var(--ink3);background:transparent;border:none;
+  text-decoration:none;flex-shrink:0;overflow:hidden;
+  transition:background .12s, color .12s, width .3s cubic-bezier(.4,0,.2,1);
+}
+.sb-icon-btn:hover{background:var(--paper3);color:var(--ink)}
+/* Icon always lives in a fixed 36px slot — never moves */
+.sb-icon-btn svg{
+  width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75;
+  stroke-linecap:round;stroke-linejoin:round;
+  flex-shrink:0;margin:0 9px;
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.sb-rail.is-open .sb-icon-btn{width:calc(200px - 16px);border-radius:7px}
+.sb-rail.is-open .sb-icon-btn::after{display:none}
+.sb-rail.is-open .sb-divider{width:calc(200px - 24px)}
+
+/* Expand/pin button */
+#sbExpandBtn{transition:background .12s, color .12s, width .3s cubic-bezier(.4,0,.2,1)}
+.sb-rail.is-open #sbExpandBtn svg{transform:rotate(180deg)}
+
+/* Divider */
+.sb-divider{width:24px;height:1px;background:var(--border);margin:4px 0;flex-shrink:0;transition:width .3s cubic-bezier(.4,0,.2,1)}
+
+/* Tooltip */
+.sb-icon-btn::after{
+  content:attr(data-tip);
+  position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);
+  background:var(--paper3);border:1px solid var(--border2);color:var(--ink);
+  font-size:11px;font-family:var(--mono);white-space:nowrap;
+  padding:4px 10px;border-radius:5px;pointer-events:none;
+  opacity:0;transition:opacity .12s;z-index:9999;
+}
+.sb-icon-btn:hover::after{opacity:1}
+@media(max-width:768px){.sb-icon-btn::after{display:none}}
+
+/* External link dot */
+.sb-icon-btn .sb-ext-dot{
+  position:absolute;top:4px;right:4px;width:5px;height:5px;
+  border-radius:50%;background:var(--ink3);opacity:.4;
+}
+
+/* Active nav indicator */
+.sb-icon-btn.nav-active{color:var(--ink);background:var(--paper3)}
+.sb-icon-btn.nav-active::before{
+  content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:3px;height:18px;border-radius:0 2px 2px 0;background:var(--red);
+}
+.sb-icon-btn.nav-active.team-nav::before{background:var(--blue)}
+
+/* Labels — clip to zero width when closed, slide in when open */
+.sb-label{
+  font-size:12px;font-family:var(--mono);white-space:nowrap;
+  width:0;overflow:hidden;flex-shrink:1;
+  opacity:0;
+  transition:width .3s cubic-bezier(.4,0,.2,1), opacity .22s ease;
+}
+.sb-rail.is-open .sb-label{width:130px;opacity:1}
+
+/* Section labels */
+.sb-nav-section-label{
+  font-size:9px;font-family:var(--mono);text-transform:uppercase;
+  letter-spacing:1px;color:var(--ink3);padding:0 10px;font-weight:600;width:100%;
+  height:0;overflow:hidden;opacity:0;
+  transition:height .3s cubic-bezier(.4,0,.2,1), opacity .22s ease, padding .3s cubic-bezier(.4,0,.2,1);
+}
+.sb-rail.is-open .sb-nav-section-label{height:22px;opacity:1;padding:4px 10px 2px}
+
+/* Team badge */
+.sb-brand-team-num{font-size:9px;font-weight:800;font-family:var(--barlow);letter-spacing:.5px;text-align:center;line-height:1.1}
+
+/* hide old sb-block/sb-link styles from DOM (they're replaced) */
+.sb-block,.sb-logo-wrap,.sb-logo,.sb-team-name,.sb-tagline,.sb-dev-note,
+.sb-nav-title,.sb-link,.sb-link-icon,.sb-link-ext{display:none!important}
 /* ── LEADERBOARD IMPROVEMENTS ── */
 .lb-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:.75rem}
 .lb-wrap{border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:var(--surface)}
@@ -312,6 +410,104 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 }
 .btn-admin-trigger:hover{background:var(--paper3);color:var(--ink);border-color:var(--ink3)}
 
+/* ── SIGNUP MODAL ── */
+.signup-modal-bg{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;
+  align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(6px);
+}
+.signup-modal-bg.open{display:flex}
+.signup-modal{
+  background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);
+  padding:1.75rem;max-width:360px;width:100%;
+  box-shadow:0 0 0 1px var(--border),0 24px 48px rgba(0,0,0,.6),var(--glow-blue);
+  position:relative;animation:modalIn .2s cubic-bezier(.34,1.56,.64,1);
+}
+.signup-modal::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--blue),var(--red));border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+}
+.signup-modal-close{position:absolute;top:12px;right:12px;background:var(--paper3);border:1px solid var(--border);
+  width:26px;height:26px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;
+  font-size:14px;cursor:pointer;color:var(--ink2);transition:all .12s;line-height:1}
+.signup-modal-close:hover{background:var(--red-bg);color:var(--red-text);border-color:rgba(255,77,26,.3)}
+.signup-team-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--blue-bg);border:1px solid rgba(61,142,240,.3);color:var(--blue);
+  font-size:9px;font-family:var(--mono);font-weight:700;text-transform:uppercase;letter-spacing:1px;
+  padding:3px 10px;border-radius:3px;margin-bottom:1rem;
+}
+.signup-modal label{font-size:10px;font-family:var(--mono);color:var(--ink3);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:4px}
+.signup-modal input{
+  width:100%;padding:9px 11px;border:1px solid var(--border2);border-radius:var(--radius);
+  font-size:13px;font-family:var(--mono);background:var(--paper);color:var(--ink);margin-bottom:10px;
+  transition:border-color .12s,box-shadow .12s;
+}
+.signup-modal input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 2px rgba(61,142,240,.2)}
+.btn-signup-submit{
+  width:100%;padding:11px;background:var(--blue);color:#fff;border:none;
+  border-radius:var(--radius);font-size:11px;font-weight:800;cursor:pointer;
+  font-family:var(--display);letter-spacing:1.5px;text-transform:uppercase;
+  transition:background .15s,box-shadow .15s,transform .1s;
+}
+.btn-signup-submit:hover{background:var(--blue-dim);box-shadow:var(--glow-blue);transform:translateY(-1px)}
+.btn-signup-submit:active{transform:translateY(0)}
+.signup-err{font-size:11px;color:var(--red-text);margin-top:6px;min-height:16px;font-family:var(--mono)}
+.signup-ok{font-size:11px;color:var(--green);margin-top:6px;font-family:var(--mono);text-align:center;line-height:1.5}
+.signup-switch{font-size:11px;color:var(--ink3);font-family:var(--mono);text-align:center;margin-top:10px}
+.signup-switch a{color:var(--blue);cursor:pointer;text-decoration:underline}
+
+/* ── TEAM USER SIDEBAR BADGE ── */
+.sb-team-badge{
+  display:flex;flex-direction:column;align-items:center;gap:6px;padding:.5rem 0;
+}
+.sb-team-num-big{
+  font-family:var(--barlow);font-size:32px;font-weight:800;letter-spacing:1px;
+  color:var(--blue);text-transform:uppercase;line-height:1;
+  text-shadow:0 0 20px rgba(61,142,240,.4);
+}
+.sb-team-user-label{
+  font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1.2px;
+  color:var(--blue);background:var(--blue-bg);border:1px solid rgba(61,142,240,.3);
+  padding:2px 10px;border-radius:3px;font-weight:700;
+}
+.mode-team{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(61,142,240,.3)}
+
+/* ── TEAM PAGE ── */
+.team-page-hero{
+  background:linear-gradient(160deg,rgba(61,142,240,.08) 0%,var(--paper) 60%);
+  border-bottom:1px solid var(--border);padding:2rem 1.5rem 1.5rem;
+  position:relative;overflow:hidden;
+}
+.team-page-hero::before{
+  content:'';position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;
+  background:radial-gradient(circle,rgba(61,142,240,.14) 0%,transparent 70%);pointer-events:none;
+}
+.team-page-num{
+  font-family:var(--barlow);font-size:clamp(40px,8vw,72px);font-weight:800;
+  letter-spacing:2px;color:var(--blue);line-height:1;
+  text-shadow:0 0 40px rgba(61,142,240,.3);
+}
+.team-page-label{font-size:10px;font-family:var(--mono);color:var(--ink3);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px}
+.team-stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:1.5rem}
+.team-stat-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:.875rem 1rem;position:relative;overflow:hidden;
+}
+.team-stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--blue);opacity:.5}
+.team-stat-label{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.9px;color:var(--ink3);margin-bottom:5px}
+.team-stat-val{font-size:22px;font-weight:800;font-family:var(--mono);color:var(--ink)}
+.team-stat-sub{font-size:10px;color:var(--ink3);font-family:var(--mono);margin-top:2px}
+.team-match-row{
+  display:flex;align-items:center;gap:12px;padding:10px 14px;
+  border-bottom:1px solid var(--border);transition:background .1s;
+}
+.team-match-row:last-child{border-bottom:none}
+.team-match-row:hover{background:var(--paper3)}
+.team-match-event{font-size:11px;color:var(--ink3);font-family:var(--mono);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.team-match-pins{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--ink);min-width:40px;text-align:right}
+.team-match-awp{font-size:10px;font-family:var(--mono);padding:1px 6px;border-radius:3px;background:var(--green-bg);color:var(--green);border:1px solid rgba(61,189,110,.3)}
+.team-match-date{font-size:10px;color:var(--ink3);font-family:var(--mono);min-width:60px;text-align:right}
+
 /* ── MAIN APP SHELL ── */
 .topbar{
   background:var(--paper2);border-bottom:1px solid var(--border);
@@ -371,6 +567,70 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 @keyframes panelIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes panelOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-6px)}}
 .page{max-width:1100px;margin:0 auto;padding:1.5rem 1.5rem}
+
+/* ── VIEWER LOCK (blur gate for unauthenticated users) ── */
+.viewer-locked-panel{position:relative;min-height:420px;overflow:hidden;max-height:520px}
+/* blur all child elements except the gate overlay */
+.viewer-locked-panel > *:not(.viewer-lock-gate){
+  filter:blur(6px) saturate(.5);
+  pointer-events:none;user-select:none;opacity:.45;
+  /* prevent inner content from scrolling */
+  overflow:hidden;max-height:460px;
+}
+.viewer-lock-gate{
+  position:absolute;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:2rem;
+  background:linear-gradient(to bottom,rgba(17,18,16,.92) 60%,rgba(17,18,16,.55) 100%);
+}
+.viewer-lock-card{
+  background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);
+  padding:2rem 2.25rem;max-width:360px;width:100%;text-align:center;
+  box-shadow:0 0 0 1px var(--border),0 28px 56px rgba(0,0,0,.7),var(--glow-red);
+  position:relative;animation:modalIn .25s cubic-bezier(.34,1.56,.64,1);
+}
+.viewer-lock-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--red),var(--blue));
+  border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+}
+.viewer-lock-icon{font-size:32px;margin-bottom:.75rem;line-height:1;display:block}
+.viewer-lock-title{
+  font-family:var(--barlow);font-size:22px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.5px;color:var(--ink);margin-bottom:.3rem;
+}
+.viewer-lock-title span{color:var(--red)}
+.viewer-lock-sub{
+  font-size:11px;font-family:var(--mono);color:var(--ink3);
+  letter-spacing:.4px;line-height:1.6;margin-bottom:1.4rem;
+}
+.viewer-lock-btns{display:flex;flex-direction:column;gap:9px}
+.viewer-lock-btn-primary{
+  width:100%;padding:11px;background:var(--red);color:#fff;border:none;
+  border-radius:var(--radius);font-size:11px;font-weight:800;cursor:pointer;
+  font-family:var(--display);letter-spacing:1.5px;text-transform:uppercase;
+  transition:background .15s,box-shadow .15s,transform .1s;
+}
+.viewer-lock-btn-primary:hover{background:var(--red-dim);box-shadow:var(--glow-red);transform:translateY(-1px)}
+.viewer-lock-btn-secondary{
+  width:100%;padding:10px;background:transparent;color:var(--blue);
+  border:1px solid rgba(61,142,240,.35);border-radius:var(--radius);
+  font-size:11px;font-weight:700;cursor:pointer;font-family:var(--display);
+  letter-spacing:1.2px;text-transform:uppercase;transition:background .15s,border-color .15s;
+}
+.viewer-lock-btn-secondary:hover{background:var(--blue-bg);border-color:var(--blue)}
+.viewer-lock-divider{
+  display:flex;align-items:center;gap:10px;margin:.2rem 0;
+  font-size:9px;font-family:var(--mono);color:var(--ink3);text-transform:uppercase;letter-spacing:.6px;
+}
+.viewer-lock-divider::before,.viewer-lock-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* Tab lock indicator */
+.tab.viewer-gated{position:relative}
+.tab.viewer-gated::after{
+  content:'🔒';font-size:8px;position:absolute;top:6px;right:4px;
+  opacity:.55;line-height:1;
+}
 
 /* ── TOAST NOTIFICATION ── */
 #toast{
@@ -1657,15 +1917,45 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
   <div class="login-modal">
     <button class="login-modal-close" onclick="closeLoginModal()" aria-label="Close">✕</button>
     <div class="login-logo">Override <span>Scout</span></div>
-    <div class="login-sub">Admin login</div>
+    <div class="login-sub">Sign in to your account</div>
     <label>Email</label>
     <input type="email" id="unInput" placeholder="admin@example.com" autocomplete="email"
       onkeydown="if(event.key==='Enter')document.getElementById('pwInput').focus()">
     <label>Password</label>
     <input type="password" id="pwInput" placeholder="Password" autocomplete="current-password"
       onkeydown="if(event.key==='Enter')tryLogin()">
-    <button class="btn-login" id="loginBtn" onclick="tryLogin()">Login</button>
+    <button class="btn-login" id="loginBtn" onclick="tryLogin()">Sign In</button>
     <div class="login-err" id="loginErr"></div>
+    <div class="signup-switch" style="margin-top:10px">No account? <a onclick="closeLoginModal();openSignupModal()">Create team account</a></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SIGNUP MODAL
+════════════════════════════════════════════ -->
+<div class="signup-modal-bg" id="signupModal" onclick="if(event.target===this)closeSignupModal()">
+  <div class="signup-modal">
+    <button class="signup-modal-close" onclick="closeSignupModal()" aria-label="Close">✕</button>
+    <div class="login-logo" style="font-family:var(--barlow);font-size:22px;font-weight:800;letter-spacing:.5px;margin-bottom:2px;text-transform:uppercase">Override <span style="color:var(--red)">Scout</span></div>
+    <div class="login-sub" style="font-size:9px;font-family:var(--mono);color:var(--ink3);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:.75rem">Create team account</div>
+    <div class="signup-team-badge">🏆 Team Account</div>
+    <label>Team Number</label>
+    <input type="text" id="signupTeam" placeholder="e.g. 97230F" autocomplete="off"
+      oninput="this.value=this.value.toUpperCase()"
+      onkeydown="if(event.key==='Enter')document.getElementById('signupEmail').focus()">
+    <label>Email</label>
+    <input type="email" id="signupEmail" placeholder="team@example.com" autocomplete="email"
+      onkeydown="if(event.key==='Enter')document.getElementById('signupPw').focus()">
+    <label>Password</label>
+    <input type="password" id="signupPw" placeholder="Min. 6 characters" autocomplete="new-password"
+      onkeydown="if(event.key==='Enter')document.getElementById('signupPw2').focus()">
+    <label>Confirm Password</label>
+    <input type="password" id="signupPw2" placeholder="Repeat password" autocomplete="new-password"
+      onkeydown="if(event.key==='Enter')trySignUp()">
+    <button class="btn-signup-submit" id="signupSubmitBtn" onclick="trySignUp()">Create Account</button>
+    <div class="signup-err" id="signupErr"></div>
+    <div class="signup-ok" id="signupOk" style="display:none"></div>
+    <div class="signup-switch">Already have an account? <a onclick="closeSignupModal();openLoginModal()">Sign in</a></div>
   </div>
 </div>
 
@@ -1683,8 +1973,9 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
     <div class="topbar-right">
       <div class="sync-dot" id="syncDot"></div>
       <span class="sync-txt" id="syncTxt">Loading…</span>
-      <button class="btn-admin-trigger" id="adminLoginBtn" onclick="openLoginModal()">Admin</button>
-      <button class="btn-sm danger" id="logoutBtn" onclick="logout()" style="display:none">Logout admin</button>
+      <button class="btn-admin-trigger" id="signupBtn" onclick="openSignupModal()" style="border-color:rgba(61,142,240,.4);color:var(--blue)">Sign Up</button>
+      <button class="btn-admin-trigger" id="adminLoginBtn" onclick="openLoginModal()">Sign In</button>
+      <button class="btn-sm danger" id="logoutBtn" onclick="logout()" style="display:none">Log Out</button>
       <button class="btn-sm" onclick="openKbdOverlay()" title="Keyboard shortcuts" style="padding:4px 8px">⌨️ <span class="kbd-hint">?</span></button>
     </div>
   </div>
@@ -1692,10 +1983,10 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
   <!-- Tabs -->
   <div class="tabs-wrap">
     <div class="tabs">
-      <button class="tab active" data-tab="leaderboard" onclick="switchTab('leaderboard',this)">Leaderboard</button>
-      <button class="tab" data-tab="calendar" onclick="switchTab('calendar',this)">📅 Events</button>
-      <button class="tab" data-tab="skills" onclick="switchTab('skills',this)">🎯 Skills</button>
       <button class="tab" data-tab="ts-rankings" onclick="switchTab('ts-rankings',this)">🌎 TS Rankings</button>
+      <button class="tab active" data-tab="leaderboard" onclick="switchTab('leaderboard',this)">Leaderboard</button>
+      <button class="tab" data-tab="skills" onclick="switchTab('skills',this)">🎯 Skills</button>
+      <button class="tab" data-tab="calendar" onclick="switchTab('calendar',this)">📅 Events</button>
       <button class="tab" data-tab="roadmap" onclick="switchTab('roadmap',this)">🗺️ Roadmap</button>
       <button class="tab" data-tab="resources" onclick="switchTab('resources',this)">📚 Resources</button>
       <button class="tab" data-tab="updates" onclick="switchTab('updates',this)">📋 Changelog</button>
@@ -1703,6 +1994,7 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
       <button class="tab" data-tab="experimental" onclick="switchTab('experimental',this)">🧪 Lab</button>
       <button class="tab" data-tab="about" onclick="switchTab('about',this)">About</button>
       <button class="tab admin-only" data-tab="add" onclick="switchTab('add',this)">+ Add Entry</button>
+      <button class="tab" data-tab="myteam" onclick="switchTab('myteam',this)" style="display:none;border-color:rgba(61,142,240,.4);color:var(--blue)">🏆 My Team</button>
       <button class="tab admin-only" data-tab="log" onclick="switchTab('log',this)">Scout Log</button>
       <button class="tab admin-only" data-tab="predict" onclick="switchTab('predict',this)">Win Probability</button>
       <button class="tab admin-only" data-tab="routes" onclick="switchTab('routes',this)">Routes</button>
@@ -1718,6 +2010,9 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
   </div>
   <!-- ── SEARCH tab removed — search bubble is now in the Leaderboard tab ── -->
   <div id="tab-search" class="panel" style="display:none!important"></div>
+
+  <!-- ── MY TEAM (team users only) ── -->
+  <div id="tab-myteam" class="panel" style="display:none"></div>
 
   <!-- ── LEADERBOARD (public) ── -->
   <div id="tab-leaderboard" class="panel active">
@@ -2856,7 +3151,9 @@ Entries processed in chronological order (created_at ascending).</div>
           <span style="padding:7px 10px;font-size:13px;color:var(--ink3);background:var(--surface);display:flex;align-items:center">🔍</span>
         </div>
         <div style="font-size:11px;font-family:var(--mono);color:var(--ink3)" id="sk-count-label"></div>
+        <span id="sk-sync-status" style="font-size:10px;font-family:var(--mono);color:var(--ink3);transition:color .2s">⟳ Loading…</span>
         <div style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn btn-sm" onclick="skLoadFromSupabase()" title="Refresh from Supabase" style="font-size:10px">↺ Sync</button>
           <button class="btn btn-sm" onclick="exportSkillsCSV()" style="font-size:10px">⬇ CSV</button>
         </div>
       </div>
@@ -3080,17 +3377,6 @@ Entries processed in chronological order (created_at ascending).</div>
           <div class="settings-section-head">
             <span class="settings-section-icon">🔐</span>
             <span class="settings-section-title">Session</span>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-info">
-              <div class="settings-row-label">Remember admin login</div>
-              <div class="settings-row-hint">Stay logged in across browser restarts — use on personal devices only</div>
-            </div>
-            <label class="toggle-switch" aria-label="Toggle remember admin">
-              <input type="checkbox" id="rememberAdminToggle" onchange="applyRememberAdmin(this.checked)">
-              <div class="toggle-track"></div>
-              <div class="toggle-thumb"></div>
-            </label>
           </div>
         </div>
 
@@ -3915,73 +4201,121 @@ OpenSkill: Weng-Lin Bradley-Terry Full (JMLR 2011 §3.1)
      1. Team logo + branding
      2. Quick nav links (tabs + external links) ── -->
 <div id="sidebar">
+<nav class="sb-rail" id="sbRail" aria-label="Sidebar">
 
-  <!-- Mobile collapse toggle (only visible on mobile) -->
-  <div class="sb-toggle-bar" onclick="toggleSidebar()" id="sbToggleBar">
-    <span class="sb-toggle-label">⚡ Bot Go Brrr <span style="font-weight:400;color:var(--ink3);font-size:11px;font-family:var(--mono)">97230F</span></span>
-    <span class="sb-toggle-chevron open" id="sbChevron">▼</span>
-  </div>
+  <!-- Top section -->
+  <div class="sb-rail-top">
 
-  <div class="sb-collapsible" id="sbCollapsible">
-
-  <!-- Branding block -->
-  <div class="sb-block">
-    <div class="sb-logo-wrap">
-      <img class="sb-logo" src="logo.png" alt="97230F Bot Go Brrr">
-      <div class="sb-team-name">Bot Go <span>Brrr</span></div>
-      <div class="sb-tagline">Team 97230F · V5RC 2026–27</div>
-      <div class="sb-dev-note">Scouting database<br>developed by 97230F</div>
+    <!-- Branding -->
+    <div class="sb-brand" id="sbBrand" title="Override Scout · 97230F">
+      <img src="logo.png" alt="Override Scout" style="width:28px;height:28px;object-fit:contain;flex-shrink:0;filter:brightness(0) invert(1);opacity:.9">
+      <span class="sb-label">Override Scout</span>
     </div>
+
+    <!-- Expand / collapse -->
+    <button class="sb-icon-btn" id="sbExpandBtn" data-tip="Pin sidebar open" onclick="toggleSidebarExpand()" aria-label="Pin sidebar" style="margin-bottom:4px">
+      <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+      <span class="sb-label" style="font-size:11px;color:var(--ink3)">Pin open</span>
+    </button>
+
+    <div class="sb-divider"></div>
+
+    <!-- My Team (team users only) -->
+    <button class="sb-icon-btn nav-active team-nav" id="sbMyTeamLink" data-tip="My Team" onclick="sidebarNav('myteam');return false;" style="display:none" aria-label="My Team">
+      <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span class="sb-label">My Team</span>
+    </button>
+
+    <div class="sb-nav-section-label">Navigation</div>
+
+    <!-- Search / Leaderboard -->
+    <button class="sb-icon-btn nav-active" data-tab-target="leaderboard" data-tip="Search Teams" onclick="sidebarNav('leaderboard');setTimeout(()=>document.getElementById('pubSearch')?.focus(),120)" aria-label="Search teams">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <span class="sb-label">Search Teams</span>
+    </button>
+
+    <!-- Leaderboard -->
+    <button class="sb-icon-btn" data-tab-target="leaderboard" data-tip="Leaderboard" onclick="sidebarNav('leaderboard')" aria-label="Leaderboard">
+      <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+      <span class="sb-label">Leaderboard</span>
+    </button>
+
+    <!-- Skills -->
+    <button class="sb-icon-btn" data-tab-target="skills" data-tip="Skills" onclick="sidebarNav('skills')" aria-label="Skills">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      <span class="sb-label">Skills</span>
+    </button>
+
+    <!-- TS Rankings -->
+    <button class="sb-icon-btn" data-tab-target="ts-rankings" data-tip="TS Rankings" onclick="sidebarNav('ts-rankings')" aria-label="TS Rankings">
+      <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <span class="sb-label">TS Rankings</span>
+    </button>
+
+    <!-- RFORCE -->
+    <button class="sb-icon-btn" data-tab-target="experimental" data-tip="RFORCE Lab" onclick="sidebarNav('experimental')" aria-label="RFORCE">
+      <svg viewBox="0 0 24 24"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-1.14"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-1.14"/></svg>
+      <span class="sb-label">RFORCE Lab</span>
+    </button>
+
+    <!-- Alliance Helper -->
+    <button class="sb-icon-btn" data-tab-target="calendar" data-tip="Alliance Helper" onclick="sidebarNav('calendar')" aria-label="Alliance Helper">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span class="sb-label">Alliance Helper</span>
+    </button>
+
+    <!-- Roadmap -->
+    <button class="sb-icon-btn" data-tab-target="roadmap" data-tip="Roadmap" onclick="sidebarNav('roadmap')" aria-label="Roadmap">
+      <svg viewBox="0 0 24 24"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+      <span class="sb-label">Roadmap</span>
+    </button>
+
+    <!-- Changelog -->
+    <button class="sb-icon-btn" data-tab-target="updates" data-tip="Changelog" onclick="sidebarNav('updates')" aria-label="Changelog">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <span class="sb-label">Changelog</span>
+    </button>
+
+    <!-- About -->
+    <button class="sb-icon-btn" data-tab-target="about" data-tip="About" onclick="sidebarNav('about')" aria-label="About">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <span class="sb-label">About</span>
+    </button>
+
+    <div class="sb-divider"></div>
+
+    <div class="sb-nav-section-label">External</div>
+
+    <!-- External: Instagram -->
+    <a class="sb-icon-btn" href="https://www.instagram.com/97230f/" target="_blank" rel="noopener" data-tip="Instagram ↗" aria-label="Instagram">
+      <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+      <span class="sb-label">Instagram <span class="sb-ext-dot" style="position:static;display:inline-block;vertical-align:middle;margin-left:2px"></span></span>
+    </a>
+
+    <!-- External: RobotEvents -->
+    <a class="sb-icon-btn" href="https://www.robotevents.com" target="_blank" rel="noopener" data-tip="RobotEvents ↗" aria-label="RobotEvents">
+      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      <span class="sb-label">RobotEvents</span>
+    </a>
+
+    <!-- External: VEX via -->
+    <a class="sb-icon-btn" href="https://vexvia.app" target="_blank" rel="noopener" data-tip="VEX via Stats ↗" aria-label="VEX via stats">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span class="sb-label">VEX via Stats</span>
+    </a>
+
+  </div><!-- /.sb-rail-top -->
+
+  <!-- Bottom section -->
+  <div class="sb-rail-bottom">
+    <!-- Settings -->
+    <button class="sb-icon-btn" data-tab-target="settings" data-tip="Settings" onclick="sidebarNav('settings')" aria-label="Settings">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span class="sb-label">Settings</span>
+    </button>
   </div>
 
-  <!-- Navigation links block -->
-  <div class="sb-block">
-    <div class="sb-nav-title">Navigation</div>
-    <!-- These call switchTab() to navigate within the app -->
-    <a class="sb-link" href="#" data-sbnav="leaderboard" onclick="sidebarNav('leaderboard');setTimeout(()=>document.getElementById('pubSearch')?.focus(),120);return false;">
-      <span class="sb-link-icon">🔍</span> Search teams
-    </a>
-    <a class="sb-link" href="#" data-sbnav="leaderboard" onclick="sidebarNav('leaderboard');return false;">
-      <span class="sb-link-icon">🏆</span> Leaderboard
-    </a>
-    <a class="sb-link" href="#" data-sbnav="skills" onclick="sidebarNav('skills');return false;">
-      <span class="sb-link-icon">🎯</span> Skills
-    </a>
-    <a class="sb-link" href="#" data-sbnav="ts-rankings" onclick="sidebarNav('ts-rankings');return false;">
-      <span class="sb-link-icon">⚡</span> TS Rankings
-    </a>
-    <a class="sb-link" href="#" data-sbnav="experimental" onclick="sidebarNav('experimental');return false;">
-      <span class="sb-link-icon">⚡</span> RFORCE
-    </a>
-    <a class="sb-link" href="#" data-sbnav="about" onclick="sidebarNav('about');return false;">
-      <span class="sb-link-icon">ℹ️</span> About us
-    </a>
-    <a class="sb-link" href="#" data-sbnav="roadmap" onclick="sidebarNav('roadmap');return false;">
-      <span class="sb-link-icon">🗺️</span> Roadmap
-    </a>
-    <a class="sb-link" href="#" data-sbnav="calendar" onclick="sidebarNav('calendar');return false;">
-      <span class="sb-link-icon">🤝</span> Alliance Helper
-    </a>
-    <a class="sb-link" href="#" data-sbnav="updates" onclick="sidebarNav('updates');return false;">
-      <span class="sb-link-icon">📋</span> Changelog
-    </a>
-    <div class="sb-nav-title" style="margin-top:12px">External links</div>
-    <!-- External links open in a new tab (target="_blank") -->
-    <a class="sb-link" href="https://www.instagram.com/97230f/" target="_blank" rel="noopener">
-      <span class="sb-link-icon">📸</span> Instagram
-      <span class="sb-link-ext">↗</span>
-    </a>
-    <a class="sb-link" href="https://www.robotevents.com" target="_blank" rel="noopener">
-      <span class="sb-link-icon">🤖</span> RobotEvents
-      <span class="sb-link-ext">↗</span>
-    </a>
-    <a class="sb-link" href="https://vexvia.app" target="_blank" rel="noopener">
-      <span class="sb-link-icon">📊</span> VEX via stats
-      <span class="sb-link-ext">↗</span>
-    </a>
-  </div>
-  </div><!-- /.sb-collapsible -->
-
+</nav>
 </div><!-- /#sidebar -->
 <div class="overlay" id="overlay" onclick="if(event.target===this)closeDetail()">
   <div class="dcard">
@@ -4552,6 +4886,39 @@ function ulSeedNewVersions() {
     { id: 'e_seed_3270_4', tag: 'arch', text: '<code>reProxyFetch</code> simplified to call RobotEvents directly — RobotEvents allows CORS GET requests from HTTP origins; the Supabase Edge Function proxy is no longer required and has been removed from the call path', versionId: 'v_seed_3270' },
   ]);
 
+  addVersion('v_seed_3280', 'v3.28.0', 'Team Sign-Up Accounts', [
+    { id: 'e_seed_3280_1', tag: 'feat', text: '🏆 Team account sign-up — new "Sign Up" button in the topbar opens a registration modal; users enter their team number, email, and password to create a Supabase-backed team account with <code>account_type: team</code> stored in user metadata', versionId: 'v_seed_3280' },
+    { id: 'e_seed_3280_2', tag: 'ux', text: 'Sign-up modal includes team number, email, password, and confirm-password fields with inline validation (min length, match check); success state shows confirmation message with email-verification notice if Supabase requires it', versionId: 'v_seed_3280' },
+    { id: 'e_seed_3280_3', tag: 'ux', text: '"Already have an account? Sign in" link in signup modal switches directly to the admin login modal; Sign Up button hidden automatically when logged in as admin and restored on logout', versionId: 'v_seed_3280' },
+  ]);
+
+  addVersion('v_seed_3290', 'v3.29.0', 'Team Login — Role-Based Access', [
+    { id: 'e_seed_3290_1', tag: 'fix', text: '🔒 Fixed team accounts incorrectly receiving admin access on login — <code>tryLogin</code> now decodes the Supabase JWT and checks <code>user_metadata.account_type</code>; only accounts without <code>account_type: team</code> are elevated to admin', versionId: 'v_seed_3290' },
+    { id: 'e_seed_3290_2', tag: 'feat', text: 'Team users get a dedicated "My Team" tab and sidebar link after sign-in showing their stats: match count, avg pins, best match, AWP rate, TrueSkill rank, and last 30 match entries', versionId: 'v_seed_3290' },
+    { id: 'e_seed_3290_3', tag: 'ux', text: 'Sidebar logo replaced with a large blue team number badge when a team user is logged in; restored to default branding on logout', versionId: 'v_seed_3290' },
+    { id: 'e_seed_3290_4', tag: 'ux', text: 'Login modal relabelled "Sign in to your account" (works for both team and admin); topbar "Admin" button renamed to "Sign In"; login modal now includes "No account? Create team account" link', versionId: 'v_seed_3290' },
+  ]);
+
+  addVersion('v_seed_3300', 'v3.30.0', 'Sidebar Polish', [
+    { id: 'e_seed_3300_1', tag: 'fix', text: 'Fixed sidebar open/close shifting icons — icons now live in a fixed 36 px slot via <code>margin:0 9px</code> on the SVG instead of <code>justify-content:center → flex-start + padding</code>; icon position is constant regardless of open state', versionId: 'v_seed_3300' },
+    { id: 'e_seed_3300_2', tag: 'ux', text: 'Smoother sidebar collapse — labels animate via <code>width:0 → 130px</code> + <code>opacity</code> transition; section labels use <code>height:0 → 22px</code>; no more instant <code>display:none</code> snap', versionId: 'v_seed_3300' },
+  ]);
+
+  // ── v3.31.0 — Security Hardening ──
+  addVersion('v_seed_3310', 'v3.31.0', 'Security Hardening', [
+    { id: 'e_seed_3310_1', tag: 'fix', text: '🔒 RLS enabled on <code>entries</code>, <code>sig_events</code>, <code>app_updates</code>, and <code>teams</code> tables — previously any holder of the public anon key could read or mutate all scouting data', versionId: 'v_seed_3310' },
+    { id: 'e_seed_3310_2', tag: 'fix', text: '🔒 Admin detection moved from <code>user_metadata</code> to <code>app_metadata</code> in <code>tryLogin</code> — team accounts could previously self-demote their <code>account_type</code> flag via the Supabase API to gain admin access; <code>app_metadata</code> is server-only and cannot be modified by users', versionId: 'v_seed_3310' },
+    { id: 'e_seed_3310_3', tag: 'fix', text: '🔒 Write RLS policies updated — replaced <code>auth.role() = \'authenticated\'</code> (any logged-in user) with <code>auth.jwt() -&gt; \'app_metadata\' -&gt;&gt; \'account_type\' IS DISTINCT FROM \'team\'</code> so team accounts cannot insert, update, or delete records', versionId: 'v_seed_3310' },
+  ]);
+
+  // ── v3.32.0 — XSS & Injection Hardening ──
+  addVersion('v_seed_3320', 'v3.32.0', 'XSS &amp; Injection Hardening', [
+    { id: 'e_seed_3320_1', tag: 'fix', text: '🔒 DOMPurify added — all changelog <code>innerHTML</code> assignments now run through <code>DOMPurify.sanitize()</code>; a compromised admin account or direct DB write could previously inject stored XSS that ran for every visitor', versionId: 'v_seed_3320' },
+    { id: 'e_seed_3320_2', tag: 'fix', text: '🔒 Admin JWT moved to <code>sessionStorage</code> only — "Remember admin login" feature removed; the token is no longer written to <code>localStorage</code> where any JS on the page could read it', versionId: 'v_seed_3320' },
+    { id: 'e_seed_3320_3', tag: 'fix', text: '🔒 Fixed <code>prefillAddEntry</code> onclick injection — team/round/side strings from RobotEvents were embedded raw in <code>onclick</code> attributes; replaced with <code>data-team</code>, <code>data-round</code>, <code>data-side</code> attributes and a single <code>addEventListener</code>', versionId: 'v_seed_3320' },
+    { id: 'e_seed_3320_4', tag: 'fix', text: '🔒 Fixed <code>openDetail</code> double-serialize — team object was embedded as <code>JSON.stringify(JSON.stringify(t))</code> in an HTML attribute; fields containing <code>&lt;/script&gt;</code> or <code>"</code> could break the attribute; replaced with <code>data-team-id</code> + <code>teamDetailMap</code> lookup via <code>addEventListener</code>', versionId: 'v_seed_3320' },
+  ]);
+
   if (changed) {
     state.edits       = edits;
     state.vblock_edits = vblocks;
@@ -4604,6 +4971,18 @@ function adminHdrs() {
 
 /* ── State ── */
 let isAdmin = false;
+let isTeamUser = false;
+let teamUserNumber = null; // e.g. "97230F"
+let teamUserToken = null;
+
+// Decode a Supabase JWT and return the user_metadata payload
+function decodeJwtMeta(token) {
+  try {
+    const payload = token.split('.')[1];
+    const json = atob(payload.replace(/-/g,'+').replace(/_/g,'/'));
+    return JSON.parse(json);
+  } catch { return {}; }
+}
 let allEntries = [], allTeams = [];
 const teamDetailMap = {};
 function setAllTeams(arr) {
@@ -4630,6 +5009,74 @@ function closeLoginModal() {
   document.getElementById('pwInput').value = '';
   document.getElementById('unInput').value = '';
   document.getElementById('loginErr').textContent = '';
+}
+
+/* ── SIGN UP ── */
+function openSignupModal() {
+  document.getElementById('signupModal')?.classList.add('open');
+  document.getElementById('signupTeam').focus();
+  document.getElementById('signupErr').textContent = '';
+  document.getElementById('signupOk').style.display = 'none';
+}
+function closeSignupModal() {
+  document.getElementById('signupModal')?.classList.remove('open');
+  ['signupTeam','signupEmail','signupPw','signupPw2'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  document.getElementById('signupErr').textContent = '';
+  document.getElementById('signupOk').style.display = 'none';
+}
+async function trySignUp() {
+  const team  = document.getElementById('signupTeam')?.value.trim().toUpperCase();
+  const email = document.getElementById('signupEmail')?.value.trim();
+  const pw    = document.getElementById('signupPw')?.value;
+  const pw2   = document.getElementById('signupPw2')?.value;
+  const errEl = document.getElementById('signupErr');
+  const okEl  = document.getElementById('signupOk');
+  const btn   = document.getElementById('signupSubmitBtn');
+
+  errEl.textContent = ''; okEl.style.display = 'none';
+  if(!team)  { errEl.textContent = 'Enter your team number.'; return; }
+  if(!email) { errEl.textContent = 'Enter an email address.'; return; }
+  if(!pw || pw.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; return; }
+  if(pw !== pw2) { errEl.textContent = 'Passwords do not match.'; return; }
+
+  errEl.style.color = 'var(--ink3)';
+  errEl.textContent = 'Creating account…';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(SB_URL + '/auth/v1/signup', {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email, password: pw,
+        data: { team_number: team, account_type: 'team' }
+      })
+    });
+    const data = await res.json();
+
+    if(!res.ok || data.error) {
+      errEl.textContent = data.error?.message || data.msg || 'Sign-up failed — try a different email.';
+      errEl.style.color = 'var(--red)';
+      btn.disabled = false;
+      return;
+    }
+
+    errEl.textContent = '';
+    okEl.style.display = 'block';
+    // Supabase may require email confirmation
+    if(data.session) {
+      okEl.textContent = `✓ Account created for ${team}! You can now sign in.`;
+    } else {
+      okEl.textContent = `✓ Account created for ${team}! Check your email to confirm before signing in.`;
+    }
+    btn.disabled = false;
+  } catch(e) {
+    errEl.textContent = 'Network error — check your connection.';
+    errEl.style.color = 'var(--red)';
+    btn.disabled = false;
+  }
 }
 
 async function tryLogin() {
@@ -4665,31 +5112,69 @@ async function tryLogin() {
       return;
     }
 
-    // Supabase returned a valid JWT — store it for authenticated requests
-    adminToken = data.access_token;
-    const expMs = Date.now() + (data.expires_in * 1000);
-    sessionStorage.setItem('sb_token', adminToken);
-    sessionStorage.setItem('sb_token_exp', expMs);
-    // Persist to localStorage if "remember admin" is enabled
-    _persistAdminToken(adminToken, expMs);
+    // Supabase returned a valid JWT — decode metadata to check account type
+    const jwt = data.access_token;
+    const meta = decodeJwtMeta(jwt);
+    const accountType = meta?.user_metadata?.account_type || meta?.app_metadata?.account_type || '';
+    const teamNum = (meta?.user_metadata?.team_number || '').toUpperCase();
 
-    isAdmin = true;
-    errEl.textContent = '';
-    btn.disabled = false;
-    closeLoginModal();
+    if (accountType === 'team') {
+      // ── TEAM USER ──
+      teamUserToken = jwt;
+      teamUserNumber = teamNum;
+      isTeamUser = true;
+      sessionStorage.setItem('sb_team_token', jwt);
+      sessionStorage.setItem('sb_team_exp', Date.now() + (data.expires_in * 1000));
+      sessionStorage.setItem('sb_team_number', teamNum);
 
-    // Reveal admin tabs
-    document.querySelectorAll('.admin-only').forEach(el => el.classList.add('admin-visible'));
-    document.getElementById('modeBadge').textContent = 'Admin';
-    document.getElementById('modeBadge').className = 'mode-badge mode-admin';
-    document.getElementById('logoutBtn').style.display = '';
-    document.getElementById('adminLoginBtn').style.display = 'none';
-    renderLog();
-    renderCalList();
-    applyUpdatesAdminState();
-    if (typeof window._ulApplyDragMode === 'function') window._ulApplyDragMode();
-    // Pull latest changelog state from Supabase now that we're authed
-    ulStatePullSupabase().then(() => { window._ulReapplyAll && window._ulReapplyAll(); });
+      errEl.textContent = '';
+      btn.disabled = false;
+      closeLoginModal();
+
+      document.getElementById('modeBadge').textContent = teamNum || 'Team';
+      document.getElementById('modeBadge').className = 'mode-badge mode-team';
+      document.getElementById('logoutBtn').style.display = '';
+      document.getElementById('adminLoginBtn').style.display = 'none';
+      document.getElementById('signupBtn').style.display = 'none';
+
+      // Update sidebar branding to show team number in blue
+      applyTeamUserSidebar(teamNum);
+      const sbLink = document.getElementById('sbMyTeamLink');
+      if (sbLink) sbLink.style.display = '';
+
+      // Reveal team tab and switch to it
+      document.querySelectorAll('.team-only').forEach(el => el.classList.add('team-visible'));
+      const teamTabBtn = document.querySelector('[data-tab="myteam"]');
+      if (teamTabBtn) { teamTabBtn.style.display = ''; teamTabBtn.click(); }
+      renderTeamPage();
+
+    } else {
+      // ── ADMIN ──
+      adminToken = jwt;
+      const expMs = Date.now() + (data.expires_in * 1000);
+      sessionStorage.setItem('sb_token', adminToken);
+      sessionStorage.setItem('sb_token_exp', expMs);
+      _persistAdminToken(adminToken, expMs);
+
+      isAdmin = true;
+      errEl.textContent = '';
+      btn.disabled = false;
+      closeLoginModal();
+
+      document.querySelectorAll('.admin-only').forEach(el => el.classList.add('admin-visible'));
+      document.getElementById('modeBadge').textContent = 'Admin';
+      document.getElementById('modeBadge').className = 'mode-badge mode-admin';
+      document.getElementById('logoutBtn').style.display = '';
+      document.getElementById('adminLoginBtn').style.display = 'none';
+      document.getElementById('signupBtn').style.display = 'none';
+      applyViewerGates(true);
+      renderLog();
+      renderCalList();
+      applyUpdatesAdminState();
+      if (typeof window._ulApplyDragMode === 'function') window._ulApplyDragMode();
+      ulStatePullSupabase().then(() => { window._ulReapplyAll && window._ulReapplyAll(); });
+      if (typeof loadData === 'function') loadData();
+    }
 
   } catch(e) {
     errEl.textContent = 'Network error — check your connection.';
@@ -4700,31 +5185,169 @@ async function tryLogin() {
 }
 
 async function logout() {
-  // Sign out from Supabase (invalidates the JWT server-side)
-  if(adminToken) {
+  const token = adminToken || teamUserToken;
+  if(token) {
     try {
       await fetch(SB_URL + '/auth/v1/logout', {
         method: 'POST',
-        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + adminToken }
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + token }
       });
     } catch(e) { /* best effort */ }
   }
-  adminToken = null;
-  isAdmin = false;
+  adminToken = null; isAdmin = false;
+  teamUserToken = null; isTeamUser = false; teamUserNumber = null;
   sessionStorage.removeItem('sb_token');
   sessionStorage.removeItem('sb_token_exp');
+  sessionStorage.removeItem('sb_team_token');
+  sessionStorage.removeItem('sb_team_exp');
+  sessionStorage.removeItem('sb_team_number');
+
   document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('admin-visible'));
+  document.querySelectorAll('.team-only').forEach(el => el.classList.remove('team-visible'));
+  const teamTabBtn = document.querySelector('[data-tab="myteam"]');
+  if (teamTabBtn) teamTabBtn.style.display = 'none';
+
+  // Restore sidebar branding
+  restoreDefaultSidebar();
+  const sbLink = document.getElementById('sbMyTeamLink');
+  if (sbLink) sbLink.style.display = 'none';
+
   document.getElementById('modeBadge').textContent = 'Viewer';
   document.getElementById('modeBadge').className = 'mode-badge mode-pub';
   document.getElementById('logoutBtn').style.display = 'none';
   document.getElementById('adminLoginBtn').style.display = '';
-  // Switch back to leaderboard tab
+  document.getElementById('signupBtn').style.display = '';
+  applyViewerGates(false);
   const _lbTabBtn = document.querySelector('[data-tab="leaderboard"]');
   if (_lbTabBtn) _lbTabBtn.click();
   renderCalList();
   applyUpdatesAdminState();
   if (typeof window._ulApplyDragMode === 'function') window._ulApplyDragMode();
 }
+function applyTeamUserSidebar(teamNum) {
+  const brand = document.getElementById('sbBrand');
+  if (!brand) return;
+  brand.className = 'sb-brand team-mode';
+  brand.title = teamNum + ' · Override Scout';
+  brand.innerHTML = `<span style="font-family:var(--barlow);font-size:13px;font-weight:800;letter-spacing:.5px;flex-shrink:0">${teamNum}</span><span class="sb-label" style="font-size:12px;font-weight:700;color:rgba(255,255,255,.8)">My Team</span>`;
+}
+function restoreDefaultSidebar() {
+  const brand = document.getElementById('sbBrand');
+  if (!brand) return;
+  brand.className = 'sb-brand';
+  brand.title = 'Override Scout · 97230F';
+  brand.innerHTML = `<img src="logo.png" alt="Override Scout" style="width:28px;height:28px;object-fit:contain;flex-shrink:0;filter:brightness(0) invert(1);opacity:.9"><span class="sb-label">Override Scout</span>`;
+}
+
+function renderTeamPage() {
+  if (!isTeamUser || !teamUserNumber) return;
+  const num = teamUserNumber;
+  const panel = document.getElementById('tab-myteam');
+  if (!panel) return;
+
+  // Pull this team's entries from allEntries
+  const entries = allEntries.filter(e => (e.team||'').toUpperCase() === num);
+  const detail  = teamDetailMap[num] || {};
+
+  const totalMatches = entries.length;
+  const avgPins = totalMatches
+    ? (entries.reduce((s,e) => s + (parseFloat(e.avg_pins)||parseFloat(e.pins)||0), 0) / totalMatches).toFixed(2)
+    : '—';
+  const awpCount = entries.filter(e => e.awp || e.auton_win_point).length;
+  const awpRate  = totalMatches ? Math.round(awpCount / totalMatches * 100) : 0;
+  const bestPins = totalMatches ? Math.max(...entries.map(e => parseFloat(e.avg_pins)||parseFloat(e.pins)||0)).toFixed(1) : '—';
+  const tsRank   = detail.ts_rank ?? detail.trueskill_rank ?? '—';
+
+  const matchRows = entries.slice().reverse().slice(0, 30).map(e => {
+    const pins = parseFloat(e.avg_pins||e.pins||0).toFixed(1);
+    const awp  = e.awp || e.auton_win_point;
+    const evt  = e.event_name || e.event || 'Match';
+    const date = e.date ? e.date.slice(0,10) : '';
+    return `<div class="team-match-row">
+      <span class="team-match-event">${evt}</span>
+      ${awp ? `<span class="team-match-awp">AWP</span>` : ''}
+      <span class="team-match-pins">${pins}</span>
+      <span class="team-match-date">${date}</span>
+    </div>`;
+  }).join('') || `<div style="padding:1.5rem;text-align:center;color:var(--ink3);font-family:var(--mono);font-size:12px">No match entries found for ${num} yet.</div>`;
+
+  panel.innerHTML = `
+    <div class="team-page-hero">
+      <div class="team-page-num">${num}</div>
+      <div class="team-page-label">Your Team · Override Scout</div>
+      <div class="team-stat-grid">
+        <div class="team-stat-card">
+          <div class="team-stat-label">Matches</div>
+          <div class="team-stat-val">${totalMatches}</div>
+          <div class="team-stat-sub">recorded entries</div>
+        </div>
+        <div class="team-stat-card">
+          <div class="team-stat-label">Avg Pins</div>
+          <div class="team-stat-val">${avgPins}</div>
+          <div class="team-stat-sub">across all entries</div>
+        </div>
+        <div class="team-stat-card">
+          <div class="team-stat-label">Best Match</div>
+          <div class="team-stat-val">${bestPins}</div>
+          <div class="team-stat-sub">pins in one match</div>
+        </div>
+        <div class="team-stat-card">
+          <div class="team-stat-label">AWP Rate</div>
+          <div class="team-stat-val">${awpRate}%</div>
+          <div class="team-stat-sub">${awpCount} of ${totalMatches}</div>
+        </div>
+        <div class="team-stat-card">
+          <div class="team-stat-label">TrueSkill Rank</div>
+          <div class="team-stat-val">${tsRank === '—' ? tsRank : '#' + tsRank}</div>
+          <div class="team-stat-sub">overall ranking</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:1rem 1.5rem .5rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
+      <div style="font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--ink3)">Recent matches</div>
+      <div style="font-size:10px;font-family:var(--mono);color:var(--ink3)">${totalMatches} total</div>
+    </div>
+    <div style="background:var(--surface);border-radius:0 0 var(--radius-lg) var(--radius-lg)">${matchRows}</div>`;
+}
+
+/* ── VIEWER GATE: tabs/panels locked for unauthenticated users ── */
+const VIEWER_GATED_TABS = ['leaderboard','skills','updates','experimental','roadmap'];
+
+function buildLockGate() {
+  const el = document.createElement('div');
+  el.className = 'viewer-lock-gate';
+  el.innerHTML = '<div class="viewer-lock-card">'
+    + '<span class="viewer-lock-icon">\uD83D\uDD12</span>'
+    + '<div class="viewer-lock-title">Override <span>Scout</span></div>'
+    + '<div class="viewer-lock-sub">Sign in or create a free account to access<br>scouting data, rankings, and analytics.</div>'
+    + '<div class="viewer-lock-btns">'
+    + '<button class="viewer-lock-btn-primary" onclick="openLoginModal()">Sign In</button>'
+    + '<div class="viewer-lock-divider">or</div>'
+    + '<button class="viewer-lock-btn-secondary" onclick="openSignupModal()">Create Account</button>'
+    + '</div></div>';
+  return el;
+}
+
+function applyViewerGates(admin) {
+  VIEWER_GATED_TABS.forEach(function(tabId) {
+    var panel = document.getElementById('tab-' + tabId);
+    var tabBtn = document.querySelector('.tab[data-tab="' + tabId + '"]');
+    if (!panel) return;
+    if (!admin) {
+      if (tabBtn) tabBtn.classList.add('viewer-gated');
+      panel.classList.add('viewer-locked-panel');
+      if (!panel.querySelector('.viewer-lock-gate')) {
+        panel.appendChild(buildLockGate());
+      }
+    } else {
+      if (tabBtn) tabBtn.classList.remove('viewer-gated');
+      panel.classList.remove('viewer-locked-panel');
+      var gate = panel.querySelector('.viewer-lock-gate');
+      if (gate) gate.remove();
+    }
+  });
+}
+
 function launchApp(admin) {
   document.getElementById('appShell').style.display = 'block';
   // Admin tabs hidden by default for viewers
@@ -4736,6 +5359,8 @@ function launchApp(admin) {
   // Start donation popup now that user is in the app (viewers only - team members know the app)
   if (!admin && window._startDonation) window._startDonation();
   document.getElementById('modeBadge').className = 'mode-badge ' + (admin ? 'mode-admin' : 'mode-pub');
+  // Apply / remove viewer gates
+  applyViewerGates(admin);
   document.getElementById('logoutBtn').style.display = admin ? '' : 'none';
   document.getElementById('adminLoginBtn').style.display = admin ? 'none' : '';
   // Only fetch from the network on first load; subsequent calls (e.g. after login)
@@ -4748,6 +5373,11 @@ function launchApp(admin) {
     if(admin) { renderLog(); renderRoutes(); }
   }
   loadRobotTypes();
+  setTimeout(() => { if (typeof skLoadFromSupabase === 'function') skLoadFromSupabase(); }, 0);
+  // Always re-render after login/logout so admin UI state is correct
+  lbApplyFilter(lbActiveF);
+  pubRenderAll();
+  if(admin) { renderLog(); renderRoutes(); }
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -4989,7 +5619,7 @@ function ulRenderFromState() {
         row.innerHTML =
           '<span class="ul-drag-handle admin-only" title="Drag to reorder">⠿</span>' +
           '<span class="ul-entry-tag ul-tag-' + escHtml(e.tag || 'feat') + '">' + escHtml(e.tag || 'feat') + '</span>' +
-          '<span class="ul-entry-text">' + (e.text || '') + '</span>' +
+          '<span class="ul-entry-text">' + DOMPurify.sanitize(e.text || '') + '</span>' +
           '<div class="ul-entry-actions admin-only">' +
             '<button class="ul-entry-btn" onclick="editUlEntry(this)">✏ Edit</button>' +
             '<button class="ul-entry-btn del" onclick="deleteUlEntry(this)">✕</button>' +
@@ -5116,7 +5746,7 @@ async function saveUpdates() {
           const tagEl = el.querySelector('.ul-entry-tag');
           const txtEl = el.querySelector('.ul-entry-text');
           if (tagEl) { tagEl.className = 'ul-entry-tag ul-tag-' + edit.tag; tagEl.textContent = edit.tag; }
-          if (txtEl) txtEl.innerHTML = edit.text;
+          if (txtEl) txtEl.innerHTML = DOMPurify.sanitize(edit.text);
         }
       }
     });
@@ -5129,7 +5759,7 @@ async function saveUpdates() {
     div.innerHTML =
       '<span class="ul-drag-handle admin-only" title="Drag to reorder">⠿</span>' +
       '<span class="ul-entry-tag ul-tag-' + tag + '">' + tag + '</span>' +
-      '<span class="ul-entry-text">' + text + '</span>' +
+      '<span class="ul-entry-text">' + DOMPurify.sanitize(text) + '</span>' +
       '<div class="ul-entry-actions admin-only">' +
       '<button class="ul-entry-btn" onclick="editUlEntry(this)">&#9999; Edit</button>' +
       '<button class="ul-entry-btn del" onclick="deleteUlEntry(this)">&#10005;</button>' +
@@ -5261,7 +5891,7 @@ async function saveUpdates() {
       const tagEl = entryEl.querySelector('.ul-entry-tag');
       const txtEl = entryEl.querySelector('.ul-entry-text');
       if (tagEl) { tagEl.className = 'ul-entry-tag ul-tag-' + _ulSelectedTag; tagEl.textContent = _ulSelectedTag; }
-      if (txtEl) txtEl.innerHTML = text;
+      if (txtEl) txtEl.innerHTML = DOMPurify.sanitize(text);
       const idx = edits.findIndex(function(e) { return e.id === id && !e.deleted && !e.isNew && !e.isVersionBlock; });
       const record = { id: id, tag: _ulSelectedTag, text: text };
       if (idx >= 0) edits[idx] = record; else edits.push(record);
@@ -6487,7 +7117,7 @@ function lbRender() {
         const pinColor = avgPins>=6?'var(--green)':avgPins>=3?'var(--amber)':'var(--red)';
         const tsInfo = typeof tsGet==='function' ? tsGet(t.team) : null;
         const worldsBadge = tsInfo?.qualified ? '<span style="display:inline-flex;align-items:center;font-size:8px;font-weight:700;font-family:var(--mono);padding:1px 5px;border-radius:3px;background:rgba(61,189,110,.15);color:var(--green);border:1px solid rgba(61,189,110,.3);margin-left:5px;vertical-align:middle">✅ WQ</span>' : '';
-        return `<div onclick="openDetail(${JSON.stringify(JSON.stringify(t))})" style="display:grid;grid-template-columns:56px 1fr 80px 120px 120px 1fr;gap:0;${rowBg}border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s" onmouseover="this.style.background='var(--paper3)'" onmouseout="this.style.background='${isMe?'rgba(240,192,48,.06)':isRival?'rgba(204,61,20,.05)':'transparent'}'">
+        return `<div data-team-id="${esc(t.team)}" style="display:grid;grid-template-columns:56px 1fr 80px 120px 120px 1fr;gap:0;${rowBg}border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s" onmouseover="this.style.background='var(--paper3)'" onmouseout="this.style.background='${isMe?'rgba(240,192,48,.06)':isRival?'rgba(204,61,20,.05)':'transparent'}'">
           <!-- Rank -->
           <div style="padding:13px 12px;display:flex;align-items:center;justify-content:center;gap:4px;flex-direction:column">
             ${medal || `<span style="font-family:var(--mono);font-size:11px;color:var(--ink3)">${rank}</span>`}
@@ -6534,6 +7164,14 @@ function lbRender() {
     document.getElementById('lbPrev').disabled=lbPg===1;
     document.getElementById('lbNext').disabled=lbPg===pages;
   } else pg.style.display='none';
+
+  // Bind clicks for team rows (replaces inline onclick with double-serialized JSON)
+  document.getElementById('lbMain').querySelectorAll('[data-team-id]').forEach(el => {
+    el.addEventListener('click', function() {
+      const t = teamDetailMap[this.dataset.teamId] || allTeams.find(x => x.team === this.dataset.teamId);
+      if (t) openDetail(t);
+    });
+  });
 }
 function lbDoSearch() {
   const res = document.getElementById('pubResult');
@@ -7974,15 +8612,63 @@ function setOutcomeNavMode(mode) {
 ════════════════════════════════════════════════════════ */
 // sidebarNav: activates a tab by its data-tab name.
 // Used by sidebar links so clicking them navigates the main content area.
+// ── Sidebar hover + pin logic ──
+(function() {
+  let hoverTimer;
+  function initSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const rail = document.getElementById('sbRail');
+    if (!sidebar || !rail) return;
+
+    function open()  { rail.classList.add('is-open'); }
+    function close() { if (!sidebar.classList.contains('sb-pinned')) rail.classList.remove('is-open'); }
+
+    sidebar.addEventListener('mouseenter', () => { clearTimeout(hoverTimer); open(); });
+    sidebar.addEventListener('mouseleave', () => { hoverTimer = setTimeout(close, 120); });
+
+    // Restore pin state
+    if (localStorage.getItem('sb_pinned') === '1') {
+      sidebar.classList.add('sb-pinned');
+      rail.classList.add('is-open');
+      const btn = document.getElementById('sbExpandBtn');
+      if (btn) {
+        btn.setAttribute('data-tip', 'Unpin sidebar');
+        const lbl = btn.querySelector('.sb-label');
+        if (lbl) lbl.textContent = 'Unpin';
+      }
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSidebar);
+  else initSidebar();
+})();
+
+function toggleSidebarExpand() {
+  const sb   = document.getElementById('sidebar');
+  const rail = document.getElementById('sbRail');
+  const btn  = document.getElementById('sbExpandBtn');
+  const pinned = sb.classList.toggle('sb-pinned');
+  if (pinned) rail.classList.add('is-open');
+  localStorage.setItem('sb_pinned', pinned ? '1' : '0');
+  if (btn) {
+    btn.setAttribute('data-tip', pinned ? 'Unpin sidebar' : 'Pin sidebar open');
+    const lbl = btn.querySelector('.sb-label');
+    if (lbl) lbl.textContent = pinned ? 'Unpin' : 'Pin open';
+  }
+}
+
 function sidebarNav(tab) {
   const btn = document.querySelector('[data-tab="'+tab+'"]');
   if(btn) switchTab(tab, btn);
 }
 
 function setSidebarActiveLink(tab) {
-  document.querySelectorAll('#sidebar .sb-link[data-sbnav]').forEach(a => a.classList.remove('active'));
-  const activeLink = document.querySelector('#sidebar .sb-link[data-sbnav="'+tab+'"]');
-  if(activeLink) activeLink.classList.add('active');
+  // New icon rail: highlight by data-tab-target
+  document.querySelectorAll('#sidebar .sb-icon-btn[data-tab-target]').forEach(btn => btn.classList.remove('nav-active'));
+  document.querySelectorAll('#sidebar .sb-icon-btn[data-tab-target="'+tab+'"]').forEach(btn => btn.classList.add('nav-active'));
+  // My Team button special case
+  const myTeamBtn = document.getElementById('sbMyTeamLink');
+  if (myTeamBtn && tab === 'myteam') myTeamBtn.classList.add('nav-active');
+  else if (myTeamBtn) myTeamBtn.classList.remove('nav-active');
 }
 
 function toggleSidebar() {
@@ -8116,13 +8802,9 @@ function toggleTrueSkillPanel() {
 /* ═══════════════════════════════════════════════════════
    INIT — check if already logged in this session
 ════════════════════════════════════════════════════════ */
-// Restore admin session — check sessionStorage first, then localStorage (remember me)
-const storedToken = sessionStorage.getItem('sb_token') ||
-  (localStorage.getItem('os_remember_admin') === '1' ? localStorage.getItem('os_admin_token') : null);
-const storedExp = parseInt(
-  sessionStorage.getItem('sb_token_exp') ||
-  (localStorage.getItem('os_remember_admin') === '1' ? localStorage.getItem('os_admin_exp') : '0') || '0'
-);
+// Restore admin session — sessionStorage only (localStorage removed for security)
+const storedToken = sessionStorage.getItem('sb_token');
+const storedExp = parseInt(sessionStorage.getItem('sb_token_exp') || '0');
 if(storedToken && Date.now() < storedExp) {
   adminToken = storedToken;
   isAdmin = true;
@@ -9186,10 +9868,16 @@ function selectMatch(m) {
   document.getElementById('em-add-buttons').innerHTML = allTeamsInMatch.map((team, i) => {
     const side = i < 2 ? 'R' : 'B';
     return `<button class="btn ${side==='R'?'':'btn-p'}" style="${side==='R'?'color:var(--red-text);border-color:var(--red-bg)':''}"
-      onclick="prefillAddEntry('${team}','${roundStr}','${side}');closeSchedModal()">
-      Log ${team} (${side==='R'?'Red':'Blue'})
+      data-team="${esc(team)}" data-round="${esc(roundStr)}" data-side="${esc(side)}">
+      Log ${esc(team)} (${side==='R'?'Red':'Blue'})
     </button>`;
   }).join('');
+  document.getElementById('em-add-buttons').querySelectorAll('button[data-team]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      prefillAddEntry(this.dataset.team, this.dataset.round, this.dataset.side);
+      closeSchedModal();
+    });
+  });
   document.getElementById('em-add-entry-bar').style.display = 'block';
 }
 
@@ -9955,6 +10643,7 @@ const TS_BETA = 25/6; // Standard TrueSkill β
 
 /* Get TrueSkill data for a team (case-insensitive) */
 function tsGet(team) {
+  if (typeof TS_DB === 'undefined') return null;
   return TS_DB[(team||'').toUpperCase().trim()] || null;
 }
 
@@ -10662,25 +11351,14 @@ function clearSettingsReToken() {
 }
 
 function applyRememberAdmin(on) {
-  try { localStorage.setItem('os_remember_admin', on ? '1' : '0'); } catch(e) {}
+  // Remember admin feature removed for security — admin JWT stays in sessionStorage only
+  try { localStorage.removeItem('os_remember_admin'); localStorage.removeItem('os_admin_token'); localStorage.removeItem('os_admin_exp'); } catch(e) {}
   const t = document.getElementById('rememberAdminToggle');
-  if (t) t.checked = on;
-  // If turning off, remove persisted token
-  if (!on) {
-    try { localStorage.removeItem('os_admin_token'); localStorage.removeItem('os_admin_exp'); } catch(e) {}
-  }
+  if (t) { t.checked = false; t.disabled = true; }
 }
 
-// Hook into login to persist token in localStorage if "remember" is on
-const _origSetItem = window._origSessionSet;
-function _persistAdminToken(token, exp) {
-  if (localStorage.getItem('os_remember_admin') === '1') {
-    try {
-      localStorage.setItem('os_admin_token', token);
-      localStorage.setItem('os_admin_exp', String(exp));
-    } catch(e) {}
-  }
-}
+// _persistAdminToken removed — admin JWT is sessionStorage only
+function _persistAdminToken(token, exp) { /* no-op: localStorage persistence removed for security */ }
 function loadSettingsFromStorage() {
   // Compact
   const compact = localStorage.getItem('os_compact') === '1';
@@ -10718,10 +11396,6 @@ function loadSettingsFromStorage() {
 
   // RobotEvents API token
   loadReToken();
-
-  // Remember admin
-  const remEl = document.getElementById('rememberAdminToggle');
-  if (remEl) remEl.checked = localStorage.getItem('os_remember_admin') === '1';
 
   // Auton calculator team numbers
   emRestoreTeams();
@@ -11602,19 +12276,126 @@ self.addEventListener('fetch', e => {
 /* ══════════════════════════════════════════════════════════
    SKILLS RUNS — localStorage-backed, exportable
 ══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════
+   SKILLS TABLE — run once in Supabase SQL editor:
+
+   create table if not exists skills_runs (
+     id         text primary key,
+     team       text not null,
+     event      text not null default '',
+     type       text not null check (type in ('auton','driver')),
+     score      integer not null default 0,
+     attempt    integer not null default 1,
+     notes      text not null default '',
+     ts         bigint not null,
+     created_at timestamptz not null default now()
+   );
+   alter table skills_runs enable row level security;
+   create policy "public read"   on skills_runs for select using (true);
+   create policy "admin insert"  on skills_runs for insert with check (auth.role() = 'authenticated');
+   create policy "admin delete"  on skills_runs for delete using  (auth.role() = 'authenticated');
+════════════════════════════════════════════════════════ */
+
 const SK_LS_KEY = 'os_skills_v1';
 let _skEntries = [];
+let _skSyncing = false;
+
+// Boot: load from localStorage immediately so leaderboard is instant
 (function() {
   try { _skEntries = JSON.parse(localStorage.getItem(SK_LS_KEY) || '[]'); } catch(e) { _skEntries = []; }
 })();
 
 let _skFilter = 'both'; // 'both' | 'auton' | 'driver'
 
+// Persist to localStorage (always) + sync status indicator
 function skSave() {
   try { localStorage.setItem(SK_LS_KEY, JSON.stringify(_skEntries)); } catch(e) {}
 }
 
-function saveSkillsRun() {
+// ── Pull all runs from Supabase, merge with any local-only entries ──
+async function skLoadFromSupabase() {
+  if (_skSyncing) return;
+  _skSyncing = true;
+  skSetSyncStatus('syncing');
+  try {
+    let rows = [], off = 0, batch;
+    do {
+      const r = await fetch(
+        SB_URL + '/rest/v1/skills_runs?select=*&order=ts.desc&limit=1000&offset=' + off,
+        { headers: HDRS }
+      );
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      batch = await r.json();
+      rows = rows.concat(batch);
+      off += 1000;
+    } while (batch.length === 1000);
+
+    // Merge: keep any local entries not yet in Supabase (pending push)
+    const sbIds = new Set(rows.map(e => e.id));
+    const localOnly = _skEntries.filter(e => !sbIds.has(e.id));
+    _skEntries = [...localOnly, ...rows];
+    skSave();
+    skRender();
+    skSetSyncStatus('ok', rows.length + ' runs');
+  } catch (err) {
+    console.error('Skills load error:', err);
+    skSetSyncStatus('err', 'Sync failed');
+  } finally {
+    _skSyncing = false;
+  }
+}
+
+// ── Push a single new run to Supabase (admin only) ──
+async function skPushToSupabase(entry) {
+  if (!isAdmin) return; // viewers can't write
+  const r = await fetch(SB_URL + '/rest/v1/skills_runs', {
+    method: 'POST',
+    headers: { ...adminHdrs(), 'Prefer': 'return=minimal', 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      id:      entry.id,
+      team:    entry.team,
+      event:   entry.event   || '',
+      type:    entry.type,
+      score:   entry.score,
+      attempt: entry.attempt || 1,
+      notes:   entry.notes   || '',
+      ts:      entry.ts
+    })
+  });
+  if (!r.ok) {
+    const txt = await r.text().catch(() => '');
+    throw new Error('Supabase error ' + r.status + ': ' + txt.slice(0, 120));
+  }
+}
+
+// ── Delete a run from Supabase (admin only) ──
+async function skDeleteFromSupabase(id) {
+  if (!isAdmin) return;
+  const r = await fetch(SB_URL + '/rest/v1/skills_runs?id=eq.' + encodeURIComponent(id), {
+    method: 'DELETE',
+    headers: adminHdrs()
+  });
+  if (!r.ok) {
+    const txt = await r.text().catch(() => '');
+    throw new Error('Delete error ' + r.status + ': ' + txt.slice(0, 120));
+  }
+}
+
+// ── Sync status badge inside Skills tab ──
+function skSetSyncStatus(state, label) {
+  const el = document.getElementById('sk-sync-status');
+  if (!el) return;
+  const map = {
+    syncing: { text: '⟳ Syncing…',      color: 'var(--blue)'  },
+    ok:      { text: '✓ ' + (label||'Synced'), color: 'var(--green)' },
+    err:     { text: '✕ ' + (label||'Error'),  color: 'var(--red)'   }
+  };
+  const s = map[state] || map.ok;
+  el.textContent = s.text;
+  el.style.color = s.color;
+}
+
+async function saveSkillsRun() {
   const team    = (document.getElementById('sk-team')?.value || '').trim().toUpperCase();
   const event_  = (document.getElementById('sk-event')?.value || '').trim();
   const type    = document.getElementById('sk-type')?.value || 'auton';
@@ -11622,6 +12403,7 @@ function saveSkillsRun() {
   const attempt = parseInt(document.getElementById('sk-attempt')?.value || '1', 10);
   const notes   = (document.getElementById('sk-notes')?.value || '').trim();
   const msg     = document.getElementById('sk-msg');
+  const btn     = document.querySelector('[onclick="saveSkillsRun()"]');
 
   if (!team)           { if (msg) { msg.style.color='var(--red)'; msg.textContent='Team # required.'; } return; }
   if (isNaN(score) || score < 0) { if (msg) { msg.style.color='var(--red)'; msg.textContent='Valid score required.'; } return; }
@@ -11630,18 +12412,19 @@ function saveSkillsRun() {
     id:      'sk_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
     team,
     event:   event_,
-    type,      // 'auton' | 'driver'
+    type,
     score,
     attempt,
     notes,
     ts:      Date.now()
   };
 
+  // Optimistic: add locally first so UI feels instant
   _skEntries.push(entry);
   skSave();
   skRender();
 
-  // Clear form fields
+  // Clear form
   ['sk-team','sk-event','sk-score','sk-notes'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
@@ -11649,19 +12432,42 @@ function saveSkillsRun() {
   const attemptEl = document.getElementById('sk-attempt');
   if (attemptEl) attemptEl.value = '1';
 
-  if (msg) {
-    msg.style.color = 'var(--green)';
-    msg.textContent = '✓ Run logged for ' + team;
-    setTimeout(() => { msg.textContent = ''; }, 3000);
+  if (msg) { msg.style.color = 'var(--green)'; msg.textContent = '⟳ Saving…'; }
+  if (btn) btn.disabled = true;
+
+  try {
+    await skPushToSupabase(entry);
+    if (msg) {
+      msg.style.color = 'var(--green)';
+      msg.textContent = '✓ Saved — ' + team + ' ' + score + ' pts';
+      setTimeout(() => { msg.textContent = ''; }, 3000);
+    }
+    showToast('🎯 Skills run saved — ' + team + ' ' + score + ' pts (' + type + ')', 'ok');
+  } catch (err) {
+    // Push failed — entry stays in localStorage as pending, show warning
+    if (msg) {
+      msg.style.color = 'var(--amber)';
+      msg.textContent = '⚠ Saved locally (sync failed: ' + err.message.slice(0,60) + ')';
+      setTimeout(() => { msg.textContent = ''; }, 6000);
+    }
+    showToast('Skills run saved locally — sync failed', 'err');
+    console.error('skPushToSupabase error:', err);
+  } finally {
+    if (btn) btn.disabled = false;
   }
-  showToast('🎯 Skills run logged — ' + team + ' ' + score + ' pts (' + type + ')', 'ok');
 }
 
-function skDeleteRun(id) {
+async function skDeleteRun(id) {
   _skEntries = _skEntries.filter(e => e.id !== id);
   skSave();
   skRender();
-  showToast('Skills run deleted', 'ok');
+  try {
+    await skDeleteFromSupabase(id);
+    showToast('Skills run deleted', 'ok');
+  } catch (err) {
+    showToast('Deleted locally — Supabase sync failed', 'err');
+    console.error('skDeleteFromSupabase error:', err);
+  }
 }
 
 function skSetFilter(f, el) {
@@ -12679,31 +13485,22 @@ function lbReImportPopulateEvents() {
   if (inp && tok) inp.value = tok;
 }
 
-// Proxy fetch — routes RobotEvents requests through the Supabase edge function
-// to avoid CORS. The token is sent in a custom header, never stored server-side.
-const RE_PROXY = SB_URL + '/functions/v1/re-proxy';
-
+// Direct fetch to RobotEvents — CORS is allowed from browser origins.
 async function reProxyFetch(path, params, token) {
-  // Sends request to Supabase Edge Function which proxies to RobotEvents server-side (avoids CORS).
-  // Path is sent as a plain header to avoid any URL encoding issues.
   let qs = '';
   if (params) Object.entries(params).forEach(([k, v]) => { qs += (qs ? '&' : '') + encodeURIComponent(k) + '=' + encodeURIComponent(String(v)); });
-  const r = await fetch(RE_PROXY, {
-    method: 'POST',
+  const url = RE_API + path + (qs ? '?' + qs : '');
+  const r = await fetch(url, {
+    method: 'GET',
     headers: {
-      'apikey': SB_KEY,
-      'Authorization': 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json',
-      're-token': token,
-      're-path': path,
-      're-params': qs
-    },
-    body: JSON.stringify({})
+      'Authorization': 'Bearer ' + token,
+      'Accept': 'application/json'
+    }
   });
   if (r.status === 401) throw new Error('Invalid API token — check your RobotEvents token in Settings.');
   if (!r.ok) {
     const txt = await r.text().catch(() => '');
-    throw new Error('Proxy error HTTP ' + r.status + (txt ? ': ' + txt.slice(0, 100) : ''));
+    throw new Error('RobotEvents error HTTP ' + r.status + (txt ? ': ' + txt.slice(0, 100) : ''));
   }
   return r.json();
 }
