@@ -94,18 +94,74 @@ html.light select option{background:var(--surface);color:var(--ink)}
 }
 #il-donate-btn:hover{background:#002a90;box-shadow:0 4px 12px rgba(0,56,184,.3)}
 
-/* ── SIDEBAR AUTH BLOCK ── */
-.sb-auth-block{
-  width:100%;overflow:hidden;
-  max-height:0;opacity:0;
-  transition:max-height .3s cubic-bezier(.4,0,.2,1), opacity .22s ease, padding .3s cubic-bezier(.4,0,.2,1);
-  padding:0 8px;
+/* ── SIDEBAR AUTH SLOT ── keeps a fixed-height area so nothing else shifts ── */
+.sb-auth-slot{
+  width:100%;
+  /* Fixed height so the slot never changes size — nav items never shift */
+  height:80px;
+  flex-shrink:0;
+  position:relative;
+  overflow:visible;
+  /* Ensure this never grows even when child expands */
+  min-height:80px;
+  max-height:80px;
 }
-.sb-rail.is-open .sb-auth-block{max-height:120px;opacity:1;padding:6px 8px}
+/* ── SIDEBAR AUTH BLOCK ── */
+/* Expanded auth panel — floats over the rail content, doesn't push items */
+.sb-auth-block{
+  position:absolute;top:0;left:8px;right:8px;
+  background:var(--paper2);
+  overflow:hidden;
+  max-height:0;opacity:0;pointer-events:none;
+  transition:max-height .3s linear, opacity .22s linear;
+  z-index:20;
+  border-radius:var(--radius);
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+}
+.sb-rail.is-open .sb-auth-block{max-height:140px;opacity:1;pointer-events:auto;padding:6px 0;border:1px solid var(--border)}
 .sb-auth-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap}
 .sb-auth-btns{display:flex;flex-direction:column;gap:4px}
 .sb-auth-btns .btn-admin-trigger,.sb-auth-btns .btn-sm{
   font-size:10px;padding:5px 10px;text-align:center;
+}
+
+/* ── MINI AUTH BUTTONS (shown when sidebar is collapsed) ── */
+.sb-mini-auth{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  width:100%;padding:4px 0;
+  position:absolute;top:0;left:0;right:0;
+  transition:opacity .22s ease;
+}
+.sb-rail.is-open .sb-mini-auth{opacity:0;pointer-events:none}
+/* Mini sign-in button (blue hollow outline) */
+.sb-mini-signin{
+  width:28px;height:28px;border-radius:6px;
+  background:transparent;color:var(--blue);border:1.5px solid var(--blue);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;font-family:var(--mono);
+  transition:background .12s,box-shadow .12s,color .12s;
+  position:relative;flex-shrink:0;
+}
+.sb-mini-signin:hover{background:var(--blue);color:#fff;box-shadow:var(--glow-blue)}
+/* Mini sign-out button (red hollow outline cross) */
+.sb-mini-signout{
+  width:28px;height:28px;border-radius:6px;
+  background:transparent;color:var(--red);border:1.5px solid var(--red);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;line-height:1;
+  transition:background .12s,box-shadow .12s,color .12s;
+  flex-shrink:0;
+}
+.sb-mini-signout:hover{background:var(--red);color:#fff;box-shadow:var(--glow-red)}
+/* Mini account type pill (hollow outline) */
+.sb-mini-acct{
+  font-size:8px;font-family:var(--mono);font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;
+  color:var(--ink3);
+  background:transparent;border:1px solid var(--border2);
+  border-radius:3px;padding:1px 5px;white-space:nowrap;
+  max-width:40px;overflow:hidden;text-overflow:ellipsis;
+  text-align:center;
 }
 .toggle-switch{
   position:relative;width:44px;height:24px;cursor:pointer;flex-shrink:0;
@@ -409,27 +465,311 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
   background-image:radial-gradient(ellipse at 0% 0%,rgba(244,2,25,.04) 0%,transparent 50%),
                    radial-gradient(ellipse at 100% 100%,rgba(61,142,240,.04) 0%,transparent 50%);}
 
+/* ── SETTINGS UI ── */
+.settings-page{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+@media(max-width:700px){.settings-page{grid-template-columns:1fr}}
+
+/* section card */
+.settings-section{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
+  overflow:hidden;
+}
+.settings-section-head{
+  display:flex;align-items:center;gap:9px;
+  padding:10px 16px;
+  background:var(--paper2);border-bottom:1px solid var(--border);
+}
+.settings-section-icon{font-size:13px;line-height:1;opacity:.85}
+.settings-section-title{
+  font-size:9px;font-family:var(--mono);text-transform:uppercase;
+  letter-spacing:1.2px;font-weight:700;color:var(--ink3);
+}
+
+/* rows inside a section */
+.settings-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:11px 16px;border-bottom:1px solid var(--border);gap:14px;
+  transition:background .1s;
+}
+.settings-row:last-child{border-bottom:none}
+.settings-row:hover{background:var(--paper3)}
+.settings-row-info{flex:1;min-width:0}
+.settings-row-label{font-size:13px;color:var(--ink);margin-bottom:2px;font-weight:600}
+.settings-row-hint{font-size:11px;color:var(--ink3);font-family:var(--mono);line-height:1.45}
+
+/* danger row */
+.settings-row.danger .settings-row-label{color:var(--red-text)}
+.settings-row.danger:hover{background:var(--red-bg)}
+
+/* footer note */
+.settings-footer-note{
+  font-size:11px;color:var(--ink3);font-family:var(--mono);
+  padding:12px 16px;text-align:center;border-top:1px solid var(--border);
+  background:var(--paper2);
+}
+
+/* ── CALCULATOR SIDE-BY-SIDE MODE ── */
+body.calc-sidebyside #calc-sidebyside-wrap {
+  display:flex !important;
+  flex-wrap:wrap;
+  gap:1rem;
+  align-items:flex-start;
+}
+body.calc-sidebyside #win-prob-col {
+  flex:1 1 400px;
+  min-width:0;
+}
+body.calc-sidebyside #tab-predict.active #auton-calc-panel {
+  flex:1 1 400px;
+  min-width:0;
+  display:block !important;
+}
+@media(max-width:900px) {
+  body.calc-sidebyside #calc-sidebyside-wrap {
+    flex-direction:column;
+  }
+}
+
+/* ── INTRO TAB ── */
+/* ════════════════════════════════════════════
+   INTRO HERO — cinematic redesign
+════════════════════════════════════════════ */
+.intro-hero{
+  position:relative;overflow:hidden;
+  background:#0a0908;
+  border-bottom:1px solid var(--border);
+  padding:4.5rem 1.5rem 3.5rem;
+  text-align:center;
+  min-height:420px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+/* Animated grid lines */
+.intro-hero::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(244,2,25,.07) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(244,2,25,.07) 1px,transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(ellipse 80% 70% at 50% 0%,black 40%,transparent 100%);
+  animation:gridPan 20s linear infinite;
+}
+@keyframes gridPan{from{background-position:0 0}to{background-position:48px 48px}}
+/* Radial glows */
+.intro-hero::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 55% at 20% 30%,rgba(244,2,25,.22) 0%,transparent 70%),
+    radial-gradient(ellipse 50% 45% at 80% 60%,rgba(61,142,240,.14) 0%,transparent 70%),
+    radial-gradient(ellipse 40% 40% at 50% 100%,rgba(200,255,0,.06) 0%,transparent 70%);
+}
+/* Scanline overlay */
+.intro-hero-scanline{
+  position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);
+}
+.intro-logo-wrap{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:80px;height:80px;border-radius:20px;
+  background:transparent;
+  margin-bottom:1.5rem;position:relative;z-index:2;
+  box-shadow:0 0 0 1px rgba(255,255,255,.1),0 0 40px rgba(244,2,25,.6),0 16px 48px rgba(0,0,0,.5);
+  font-size:36px;overflow:hidden;
+  animation:logoPulse 3s ease-in-out infinite;
+}
+@keyframes logoPulse{
+  0%,100%{box-shadow:0 0 0 1px rgba(255,255,255,.1),0 0 40px rgba(244,2,25,.6),0 16px 48px rgba(0,0,0,.5)}
+  50%{box-shadow:0 0 0 1px rgba(255,255,255,.15),0 0 60px rgba(244,2,25,.85),0 16px 48px rgba(0,0,0,.5)}
+}
+.intro-eyebrow{
+  font-family:var(--mono);font-size:10px;font-weight:600;
+  letter-spacing:3px;text-transform:uppercase;
+  color:var(--red);position:relative;z-index:2;
+  margin-bottom:.75rem;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.intro-eyebrow::before,.intro-eyebrow::after{
+  content:'';display:inline-block;width:28px;height:1px;background:var(--red);opacity:.6;
+}
+.intro-headline{
+  font-family:var(--barlow);font-size:clamp(42px,8vw,80px);font-weight:800;
+  letter-spacing:2px;text-transform:uppercase;line-height:.95;
+  color:#fff;position:relative;z-index:2;
+  text-shadow:0 0 80px rgba(244,2,25,.4);
+}
+.intro-headline span{
+  color:var(--red);
+  -webkit-text-stroke:.5px rgba(244,2,25,.3);
+}
+.intro-sub{
+  font-size:11px;font-family:var(--mono);color:rgba(168,164,156,.7);
+  letter-spacing:2px;text-transform:uppercase;margin-top:1rem;
+  position:relative;z-index:2;
+}
+.intro-cta-row{
+  display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
+  margin-top:2rem;position:relative;z-index:2;
+}
+.intro-cta{
+  padding:12px 30px;border-radius:var(--radius);font-size:11px;font-weight:800;
+  font-family:var(--display);letter-spacing:1.5px;text-transform:uppercase;
+  cursor:pointer;border:none;transition:all .2s;
+}
+.intro-cta-primary{
+  background:var(--red);color:#fff;
+  box-shadow:0 4px 24px rgba(244,2,25,.5),0 0 0 1px rgba(255,255,255,.08);
+}
+.intro-cta-primary:hover{background:#d4001a;transform:translateY(-2px);box-shadow:0 8px 32px rgba(244,2,25,.7)}
+.intro-cta-secondary{
+  background:rgba(255,255,255,.05);color:rgba(232,230,224,.8);
+  border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(4px);
+}
+.intro-cta-secondary:hover{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25);transform:translateY(-2px)}
+
+/* ── STAT STRIP ── */
+.intro-stats{
+  display:flex;justify-content:center;gap:0;flex-wrap:wrap;
+  border:1px solid rgba(255,255,255,.07);border-radius:var(--radius-lg);
+  overflow:hidden;max-width:640px;margin:2.5rem auto 0;
+  background:rgba(255,255,255,.03);backdrop-filter:blur(8px);
+}
+.intro-stat{
+  flex:1;min-width:130px;padding:1.1rem 1.25rem;text-align:center;
+  border-right:1px solid rgba(255,255,255,.07);position:relative;
+}
+.intro-stat::before{
+  content:'';position:absolute;top:0;left:25%;right:25%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--red),transparent);
+  opacity:.5;
+}
+.intro-stat:last-child{border-right:none}
+.intro-stat-val{font-size:28px;font-weight:800;font-family:var(--barlow);color:#fff;line-height:1}
+.intro-stat-lbl{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1.2px;color:rgba(168,164,156,.55);margin-top:5px}
+
+/* ── FEATURE CARDS ── */
+.intro-features{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:1px;max-width:960px;margin:2.5rem auto 0;
+  border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;
+  background:var(--border);
+}
+.intro-feat-card{
+  background:var(--paper2);
+  padding:1.375rem 1.375rem 1.25rem;
+  text-align:left;position:relative;overflow:hidden;
+  transition:background .18s,transform .18s;
+  cursor:pointer;
+}
+.intro-feat-card:hover{background:var(--surface);transform:none}
+.intro-feat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--feat-accent,var(--red));
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .28s ease;
+}
+.intro-feat-card:hover::before{transform:scaleX(1)}
+.intro-feat-card::after{
+  content:'';position:absolute;bottom:0;right:0;
+  width:80px;height:80px;
+  background:radial-gradient(circle,var(--feat-accent,.3) 0%,transparent 70%);
+  opacity:.08;pointer-events:none;
+}
+.intro-feat-icon{font-size:24px;margin-bottom:.75rem;line-height:1;display:block}
+.intro-feat-title{font-size:13px;font-weight:700;font-family:var(--display);color:var(--ink);margin-bottom:5px;letter-spacing:.3px}
+.intro-feat-desc{font-size:11px;font-family:var(--mono);color:var(--ink3);line-height:1.65}
+.intro-feat-arrow{
+  position:absolute;top:1.2rem;right:1.2rem;
+  font-size:14px;color:var(--ink3);opacity:0;
+  transition:opacity .18s,transform .18s;
+}
+.intro-feat-card:hover .intro-feat-arrow{opacity:1;transform:translate(2px,-2px)}
+
+/* ── SECTION DIVIDER ── */
+.intro-divider{
+  display:flex;align-items:center;gap:12px;max-width:960px;margin:2.5rem auto 0;
+  font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:2px;color:var(--ink3);
+}
+.intro-divider::before,.intro-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── HOW TO USE STEPS ── */
+.intro-steps{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:12px;max-width:960px;margin:1.25rem auto 0;
+}
+.intro-step{
+  display:flex;gap:14px;align-items:flex-start;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:1.1rem 1.25rem;
+  transition:border-color .18s,transform .18s;
+}
+.intro-step:hover{border-color:var(--border2);transform:translateY(-2px)}
+.intro-step-num{
+  font-family:var(--barlow);font-size:28px;font-weight:800;
+  line-height:1;flex-shrink:0;margin-top:1px;
+  background:linear-gradient(135deg,var(--step-color,var(--red)) 0%,transparent 120%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.intro-step-title{font-size:12px;font-weight:700;color:var(--ink);font-family:var(--display);margin-bottom:4px;letter-spacing:.3px}
+.intro-step-desc{font-size:11px;font-family:var(--mono);color:var(--ink3);line-height:1.6}
+
+/* ── FOOTER NOTE ── */
+.intro-footer-note{
+  max-width:960px;margin:2rem auto 0;
+  padding:14px 18px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+
+.intro-team-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(61,142,240,.08);border:1px solid rgba(61,142,240,.25);
+  border-radius:var(--radius);padding:5px 14px 5px 10px;
+  font-size:11px;font-family:var(--mono);color:var(--blue);font-weight:700;
+  margin-top:10px;position:relative;z-index:2;
+}
+.intro-team-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0;
+  box-shadow:0 0 6px rgba(61,142,240,.6)}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:var(--paper2);border-radius:0}
+::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,#f40219 0%,#9c0010 100%);
+  border-radius:2px;
+  border:1px solid #8a0012;
+  transition:background .15s;
+}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#f40219 0%,#c40118 100%)}
+::-webkit-scrollbar-thumb:active{background:linear-gradient(180deg,#f40219 0%,#c40118 100%)}
+::-webkit-scrollbar-corner{background:var(--paper2)}
+/* Firefox */
+*{scrollbar-width:thin;scrollbar-color:#8a0012 var(--paper2)}
+
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height:100vh;display:flex;flex-direction:row;
+  background-image:radial-gradient(ellipse at 0% 0%,rgba(244,2,25,.04) 0%,transparent 50%),
+                   radial-gradient(ellipse at 100% 100%,rgba(61,142,240,.04) 0%,transparent 50%);}
+
 /* ── SIDEBAR ── */
 #sidebar{
-  width:52px;min-width:52px;max-width:52px;
+  width:44px;min-width:44px;max-width:44px;
   background:var(--paper);border-right:1px solid var(--border);
   position:sticky;top:0;height:100vh;overflow:visible;
   display:flex;flex-direction:column;flex-shrink:0;
   z-index:200;
-  transition:width .28s cubic-bezier(.4,0,.2,1), min-width .28s cubic-bezier(.4,0,.2,1), max-width .28s cubic-bezier(.4,0,.2,1);
+  transition:width .28s linear, min-width .28s linear, max-width .28s linear;
 }
 /* Floating expanded rail */
 .sb-rail{
   display:flex;flex-direction:column;align-items:center;
-  width:52px;height:100vh;padding:10px 0;gap:2px;
+  width:44px;height:100vh;padding:6px 0;gap:1px;
   position:absolute;top:0;left:0;
   background:var(--paper);border-right:1px solid var(--border);
   overflow:hidden;overflow-y:auto;
-  transition:width .28s cubic-bezier(.4,0,.2,1), box-shadow .28s ease;
+  transition:width .28s linear, box-shadow .28s linear;
   will-change:width;
 }
 .sb-rail.is-open{
-  width:200px;
+  width:185px;
   box-shadow:6px 0 28px rgba(0,0,0,.35);
 }
 #appShell{flex:1;min-width:0;width:0;overflow-x:hidden;overflow-y:scroll;scrollbar-gutter:stable;display:block}
@@ -438,7 +778,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
   #sidebar{width:100%;max-width:100%!important;min-width:0!important;height:auto;position:relative;
     border-right:none;border-bottom:1px solid var(--border);}
   .sb-rail{position:relative;flex-direction:row;height:auto;width:100%!important;
-    padding:6px 8px;overflow-x:auto;box-shadow:none!important;border-right:none}
+    padding:4px 6px;overflow-x:auto;box-shadow:none!important;border-right:none}
   #appShell{width:100%}
 }
 
@@ -446,51 +786,51 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 .sb-toggle-bar{display:none}
 
 /* Top section: branding + nav */
-.sb-rail-top{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;width:100%}
+.sb-rail-top{display:flex;flex-direction:column;align-items:center;gap:1px;flex:1;width:100%}
 
 /* Bottom section */
-.sb-rail-bottom{display:flex;flex-direction:column;align-items:center;gap:2px;padding-bottom:6px;width:100%}
+.sb-rail-bottom{display:flex;flex-direction:column;align-items:center;gap:1px;padding-bottom:4px;width:100%}
 
 /* Logo / branding */
 .sb-brand{
-  width:36px;height:36px;border-radius:8px;margin-bottom:4px;
+  width:30px;height:30px;border-radius:7px;margin-bottom:2px;
   display:flex;align-items:center;justify-content:center;overflow:hidden;
   background:transparent;color:#fff;font-family:var(--barlow);
-  font-size:11px;font-weight:800;letter-spacing:.5px;cursor:default;
+  font-size:10px;font-weight:800;letter-spacing:.5px;cursor:default;
   flex-shrink:0;user-select:none;
-  transition:width .3s cubic-bezier(.4,0,.2,1), border-radius .3s;
+  transition:width .3s linear, border-radius .3s linear;
 }
 .sb-brand.team-mode{background:var(--blue)}
-.sb-rail.is-open .sb-brand{width:calc(200px - 16px);padding:0 9px}
+.sb-rail.is-open .sb-brand{width:calc(185px - 14px);padding:0 8px}
 
-/* Icon button — uses a fixed 36px icon slot so the icon never moves */
+/* Icon button — uses a fixed 30px icon slot so the icon never moves */
 .sb-icon-btn{
   position:relative;
-  width:36px;height:36px;border-radius:8px;
+  width:30px;height:30px;border-radius:6px;
   display:flex;align-items:center;
   cursor:pointer;
   color:var(--ink3);background:transparent;border:none;
   text-decoration:none;flex-shrink:0;overflow:hidden;
-  transition:background .12s, color .12s, width .3s cubic-bezier(.4,0,.2,1);
+  transition:background .12s, color .12s, width .3s linear;
 }
 .sb-icon-btn:hover{background:var(--paper3);color:var(--ink)}
-/* Icon always lives in a fixed 36px slot — never moves */
+/* Icon always lives in a fixed 30px slot — never moves */
 .sb-icon-btn svg{
-  width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75;
+  width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.75;
   stroke-linecap:round;stroke-linejoin:round;
-  flex-shrink:0;margin:0 9px;
-  transition:transform .3s cubic-bezier(.4,0,.2,1);
+  flex-shrink:0;margin:0 7px;
+  transition:transform .3s linear;
 }
-.sb-rail.is-open .sb-icon-btn{width:calc(200px - 16px);border-radius:7px}
+.sb-rail.is-open .sb-icon-btn{width:calc(185px - 14px);border-radius:6px}
 .sb-rail.is-open .sb-icon-btn::after{display:none}
-.sb-rail.is-open .sb-divider{width:calc(200px - 24px)}
+.sb-rail.is-open .sb-divider{width:calc(185px - 20px)}
 
 /* Expand/pin button */
-#sbExpandBtn{transition:background .12s, color .12s, width .3s cubic-bezier(.4,0,.2,1)}
+#sbExpandBtn{transition:background .12s, color .12s, width .3s linear}
 .sb-rail.is-open #sbExpandBtn svg{transform:rotate(180deg)}
 
 /* Divider */
-.sb-divider{width:24px;height:1px;background:var(--border);margin:4px 0;flex-shrink:0;transition:width .3s cubic-bezier(.4,0,.2,1)}
+.sb-divider{width:20px;height:1px;background:var(--border);margin:2px 0;flex-shrink:0;transition:width .3s linear}
 
 /* Tooltip */
 .sb-icon-btn::after{
@@ -506,7 +846,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 
 /* External link dot */
 .sb-icon-btn .sb-ext-dot{
-  position:absolute;top:4px;right:4px;width:5px;height:5px;
+  position:absolute;top:3px;right:3px;width:4px;height:4px;
   border-radius:50%;background:var(--ink3);opacity:.4;
 }
 
@@ -514,27 +854,44 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 .sb-icon-btn.nav-active{color:var(--ink);background:var(--paper3)}
 .sb-icon-btn.nav-active::before{
   content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
-  width:3px;height:18px;border-radius:0 2px 2px 0;background:var(--red);
+  width:2px;height:14px;border-radius:0 2px 2px 0;background:var(--red);
 }
 .sb-icon-btn.nav-active.team-nav::before{background:var(--blue)}
 
 /* Labels — clip to zero width when closed, slide in when open */
 .sb-label{
-  font-size:12px;font-family:var(--mono);white-space:nowrap;
+  font-size:11px;font-family:var(--mono);white-space:nowrap;
   width:0;overflow:hidden;flex-shrink:1;
   opacity:0;
-  transition:width .3s cubic-bezier(.4,0,.2,1), opacity .22s ease;
+  transition:width .3s linear, opacity .22s linear;
 }
-.sb-rail.is-open .sb-label{width:130px;opacity:1}
+.sb-rail.is-open .sb-label{width:120px;opacity:1}
 
-/* Section labels */
+/* Section labels — zero space when collapsed, animate in when open */
 .sb-nav-section-label{
-  font-size:9px;font-family:var(--mono);text-transform:uppercase;
-  letter-spacing:1px;color:var(--ink3);padding:0 10px;font-weight:600;width:100%;
-  height:0;overflow:hidden;opacity:0;
-  transition:height .3s cubic-bezier(.4,0,.2,1), opacity .22s ease, padding .3s cubic-bezier(.4,0,.2,1);
+  font-size:8px;font-family:var(--mono);text-transform:uppercase;
+  letter-spacing:1px;color:var(--ink3);font-weight:600;width:100%;
+  height:18px;overflow:hidden;opacity:1;
+  display:flex;align-items:center;justify-content:center;
+  padding:0;margin:1px 0;
+  transition:height .3s linear, opacity .22s linear,
+             padding .3s linear, justify-content .3s linear;
 }
-.sb-rail.is-open .sb-nav-section-label{height:22px;opacity:1;padding:4px 10px 2px}
+/* Collapsed: show a short coloured tick mark instead of text */
+.sb-nav-section-label::before{
+  content:''; display:block;
+  width:14px;height:1px;background:var(--border2);border-radius:1px;
+  flex-shrink:0;
+  transition:width .3s linear, opacity .22s linear;
+}
+.sb-nav-section-label span{
+  width:0;overflow:hidden;opacity:0;white-space:nowrap;
+  transition:width .3s linear, opacity .22s linear, margin .3s linear;
+  margin-left:0;
+}
+.sb-rail.is-open .sb-nav-section-label{justify-content:flex-start;padding:0 8px}
+.sb-rail.is-open .sb-nav-section-label::before{width:0;opacity:0;margin:0}
+.sb-rail.is-open .sb-nav-section-label span{width:auto;opacity:1;margin-left:0}
 
 /* Team badge */
 .sb-brand-team-num{font-size:9px;font-weight:800;font-family:var(--barlow);letter-spacing:.5px;text-align:center;line-height:1.1}
@@ -794,18 +1151,18 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 .admin-visible.admin-only.sb-divider{display:block!important}
 .admin-visible.admin-only.sb-nav-section-label{display:block!important}
 /* Make admin section labels reflow properly when shown */
-.sb-rail.is-open .sb-nav-section-label.admin-visible{height:22px;opacity:1;padding:4px 10px 2px}
+.sb-rail.is-open .sb-nav-section-label.admin-visible{justify-content:flex-start;padding:0 10px;height:20px}
 
 /* ── PANELS ── */
 .panel{display:none;opacity:0;width:100%}
-.panel.active{display:block;width:100%;animation:panelIn .28s cubic-bezier(.22,.68,0,1.2) forwards}
+.panel.active{display:block;width:100%;animation:panelIn .45s linear forwards}
 .panel.exit{display:none;pointer-events:none}
-@keyframes panelIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@keyframes panelOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-6px)}}
+@keyframes panelIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes panelOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-12px)}}
 .page{max-width:1100px;margin:0 auto;padding:1.5rem 1.5rem}
 
 /* ── VIEWER LOCK (blur gate for unauthenticated users) ── */
-.viewer-locked-panel{position:relative;min-height:420px;overflow:hidden;max-height:520px}
+.viewer-locked-panel{position:relative;min-height:420px;overflow:hidden;max-height:100vh}
 /* blur all child elements except the gate overlay */
 .viewer-locked-panel > *:not(.viewer-lock-gate){
   filter:blur(6px) saturate(.5);
@@ -814,10 +1171,10 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
   overflow:hidden;max-height:460px;
 }
 .viewer-lock-gate{
-  position:absolute;top:0;left:0;right:0;z-index:50;
-  display:flex;align-items:flex-start;justify-content:center;
+  position:absolute;inset:0;z-index:50;
+  display:flex;align-items:center;justify-content:center;
   padding:2rem;
-  background:linear-gradient(to bottom,rgba(17,18,16,.92) 60%,rgba(17,18,16,.55) 100%);
+  background:rgba(17,18,16,.7);
 }
 .viewer-lock-card{
   background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);
@@ -864,8 +1221,26 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 /* Tab lock indicator */
 .tab.viewer-gated{position:relative}
 .tab.viewer-gated::after{
-  content:'\1F512';font-size:8px;position:absolute;top:6px;right:4px;
-  opacity:.55;line-height:1;
+  content:'';
+  display:inline-block;
+  width:10px;height:10px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235c5852' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2'/%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'/%3E%3C/svg%3E");
+  background-size:contain;background-repeat:no-repeat;
+  position:absolute;top:5px;right:5px;
+  opacity:.7;line-height:1;
+  pointer-events:none;
+}
+
+/* Sidebar icon button lock badge */
+.sb-icon-btn.viewer-gated{position:relative}
+.sb-icon-btn.viewer-gated::after{
+  content:'';
+  position:absolute;top:2px;right:2px;
+  width:9px;height:9px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235c5852' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2'/%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'/%3E%3C/svg%3E");
+  background-size:contain;background-repeat:no-repeat;
+  opacity:.65;pointer-events:none;
+  border-radius:2px;
 }
 
 /* ── TOAST NOTIFICATION ── */
@@ -2230,29 +2605,44 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
 
     <!-- Branding -->
     <div class="sb-brand" id="sbBrand" title="Override Scout · 97230F">
-      <img src="olog.webp" alt="Override Scout" style="width:28px;height:28px;object-fit:contain;flex-shrink:0">
+      <img src="olog.webp" alt="Override Scout" style="width:28px;height:28px;object-fit:contain;flex-shrink:0;margin-left:4px">
       <span class="sb-label" style="display:flex;align-items:center;gap:6px;width:130px;padding-left:6px">
         Override Scout
       </span>
     </div>
 
-    <!-- Auth block (sign in / sign up / account type) — only visible when sidebar is open -->
-    <div class="sb-auth-block" id="sbAuthBlock">
-      <div class="sb-auth-row">
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink3);flex-shrink:0"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <span class="mode-badge mode-pub" id="modeBadge">Viewer</span>
-        <div class="sync-dot" id="syncDot" style="flex-shrink:0;margin-left:2px"></div>
+    <!-- Auth slot — fixed height so nav items never shift when auth block opens -->
+    <div class="sb-auth-slot">
+      <!-- Mini auth buttons — visible when sidebar is collapsed -->
+      <div class="sb-mini-auth" id="sbMiniAuth">
+        <!-- Account type pill — always shown at top -->
+        <div class="sb-mini-acct" id="miniAcctType">View</div>
+        <!-- Sign-in mini button (blue) — hidden when logged in -->
+        <button class="sb-mini-signin" id="miniSigninBtn" onclick="openLoginModal()" data-tip="Sign In" title="Sign In">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        </button>
+        <!-- Sign-out mini button (red ✕) — hidden when not logged in -->
+        <button class="sb-mini-signout" id="miniSignoutBtn" onclick="logout()" data-tip="Sign Out" title="Sign Out" style="display:none">&#10005;</button>
       </div>
-      <div class="sb-auth-btns">
-        <span id="syncTxt" style="display:none"></span>
-        <button class="btn-admin-trigger" id="signupBtn" onclick="openSignupModal()" style="border-color:rgba(61,142,240,.4);color:var(--blue);width:100%">Sign Up</button>
-        <button class="btn-admin-trigger" id="adminLoginBtn" onclick="openLoginModal()" style="width:100%">Sign In</button>
-        <button class="btn-sm danger" id="logoutBtn" onclick="logout()" style="display:none;width:100%">Log Out</button>
+
+      <!-- Auth block (sign in / sign up / account type) — only visible when sidebar is open -->
+      <div class="sb-auth-block" id="sbAuthBlock">
+        <div class="sb-auth-row" style="padding:0 8px">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink3);flex-shrink:0"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span class="mode-badge mode-pub" id="modeBadge">Viewer</span>
+          <div class="sync-dot" id="syncDot" style="flex-shrink:0;margin-left:2px"></div>
+        </div>
+        <div class="sb-auth-btns" style="padding:0 8px">
+          <span id="syncTxt" style="display:none"></span>
+          <button class="btn-admin-trigger" id="signupBtn" onclick="openSignupModal()" style="border-color:rgba(61,142,240,.4);color:var(--blue);width:100%">Sign Up</button>
+          <button class="btn-admin-trigger" id="adminLoginBtn" onclick="openLoginModal()" style="width:100%">Sign In</button>
+          <button class="btn-sm danger" id="logoutBtn" onclick="logout()" style="display:none;width:100%">Log Out</button>
+        </div>
       </div>
     </div>
 
     <!-- Expand / collapse -->
-    <button class="sb-icon-btn" id="sbExpandBtn" data-tip="Pin sidebar open" onclick="toggleSidebarExpand()" aria-label="Pin sidebar" style="margin-bottom:4px">
+    <button class="sb-icon-btn" id="sbExpandBtn" data-tip="Pin sidebar open" onclick="toggleSidebarExpand()" aria-label="Pin sidebar" style="margin-top:10px;margin-bottom:4px">
       <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
       <span class="sb-label" id="sbPinLabel" style="font-size:11px;color:var(--ink3)">Pin open</span>
     </button>
@@ -2265,7 +2655,7 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
       <span class="sb-label">My Team</span>
     </button>
 
-    <div class="sb-nav-section-label">Navigation</div>
+    <div class="sb-nav-section-label"><span>Navigation</span></div>
 
     <!-- Home -->
     <button class="sb-icon-btn nav-active" data-tab-target="intro" data-tip="Home" onclick="sidebarNav('intro')" aria-label="Home">
@@ -2335,7 +2725,7 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
 
     <div class="sb-divider admin-only" style="display:none"></div>
 
-    <div class="sb-nav-section-label admin-only">Admin</div>
+    <div class="sb-nav-section-label admin-only"><span>Admin</span></div>
 
     <!-- Add Entry (admin only) -->
     <button class="sb-icon-btn admin-only" data-tab-target="add" data-tip="Add Entry" onclick="sidebarNav('add')" aria-label="Add Entry" style="display:none">
@@ -2369,7 +2759,7 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
 
     <div class="sb-divider"></div>
 
-    <div class="sb-nav-section-label">External</div>
+    <div class="sb-nav-section-label"><span>External</span></div>
 
     <!-- External: Instagram -->
     <a class="sb-icon-btn" href="https://www.instagram.com/97230f/" target="_blank" rel="noopener" data-tip="Instagram ↗" aria-label="Instagram">
@@ -5402,6 +5792,35 @@ function ulSeedNewVersions() {
     { id: 'e_seed_3380_4', tag: 'ux', text: '"Search Teams" sidebar label shortened to "Search"; duplicate search/leaderboard button removed — a single Search entry navigates to the leaderboard and focuses the search input', versionId: 'v_seed_3380' },
   ]);
 
+  addVersion('v_seed_3440', 'v3.44.0', 'Pin Button Spacing &amp; Panel Animation Polish', [
+    { id: 'e_seed_3440_1', tag: 'ux', text: 'Pin open button moved down 10px — was overlapping auth block above', versionId: 'v_seed_3440' },
+    { id: 'e_seed_3440_2', tag: 'ux', text: 'Tab entry/exit animation smoothed — <code>cubic-bezier(0.16,1,0.3,1)</code> easeOutExpo at 0.45s; entry slides up 18px, exit drops 12px for a natural feel', versionId: 'v_seed_3440' },
+  ]);
+
+  addVersion('v_seed_3430', 'v3.43.0', 'Sidebar Animation &amp; Admin Section Fix', [
+    { id: 'e_seed_3430_1', tag: 'ux', text: 'Sidebar open/close uses <code>cubic-bezier(0.87,0,0.13,1)</code> (easeInOutExpo) at 0.38s — exponential feel, snappy start and end', versionId: 'v_seed_3430' },
+    { id: 'e_seed_3430_2', tag: 'fix', text: 'Admin section label height fixed to 20px when open — was inheriting wrong height causing spacing inconsistency vs Navigation and External labels', versionId: 'v_seed_3430' },
+  ]);
+
+  addVersion('v_seed_3420', 'v3.42.0', 'Sidebar Section Labels Always Visible', [
+    { id: 'e_seed_3420_1', tag: 'ux', text: 'Section labels (Navigation, Admin, External) now always visible in collapsed sidebar as a short horizontal rule; text slides in when sidebar is pinned open — no layout shift', versionId: 'v_seed_3420' },
+  ]);
+
+  addVersion('v_seed_3410', 'v3.41.0', 'Sidebar Section Labels — No Layout Shift', [
+    { id: 'e_seed_3410_1', tag: 'fix', text: 'Section labels (Navigation, Admin, External) now take strictly zero space when sidebar is collapsed — <code>padding:0;margin:0</code> added to collapsed state and both animate via CSS transitions; icons never shift on open/close', versionId: 'v_seed_3410' },
+  ]);
+
+  addVersion('v_seed_3400', 'v3.40.0', 'Sidebar Layout Polish', [
+    { id: 'e_seed_3400_1', tag: 'ux', text: 'Account type pill moved above sign-in/sign-out buttons in collapsed sidebar mini-auth stack', versionId: 'v_seed_3400' },
+    { id: 'e_seed_3400_2', tag: 'ux', text: 'Sidebar logo shifted right via <code>margin-left:4px</code> to align with icon buttons below', versionId: 'v_seed_3400' },
+    { id: 'e_seed_3400_3', tag: 'fix', text: '<code>.sb-auth-slot</code> height increased to 80px to accommodate pill + sign-in + sign-out stack without overflow; slot <code>min/max-height</code> enforced so section headers (NAV, ADMIN, EXTERNAL) never shift vertically', versionId: 'v_seed_3400' },
+  ]);
+
+  addVersion('v_seed_3390', 'v3.39.0', 'Sidebar Auth UX — Hollow Mini Buttons &amp; No Vertical Shift', [
+    { id: 'e_seed_3390_1', tag: 'fix', text: 'Sidebar no longer shifts nav items vertically when the auth block opens — <code>.sb-auth-slot</code> now enforces <code>max-height:36px</code> and the auth block floats absolutely over content with <code>z-index:20</code> and a drop shadow', versionId: 'v_seed_3390' },
+    { id: 'e_seed_3390_2', tag: 'ux', text: 'Mini auth buttons (collapsed sidebar) are now hollow outline-only — sign-in button uses blue border/text with transparent fill; sign-out button uses red border/text with transparent fill; both fill solid on hover; account type pill uses transparent background with border only', versionId: 'v_seed_3390' },
+  ]);
+
   if (changed) {
     state.edits       = edits;
     state.vblock_edits = vblocks;
@@ -5619,6 +6038,7 @@ async function tryLogin() {
       document.getElementById('logoutBtn').style.display = '';
       document.getElementById('adminLoginBtn').style.display = 'none';
       document.getElementById('signupBtn').style.display = 'none';
+      updateMiniAuth('team', teamNum);
 
       // Update sidebar branding to show team number in blue
       applyTeamUserSidebar(teamNum);
@@ -5650,6 +6070,7 @@ async function tryLogin() {
       document.getElementById('logoutBtn').style.display = '';
       document.getElementById('adminLoginBtn').style.display = 'none';
       document.getElementById('signupBtn').style.display = 'none';
+      updateMiniAuth('admin');
       applyViewerGates(true);
       renderLog();
       renderCalList();
@@ -5700,12 +6121,27 @@ async function logout() {
   document.getElementById('logoutBtn').style.display = 'none';
   document.getElementById('adminLoginBtn').style.display = '';
   document.getElementById('signupBtn').style.display = '';
+  updateMiniAuth('viewer');
   applyViewerGates(false);
   const _lbTabBtn = document.querySelector('[data-tab="leaderboard"]');
   if (_lbTabBtn) _lbTabBtn.click();
   renderCalList();
   applyUpdatesAdminState();
   if (typeof window._ulApplyDragMode === 'function') window._ulApplyDragMode();
+}
+
+/* ── Mini auth button state helper ── */
+function updateMiniAuth(role, label) {
+  const signinBtn   = document.getElementById('miniSigninBtn');
+  const signoutBtn  = document.getElementById('miniSignoutBtn');
+  const acctPill    = document.getElementById('miniAcctType');
+  if (!signinBtn || !signoutBtn || !acctPill) return;
+  const loggedIn = role && role !== 'viewer';
+  signinBtn.style.display  = loggedIn ? 'none' : '';
+  signoutBtn.style.display = loggedIn ? '' : 'none';
+  if (role === 'admin')       { acctPill.textContent = 'Admin'; acctPill.style.color = 'var(--red)'; acctPill.style.borderColor = 'rgba(244,2,25,.3)'; }
+  else if (role === 'team')   { acctPill.textContent = label || 'Team'; acctPill.style.color = 'var(--blue)'; acctPill.style.borderColor = 'rgba(61,142,240,.3)'; }
+  else                        { acctPill.textContent = 'View'; acctPill.style.color = ''; acctPill.style.borderColor = ''; }
 }
 function applyTeamUserSidebar(teamNum) {
   const brand = document.getElementById('sbBrand');
@@ -5969,15 +6405,18 @@ function applyViewerGates(admin) {
   VIEWER_GATED_TABS.forEach(function(tabId) {
     var panel = document.getElementById('tab-' + tabId);
     var tabBtn = document.querySelector('.tab[data-tab="' + tabId + '"]');
+    var sbBtn = document.querySelector('.sb-icon-btn[data-tab-target="' + tabId + '"]');
     if (!panel) return;
     if (!admin) {
       if (tabBtn) tabBtn.classList.add('viewer-gated');
+      if (sbBtn) sbBtn.classList.add('viewer-gated');
       panel.classList.add('viewer-locked-panel');
       if (!panel.querySelector('.viewer-lock-gate')) {
         panel.appendChild(buildLockGate());
       }
     } else {
       if (tabBtn) tabBtn.classList.remove('viewer-gated');
+      if (sbBtn) sbBtn.classList.remove('viewer-gated');
       panel.classList.remove('viewer-locked-panel');
       var gate = panel.querySelector('.viewer-lock-gate');
       if (gate) gate.remove();
@@ -6000,6 +6439,7 @@ function launchApp(admin) {
   applyViewerGates(admin);
   document.getElementById('logoutBtn').style.display = admin ? '' : 'none';
   document.getElementById('adminLoginBtn').style.display = admin ? 'none' : '';
+  updateMiniAuth(admin ? 'admin' : 'viewer');
   // Only fetch from the network on first load; subsequent calls (e.g. after login)
   // just re-render with already-loaded data to avoid redundant network requests.
   if (!allEntries.length) {
@@ -6549,7 +6989,9 @@ async function saveUpdates() {
       stampIds();
       const newId = 'ul_new_' + Date.now();
       const newEl = buildEntryEl(newId, _ulSelectedTag, text);
-      targetVb.querySelector('.ul-entries').appendChild(newEl);
+      newEl.querySelectorAll('.admin-only').forEach(function(el) { el.classList.add('admin-visible'); });
+      const entriesContainer = targetVb.querySelector('.ul-entries');
+      entriesContainer.prepend(newEl);
       edits.push({ id: newId, tag: _ulSelectedTag, text: text, isNew: true, versionId: targetVb.dataset.ulVid });
       saveEdits(edits);
       showToast('Entry added', 'ok');
