@@ -42,7 +42,7 @@ html.light{
   --ink:#1a1917;--ink2:#4a4844;--ink3:#8a8680;
   --paper:#f5f4f0;--paper2:#eceae5;--paper3:#e2e0da;
   --surface:#ffffff;--surface2:#f0eeea;--border:#d4d1cb;--border2:#c4c1bb;
-  --red-bg:rgba(244,2,25,.10);--red-text:#f40219;
+  --red-bg:rgba(244,2,25,.10);--red-text:#d40016;
   --blue-bg:rgba(61,142,240,.10);
   --green-bg:rgba(61,189,110,.10);
   --amber-bg:rgba(240,192,48,.10);
@@ -52,6 +52,72 @@ html.light body{
   background-image:radial-gradient(ellipse at 0% 0%,rgba(244,2,25,.035) 0%,transparent 50%),
                    radial-gradient(ellipse at 100% 100%,rgba(61,142,240,.035) 0%,transparent 50%);
 }
+
+/* ── Sidebar: lighter shadow ── */
+html.light .sb-rail.is-open{box-shadow:4px 0 20px rgba(0,0,0,.10)}
+
+/* ── Hero ── */
+html.light .intro-hero{background:var(--paper2)}
+html.light .intro-hero::before{
+  background-image:
+    linear-gradient(rgba(244,2,25,.13) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(244,2,25,.13) 1px,transparent 1px);
+}
+html.light .intro-hero::after{
+  background:
+    radial-gradient(ellipse 60% 55% at 20% 30%,rgba(244,2,25,.20) 0%,transparent 70%),
+    radial-gradient(ellipse 50% 45% at 80% 60%,rgba(61,142,240,.12) 0%,transparent 70%),
+    radial-gradient(ellipse 40% 40% at 50% 100%,rgba(200,180,0,.05) 0%,transparent 70%);
+}
+html.light .intro-hero-scanline{
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.02) 2px,rgba(0,0,0,.02) 4px);
+}
+html.light .intro-logo-wrap{
+  box-shadow:0 0 0 1px rgba(0,0,0,.10),0 0 28px rgba(244,2,25,.30),0 12px 32px rgba(0,0,0,.10);
+  animation:logoPulseLight 3s ease-in-out infinite;
+}
+@keyframes logoPulseLight{
+  0%,100%{box-shadow:0 0 0 1px rgba(0,0,0,.10),0 0 28px rgba(244,2,25,.30),0 12px 32px rgba(0,0,0,.10)}
+  50%{box-shadow:0 0 0 1px rgba(0,0,0,.14),0 0 46px rgba(244,2,25,.52),0 12px 32px rgba(0,0,0,.10)}
+}
+html.light .intro-headline{color:var(--ink);text-shadow:0 0 50px rgba(244,2,25,.16)}
+html.light .intro-headline span{color:var(--red-text);-webkit-text-stroke:.5px rgba(244,2,25,.20)}
+html.light .intro-sub{color:var(--ink3)}
+html.light .intro-cta-secondary{
+  background:rgba(0,0,0,.04);color:var(--ink2);border:1px solid var(--border2);
+}
+html.light .intro-cta-secondary:hover{background:rgba(0,0,0,.07);color:var(--ink);border-color:var(--border2);transform:translateY(-2px)}
+html.light .intro-cta-primary{box-shadow:0 4px 18px rgba(244,2,25,.38),0 0 0 1px rgba(0,0,0,.06)}
+html.light .intro-stats{background:var(--surface);border:1px solid var(--border);backdrop-filter:none}
+html.light .intro-stat{border-right-color:var(--border)}
+html.light .intro-stat-val{color:var(--ink)}
+html.light .intro-stat-lbl{color:var(--ink3)}
+
+/* ── Toasts ── */
+html.light #toast{box-shadow:0 4px 16px rgba(0,0,0,.12)}
+html.light #toast.ok{box-shadow:0 4px 16px rgba(0,0,0,.12),var(--glow-blue)}
+html.light #toast.err{box-shadow:0 4px 16px rgba(0,0,0,.12),var(--glow-red)}
+
+/* ── Modals ── */
+html.light .login-modal-bg,
+html.light .signup-modal-bg,
+html.light .overlay,
+html.light #ul-editor-modal-bg,
+html.light #ul-subheading-modal-bg,
+html.light #ul-vblock-modal-bg,
+html.light #pit-modal-bg,
+html.light #event-detail-modal-bg,
+html.light #tsconfig-modal-bg{background:rgba(100,95,88,.45);backdrop-filter:blur(4px)}
+html.light .login-modal{box-shadow:0 0 0 1px var(--border),0 16px 40px rgba(0,0,0,.14),var(--glow-red)}
+html.light .signup-modal{box-shadow:0 0 0 1px var(--border),0 16px 40px rgba(0,0,0,.14),var(--glow-blue)}
+
+/* ── Misc ── */
+html.light .sb-team-num-big{text-shadow:0 0 12px rgba(61,142,240,.2)}
+html.light .cal-event-sig{box-shadow:0 0 0 1px rgba(240,192,48,.25),0 2px 8px rgba(0,0,0,.08)!important}
+html.light .cal-event-card.is-sig:hover{box-shadow:0 0 0 1px rgba(240,192,48,.4),0 6px 20px rgba(240,192,48,.12),0 4px 14px rgba(0,0,0,.09)!important}
+html.light .cal-event-card.is-live:hover{box-shadow:0 0 0 1px rgba(61,189,110,.4),0 6px 20px rgba(61,189,110,.12),0 4px 14px rgba(0,0,0,.09)!important}
+html.light #il-donate-inner{box-shadow:0 6px 20px rgba(0,0,0,.10),0 1px 4px rgba(0,0,0,.06)}
+html.light .sb-auth-block{box-shadow:0 4px 16px rgba(0,0,0,.08)}
 html.light .about-logo{filter:brightness(0)!important;opacity:.7!important;mix-blend-mode:normal!important}
 html.light select option{background:var(--surface);color:var(--ink)}
 
@@ -102,9 +168,6 @@ html.light select option{background:var(--surface);color:var(--ink)}
   flex-shrink:0;
   position:relative;
   overflow:visible;
-  /* Ensure this never grows even when child expands */
-  min-height:44px;
-  max-height:44px;
 }
 /* ── SIDEBAR AUTH BLOCK ── */
 /* Expanded auth panel — floats over the rail content, doesn't push items */
@@ -453,7 +516,6 @@ body.calc-sidebyside #tab-predict.active #auton-calc-panel {
   background:linear-gradient(180deg,#f40219 0%,#9c0010 100%);
   border-radius:2px;
   border:1px solid #8a0012;
-  transition:background .15s;
 }
 ::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#f40219 0%,#c40118 100%)}
 ::-webkit-scrollbar-thumb:active{background:linear-gradient(180deg,#f40219 0%,#c40118 100%)}
@@ -485,7 +547,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
   position:absolute;top:0;left:0;
   background:var(--paper);border-right:1px solid var(--border);
   overflow:hidden;overflow-y:auto;
-  transition:width .28s linear, box-shadow .28s linear;
+  transition:width .32s cubic-bezier(0.87,0,0.13,1), box-shadow .32s ease;
   will-change:width;
 }
 .sb-rail.is-open{
@@ -518,7 +580,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
   background:transparent;color:#fff;font-family:var(--barlow);
   font-size:10px;font-weight:800;letter-spacing:.5px;cursor:default;
   flex-shrink:0;user-select:none;
-  transition:width .3s linear, border-radius .3s linear;
+  transition:width .32s cubic-bezier(0.87,0,0.13,1), border-radius .3s ease;
 }
 .sb-brand.team-mode{background:var(--blue)}
 .sb-rail.is-open .sb-brand{width:calc(185px - 14px);padding:0 8px}
@@ -531,7 +593,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
   cursor:pointer;
   color:var(--ink3);background:transparent;border:none;
   text-decoration:none;flex-shrink:0;overflow:hidden;
-  transition:background .12s, color .12s, width .3s linear;
+  transition:background .15s ease, color .15s ease, width .32s cubic-bezier(0.87,0,0.13,1);
 }
 .sb-icon-btn:hover{background:var(--paper3);color:var(--ink)}
 /* Icon always lives in a fixed 30px slot — never moves */
@@ -539,18 +601,18 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
   width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.75;
   stroke-linecap:round;stroke-linejoin:round;
   flex-shrink:0;margin:0 7px;
-  transition:transform .3s linear;
+  transition:transform .32s cubic-bezier(0.87,0,0.13,1);
 }
 .sb-rail.is-open .sb-icon-btn{width:calc(185px - 14px);border-radius:6px}
 .sb-rail.is-open .sb-icon-btn::after{display:none}
 .sb-rail.is-open .sb-divider{width:calc(185px - 20px)}
 
 /* Expand/pin button */
-#sbExpandBtn{transition:background .12s, color .12s, width .3s linear}
+#sbExpandBtn{transition:background .15s ease, color .15s ease, width .32s cubic-bezier(0.87,0,0.13,1)}
 .sb-rail.is-open #sbExpandBtn svg{transform:rotate(180deg)}
 
 /* Divider */
-.sb-divider{width:20px;height:1px;background:var(--border);margin:2px 0;flex-shrink:0;transition:width .3s linear}
+.sb-divider{width:20px;height:1px;background:var(--border);margin:2px 0;flex-shrink:0;transition:width .32s cubic-bezier(0.87,0,0.13,1)}
 
 /* Tooltip */
 .sb-icon-btn::after{
@@ -559,7 +621,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
   background:var(--paper3);border:1px solid var(--border2);color:var(--ink);
   font-size:11px;font-family:var(--mono);white-space:nowrap;
   padding:4px 10px;border-radius:5px;pointer-events:none;
-  opacity:0;transition:opacity .12s;z-index:9999;
+  opacity:0;transition:opacity .15s ease;z-index:9999;
 }
 .sb-icon-btn:hover::after{opacity:1}
 @media(max-width:768px){.sb-icon-btn::after{display:none}}
@@ -570,11 +632,18 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
   border-radius:50%;background:var(--ink3);opacity:.4;
 }
 
-/* Active nav indicator */
+/* Active nav indicator — animated pill that slides in from the left */
+.sb-icon-btn::before{
+  content:'';position:absolute;left:0;top:50%;
+  width:2px;height:14px;border-radius:0 2px 2px 0;background:var(--red);
+  transform:translateY(-50%) scaleY(0);transform-origin:center;
+  transition:transform .25s cubic-bezier(0.34,1.56,0.64,1), opacity .2s ease;
+  opacity:0;
+}
 .sb-icon-btn.nav-active{color:var(--ink);background:var(--paper3)}
 .sb-icon-btn.nav-active::before{
-  content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
-  width:2px;height:14px;border-radius:0 2px 2px 0;background:var(--red);
+  transform:translateY(-50%) scaleY(1);
+  opacity:1;
 }
 .sb-icon-btn.nav-active.team-nav::before{background:var(--blue)}
 
@@ -583,9 +652,9 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
   font-size:11px;font-family:var(--mono);white-space:nowrap;
   width:0;overflow:hidden;flex-shrink:1;
   opacity:0;
-  transition:width .3s linear, opacity .22s linear;
+  transition:width .32s cubic-bezier(0.87,0,0.13,1), opacity .2s ease;
 }
-.sb-rail.is-open .sb-label{width:120px;opacity:1}
+.sb-rail.is-open .sb-label{width:120px;opacity:1;transition:width .32s cubic-bezier(0.87,0,0.13,1), opacity .22s ease .08s}
 
 /* Section labels — zero space when collapsed, animate in when open */
 .sb-nav-section-label{
@@ -594,19 +663,19 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
   height:18px;overflow:hidden;opacity:1;
   display:flex;align-items:center;justify-content:center;
   padding:0;margin:1px 0;
-  transition:height .3s linear, opacity .22s linear,
-             padding .3s linear, justify-content .3s linear;
+  transition:height .32s cubic-bezier(0.87,0,0.13,1), opacity .2s ease,
+             padding .32s cubic-bezier(0.87,0,0.13,1);
 }
 /* Collapsed: show a short coloured tick mark instead of text */
 .sb-nav-section-label::before{
   content:''; display:block;
   width:14px;height:1px;background:var(--border2);border-radius:1px;
   flex-shrink:0;
-  transition:width .3s linear, opacity .22s linear;
+  transition:width .3s ease-in-out, opacity .22s ease-in-out;
 }
 .sb-nav-section-label span{
   width:0;overflow:hidden;opacity:0;white-space:nowrap;
-  transition:width .3s linear, opacity .22s linear, margin .3s linear;
+  transition:width .3s ease-in-out, opacity .22s ease-in-out, margin .3s ease-in-out;
   margin-left:0;
 }
 .sb-rail.is-open .sb-nav-section-label{justify-content:flex-start;padding:0 8px}
@@ -857,12 +926,22 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 @media(max-width:768px){.tabs-wrap::after{display:block}}
 .tabs{display:flex;gap:0;white-space:nowrap}
 .tab{
+  position:relative;
   padding:10px 16px;font-size:10px;cursor:pointer;border:none;background:transparent;
   color:var(--ink3);border-bottom:2px solid transparent;margin-bottom:-1px;
   font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;font-weight:500;
-  transition:color .12s,background .12s,border-color .12s;
+  transition:color .2s cubic-bezier(0.22,1,0.36,1),background .18s ease;
 }
-.tab.active{color:var(--red-text);font-weight:700;border-bottom-color:var(--red)}
+/* Animated underline indicator — grows from centre on activation */
+.tab::after{
+  content:'';
+  position:absolute;bottom:-1px;left:8px;right:8px;height:2px;
+  background:var(--red);border-radius:2px 2px 0 0;
+  transform:scaleX(0);transform-origin:center;
+  transition:transform .3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.tab.active{color:var(--red-text);font-weight:700;border-bottom-color:transparent}
+.tab.active::after{transform:scaleX(1)}
 .tab:hover:not(.active){color:var(--ink2);background:var(--paper3)}
 .tab.admin-only{display:none}
 .tab.admin-visible{display:block!important}
@@ -877,10 +956,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 /* ── PANELS ── */
 .panel{display:none;opacity:0;width:100%}
 #tab-roadmap{overflow:hidden;height:calc(100vh - var(--topbar-h,48px))}
-.panel.active{display:block;width:100%;animation:panelIn .45s linear forwards}
-.panel.exit{display:none;pointer-events:none}
-@keyframes panelIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-/* panelOut keyframe defined below */
+/* .panel.active / .panel.exit / @keyframes panelIn / @keyframes panelOut defined below */
 .page{max-width:1100px;margin:0 auto;padding:1.5rem 1.5rem}
 
 /* ── VIEWER LOCK (blur gate for unauthenticated users) ── */
@@ -1638,7 +1714,56 @@ body.compact-mode .lb-card .stat-pill { padding:2px 4px; font-size:9px; }
 /* ═══════════════════════════════════════════════
    UPDATE LOG TAB — styles ported from logbooks.html
 ════════════════════════════════════════════════ */
-#tab-updates .ul-wrap{max-width:860px;margin:0 auto;padding:0 0 80px;position:relative}
+/* ── CHANGELOG SIDEBAR ── */
+#ul-outer-layout{display:flex;gap:0;align-items:flex-start;position:relative}
+#ul-version-sidebar{
+  width:148px;flex-shrink:0;
+  position:sticky;top:80px;
+  max-height:calc(100vh - 100px);
+  overflow-y:auto;overflow-x:hidden;
+  padding:4px 0 32px;
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent;
+  /* hide by default on narrow viewports */
+}
+#ul-version-sidebar::-webkit-scrollbar{width:3px}
+#ul-version-sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+#ul-version-sidebar .vsb-label{
+  font-family:var(--mono);font-size:9px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink3);
+  padding:0 12px 8px;display:block;border-bottom:1px solid var(--border);margin-bottom:6px;
+}
+#ul-version-sidebar .vsb-item{
+  display:block;width:100%;text-align:left;background:none;border:none;cursor:pointer;
+  padding:5px 12px;
+  font-family:var(--mono);font-size:10px;font-weight:600;
+  color:var(--ink3);border-radius:var(--radius);
+  transition:background .12s,color .12s;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  border-left:2px solid transparent;
+  line-height:1.3;
+}
+#ul-version-sidebar .vsb-item:hover{color:var(--ink);background:var(--surface2)}
+#ul-version-sidebar .vsb-item.vsb-active{
+  color:var(--red-text);background:var(--red-bg);
+  border-left-color:var(--red);
+}
+#ul-version-sidebar .vsb-item .vsb-sub{
+  display:block;font-size:9px;font-weight:400;
+  color:inherit;opacity:.65;margin-top:1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+/* drag-over highlight */
+#ul-version-sidebar .vsb-item.vsb-drag-over{
+  background:var(--blue-bg);color:var(--blue);border-left-color:var(--blue);
+}
+/* drag ghost */
+#ul-version-sidebar .vsb-item.vsb-dragging{opacity:.35}
+
+#tab-updates .ul-wrap{max-width:860px;margin:0 auto;padding:0 0 80px;position:relative;flex:1;min-width:0}
+@media(max-width:780px){
+  #ul-version-sidebar{display:none}
+  #ul-outer-layout{display:block}
+}
 #ul-dynamic-wrap{position:relative}
 #tab-updates .ul-version-block{position:relative}
 #tab-updates .ul-version-block > .ul-drag-handle{position:absolute;left:-26px;top:10px}
@@ -1759,10 +1884,39 @@ body.compact-mode .lb-card .stat-pill { padding:2px 4px; font-size:9px; }
 .rd-filter-btn.rd-cat-feat.on,.rd-filter-btn.rd-cat-ux.on,.rd-filter-btn.rd-cat-sec.on,.rd-filter-btn.rd-cat-arch.on{opacity:1}
 .rd-filter-btn:hover{color:var(--ink);background:var(--surface2)}
 #rd-add-form.admin-visible{display:block!important}
-.rd-item{cursor:grab}
+.rd-item{cursor:grab;position:relative}
 .rd-item.rd-dragging{opacity:.4;cursor:grabbing}
 .rd-col-over{background:rgba(61,142,240,.04)}
 .rd-drop-indicator{height:2px;background:var(--blue);border-radius:2px;margin:2px 0;pointer-events:none}
+/* ── Roadmap card: edit/delete overlay at top-right ── */
+.rd-item-actions-overlay{
+  position:absolute;top:6px;right:6px;
+  display:flex;gap:3px;
+  opacity:0;
+  transition:opacity .12s;
+  pointer-events:none;
+  z-index:2;
+}
+.rd-item:hover .rd-item-actions-overlay{opacity:1;pointer-events:auto}
+/* ── Column resize handle ── */
+.rd-col-resize{
+  width:5px;flex-shrink:0;cursor:col-resize;
+  background:transparent;
+  transition:background .15s;
+  position:relative;z-index:1;
+  user-select:none;
+}
+.rd-col-resize:hover,.rd-col-resize.rd-resizing{background:var(--blue);opacity:.55}
+/* ── Roadmap column 2-up grid (applied when column is wide) ── */
+.rd-col-2up{
+  display:grid!important;
+  grid-template-columns:1fr 1fr;
+  grid-auto-rows:min-content;
+  align-content:start;
+  gap:6px!important;
+}
+.rd-col-2up .rd-drop-indicator{grid-column:1/-1}
+.rd-col-2up>.empty-state{grid-column:1/-1}
 #tab-updates .ul-entry-text{font-size:13px;color:var(--ink2);line-height:1.65;font-family:var(--sans)}
 #tab-updates .ul-entry-text strong{color:var(--ink);font-weight:700}
 #tab-updates .ul-entry-text code{
@@ -2079,12 +2233,23 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:2px;padding:6px 2px;background:none;border:none;cursor:pointer;
   color:var(--ink3);font-size:9px;font-family:var(--mono);text-transform:uppercase;
-  letter-spacing:.5px;transition:color .12s,background .12s;min-width:0;
+  letter-spacing:.5px;transition:color .2s ease,background .18s ease;min-width:0;
+  position:relative;
 }
-.mbn-btn .mbn-icon{font-size:18px;line-height:1}
+/* Animated top indicator dot */
+.mbn-btn::before{
+  content:'';
+  position:absolute;top:0;left:50%;transform:translateX(-50%) scaleX(0);
+  width:22px;height:2px;border-radius:0 0 3px 3px;
+  background:var(--red);
+  transform-origin:center;
+  transition:transform .28s cubic-bezier(0.34,1.56,0.64,1);
+}
+.mbn-btn .mbn-icon{font-size:18px;line-height:1;transition:transform .28s cubic-bezier(0.34,1.56,0.64,1), filter .2s ease}
 .mbn-btn:hover{background:var(--paper3);color:var(--ink)}
 .mbn-btn.active{color:var(--red-text)}
-.mbn-btn.active .mbn-icon{filter:drop-shadow(0 0 4px rgba(244,2,25,.5))}
+.mbn-btn.active::before{transform:translateX(-50%) scaleX(1)}
+.mbn-btn.active .mbn-icon{filter:drop-shadow(0 0 4px rgba(244,2,25,.5));transform:translateY(-1px) scale(1.08)}
 
 /* ── PIT SCOUT log rows ── */
 .pit-row{
@@ -2229,39 +2394,156 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
   max-width: 200px !important;
 }
 
-/* ── PANEL ANIMATIONS: smoother entry ─────────────────────
-   Replace linear with cubic-bezier for a springy feel.
-   Shorter duration (0.3s vs 0.45s) feels snappier.
-   Exit panels fade out instead of just display:none snap.
+/* ── PANEL ANIMATIONS ─────────────────────────────────────
+   Single canonical definition. The duplicate at the top of
+   the stylesheet has been neutralised — these win.
 ──────────────────────────────────────────────────────── */
 @keyframes panelIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 @keyframes panelOut {
-  from { opacity: 1; transform: translateY(0); }
-  to   { opacity: 0; transform: translateY(-8px); }
+  from { opacity: 1; }
+  to   { opacity: 0; }
 }
+
+/* Incoming panel */
 .panel.active {
   display: block;
   width: 100%;
-  animation: panelIn .28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: panelIn 220ms cubic-bezier(0.87, 0, 0.13, 1) both;
+  will-change: opacity;
+  position: relative;
+  z-index: 1;
 }
-/* Give exiting panels a brief fade instead of instant snap */
+
+/* Exiting panel: fade out, kept visible (display:block) so animationend fires correctly */
 .panel.exit {
   display: block !important;
   pointer-events: none;
-  animation: panelOut .16s cubic-bezier(0.4, 0, 1, 1) forwards;
-  position: absolute; /* prevent layout shift during exit */
+  animation: panelOut 160ms cubic-bezier(0.87, 0, 0.13, 1) both;
+  position: absolute;
   top: 0; left: 0; right: 0;
+  will-change: opacity;
+  z-index: 0;
 }
 
 /* ── SIDEBAR PIN TRANSITION ────────────────────────────────
-   appShell gains width smoothly when sidebar is pinned/unpinned.
+   appShell responds smoothly when sidebar is pinned/unpinned.
 ──────────────────────────────────────────────────────── */
 #appShell {
-  transition: padding-left .28s linear;
+  transition: padding-left .32s cubic-bezier(0.87, 0, 0.13, 1);
 }
+
+/* ═══════════════════════════════════════════════════════
+   SKELETON LOADING — shimmer placeholders while tabs load
+════════════════════════════════════════════════════════ */
+@keyframes skeletonShimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+
+.sk-base {
+  border-radius: 4px;
+  background: var(--surface2);
+  background-image: linear-gradient(
+    90deg,
+    var(--surface2)   0%,
+    var(--paper3)     40%,
+    var(--surface2)   80%
+  );
+  background-size: 600px 100%;
+  animation: skeletonShimmer 1.4s linear infinite;
+}
+
+/* Light-mode overrides so contrast stays right */
+html.light .sk-base {
+  background-color: var(--paper3);
+  background-image: linear-gradient(
+    90deg,
+    var(--paper3)  0%,
+    #e0ddd7       40%,
+    var(--paper3)  80%
+  );
+}
+
+/* Skeleton wrapper — fills the panel */
+.sk-screen {
+  padding: 1.5rem 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  animation: panelIn 220ms cubic-bezier(0.87,0,0.13,1) both;
+}
+
+/* Generic block shapes */
+.sk-h1     { height: 32px; width: 38%; margin-bottom: 10px; }
+.sk-h2     { height: 20px; width: 55%; margin-bottom: 8px; }
+.sk-line   { height: 13px; width: 100%; margin-bottom: 7px; }
+.sk-line-s { height: 13px; width: 60%; margin-bottom: 7px; }
+.sk-line-xs{ height: 11px; width: 40%; margin-bottom: 7px; }
+
+/* Hero banner */
+.sk-hero {
+  height: 140px;
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.25rem;
+}
+
+/* Stat strip */
+.sk-stat-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 1.25rem;
+}
+.sk-stat-card {
+  height: 68px;
+  border-radius: var(--radius-lg);
+}
+@media(max-width:640px) {
+  .sk-stat-strip { grid-template-columns: 1fr 1fr; }
+}
+
+/* Toolbar row */
+.sk-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.sk-btn  { height: 30px; width: 90px; border-radius: var(--radius); }
+.sk-btn-wide { height: 30px; width: 160px; border-radius: var(--radius); }
+.sk-search { height: 38px; flex: 1; min-width: 180px; border-radius: var(--radius); }
+
+/* Table skeleton */
+.sk-table { border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 1rem; border: 1px solid var(--border); }
+.sk-thead { height: 38px; background: var(--paper2); border-bottom: 1px solid var(--border); }
+.sk-row   { height: 44px; border-bottom: 1px solid var(--border); }
+.sk-row:last-child { border-bottom: none; }
+
+/* Card grid */
+.sk-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+.sk-card { height: 130px; border-radius: var(--radius-lg); }
+
+/* List rows */
+.sk-list-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.sk-list-row:last-child { border-bottom: none; }
+.sk-avatar { width: 44px; height: 44px; border-radius: var(--radius); flex-shrink: 0; }
+.sk-list-body { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.sk-list-body .sk-line   { margin-bottom: 0; }
+.sk-list-body .sk-line-s { margin-bottom: 0; }
 </style>
 </head>
 
@@ -3624,22 +3906,28 @@ body.ul-admin-drag .ul-drag-handle{display:flex}
 
     <!-- Content -->
     <div id="updates-content" style="display:none;height:calc(100vh - 112px);overflow:hidden">
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;height:100%;overflow:hidden">
+      <div id="rd-board" style="display:flex;height:100%;overflow:hidden">
 
         <!-- In Progress -->
-        <div style="border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden">
+        <div id="rd-col-wrap-inprogress" style="flex:0 0 33.33%;min-width:120px;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border)">
           <div style="padding:10px 14px;border-bottom:1px solid var(--border);background:var(--paper3);font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink2);font-weight:700;flex-shrink:0">In Progress</div>
           <div id="rd-col-inprogress" style="flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px"></div>
         </div>
 
+        <!-- Resize handle 1 -->
+        <div class="rd-col-resize" data-left="inprogress" data-right="planned"></div>
+
         <!-- Planned -->
-        <div style="border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden">
+        <div id="rd-col-wrap-planned" style="flex:0 0 33.33%;min-width:120px;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border)">
           <div style="padding:10px 14px;border-bottom:1px solid var(--border);background:var(--paper3);font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink2);font-weight:700;flex-shrink:0">Planned</div>
           <div id="rd-col-planned" style="flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px"></div>
         </div>
 
+        <!-- Resize handle 2 -->
+        <div class="rd-col-resize" data-left="planned" data-right="fixes"></div>
+
         <!-- Known Fixes -->
-        <div style="display:flex;flex-direction:column;overflow:hidden">
+        <div id="rd-col-wrap-fixes" style="flex:1;min-width:120px;display:flex;flex-direction:column;overflow:hidden">
           <div style="padding:10px 14px;border-bottom:1px solid var(--border);background:var(--paper3);font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink2);font-weight:700;flex-shrink:0">Known Fixes</div>
           <div id="rd-col-fixes" style="flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px"></div>
         </div>
@@ -4822,6 +5110,11 @@ OpenSkill: Weng-Lin Bradley-Terry Full (JMLR 2011 §3.1)
   <!-- ── UPDATE LOG (public) ── -->
   <div id="tab-updates" class="panel">
     <div class="page">
+    <div id="ul-outer-layout">
+    <nav id="ul-version-sidebar" aria-label="Version navigation">
+      <span class="vsb-label">Versions</span>
+      <!-- populated by ulBuildSidebar() -->
+    </nav>
     <div class="ul-wrap">
 
       <header class="ul-page-header">
@@ -4849,11 +5142,10 @@ OpenSkill: Weng-Lin Bradley-Terry Full (JMLR 2011 §3.1)
         <span><a href="https://instagram.com/97230f" target="_blank">@97230f</a> on Instagram</span>
       </footer>
 
-    </div>
-    </div>
-  </div>
-
-</div><!-- end appShell -->
+    </div><!-- end ul-wrap -->
+    </div><!-- end ul-outer-layout -->
+    </div><!-- end page -->
+  </div><!-- end tab-updates -->
 
 <div class="overlay" id="overlay" onclick="if(event.target===this)closeDetail()">
   <div class="dcard">
@@ -5077,6 +5369,9 @@ const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 
 // Public read-only headers (anon key — safe to expose)
 const HDRS = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Accept': 'application/json' };
+// Page size for server-side paginated fetches (Range header).
+// 500 rows per request balances latency vs. number of round trips.
+const SB_FETCH_PAGE_SIZE = 500;
 
 /* ═══════════════════════════════════════════════════════
    SETTINGS CACHE — read localStorage once at startup,
@@ -5093,22 +5388,22 @@ const _LS_KEYS = [
 const _settings = {};
 (function _loadSettingsCache() {
   _LS_KEYS.forEach(k => {
-    try { _settings[k] = lsGet(k); } catch(e) { _settings[k] = null; }
+    try { _settings[k] = localStorage.getItem(k); } catch(e) { _settings[k] = null; }
   });
 })();
 // Wrapper: write through to localStorage AND update the cache
 function lsSet(key, val) {
-  try { lsSet(key, val); } catch(e) {}
+  try { window.localStorage.setItem(key, val); } catch(e) {}
   _settings[key] = val;
 }
 // Wrapper: read from cache (fall back to localStorage if key not pre-loaded)
 function lsGet(key) {
   if (key in _settings) return _settings[key];
-  try { return lsGet(key); } catch(e) { return null; }
+  try { return window.localStorage.getItem(key); } catch(e) { return null; }
 }
 // Wrapper: remove from localStorage and invalidate cache
 function lsRemove(key) {
-  try { lsRemove(key); } catch(e) {}
+  try { window.localStorage.removeItem(key); } catch(e) {}
   _settings[key] = null;
 }
 
@@ -5131,13 +5426,160 @@ function lsRemove(key) {
 ════════════════════════════════════════════════════════ */
 
 // In-memory changelog state (kept in sync with Supabase + localStorage cache)
-window._ulState = {
-  edits:        [],   // ul_edits_v1
-  vblock_edits: {},   // ul_vblock_edits_v1
-  dividers:     {},   // ul_dividers_v1
-  order:        null  // ul_order_v1
-};
+window._ulState = { edits:[], vblock_edits:{}, dividers:{}, order:null };
 const UL_LS_KEY = 'ul_changelog_v1'; // single localStorage cache key
+
+// Hardcoded seed entries — always merged in so they show on every load.
+// Keyed by id so merging is idempotent across cache/Supabase round-trips.
+const _UL_SEED = {
+  edits: [
+    {
+      id: 'e_tabfix_20260602',
+      versionId: 'v_tabfix_20260602',
+      tag: 'fix',
+      text: '<strong>Routes &amp; Formulas tabs blank page fixed</strong> — Both panels were accidentally nested inside <code>.pit-modal-bg</code> (a <code>display:none</code> overlay) due to a missing <code>&lt;/div&gt;</code> closing tag on the Pit Scouting modal. Added the missing tag so the panels render outside the modal. Also fixed a dangling <code>if(t===\'routes\')</code> with no body in <code>switchTab</code> that was silently swallowing the Scout Log render call.',
+      deleted: false
+    },
+    {
+      id: 'e_routes_restore_20260602',
+      versionId: 'v_routes_restore_20260602',
+      tag: 'feat',
+      text: '<strong>Routes tab restored</strong> — Field Overview (Push Back top-down view), Route Notation table, Element Notation table (16 elements + roller), AWP Criteria panel, and Named Routes table are all back. Field image referenced via <code>field.png</code> rather than embedded.',
+      deleted: false
+    },
+    {
+      id: 'e_sb_migration_routes_20260603',
+      versionId: 'v_sb_migration_20260603',
+      tag: 'arch',
+      text: '<strong>Routes synced to Supabase</strong> — Saved routes now live in a <code>user_routes</code> table, scoped to the signed-in user via RLS. Routes saved while offline are buffered in <code>localStorage</code> and migrated to the database automatically on next sign-in.',
+      deleted: false
+    },
+    {
+      id: 'e_sb_migration_pit_20260603',
+      versionId: 'v_sb_migration_20260603',
+      tag: 'arch',
+      text: '<strong>Pit Scout data moved to Supabase</strong> — Pit entries are now read from and written to the <code>pit_scout</code> table (public read, authenticated write). <code>localStorage</code> is kept as a write-buffer only: entries are saved locally on submit for resilience, then confirmed in the database async. The log refreshes from Supabase every time the pit modal opens.',
+      deleted: false
+    },
+    {
+      id: 'e_sb_migration_lsbug_20260603',
+      versionId: 'v_sb_migration_20260603',
+      tag: 'fix',
+      text: '<strong>localStorage wrapper infinite-recursion fixed</strong> — <code>lsGet</code>, <code>lsSet</code>, and <code>lsRemove</code> were calling themselves instead of <code>window.localStorage</code>, causing a stack overflow on any cache miss or settings write. All three now call the native browser API directly.',
+      deleted: false
+    },
+    {
+      id: 'e_sb_migration_roadmap_20260603',
+      versionId: 'v_sb_migration_20260603',
+      tag: 'arch',
+      text: '<strong>Roadmap migrated from JSON blob to proper table</strong> — Items now live in a <code>roadmap_items</code> table with individual rows. Save and delete hit single-row upsert/DELETE endpoints. Drag-and-drop reorder uses a targeted <code>PATCH</code> that only writes rows whose <code>section</code> or <code>sort_order</code> changed. Drop-zone listeners are now registered once at init instead of being re-added on every render.',
+      deleted: false
+    },
+    {
+      id: 'e_import_rok_20260603',
+      versionId: 'v_bugfix_20260603',
+      tag: 'fix',
+      text: '<strong>Event import silently swallowing errors fixed</strong> — <code>importSelectedReEvents</code> was checking <code>r.ok</code> (undefined) instead of <code>evRes.ok</code> after the fetch. Every failed import was silently caught and counted as a failure with no useful error. Now correctly checks <code>evRes.ok</code> so HTTP errors surface properly.',
+      deleted: false
+    },
+    {
+      id: 'e_settings_cache_init_20260603',
+      versionId: 'v_bugfix_20260603',
+      tag: 'fix',
+      text: '<strong>Settings cache init no longer goes through wrapper</strong> — The <code>_loadSettingsCache</code> IIFE now calls <code>localStorage.getItem</code> directly rather than routing through <code>lsGet</code>. This avoids any ordering dependency and makes the boot sequence explicit: seed the cache from native storage first, then let the wrappers use it.',
+      deleted: false
+    },
+    {
+      id: 'e_css_nonanimate_20260603',
+      versionId: 'v_bugfix_20260603',
+      tag: 'fix',
+      text: '<strong>Non-animatable CSS properties removed from transitions</strong> — Removed <code>justify-content</code> from the <code>.sb-nav-section-label</code> transition (not animatable in CSS; always snaps) and removed <code>transition:background</code> from <code>::-webkit-scrollbar-thumb</code> (unsupported on pseudo-elements). Also removed the redundant <code>min-height</code> and <code>max-height</code> declarations from <code>.sb-auth-slot</code> — <code>height:44px</code> alone is sufficient.',
+      deleted: false
+    },
+    {
+      id: 'e_remove_ask_claude_20260603',
+      versionId: 'v_bugfix_20260603',
+      tag: 'fix',
+      text: '<strong>Ask Claude feature removed</strong> — The Route Analysis and Formula Builder panels that called <code>api.anthropic.com/v1/messages</code> directly from the browser have been removed. Direct client-side API calls had no auth header and would return 401 in any real deployment. The formula reference cards remain untouched.',
+      deleted: false
+    },
+    {
+      id: 'e_alscore_weights_20260603',
+      versionId: 'v_alscore_20260603',
+      tag: 'feat',
+      text: '<strong>alScore reweighted — 65% event performance, 35% TrueSkill</strong> — Alliance picker scoring now weights TrueSkill more heavily (up from 10% → 35%). Event performance sub-weights adjusted to sum to 65%: avg_pins 43%, awp_pct 14%, success_pct 8%.',
+      deleted: false
+    },
+    {
+      id: 'e_skeleton_tabs_20260604',
+      versionId: 'v_skeleton_ux_20260604',
+      tag: 'ux',
+      text: '<strong>Skeleton loading screens added to all major tabs</strong> — Tabs that fetch async data (Leaderboard, Skills, TS Rankings, Calendar, Roadmap, Scout Log, Win Probability, and more) now show shimmer placeholder UIs while content loads. Skeletons match each tab\'s real layout — stat strips, table rows, hero cards, list items — so the page feels populated instantly instead of flashing blank.',
+      deleted: false
+    },
+    {
+      id: 'e_skeleton_subtarget_20260604',
+      versionId: 'v_skeleton_ux_20260604',
+      tag: 'arch',
+      text: '<strong>Skeleton overlay system supports per-tab target elements</strong> — <code>_skShow(panelId)</code> checks a <code>_skeletonTemplates[\'_&lt;tab&gt;Target\']</code> override before falling back to the full panel. Tabs with static hero banners (e.g. Skills) receive a sub-element skeleton that only covers the table area, leaving the hero untouched.',
+      deleted: false
+    },
+    {
+      id: 'e_skills_hero_fix_20260604',
+      versionId: 'v_skeleton_ux_20260604',
+      tag: 'fix',
+      text: '<strong>Skills tab hero banner no longer hidden by skeleton overlay</strong> — The skeleton overlay was <code>position:absolute; top:0</code> and covered the entire panel, including the static <code>#sk-hero</code> banner. Fixed by targeting <code>#sk-lb-wrap</code> directly so only the leaderboard table area gets the shimmer — the spotlight cards and filter tabs stay visible immediately.',
+      deleted: false
+    }
+  ],
+  vblock_edits: {
+    'v_tabfix_20260602': { num: 'v—', name: 'Tab Bug Fixes', date: '2 Jun 2026' },
+    'v_routes_restore_20260602': { num: 'v—', name: 'Routes Tab Restored', date: '2 Jun 2026' },
+    'v_sb_migration_20260603': { num: 'v—', name: 'Cache to Supabase Migration', date: '3 Jun 2026' },
+    'v_bugfix_20260603': { num: 'v—', name: 'Bug Fix & CSS Cleanup', date: '3 Jun 2026' },
+    'v_alscore_20260603': { num: 'v—', name: 'alScore Weight Tuning', date: '3 Jun 2026' },
+    'v_skeleton_ux_20260604': { num: 'v—', name: 'Skeleton Loading UX', date: '4 Jun 2026' }
+  },
+  order_tail: [
+    { type: 'version', id: 'v_tabfix_20260602' },
+    { type: 'version', id: 'v_routes_restore_20260602' },
+    { type: 'version', id: 'v_sb_migration_20260603' },
+    { type: 'version', id: 'v_bugfix_20260603' },
+    { type: 'version', id: 'v_alscore_20260603' },
+    { type: 'version', id: 'v_skeleton_ux_20260604' }
+  ]
+};
+
+function ulMergeSeed(state) {
+  var existingIds = {};
+  (state.edits || []).forEach(function(e) { existingIds[e.id] = true; });
+  _UL_SEED.edits.forEach(function(e) {
+    if (!existingIds[e.id]) state.edits.push(e);
+  });
+  Object.keys(_UL_SEED.vblock_edits).forEach(function(k) {
+    if (!state.vblock_edits[k]) state.vblock_edits[k] = _UL_SEED.vblock_edits[k];
+  });
+  if (!Array.isArray(state.order)) state.order = [];
+  var existingOrderIds = {};
+  state.order.forEach(function(o) { existingOrderIds[o.id] = true; });
+  _UL_SEED.order_tail.forEach(function(item) {
+    if (!existingOrderIds[item.id]) state.order.push(item);
+  });
+
+  // Migration: promote legacy isVersionBlock edits into vblock_edits + order
+  // so that version blocks created before this fix are not lost on re-render.
+  (state.edits || []).forEach(function(e) {
+    if (e.isVersionBlock && e.id && !state.vblock_edits[e.id]) {
+      state.vblock_edits[e.id] = { num: e.vnum || '', name: e.vname || '', date: '' };
+    }
+    if (e.isVersionBlock && e.id && !existingOrderIds[e.id]) {
+      state.order.push({ type: 'version', id: e.id });
+      existingOrderIds[e.id] = true;
+    }
+  });
+
+  return state;
+}
 
 // Load state from localStorage cache (synchronous, used on boot)
 function ulStateLoadCache() {
@@ -5150,6 +5592,7 @@ function ulStateLoadCache() {
       }
     }
   } catch(e) {}
+  ulMergeSeed(window._ulState);
 }
 
 // Save state to localStorage cache
@@ -5188,6 +5631,7 @@ async function ulStatePullSupabase() {
     if (!rows || !rows.length || !rows[0].data) return;
     const remote = rows[0].data;
     window._ulState = Object.assign({ edits:[], vblock_edits:{}, dividers:{}, order:null }, remote);
+    ulMergeSeed(window._ulState); // always keep seed entries visible
     ulStateSaveCache(); // update local cache
     // Re-render if DOM is ready
     if (document.readyState !== 'loading') ulRenderFromState();
@@ -5361,9 +5805,9 @@ async function trySignUp() {
     okEl.style.display = 'block';
     // Supabase may require email confirmation
     if(data.session) {
-      okEl.textContent = `&#10003; Account created for ${team}! You can now sign in.`;
+      okEl.innerHTML = `&#10003; Account created for ${team}! You can now sign in.`;
     } else {
-      okEl.textContent = `&#10003; Account created for ${team}! Check your email to confirm before signing in.`;
+      okEl.innerHTML = `&#10003; Account created for ${team}! Check your email to confirm before signing in.`;
     }
     btn.disabled = false;
   } catch(e) {
@@ -5780,7 +6224,7 @@ function buildLockGate() {
   const el = document.createElement('div');
   el.className = 'viewer-lock-gate';
   el.innerHTML = '<div class="viewer-lock-card">'
-    + '<span class="viewer-lock-icon"><svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 24 24\\" width=\\"1em\\" height=\\"1em\\" fill=\\"none\\" stroke=\\"currentColor\\" stroke-width=\\"2\\" stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\" style=\\"vertical-align:-0.125em\\"><rect x=\\"3\\" y=\\"11\\" width=\\"18\\" height=\\"11\\" rx=\\"2\\"/><path d=\\"M7 11V7a5 5 0 0 1 10 0v4\\"/></svg></span>'
+    + '<img src="olog.webp" alt="Bot Go Brrr 97230F" style="width:96px;height:96px;object-fit:contain;border-radius:12px;margin-bottom:1rem;box-shadow:0 0 24px rgba(244,2,25,.3),0 4px 16px rgba(0,0,0,.4)">'
     + '<div class="viewer-lock-title">Override <span>Scout</span></div>'
     + '<div class="viewer-lock-sub">Sign in or create a free account to access<br>scouting data, rankings, and analytics.</div>'
     + '<div class="viewer-lock-btns">'
@@ -5855,14 +6299,31 @@ function launchApp(admin) {
 async function loadData() {
   setSyncStatus('syncing', 'Loading…');
   try {
-    let rows = [], off = 0, batch;
-    do {
-      const r = await fetch(SB_URL+'/rest/v1/entries?select=*&order=created_at.desc&limit=1000&offset='+off, {headers:HDRS});
-      if(!r.ok) throw new Error('HTTP '+r.status+': '+(await r.text()).slice(0,120));
-      batch = await r.json();
+    // Server-side pagination: request SB_FETCH_PAGE_SIZE rows at a time.
+    // Using Prefer: count=exact on the first request so we can show progress.
+    let rows = [], off = 0, totalCount = null;
+    while (true) {
+      const rangeStart = off;
+      const rangeEnd   = off + SB_FETCH_PAGE_SIZE - 1;
+      const reqHeaders = { ...HDRS, 'Range-Unit': 'items', 'Range': rangeStart + '-' + rangeEnd };
+      if (totalCount === null) reqHeaders['Prefer'] = 'count=exact';
+      const r = await fetch(
+        SB_URL + '/rest/v1/entries?select=*&order=created_at.desc',
+        { headers: reqHeaders }
+      );
+      if (!r.ok) throw new Error('HTTP ' + r.status + ': ' + (await r.text()).slice(0, 120));
+      if (totalCount === null) {
+        const cr = r.headers.get('Content-Range');
+        if (cr) {
+          const m = cr.match(/\/(\d+)$/);
+          if (m) totalCount = parseInt(m[1], 10);
+        }
+      }
+      const batch = await r.json();
       rows = rows.concat(batch);
-      off += 1000;
-    } while(batch.length === 1000);
+      off += batch.length;
+      if (batch.length < SB_FETCH_PAGE_SIZE) break; // last page
+    }
 
     allEntries = rows;
     setAllTeams(buildStats(rows));
@@ -5952,31 +6413,47 @@ function rdApplyCorrections() {
       changed = true;
     }
   });
-  if (changed) rdPushItems();
+  if (changed) rdPushReorder(['inprogress','planned','fixes']);
 }
 
 /* ── Roadmap in-memory state ── */
-window._rdItems = []; // array of {id,title,cat,urg,section,notes}
+window._rdItems = []; // array of {id,title,cat,urg,scale,section,notes,sort_order}
 window._rdFilterCat = 'all';
 window._rdFilterUrg = 'all';
 window._rdDragId = null;
 
 async function loadUpdates() {
   try {
-    const r = await fetch(SB_URL + '/rest/v1/app_updates?id=eq.1&select=*', { headers: HDRS });
-    const rows = r.ok ? await r.json() : [];
-    const row = rows[0] || {};
-    const ts  = row.updated_at ? new Date(row.updated_at).toLocaleString() : null;
+    const r = await fetch(
+      SB_URL + '/rest/v1/roadmap_items?select=*&order=sort_order.asc,created_at.asc',
+      { headers: HDRS }
+    );
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const rows = await r.json();
 
-    if (row.roadmap_items) {
-      try { window._rdItems = JSON.parse(row.roadmap_items); } catch(e) { window._rdItems = []; }
-    } else {
-      window._rdItems = [];
-    }
+    window._rdItems = rows.map(function(row) {
+      return {
+        id:         row.id,
+        title:      row.title      || '',
+        cat:        row.cat        || 'feat',
+        urg:        row.urg        || 'low',
+        scale:      row.scale      || 'minimal',
+        section:    row.section    || 'planned',
+        notes:      row.notes      || '',
+        sort_order: row.sort_order || 0
+      };
+    });
 
-    if(ts) {
-      document.getElementById('updates-footer').style.display = 'block';
-      document.getElementById('updates-ts').textContent = ts;
+    // Show the last-modified timestamp from the most-recently updated row
+    if (rows.length) {
+      var latest = rows.reduce(function(a, b) {
+        return (a.updated_at || '') > (b.updated_at || '') ? a : b;
+      });
+      if (latest.updated_at) {
+        document.getElementById('updates-footer').style.display = 'block';
+        document.getElementById('updates-ts').textContent =
+          new Date(latest.updated_at).toLocaleString();
+      }
     }
 
     document.getElementById('updates-loading').style.display = 'none';
@@ -6036,22 +6513,21 @@ function rdMakeCard(it, isAdm) {
 
   if(isAdm) {
     const actions = document.createElement('div');
-    actions.className = 'rd-item-actions';
-    actions.style.cssText = 'margin-top:6px;display:flex;gap:4px';
+    actions.className = 'rd-item-actions-overlay';
 
     const editBtn = document.createElement('button');
     editBtn.className = 'ul-entry-btn';
     editBtn.textContent = 'Edit';
-    editBtn.onclick = function(){ rdEditItem(it.id); };
+    editBtn.onclick = function(e){ e.stopPropagation(); rdEditItem(it.id); };
 
     const delBtn = document.createElement('button');
     delBtn.className = 'ul-entry-btn del';
     delBtn.textContent = '✕';
-    delBtn.onclick = function(){ rdDeleteItem(it.id); };
+    delBtn.onclick = function(e){ e.stopPropagation(); rdDeleteItem(it.id); };
 
     actions.appendChild(editBtn);
     actions.appendChild(delBtn);
-    body.appendChild(actions);
+    card.appendChild(actions);
   }
 
   card.appendChild(body);
@@ -6090,6 +6566,7 @@ function rdRender() {
 
     if(!grp.length) {
       const empty = document.createElement('div');
+      empty.className = 'empty-state';
       empty.style.cssText = 'color:var(--ink3);font-size:12px;padding:20px 0;text-align:center;font-family:var(--mono)';
       empty.textContent = 'Nothing here.';
       col.appendChild(empty);
@@ -6097,63 +6574,9 @@ function rdRender() {
       grp.forEach(function(it) { col.appendChild(rdMakeCard(it, isAdm)); });
     }
 
-    // ── Drop zone events on each column ──
-    col.addEventListener('dragover', function(e) {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-      col.classList.add('rd-col-over');
-
-      // Show insert indicator
-      document.querySelectorAll('.rd-drop-indicator').forEach(function(el){ el.remove(); });
-      const afterEl = rdGetDragAfter(col, e.clientY);
-      const indicator = document.createElement('div');
-      indicator.className = 'rd-drop-indicator';
-      if(afterEl) col.insertBefore(indicator, afterEl);
-      else col.appendChild(indicator);
-    });
-    col.addEventListener('dragleave', function(e) {
-      if(!col.contains(e.relatedTarget)) {
-        col.classList.remove('rd-col-over');
-        col.querySelectorAll('.rd-drop-indicator').forEach(function(el){ el.remove(); });
-      }
-    });
-    col.addEventListener('drop', function(e) {
-      e.preventDefault();
-      col.classList.remove('rd-col-over');
-      col.querySelectorAll('.rd-drop-indicator').forEach(function(el){ el.remove(); });
-
-      const dragId = window._rdDragId;
-      if(!dragId) return;
-
-      // Find insert position from DOM
-      const afterEl = rdGetDragAfter(col, e.clientY);
-      const afterId = afterEl ? afterEl.dataset.rdId : null;
-
-      // Update section
-      const items = window._rdItems || [];
-      const dragIdx = items.findIndex(function(x){ return x.id === dragId; });
-      if(dragIdx < 0) return;
-      const item = Object.assign({}, items[dragIdx], { section: sec });
-
-      // Remove from current position
-      items.splice(dragIdx, 1);
-
-      // Insert at new position
-      if(afterId) {
-        const insertIdx = items.findIndex(function(x){ return x.id === afterId; });
-        items.splice(insertIdx >= 0 ? insertIdx : items.length, 0, item);
-      } else {
-        // Drop at end of section — insert after last item of this section
-        var lastIdx = -1;
-        items.forEach(function(x, i){ if(x.section === sec) lastIdx = i; });
-        items.splice(lastIdx + 1, 0, item);
-      }
-
-      window._rdItems = items;
-      rdRender();
-      rdPushItems();
-    });
   });
+  /* Re-check 2-up widths after every render */
+  if (typeof window._rdUpdateTwoUp === 'function') window._rdUpdateTwoUp();
 }
 
 function rdGetDragAfter(col, y) {
@@ -6217,40 +6640,59 @@ function rdEditItem(id) {
   setTimeout(function(){ document.getElementById('rd-inp-title').focus(); }, 50);
 }
 
-function rdDeleteItem(id) {
+async function rdDeleteItem(id) {
   if(!confirm('Delete this item?')) return;
   window._rdItems = (window._rdItems||[]).filter(function(x){return x.id!==id;});
   rdRender();
-  rdPushItems();
+  try {
+    const r = await fetch(SB_URL + '/rest/v1/roadmap_items?id=eq.' + encodeURIComponent(id), {
+      method: 'DELETE',
+      headers: adminHdrs()
+    });
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    showToast('Item deleted','ok');
+  } catch(e) {
+    showToast('Delete failed: '+e.message,'err',5000);
+  }
 }
 
 async function rdSaveItem() {
   if(!isAdmin) return;
-  const id    = document.getElementById('rd-edit-id').value || ('rd_' + Date.now());
-  const title = document.getElementById('rd-inp-title').value.trim();
-  const cat   = document.getElementById('rd-inp-cat').value;
-  const urg   = document.getElementById('rd-inp-urg').value;
-  const scale = document.getElementById('rd-inp-scale').value;
+  const id      = document.getElementById('rd-edit-id').value || ('rd_' + Date.now());
+  const title   = document.getElementById('rd-inp-title').value.trim();
+  const cat     = document.getElementById('rd-inp-cat').value;
+  const urg     = document.getElementById('rd-inp-urg').value;
+  const scale   = document.getElementById('rd-inp-scale').value;
   const section = document.getElementById('rd-inp-section').value;
-  const notes = document.getElementById('rd-inp-notes').value.trim();
+  const notes   = document.getElementById('rd-inp-notes').value.trim();
   if(!title) { showToast('Title required','err'); return; }
+
   const items = window._rdItems = (window._rdItems||[]);
-  const idx = items.findIndex(function(x){return x.id===id;});
-  const item = {id,title,cat,urg,scale,section,notes};
-  if(idx>=0) items[idx] = item; else items.push(item);
+  const idx   = items.findIndex(function(x){return x.id===id;});
+
+  // Preserve existing sort_order on edit; put new items at end of their section
+  var sort_order = 0;
+  if(idx >= 0) {
+    sort_order = items[idx].sort_order || 0;
+  } else {
+    var sectionItems = items.filter(function(x){return x.section===section;});
+    sort_order = sectionItems.length
+      ? Math.max.apply(null, sectionItems.map(function(x){return x.sort_order||0;})) + 1
+      : 0;
+  }
+
+  const item = {id, title, cat, urg, scale, section, notes, sort_order};
+  if(idx >= 0) items[idx] = item; else items.push(item);
   rdCancelEdit();
   rdRender();
-  await rdPushItems();
-}
 
-async function rdPushItems() {
   const status = document.getElementById('updates-save-status');
   if(status){ status.textContent='Saving…'; status.style.color='var(--ink3)'; }
   try {
-    const r = await fetch(SB_URL + '/rest/v1/app_updates', {
+    const r = await fetch(SB_URL + '/rest/v1/roadmap_items', {
       method: 'POST',
       headers: { ...adminHdrs(), 'Prefer': 'resolution=merge-duplicates,return=representation' },
-      body: JSON.stringify({ id:1, roadmap_items: JSON.stringify(window._rdItems), updated_at: new Date().toISOString() })
+      body: JSON.stringify(item)
     });
     if(!r.ok) throw new Error('HTTP ' + r.status);
     const ts = new Date().toLocaleString();
@@ -6263,6 +6705,49 @@ async function rdPushItems() {
     showToast('Save failed: '+e.message,'err',5000);
   }
 }
+
+/*
+ * rdPushReorder(sections)
+ * Called after drag-and-drop.  Receives the array of section names that
+ * were touched during the drop.  Only writes rows whose section or
+ * sort_order actually changed — no full-blob replacement needed.
+ */
+async function rdPushReorder(sections) {
+  if(!isAdmin) return;
+  const items = window._rdItems || [];
+
+  // Collect candidate rows: everything in the affected sections
+  var candidates = items.filter(function(x){ return sections.indexOf(x.section) >= 0; });
+
+  // For each, build a minimal patch payload
+  var patches = candidates.map(function(it, i) {
+    // Re-compute sort_order from current position within the section
+    var secItems = items.filter(function(x){ return x.section === it.section; });
+    var newOrder = secItems.indexOf(it);
+    return { id: it.id, section: it.section, sort_order: newOrder };
+  });
+
+  // Fire all upserts in parallel
+  try {
+    await Promise.all(patches.map(function(patch) {
+      return fetch(SB_URL + '/rest/v1/roadmap_items?id=eq.' + encodeURIComponent(patch.id), {
+        method: 'PATCH',
+        headers: { ...adminHdrs(), 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ section: patch.section, sort_order: patch.sort_order })
+      }).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status+' on '+patch.id); });
+    }));
+    // Update in-memory sort_order to match what we just persisted
+    patches.forEach(function(patch) {
+      var it = items.find(function(x){ return x.id === patch.id; });
+      if(it) it.sort_order = patch.sort_order;
+    });
+  } catch(e) {
+    showToast('Reorder save failed: '+e.message,'err',5000);
+  }
+}
+
+// Legacy stub — kept so any stray call doesn't throw
+async function rdPushItems() {}
 
 function rdExportCSV() {
   const items = window._rdItems || [];
@@ -6289,6 +6774,185 @@ function rdExportCSV() {
 
 // legacy stub — no longer used but referenced elsewhere
 async function saveUpdates() {}
+
+/* ── Roadmap column resize + 2-up grid ── */
+(function() {
+  var _resizeActive = false;
+  var _resizeHandle = null;
+  var _leftWrap = null;
+  var _rightWrap = null;
+  var _leftColId  = null;
+  var _rightColId = null;
+  var _startX = 0;
+  var _startLeftW = 0;
+  var _startRightW = 0;
+  var _board = null;
+
+  /* Minimum px for a column — wider when it actually has cards */
+  function colMinW(wrapEl) {
+    if (!wrapEl) return 72;
+    var colId = wrapEl.id.replace('rd-col-wrap-', 'rd-col-');
+    var inner = document.getElementById(colId);
+    return (inner && inner.querySelector('.rd-item')) ? 180 : 72;
+  }
+
+  /* Toggle 2-column grid based on wrapper width */
+  var TWO_UP_PX = 600;
+  function updateTwoUp(wrapEl) {
+    if (!wrapEl) return;
+    var colId = wrapEl.id.replace('rd-col-wrap-', 'rd-col-');
+    var inner = document.getElementById(colId);
+    if (!inner) return;
+    var wide = wrapEl.getBoundingClientRect().width >= TWO_UP_PX;
+    inner.classList.toggle('rd-col-2up', wide);
+    /* When going 2-up, drop the inline gap (gap is in CSS) */
+    inner.style.gap = '';
+  }
+
+  function initColResize() {
+    _board = document.getElementById('rd-board');
+    if (!_board) return;
+
+    /* ResizeObserver for 2-up toggling */
+    if (window.ResizeObserver) {
+      var ro = new ResizeObserver(function(entries) {
+        entries.forEach(function(entry) { updateTwoUp(entry.target); });
+      });
+      ['inprogress','planned','fixes'].forEach(function(sec) {
+        var w = document.getElementById('rd-col-wrap-' + sec);
+        if (w) ro.observe(w);
+      });
+    }
+
+    document.querySelectorAll('.rd-col-resize').forEach(function(handle) {
+      handle.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        _leftColId  = handle.dataset.left;
+        _rightColId = handle.dataset.right;
+        _leftWrap  = document.getElementById('rd-col-wrap-' + _leftColId);
+        _rightWrap = document.getElementById('rd-col-wrap-' + _rightColId);
+        if (!_leftWrap || !_rightWrap) return;
+        _resizeActive = true;
+        _resizeHandle = handle;
+        _startX = e.clientX;
+        _startLeftW  = _leftWrap.getBoundingClientRect().width;
+        _startRightW = _rightWrap.getBoundingClientRect().width;
+        handle.classList.add('rd-resizing');
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+      });
+    });
+
+    document.addEventListener('mousemove', function(e) {
+      if (!_resizeActive) return;
+      var dx = e.clientX - _startX;
+      var total = _startLeftW + _startRightW;
+      var newLeft  = _startLeftW  + dx;
+      var newRight = _startRightW - dx;
+      var minLeft  = colMinW(_leftWrap);
+      var minRight = colMinW(_rightWrap);
+      /* Clamp left */
+      if (newLeft < minLeft)   { newLeft = minLeft;         newRight = total - minLeft; }
+      /* Clamp right */
+      if (newRight < minRight) { newRight = minRight;       newLeft  = total - minRight; }
+      /* Double-check opposite side didn't violate after clamping */
+      if (newLeft  < minLeft)  { newLeft  = minLeft; }
+      if (newRight < minRight) { newRight = minRight; }
+      _leftWrap.style.flex  = '0 0 ' + newLeft  + 'px';
+      _rightWrap.style.flex = '0 0 ' + newRight + 'px';
+    });
+
+    document.addEventListener('mouseup', function() {
+      if (!_resizeActive) return;
+      _resizeActive = false;
+      if (_resizeHandle) _resizeHandle.classList.remove('rd-resizing');
+      _resizeHandle = null;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    });
+
+    // ── One-time drop-zone listeners — registered here, not re-added by rdRender ──
+    ['inprogress','planned','fixes'].forEach(function(sec) {
+      var col = document.getElementById('rd-col-' + sec);
+      if(!col) return;
+
+      col.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        col.classList.add('rd-col-over');
+        document.querySelectorAll('.rd-drop-indicator').forEach(function(el){ el.remove(); });
+        var afterEl = rdGetDragAfter(col, e.clientY);
+        var indicator = document.createElement('div');
+        indicator.className = 'rd-drop-indicator';
+        if(afterEl) col.insertBefore(indicator, afterEl);
+        else col.appendChild(indicator);
+      });
+
+      col.addEventListener('dragleave', function(e) {
+        if(!col.contains(e.relatedTarget)) {
+          col.classList.remove('rd-col-over');
+          col.querySelectorAll('.rd-drop-indicator').forEach(function(el){ el.remove(); });
+        }
+      });
+
+      col.addEventListener('drop', function(e) {
+        e.preventDefault();
+        col.classList.remove('rd-col-over');
+        col.querySelectorAll('.rd-drop-indicator').forEach(function(el){ el.remove(); });
+
+        var dragId = window._rdDragId;
+        if(!dragId) return;
+
+        var afterEl  = rdGetDragAfter(col, e.clientY);
+        var afterId  = afterEl ? afterEl.dataset.rdId : null;
+        var items    = window._rdItems || [];
+        var dragIdx  = items.findIndex(function(x){ return x.id === dragId; });
+        if(dragIdx < 0) return;
+
+        var prevSection = items[dragIdx].section;
+        var item = Object.assign({}, items[dragIdx], { section: sec });
+
+        items.splice(dragIdx, 1);
+
+        if(afterId) {
+          var insertIdx = items.findIndex(function(x){ return x.id === afterId; });
+          items.splice(insertIdx >= 0 ? insertIdx : items.length, 0, item);
+        } else {
+          var lastIdx = -1;
+          items.forEach(function(x, i){ if(x.section === sec) lastIdx = i; });
+          items.splice(lastIdx + 1, 0, item);
+        }
+
+        window._rdItems = items;
+        rdRender();
+
+        // Only push sections that actually changed
+        var touched = [sec];
+        if(prevSection !== sec) touched.push(prevSection);
+        rdPushReorder(touched);
+      });
+    });
+  }
+
+  /* Expose so rdRender can trigger a 2-up check after re-rendering cards */
+  window._rdUpdateTwoUp = function() {
+    ['inprogress','planned','fixes'].forEach(function(sec) {
+      updateTwoUp(document.getElementById('rd-col-wrap-' + sec));
+    });
+  };
+
+  /* Initialise once the roadmap content becomes visible */
+  var _resizeInited = false;
+  var _origLoadUpdates = window.loadUpdates;
+  window.loadUpdates = async function() {
+    await _origLoadUpdates.apply(this, arguments);
+    if (!_resizeInited) { _resizeInited = true; initColResize(); }
+  };
+  document.addEventListener('DOMContentLoaded', function() {
+    initColResize();
+    _resizeInited = true;
+  });
+})()
 
 /* ═══════════════════════════════════════════════════════
    RENDER CHANGELOG FROM _ulState
@@ -6424,7 +7088,156 @@ function ulRenderFromState() {
     document.body.classList.add('ul-admin-drag');
     wrap.querySelectorAll('.admin-only').forEach(function(el) { el.classList.add('admin-visible'); });
   }
+
+  // Rebuild sidebar after every render
+  ulBuildSidebar();
 }
+
+/* ═══════════════════════════════════════════════════════
+   VERSION SIDEBAR — build, scroll-spy, drag-to-reorder
+════════════════════════════════════════════════════════ */
+
+function ulBuildSidebar() {
+  var sb = document.getElementById('ul-version-sidebar');
+  if (!sb) return;
+
+  // Collect ordered version blocks from the DOM (reflects current render order)
+  var blocks = Array.from(document.querySelectorAll('#ul-dynamic-wrap .ul-version-block'));
+  if (!blocks.length) { sb.style.display = 'none'; return; }
+  sb.style.display = '';
+
+  // Clear existing items (keep the label)
+  var label = sb.querySelector('.vsb-label');
+  sb.innerHTML = '';
+  if (label) sb.appendChild(label);
+  else { var lbl = document.createElement('span'); lbl.className = 'vsb-label'; lbl.textContent = 'Versions'; sb.appendChild(lbl); }
+
+  blocks.forEach(function(block, idx) {
+    var vid = block.dataset.ulVid || ('vsb_' + idx);
+    // Give each block an id anchor if it doesn't have one
+    if (!block.id) block.id = 'ulvb_' + vid;
+
+    var numEl  = block.querySelector('.ul-v-number');
+    var nameEl = block.querySelector('.ul-v-name');
+    var dateEl = block.querySelector('.ul-v-date');
+    var num  = numEl  ? numEl.textContent.trim()  : '';
+    var name = nameEl ? nameEl.textContent.trim() : '';
+    var date = dateEl ? dateEl.textContent.trim() : '';
+
+    var btn = document.createElement('button');
+    btn.className = 'vsb-item';
+    btn.setAttribute('data-vsb-vid', vid);
+    btn.setAttribute('data-vsb-idx', idx);
+    btn.setAttribute('draggable', 'true');
+    btn.title = (name || num) + (date ? ' · ' + date : '');
+    btn.innerHTML = '<span>' + (num || '—') + '</span>' +
+                    (name ? '<span class="vsb-sub">' + name + '</span>' : '');
+
+    // Click → scroll to block
+    btn.addEventListener('click', function() {
+      var target = document.getElementById('ulvb_' + vid) || block;
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Brief highlight
+      target.style.transition = 'outline .1s';
+      target.style.outline = '2px solid var(--red)';
+      setTimeout(function() { target.style.outline = ''; }, 900);
+    });
+
+    // ── Drag to reorder sidebar (reorders DOM blocks + state) ──
+    btn.addEventListener('dragstart', function(ev) {
+      ev.dataTransfer.effectAllowed = 'move';
+      ev.dataTransfer.setData('text/plain', vid);
+      btn.classList.add('vsb-dragging');
+    });
+    btn.addEventListener('dragend', function() {
+      btn.classList.remove('vsb-dragging');
+      sb.querySelectorAll('.vsb-drag-over').forEach(function(el) { el.classList.remove('vsb-drag-over'); });
+    });
+    btn.addEventListener('dragover', function(ev) {
+      ev.preventDefault();
+      ev.dataTransfer.dropEffect = 'move';
+      sb.querySelectorAll('.vsb-drag-over').forEach(function(el) { el.classList.remove('vsb-drag-over'); });
+      btn.classList.add('vsb-drag-over');
+    });
+    btn.addEventListener('dragleave', function() { btn.classList.remove('vsb-drag-over'); });
+    btn.addEventListener('drop', function(ev) {
+      ev.preventDefault();
+      btn.classList.remove('vsb-drag-over');
+      var srcVid = ev.dataTransfer.getData('text/plain');
+      if (!srcVid || srcVid === vid) return;
+      _ulSidebarReorder(srcVid, vid);
+    });
+
+    sb.appendChild(btn);
+  });
+
+  // Activate scroll-spy
+  ulSidebarScrollSpy();
+}
+
+/* Move srcVid block to just before dstVid block in DOM + state */
+function _ulSidebarReorder(srcVid, dstVid) {
+  // Reorder DOM version blocks
+  var wrap = document.getElementById('ul-dynamic-wrap');
+  if (!wrap) return;
+  var srcBlock = wrap.querySelector('[data-ul-vid="' + srcVid + '"]');
+  var dstBlock = wrap.querySelector('[data-ul-vid="' + dstVid + '"]');
+  if (!srcBlock || !dstBlock || srcBlock === dstBlock) return;
+  wrap.insertBefore(srcBlock, dstBlock);
+
+  // Reorder state.order to match new DOM order
+  var allBlocks = Array.from(wrap.querySelectorAll('.ul-version-block'));
+  var newOrder = [];
+  allBlocks.forEach(function(b) {
+    var vid = b.dataset.ulVid;
+    if (vid) newOrder.push({ type: 'version', id: vid });
+  });
+  // Preserve non-version items (dividers) in their relative positions
+  var dividerItems = (window._ulState.order || []).filter(function(o) { return o.type !== 'version'; });
+  window._ulState.order = newOrder.concat(dividerItems);
+
+  // Save + sync
+  if (typeof ulStateSaveCache === 'function') ulStateSaveCache();
+  if (typeof ulStatePushSupabase === 'function') {
+    ulStatePushSupabase().catch(function(e) { console.warn('Sidebar reorder sync failed:', e); });
+  }
+
+  // Rebuild sidebar to reflect new order
+  ulBuildSidebar();
+}
+
+/* Scroll-spy: highlight sidebar item matching the most visible version block */
+(function() {
+  var _spyTimer = null;
+  window.ulSidebarScrollSpy = function() {
+    // Run on next frame so DOM is stable
+    cancelAnimationFrame(_spyTimer);
+    _spyTimer = requestAnimationFrame(function() {
+      var panel = document.getElementById('tab-updates');
+      if (!panel) return;
+      var blocks = Array.from(panel.querySelectorAll('.ul-version-block'));
+      if (!blocks.length) return;
+      var best = null, bestY = Infinity;
+      blocks.forEach(function(b) {
+        var r = b.getBoundingClientRect();
+        // Pick the block whose top is closest to (but not below) 40% of viewport
+        var dist = Math.abs(r.top - window.innerHeight * 0.25);
+        if (dist < bestY) { bestY = dist; best = b; }
+      });
+      var activeVid = best ? best.dataset.ulVid : null;
+      var sb = document.getElementById('ul-version-sidebar');
+      if (!sb) return;
+      sb.querySelectorAll('.vsb-item').forEach(function(btn) {
+        btn.classList.toggle('vsb-active', btn.getAttribute('data-vsb-vid') === activeVid);
+      });
+    });
+  };
+  // Attach scroll listener once
+  document.addEventListener('scroll', window.ulSidebarScrollSpy, { passive: true });
+  // Also spy on the panel scroll container if it has overflow
+  var panel = document.getElementById('tab-updates');
+  if (panel) panel.addEventListener('scroll', window.ulSidebarScrollSpy, { passive: true });
+})();
 
 /* ═══════════════════════════════════════════════════════
    CHANGELOG SNAPSHOT — pushes the current _ulState to Supabase.
@@ -6432,17 +7245,17 @@ function ulRenderFromState() {
 async function ulSnapshotAndSync() {
   if (!isAdmin) return;
   const btn = document.getElementById('ul-sync-btn');
-  if (btn) { btn.disabled = true; btn.textContent = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;flex-shrink:0" ><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg> Syncing…'; }
+  if (btn) { btn.disabled = true; btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;flex-shrink:0" ><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg> Syncing…'; }
   try {
     ulStateSaveCache();
     await ulStatePushSupabase();
     const count = (window._ulState.edits || []).length;
-    if (btn) { btn.textContent = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic1"/></svg> Synced!'; btn.disabled = false; }
+    if (btn) { btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic1"/></svg> Synced!'; btn.disabled = false; }
     showToast('Changelog synced to Supabase (' + count + ' entries)', 'ok', 4000);
-    setTimeout(function() { if (btn) btn.textContent = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;flex-shrink:0" ><path d="M12 19V5"/><polyline points="5 12 12 5 19 12"/></svg> Sync to Supabase'; }, 3000);
+    setTimeout(function() { if (btn) btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;flex-shrink:0" ><path d="M12 19V5"/><polyline points="5 12 12 5 19 12"/></svg> Sync to Supabase'; }, 3000);
   } catch(e) {
     console.error('ulSnapshotAndSync error:', e);
-    if (btn) { btn.textContent = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;flex-shrink:0" ><path d="M12 19V5"/><polyline points="5 12 12 5 19 12"/></svg> Sync to Supabase'; btn.disabled = false; }
+    if (btn) { btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;flex-shrink:0" ><path d="M12 19V5"/><polyline points="5 12 12 5 19 12"/></svg> Sync to Supabase'; btn.disabled = false; }
     showToast('Sync failed: ' + e.message, 'err', 5000);
   }
 }
@@ -6637,87 +7450,60 @@ async function ulSnapshotAndSync() {
     if (_ulEditTarget && _ulEditTarget.mode === 'edit') {
       const entryEl = _ulEditTarget.entryEl;
       const id = entryEl.dataset.ulId;
-      const tagEl = entryEl.querySelector('.ul-entry-tag');
-      const txtEl = entryEl.querySelector('.ul-entry-text');
-      if (tagEl) { tagEl.className = 'ul-entry-tag ul-tag-' + _ulSelectedTag; tagEl.textContent = _ulSelectedTag; }
-      if (txtEl) txtEl.innerHTML = DOMPurify.sanitize(text);
-      const idx = edits.findIndex(function(e) { return e.id === id && !e.deleted && !e.isNew && !e.isVersionBlock; });
-      const record = { id: id, tag: _ulSelectedTag, text: text };
+      const idx = edits.findIndex(function(e) { return e.id === id && !e.deleted && !e.isVersionBlock; });
+      const record = { id: id, tag: _ulSelectedTag, text: text, isNew: edits[idx] ? edits[idx].isNew : false, versionId: edits[idx] ? edits[idx].versionId : undefined };
       if (idx >= 0) edits[idx] = record; else edits.push(record);
       saveEdits(edits);
+      ulRenderFromState();
       showToast('Entry updated', 'ok');
     } else {
       const sel = document.getElementById('ul-editor-version-pick');
       const pickedVid = sel.value;
-      let targetVb;
+      let targetVid;
       if (pickedVid === '__new__') {
         const vnum  = (document.getElementById('ul-editor-vnumber').value || '').trim() || 'vX.X.X';
         const vname = (document.getElementById('ul-editor-vname').value   || '').trim() || 'Untitled';
-        targetVb = createVersionBlock(vnum, vname);
+        targetVid = createVersionBlock(vnum, vname); // now returns a vid string
       } else {
-        targetVb = document.querySelector('[data-ul-vid="' + pickedVid + '"]');
+        targetVid = pickedVid;
       }
-      if (!targetVb) { showToast('Could not find version block', 'err'); return; }
-      stampIds();
+      if (!targetVid) { showToast('Could not find version block', 'err'); return; }
       const newId = 'ul_new_' + Date.now();
-      const newEl = buildEntryEl(newId, _ulSelectedTag, text);
-      newEl.querySelectorAll('.admin-only').forEach(function(el) { el.classList.add('admin-visible'); });
-      const entriesContainer = targetVb.querySelector('.ul-entries');
-      entriesContainer.prepend(newEl);
-      edits.push({ id: newId, tag: _ulSelectedTag, text: text, isNew: true, versionId: targetVb.dataset.ulVid });
+      edits.push({ id: newId, tag: _ulSelectedTag, text: text, isNew: true, versionId: targetVid });
       saveEdits(edits);
+      // Re-render from state so the new entry (and any new version block) is
+      // immediately visible on the client without requiring a page reload.
+      ulRenderFromState();
       showToast('Entry added', 'ok');
     }
     closeUlEditor();
   };
 
   function createVersionBlock(vnum, vname) {
-    const footer = document.querySelector('#tab-updates .ul-footer');
-    const wrap   = document.querySelector('#tab-updates .ul-wrap');
-    const vb = document.createElement('div');
     const vid = 'v_new_' + Date.now();
-    vb.className = 'ul-version-block';
-    vb.dataset.ulVid = vid;
-    vb.innerHTML =
-      '<div class="ul-version-header">' +
-      '<span class="ul-drag-handle admin-only" title="Drag to reorder" style="position:static;margin-right:4px">⠿</span>' +
-      '<span class="ul-v-number">' + vnum + '</span>' +
-      '<span class="ul-v-name">' + vname + '</span>' +
-      '<div class="ul-version-actions admin-only">' +
-      '<button class="ul-entry-btn" onclick="editUlVBlock(this)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic15"/></svg> Edit version</button>' +
-      '<button class="ul-entry-btn" onclick="addUlEntryToVersion(this)">＋ Entry</button>' +
-      '</div></div>' +
-      '<div class="ul-entries"></div>';
+
+    // Register in vblock_edits so ulRenderFromState can render it
+    if (!window._ulState.vblock_edits) window._ulState.vblock_edits = {};
+    window._ulState.vblock_edits[vid] = { num: vnum, name: vname, date: '' };
+
+    // Append to order so it appears in the rendered list
+    if (!Array.isArray(window._ulState.order)) window._ulState.order = [];
+    window._ulState.order.push({ type: 'version', id: vid });
+
+    // Also record in edits (legacy / restoreNewVersionBlocks path)
     const edits = loadEdits();
     edits.push({ id: vid, isVersionBlock: true, vnum: vnum, vname: vname });
-    saveEdits(edits);
-    if (footer) wrap.insertBefore(vb, footer);
-    else wrap.appendChild(vb);
-    return vb;
+    // saveEdits will be called by the caller (saveUlEntry) right after, so just
+    // update _ulState.edits here without triggering a double save.
+    window._ulState.edits = edits;
+
+    return vid; // return the id; DOM building now done by ulRenderFromState
   }
 
   function restoreNewVersionBlocks() {
-    const edits = loadEdits();
-    const footer = document.querySelector('#tab-updates .ul-footer');
-    const wrap   = document.querySelector('#tab-updates .ul-wrap');
-    edits.filter(function(e) { return e.isVersionBlock; }).forEach(function(e) {
-      if (document.querySelector('[data-ul-vid="' + e.id + '"]')) return;
-      const vb = document.createElement('div');
-      vb.className = 'ul-version-block';
-      vb.dataset.ulVid = e.id;
-      vb.innerHTML =
-        '<div class="ul-version-header">' +
-        '<span class="ul-drag-handle admin-only" title="Drag to reorder" style="position:static;margin-right:4px">⠿</span>' +
-        '<span class="ul-v-number">' + e.vnum + '</span>' +
-        '<span class="ul-v-name">' + e.vname + '</span>' +
-        '<div class="ul-version-actions admin-only">' +
-        '<button class="ul-entry-btn" onclick="editUlVBlock(this)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic15"/></svg> Edit version</button>' +
-        '<button class="ul-entry-btn" onclick="addUlEntryToVersion(this)">＋ Entry</button>' +
-        '</div></div>' +
-        '<div class="ul-entries"></div>';
-      if (footer) wrap.insertBefore(vb, footer);
-      else wrap.appendChild(vb);
-    });
+    // No-op: new version blocks are now rendered entirely through ulRenderFromState
+    // via _ulState.vblock_edits + _ulState.order. Kept as a stub so existing
+    // DOMContentLoaded and _ulApplyEntries call sites don't error.
   }
 
   document.addEventListener('DOMContentLoaded', function() {
@@ -8111,11 +8897,11 @@ function toggleREProfile(teamNum) {
   const btn   = document.getElementById('re-expand-btn');
   if(_reProfileOpen) {
     panel.innerHTML = '';
-    btn.textContent = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic20"/></svg> Expand — Full Team Profile (RobotEvents)';
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic20"/></svg> Expand — Full Team Profile (RobotEvents)';
     _reProfileOpen = false;
   } else {
     _reProfileOpen = true;
-    btn.textContent = '&#9650; Collapse Team Profile';
+    btn.innerHTML = '&#9650; Collapse Team Profile';
     loadRETeamProfile(teamNum);
   }
 }
@@ -8642,7 +9428,7 @@ async function saveEditEntry() {
     try { lsSet('override_scout_v3', JSON.stringify(localDb)); } catch(e) {}
     setAllTeams(buildStats(allEntries));
     errEl.style.color = 'var(--green)';
-    errEl.textContent = '&#10003; Saved!';
+    errEl.innerHTML = '&#10003; Saved!';
     setTimeout(closeEditEntryModal, 700);
     renderLog(); lbApplyFilter(lbActiveF);
     setSyncStatus('ok', allTeams.length+' teams · '+allEntries.length+' entries');
@@ -8824,7 +9610,7 @@ function switchAutoMode(id) {
         const note = document.createElement('div');
         note.id = partner+'-idle-note';
         note.style.cssText = 'font-size:11px;font-family:var(--mono);color:var(--amber);background:var(--amber-bg);border-radius:var(--radius);padding:5px 8px;margin-bottom:6px';
-        note.textContent = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic4"/></svg> Idle — partner is running SAWP solo';
+        note.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic4"/></svg> Idle — partner is running SAWP solo';
         pPanel.parentElement.insertBefore(note, pPanel);
       }
     } else {
@@ -9044,7 +9830,7 @@ function calcProb() {
     // Add a golden star to the highest-probability segment
     if (o === mostLikely) {
       const star = document.createElement('span');
-      star.textContent = '&#9733;';
+      star.innerHTML = '&#9733;';
       star.style.cssText = 'font-size:14px;color:#ffd700;text-shadow:0 0 4px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.4);margin-left:3px;pointer-events:none;line-height:1;filter:drop-shadow(0 0 3px rgba(255,215,0,.7))';
       seg.appendChild(star);
     }
@@ -9368,6 +10154,10 @@ function showToast(msg, type='info', dur=3000) {
 /* ═══════════════════════════════════════════════════════
    TABS
 ════════════════════════════════════════════════════════ */
+
+/* Track pending exit cleanup so rapid-switching cancels the previous */
+let _pendingTabExit = null;
+
 function switchTab(t, el) {
   const incoming = document.getElementById('tab-'+t);
   if (!incoming) {
@@ -9386,52 +10176,103 @@ function switchTab(t, el) {
   const outgoing = document.querySelector('.panel.active');
   if (outgoing === incoming) return true;
 
-  // Hide all non-outgoing panels immediately
+  // Cancel any in-flight exit animation from a rapid prior switch
+  if (_pendingTabExit) {
+    const { panel, listener, timer } = _pendingTabExit;
+    clearTimeout(timer);
+    if (listener) panel.removeEventListener('animationend', listener);
+    panel.classList.remove('active', 'exit');
+    panel.style.display = 'none';
+    _pendingTabExit = null;
+  }
+
+  // Hide all panels except the outgoing one immediately
   document.querySelectorAll('.panel').forEach(p => {
-    if (p !== outgoing) {
-      p.classList.remove('active');
+    if (p !== outgoing && p !== incoming) {
+      p.classList.remove('active', 'exit');
       p.style.display = 'none';
     }
   });
 
-  // Animate outgoing panel out (brief fade-up), then show incoming
   function showIncoming() {
+    _pendingTabExit = null;
     if (outgoing) {
-      outgoing.classList.remove('active');
+      outgoing.classList.remove('active', 'exit');
       outgoing.style.display = 'none';
     }
-    incoming.style.display = 'block';
+    incoming.style.removeProperty('display');
     void incoming.offsetWidth; // force reflow so animation triggers
     incoming.classList.add('active');
+    // Scroll content area back to top for the new tab
+    try {
+      const shell = document.getElementById('appShell');
+      if (shell) shell.scrollTo({ top: 0, behavior: 'instant' });
+    } catch(e) {}
   }
 
   if (outgoing) {
+    // Start exit animation on outgoing (position:absolute so it floats behind)
     outgoing.classList.add('exit');
-    // Wait for exit animation (180ms), then swap
-    setTimeout(function() {
-      outgoing.classList.remove('exit');
-      showIncoming();
-    }, 160);
+
+    // Immediately start incoming — true crossfade, both animate at once
+    incoming.style.removeProperty('display');
+    void incoming.offsetWidth;
+    incoming.classList.add('active');
+    try {
+      const shell = document.getElementById('appShell');
+      if (shell) shell.scrollTo({ top: 0, behavior: 'instant' });
+    } catch(e) {}
+
+    // Clean up outgoing once it finishes fading out
+    const exitListener = function(e) {
+      if (e.animationName !== 'panelOut') return;
+      outgoing.removeEventListener('animationend', exitListener);
+      if (_pendingTabExit && _pendingTabExit.listener === exitListener) {
+        clearTimeout(_pendingTabExit.timer);
+      }
+      outgoing.classList.remove('active', 'exit');
+      outgoing.style.display = 'none';
+      _pendingTabExit = null;
+    };
+    const exitTimer = setTimeout(function() {
+      outgoing.removeEventListener('animationend', exitListener);
+      if (outgoing.classList.contains('exit')) {
+        outgoing.classList.remove('active', 'exit');
+        outgoing.style.display = 'none';
+        _pendingTabExit = null;
+      }
+    }, 200);
+
+    _pendingTabExit = { panel: outgoing, listener: exitListener, timer: exitTimer };
+    outgoing.addEventListener('animationend', exitListener);
   } else {
     showIncoming();
   }
 
   try {
-    if(t==='predict') { calcProb(); updateTsBadges(); }
-    if(t==='routes')
+    /* Show skeleton placeholder while the tab's async data loads */
+    if (typeof _skeletonTabs !== 'undefined' && _skeletonTabs.has(t)) _skShow(t);
+
+    if(t==='predict') { calcProb(); updateTsBadges(); _skHide(); }
     if(t==='log') { logPg = _logDirty ? 1 : logPg; renderLog(); }
     if(t==='leaderboard' && _lbDirty) { _lbDirty = false; lbSortRender(); }
+    if(t==='leaderboard' && !_lbDirty) { _skHide(); }
     if(t==='roadmap') loadUpdates().catch(e => console.warn('Roadmap load failed:', e));
     if(t==='ts-rankings') tsApply();
-    if(t==='experimental') { renderRforce(); trBuild(); }
+    if(t==='experimental') { renderRforce(); trBuild(); _skHide(); }
     if(t==='skills') { skRender(); if (!_skEntries.length) skLoadFromSupabase(); }
     if(t==='calendar') {
-      loadCalEvents().catch(e => console.warn('Calendar load failed:', e));
+      loadCalEvents().catch(e => { console.warn('Calendar load failed:', e); _skHide(); });
       setTimeout(function() {
         try { runAlliance(); } catch(e) { console.warn('Alliance helper render failed:', e); }
       }, 100);
     }
+    /* Tabs whose content is static / already rendered — dismiss skeleton right away */
+    if (['settings','resources','about','updates','add','formulas'].indexOf(t) !== -1) {
+      requestAnimationFrame(_skHide);
+    }
   } catch(e) {
+    _skHide();
     console.error('Tab setup failed for "' + t + '":', e);
     showToast('That tab hit a render error, but navigation recovered.', 'err', 3500);
   }
@@ -9443,6 +10284,406 @@ function switchTab(t, el) {
   }
   return true;
 }
+
+/* ═══════════════════════════════════════════════════════
+   SKELETON LOADING — inject shimmer placeholders while a
+   tab's async content is being fetched, then remove them
+   once the real content renders.
+════════════════════════════════════════════════════════ */
+
+/* Skeleton HTML builders for each tab type */
+var _skeletonTemplates = {
+
+  leaderboard: function() {
+    return '<div class="sk-screen">' +
+      '<div class="sk-hero sk-base"></div>' +
+      '<div class="sk-toolbar">' +
+        '<div class="sk-search sk-base"></div>' +
+        '<div class="sk-btn sk-base"></div>' +
+        '<div class="sk-btn sk-base"></div>' +
+        '<div class="sk-btn sk-base"></div>' +
+      '</div>' +
+      '<div class="sk-table">' +
+        '<div class="sk-thead sk-base"></div>' +
+        [1,2,3,4,5,6,7,8].map(function() {
+          return '<div class="sk-row sk-base"></div>';
+        }).join('') +
+      '</div>' +
+      '<div style="display:flex;justify-content:center;gap:6px;margin-top:12px">' +
+        '<div class="sk-btn sk-base" style="width:60px"></div>' +
+        '<div class="sk-btn sk-base" style="width:40px"></div>' +
+        '<div class="sk-btn sk-base" style="width:60px"></div>' +
+      '</div>' +
+    '</div>';
+  },
+
+  'ts-rankings': function() {
+    return '<div class="sk-screen">' +
+      '<div class="sk-h1 sk-base" style="width:45%;height:38px;margin-bottom:14px"></div>' +
+      '<div class="sk-h2 sk-base" style="width:65%;margin-bottom:1.5rem"></div>' +
+      '<div class="sk-stat-strip">' +
+        [1,2,3,4].map(function() { return '<div class="sk-stat-card sk-base"></div>'; }).join('') +
+      '</div>' +
+      '<div class="sk-toolbar">' +
+        '<div class="sk-search sk-base"></div>' +
+        '<div class="sk-btn sk-base"></div>' +
+      '</div>' +
+      '<div class="sk-table">' +
+        '<div class="sk-thead sk-base"></div>' +
+        [1,2,3,4,5,6,7].map(function() { return '<div class="sk-row sk-base"></div>'; }).join('') +
+      '</div>' +
+    '</div>';
+  },
+
+  skills: function() {
+    /* Skills has a static hero banner — only shimmer the table area below it */
+    return '<div class="sk-table">' +
+      '<div class="sk-thead sk-base"></div>' +
+      [1,2,3,4,5,6,7,8,9,10].map(function() { return '<div class="sk-row sk-base"></div>'; }).join('') +
+    '</div>';
+  },
+
+  /* Target element override: skills skeleton goes into #sk-lb-wrap, not the full panel */
+  _skillsTarget: 'sk-lb-wrap',
+
+  calendar: function() {
+    return '<div class="sk-screen">' +
+      '<div class="sk-h1 sk-base" style="width:35%;height:38px;margin-bottom:14px"></div>' +
+      '<div class="sk-toolbar" style="margin-bottom:1.25rem">' +
+        '<div class="sk-btn sk-base" style="width:120px"></div>' +
+        '<div class="sk-btn sk-base" style="width:100px"></div>' +
+        '<div class="sk-btn sk-base" style="width:80px"></div>' +
+      '</div>' +
+      [1,2,3,4,5].map(function() {
+        return '<div style="display:flex;gap:14px;padding:14px 16px 14px 20px;border:1px solid var(--border);border-radius:10px;margin-bottom:10px">' +
+          '<div class="sk-base" style="width:52px;min-height:80px;border-radius:8px;flex-shrink:0"></div>' +
+          '<div style="flex:1">' +
+            '<div class="sk-h2 sk-base" style="width:55%;margin-bottom:10px"></div>' +
+            '<div class="sk-line-s sk-base" style="margin-bottom:6px"></div>' +
+            '<div class="sk-line-xs sk-base"></div>' +
+          '</div>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+  },
+
+  roadmap: function() {
+    return '<div class="sk-screen">' +
+      '<div class="sk-hero sk-base" style="height:120px;margin-bottom:1.25rem"></div>' +
+      '<div class="sk-toolbar">' +
+        [1,2,3,4,5].map(function() { return '<div class="sk-btn sk-base" style="width:70px"></div>'; }).join('') +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:1rem">' +
+        [1,2,3].map(function() {
+          return '<div>' +
+            '<div class="sk-base" style="height:22px;width:80px;border-radius:3px;margin-bottom:10px"></div>' +
+            [1,2,3,4].map(function() {
+              return '<div style="display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px;background:var(--paper2)">' +
+                '<div class="sk-base" style="width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px"></div>' +
+                '<div style="flex:1">' +
+                  '<div class="sk-base sk-line" style="margin-bottom:5px"></div>' +
+                  '<div class="sk-base sk-line-xs"></div>' +
+                '</div>' +
+              '</div>';
+            }).join('') +
+          '</div>';
+        }).join('') +
+      '</div>' +
+    '</div>';
+  },
+
+  updates: function() {
+    return '<div class="sk-screen" style="max-width:860px">' +
+      '<div style="padding:40px 0 28px;border-bottom:1px solid var(--border);margin-bottom:40px">' +
+        '<div class="sk-h1 sk-base" style="width:50%;height:52px;margin-bottom:14px"></div>' +
+        '<div class="sk-base sk-line-s" style="width:70%"></div>' +
+      '</div>' +
+      [1,2,3].map(function() {
+        return '<div style="background:var(--paper2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:14px">' +
+          '<div style="padding:14px 18px 12px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;gap:14px;align-items:center">' +
+            '<div class="sk-base" style="height:22px;width:80px;border-radius:3px"></div>' +
+            '<div class="sk-base" style="height:18px;width:140px;border-radius:3px"></div>' +
+          '</div>' +
+          [1,2,3].map(function() {
+            return '<div style="display:flex;gap:12px;padding:10px 18px;border-bottom:1px solid var(--border)">' +
+              '<div class="sk-base" style="height:20px;width:40px;border-radius:3px;flex-shrink:0"></div>' +
+              '<div class="sk-base sk-line" style="margin-bottom:0"></div>' +
+            '</div>';
+          }).join('') +
+        '</div>';
+      }).join('') +
+    '</div>';
+  },
+
+  settings: function() {
+    return '<div class="sk-screen">' +
+      '<div class="sk-h1 sk-base" style="width:28%;height:34px;margin-bottom:1.5rem"></div>' +
+      '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px">' +
+        [1,2,3,4].map(function() {
+          return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">' +
+            '<div style="height:42px;background:var(--paper2);border-bottom:1px solid var(--border)" class="sk-base"></div>' +
+            [1,2,3].map(function() {
+              return '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--border)">' +
+                '<div style="flex:1;margin-right:14px">' +
+                  '<div class="sk-base" style="height:14px;width:55%;border-radius:3px;margin-bottom:6px"></div>' +
+                  '<div class="sk-base" style="height:11px;width:80%;border-radius:3px"></div>' +
+                '</div>' +
+                '<div class="sk-base" style="height:24px;width:44px;border-radius:12px;flex-shrink:0"></div>' +
+              '</div>';
+            }).join('') +
+          '</div>';
+        }).join('') +
+      '</div>' +
+    '</div>';
+  },
+
+  resources: function() {
+    return '<div class="sk-screen">' +
+      '<div class="sk-h1 sk-base" style="width:35%;height:36px;margin-bottom:1rem"></div>' +
+      '<div class="sk-h2 sk-base" style="width:65%;margin-bottom:1.5rem"></div>' +
+      '<div class="sk-card-grid">' +
+        [1,2,3,4,5,6].map(function() { return '<div class="sk-card sk-base"></div>'; }).join('') +
+      '</div>' +
+    '</div>';
+  },
+
+  about: function() {
+    return '<div class="sk-screen" style="max-width:800px">' +
+      '<div style="display:flex;gap:16px;align-items:center;margin-bottom:1.5rem">' +
+        '<div class="sk-base" style="width:90px;height:90px;border-radius:16px;flex-shrink:0"></div>' +
+        '<div style="flex:1">' +
+          '<div class="sk-h1 sk-base" style="width:50%;height:30px;margin-bottom:8px"></div>' +
+          '<div class="sk-base sk-line-s" style="width:75%"></div>' +
+        '</div>' +
+      '</div>' +
+      [1,2,3].map(function() {
+        return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem">' +
+          '<div class="sk-base" style="height:14px;width:30%;border-radius:3px;margin-bottom:12px"></div>' +
+          '<div class="sk-base sk-line" style="margin-bottom:6px"></div>' +
+          '<div class="sk-base sk-line" style="margin-bottom:6px"></div>' +
+          '<div class="sk-base sk-line-s"></div>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+  },
+
+  predict: function() {
+    return '<div class="sk-screen">' +
+      '<div class="sk-h1 sk-base" style="width:42%;height:36px;margin-bottom:1.25rem"></div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem">' +
+        [1,2].map(function() {
+          return '<div style="border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem">' +
+            '<div class="sk-base" style="height:14px;width:40%;border-radius:3px;margin-bottom:12px"></div>' +
+            [1,2,3].map(function() {
+              return '<div class="sk-base" style="height:38px;border-radius:var(--radius);margin-bottom:8px"></div>';
+            }).join('') +
+          '</div>';
+        }).join('') +
+      '</div>' +
+      '<div class="sk-base" style="height:24px;border-radius:var(--radius);margin-bottom:10px"></div>' +
+      '<div class="sk-base" style="height:140px;border-radius:var(--radius-lg);margin-bottom:1rem"></div>' +
+    '</div>';
+  },
+
+  log: function() {
+    return '<div class="sk-screen">' +
+      '<div class="sk-toolbar">' +
+        '<div class="sk-search sk-base"></div>' +
+        '<div class="sk-btn sk-base"></div>' +
+      '</div>' +
+      '<div class="sk-stat-strip" style="grid-template-columns:repeat(4,1fr);margin-bottom:1rem">' +
+        [1,2,3,4].map(function() { return '<div class="sk-stat-card sk-base" style="height:56px"></div>'; }).join('') +
+      '</div>' +
+      '<div class="sk-table">' +
+        '<div class="sk-thead sk-base"></div>' +
+        [1,2,3,4,5,6,7,8,9,10].map(function() { return '<div class="sk-row sk-base"></div>'; }).join('') +
+      '</div>' +
+    '</div>';
+  },
+
+  add: function() {
+    return '<div class="sk-screen" style="max-width:720px">' +
+      '<div class="sk-h1 sk-base" style="width:32%;height:34px;margin-bottom:1.25rem"></div>' +
+      [1,2,3].map(function() {
+        return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem">' +
+          '<div class="sk-base" style="height:13px;width:28%;border-radius:3px;margin-bottom:1rem"></div>' +
+          '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">' +
+            [1,2,3].map(function() {
+              return '<div>' +
+                '<div class="sk-base" style="height:11px;width:70%;border-radius:3px;margin-bottom:5px"></div>' +
+                '<div class="sk-base" style="height:34px;border-radius:var(--radius)"></div>' +
+              '</div>';
+            }).join('') +
+          '</div>' +
+        '</div>';
+      }).join('') +
+      '<div style="display:flex;gap:8px">' +
+        '<div class="sk-base" style="height:36px;width:120px;border-radius:var(--radius)"></div>' +
+        '<div class="sk-base" style="height:36px;width:80px;border-radius:var(--radius)"></div>' +
+      '</div>' +
+    '</div>';
+  },
+
+  formulas: function() {
+    return '<div class="sk-screen">' +
+      '<div class="sk-hero sk-base" style="height:130px;margin-bottom:1.5rem"></div>' +
+      [1,2].map(function() {
+        return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem">' +
+          [1,2].map(function() {
+            return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem">' +
+              '<div class="sk-base" style="height:13px;width:40%;border-radius:3px;margin-bottom:10px"></div>' +
+              '<div class="sk-base" style="height:80px;border-radius:var(--radius);margin-bottom:8px"></div>' +
+              '<div class="sk-base sk-line-s"></div>' +
+            '</div>';
+          }).join('') +
+        '</div>';
+      }).join('') +
+    '</div>';
+  }
+};
+
+/* Tabs that get skeletons and should clear them once real content arrives */
+var _skeletonTabs = new Set([
+  'leaderboard','ts-rankings','skills','calendar','roadmap',
+  'updates','settings','resources','about','predict','log',
+  'add','formulas'
+]);
+
+/* ID of the currently-showing skeleton so we can remove it */
+var _skActivePanel = null;
+var _skActiveEl    = null;
+
+/* Inject (or update) a skeleton for a panel */
+function _skShow(panelId) {
+  var tpl = _skeletonTemplates[panelId];
+  if (!tpl) return;
+
+  /* Some tabs define a custom target element (e.g. skills only covers the table, not the hero) */
+  var targetKey = _skeletonTemplates['_' + panelId + 'Target'];
+  var target;
+  if (targetKey) {
+    target = document.getElementById(targetKey);
+  }
+  if (!target) {
+    target = document.getElementById('tab-' + panelId);
+  }
+  if (!target) return;
+
+  /* Remove any previous skeleton */
+  _skHide();
+
+  var el = document.createElement('div');
+  el.id = 'sk-overlay-' + panelId;
+
+  /* If targeting the full panel, use absolute overlay; if a sub-element, use relative */
+  var isFullPanel = (target.id === 'tab-' + panelId);
+  if (isFullPanel) {
+    el.style.cssText = [
+      'position:absolute',
+      'top:0','left:0','right:0',
+      'z-index:10',
+      'pointer-events:none',
+      'background:var(--paper)'
+    ].join(';');
+    /* Panel needs relative positioning for the overlay */
+    if (!target.style.position || target.style.position === 'static') {
+      target.style.position = 'relative';
+    }
+  } else {
+    /* For sub-elements, just replace their inner content with the skeleton */
+    el.style.cssText = 'width:100%;pointer-events:none';
+  }
+
+  el.innerHTML = tpl();
+
+  if (isFullPanel) {
+    target.appendChild(el);
+  } else {
+    /* Swap contents of the target element */
+    el.dataset.skPrevHtml = target.innerHTML;
+    target.innerHTML = '';
+    target.appendChild(el);
+  }
+
+  _skActivePanel = panelId;
+  _skActiveEl    = el;
+  _skActiveTarget = target;
+  _skActiveIsFullPanel = isFullPanel;
+}
+
+/* Remove the skeleton overlay */
+var _skActiveTarget      = null;
+var _skActiveIsFullPanel = true;
+
+function _skHide() {
+  if (_skActiveEl) {
+    try {
+      if (_skActiveIsFullPanel) {
+        /* Full-panel overlay: just remove the node */
+        _skActiveEl.parentNode && _skActiveEl.parentNode.removeChild(_skActiveEl);
+      } else {
+        /* Sub-element: the real content is restored by the render function;
+           just remove the skeleton node if still there */
+        _skActiveEl.parentNode && _skActiveEl.parentNode.removeChild(_skActiveEl);
+      }
+    } catch(e) {}
+    _skActiveEl          = null;
+    _skActivePanel       = null;
+    _skActiveTarget      = null;
+    _skActiveIsFullPanel = true;
+  }
+  /* Also clean up any orphaned overlays (safety net) */
+  document.querySelectorAll('[id^="sk-overlay-"]').forEach(function(el) {
+    try { el.parentNode && el.parentNode.removeChild(el); } catch(e) {}
+  });
+}
+
+/* Hook real render functions to dismiss the skeleton once they run */
+(function() {
+  /* Patch a named window function to call _skHide before running */
+  function patchFn(name) {
+    var orig = window[name];
+    if (typeof orig !== 'function') return;
+    window[name] = function() {
+      _skHide();
+      return orig.apply(this, arguments);
+    };
+  }
+
+  /* Patch the main render functions for each async tab */
+  var toHook = [
+    'lbSortRender','lbApplyFilter','lbRender',  /* leaderboard */
+    'tsApply','tsRender',                         /* ts-rankings */
+    'skRender',                                   /* skills */
+    'renderCalList',                              /* calendar */
+    'rdRender','rdRenderAll',                     /* roadmap */
+    'renderLog',                                  /* scout log */
+  ];
+  toHook.forEach(patchFn);
+
+  /* Also patch loadCalEvents, loadUpdates (async), and skLoadFromSupabase */
+  var origLoadCal = window.loadCalEvents;
+  if (typeof origLoadCal === 'function') {
+    window.loadCalEvents = function() {
+      var result = origLoadCal.apply(this, arguments);
+      if (result && typeof result.then === 'function') {
+        result.then(_skHide).catch(_skHide);
+      }
+      return result;
+    };
+  }
+
+  var origLoadUpd = window.loadUpdates;
+  if (typeof origLoadUpd === 'function') {
+    window.loadUpdates = function() {
+      var result = origLoadUpd.apply(this, arguments);
+      if (result && typeof result.then === 'function') {
+        result.then(_skHide).catch(_skHide);
+      }
+      return result;
+    };
+  }
+})();
 
 /* ── Auton Calculator panel toggle ── */
 function toggleAutonCalcPanel() {
@@ -9681,7 +10922,7 @@ async function saveEditCalEvent() {
     });
     if(!r.ok) { const t = await r.text(); throw new Error(t); }
     errEl.style.color = 'var(--green)';
-    errEl.textContent = '&#10003; Saved!';
+    errEl.innerHTML = '&#10003; Saved!';
     setTimeout(closeEditCalModal, 700);
     await loadCalEvents();
   } catch(e) {
@@ -9955,6 +11196,8 @@ function openPitForEvent(id) {
   pitModalTab('form', document.querySelector('.pit-modal-tab'));
   document.getElementById('pit-modal-bg').classList.add('open');
   renderPitLog();
+  // Refresh from Supabase in the background so the log is always up-to-date
+  pitLoadFromSupabase();
 }
 
 function closePitModal() {
@@ -10281,7 +11524,7 @@ async function importSelectedReEvents() {
           maps_url:     maps_url || null
         })
       });
-      if(!r.ok) throw new Error('HTTP ' + r.status);
+      if(!evRes.ok) throw new Error('HTTP ' + evRes.status);
       saved++;
     } catch(e) {
       console.error('Failed to save', re.name, e);
@@ -10386,12 +11629,12 @@ async function fetchSchedule() {
   if(!_schedEvent) return;
   const token = getREToken();
   if(!token) {
-    document.getElementById('sched-status').textContent = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic4"/></svg> Paste your RobotEvents API token first.';
+    document.getElementById('sched-status').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic4"/></svg> Paste your RobotEvents API token first.';
     document.getElementById('sched-status').style.color = 'var(--red-text)';
     return;
   }
   if(!_schedEvent.re_event_id) {
-    document.getElementById('sched-status').textContent = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic4"/></svg> This event has no RobotEvents ID. Re-import it via the RobotEvents sync tool.';
+    document.getElementById('sched-status').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic4"/></svg> This event has no RobotEvents ID. Re-import it via the RobotEvents sync tool.';
     document.getElementById('sched-status').style.color = 'var(--red-text)';
     return;
   }
@@ -12535,9 +13778,9 @@ function injectSearchExtras() {
     btn.className = 'star-btn' + (stars.includes(team) ? ' starred' : '');
     btn.dataset.team = team;
     btn.title = 'Star this team';
-    btn.textContent = '&#9733; ' + (stars.includes(team) ? 'Starred' : 'Star team');
+    btn.innerHTML = '&#9733; ' + (stars.includes(team) ? 'Starred' : 'Star team');
     btn.style.cssText = 'margin:6px 0;font-size:13px;padding:4px 12px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--paper3);font-family:var(--mono);cursor:pointer;display:flex;align-items:center;gap:4px';
-    btn.onclick = function() { toggleStar(team); btn.textContent = '&#9733; ' + (getStarred().includes(team) ? 'Starred' : 'Star team'); btn.classList.toggle('starred', getStarred().includes(team)); };
+    btn.onclick = function() { toggleStar(team); btn.innerHTML = '&#9733; ' + (getStarred().includes(team) ? 'Starred' : 'Star team'); btn.classList.toggle('starred', getStarred().includes(team)); };
     teamEl.closest('.card') && teamEl.closest('.card').insertAdjacentElement('afterbegin', btn);
     if (!teamEl.closest('.card')) res.insertAdjacentElement('afterbegin', btn);
   }
@@ -12587,7 +13830,7 @@ function injectSearchExtras() {
       // Add compare button
       const cmpBtn = document.createElement('button');
       cmpBtn.className = 'cmp-trigger';
-      cmpBtn.textContent = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic18"/></svg> Compare';
+      cmpBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic18"/></svg> Compare';
       cmpBtn.onclick = () => { openCompareModal(); setTimeout(()=>{ const inp=document.getElementById('cmp-t1'); if(inp){inp.value=team;runCompare();} },50); };
       res.insertAdjacentElement('afterbegin', cmpBtn);
     }
@@ -12659,7 +13902,7 @@ window.showOutcomeDetail = function(o, clickedSeg, allOutcomes) {
     const redPct = allOutcomes.filter(x=>x.winner==='Red wins').reduce((s,x)=>s+x.probability,0)/totalProb*100;
     const btn = document.createElement('button');
     btn.className = 'log-pred-btn btn-sm';
-    btn.textContent = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic6"/></svg> Log Prediction';
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic6"/></svg> Log Prediction';
     btn.style.cssText = 'margin-top:.75rem;display:block;width:100%';
     btn.onclick = () => { logPrediction(redPct, null); };
     det.appendChild(btn);
@@ -13012,7 +14255,7 @@ function skSetSyncStatus(state, label) {
     err:     { text: '&#10005; ' + (label||'Error'),  color: 'var(--red)'   }
   };
   const s = map[state] || map.ok;
-  el.textContent = s.text;
+  el.innerHTML = s.text;
   el.style.color = s.color;
 }
 
@@ -13174,16 +14417,20 @@ function skAttachScrollListener() {
   _skScrollBound = true;
   const shell = document.getElementById('appShell');
   if (!shell) return;
-  shell.addEventListener('scroll', function() {
+  function skScrollCheck() {
     const sentinel = document.getElementById('sk-sentinel');
     if (!sentinel || sentinel.style.display === 'none') return;
-    const shellRect     = shell.getBoundingClientRect();
-    const sentinelRect  = sentinel.getBoundingClientRect();
-    // Load next page when sentinel is within 300px of the visible bottom
-    if (sentinelRect.top < shellRect.bottom + 300) {
+    const shellRect    = shell.getBoundingClientRect();
+    const sentinelRect = sentinel.getBoundingClientRect();
+    // Load next batch when sentinel is within 400px of visible bottom
+    if (sentinelRect.top < shellRect.bottom + 400) {
       skRenderMore();
     }
-  }, { passive: true });
+  }
+  shell.addEventListener('scroll', skScrollCheck, { passive: true });
+  // Immediately check in case the initial page is shorter than the viewport
+  // (setTimeout lets the DOM paint first so getBoundingClientRect is accurate)
+  setTimeout(skScrollCheck, 120);
 }
 
 function skRender() {
@@ -13269,14 +14516,17 @@ function skRender() {
     <div id="sk-table-body">
       ${firstPage.map((t, i) => _skRowHTML(t, i, grid, maxScore, myTeam_, isAdmin_)).join('')}
     </div>
-    <!-- Infinite scroll sentinel -->
+    <!-- Infinite scroll sentinel + manual fallback button -->
     <div id="sk-sentinel" style="${hasMore ? '' : 'display:none;'}padding:18px;text-align:center;
          font-size:11px;font-family:var(--mono);color:var(--ink3);border-top:1px solid var(--border)">
       <span class="spin" style="margin-right:6px"></span> Loading more teams…
+      <button onclick="skRenderMore()" style="margin-left:10px;padding:4px 12px;border:1px solid var(--border2);background:var(--paper3);color:var(--ink2);border-radius:var(--radius);font-size:10px;font-family:var(--mono);cursor:pointer;vertical-align:middle">Load more</button>
     </div>
   </div>`;
 
-  // Attach infinite-scroll listener (no-op if already attached)
+  // Re-attach scroll listener every time we render so tab switches
+  // (which rebuild the DOM) don't silently orphan the old listener.
+  _skScrollBound = false;
   skAttachScrollListener();
 }
 
@@ -13311,13 +14561,112 @@ function exportSkillsCSV() {
 }
 
 /* ══════════════════════════════════════════════════════════
-   PIT SCOUT — localStorage-backed, exportable
+   PIT SCOUT — Supabase primary, localStorage write-buffer
+   Supabase table: pit_scout (public read, authenticated write)
+   On boot: show local cache instantly, then pull fresh from DB.
+   On save: write to localStorage immediately, push to DB async.
+   On load: pull DB, prune any local rows that made it in, merge
+            any that are still pending.
 ══════════════════════════════════════════════════════════ */
 const PIT_LS_KEY = 'os_pit_scout_v1';
 let _pitEntries = [];
+
+/* ── Boot: show cached data immediately ── */
 (function() {
   try { _pitEntries = JSON.parse(lsGet(PIT_LS_KEY) || '[]'); } catch(e) { _pitEntries = []; }
 })();
+
+/* ── Map a DB row (snake_case) → in-memory entry (short keys) ── */
+function _pitRowToEntry(row) {
+  return {
+    id:         row.id,
+    ts:         row.created_at,
+    team:       row.team        || '',
+    name:       row.robot_name  || '',
+    event:      row.event       || '',
+    drive:      row.drive_type  || '',
+    motors:     row.motors      || '',
+    ratio:      row.gear_ratio  || '',
+    type:       row.robot_type  || '',
+    lift:       row.lift_height || '',
+    weight:     row.weight_lbs  || '',
+    routes:     row.routes      || '',
+    best_auton: row.best_auton  || '',
+    sawp:       row.can_sawp    || '',
+    lang:       row.prog_lang   || '',
+    notes:      row.notes       || '',
+  };
+}
+
+/* ── Map an in-memory entry → DB payload ── */
+function _pitEntryToPayload(entry) {
+  return {
+    id:          String(entry.id),
+    created_at:  entry.ts,
+    team:        entry.team,
+    robot_name:  entry.name  || null,
+    event:       entry.event || null,
+    drive_type:  entry.drive || null,
+    motors:      entry.motors || null,
+    gear_ratio:  entry.ratio || null,
+    robot_type:  entry.type  || null,
+    lift_height: entry.lift  || null,
+    weight_lbs:  entry.weight || null,
+    routes:      entry.routes || null,
+    best_auton:  entry.best_auton || null,
+    can_sawp:    entry.sawp  || null,
+    prog_lang:   entry.lang  || null,
+    notes:       entry.notes || null,
+  };
+}
+
+/* ── Pull from Supabase (called on tab open + after auth) ── */
+async function pitLoadFromSupabase() {
+  try {
+    const r = await fetch(SB_URL + '/rest/v1/pit_scout?select=*&order=created_at.desc', { headers: HDRS });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const rows = await r.json();
+
+    const remoteIds = new Set(rows.map(function(x){ return String(x.id); }));
+
+    // Push any offline-buffered entries that haven't made it to Supabase
+    const pending = _pitEntries.filter(function(e){ return !remoteIds.has(String(e.id)); });
+    if (pending.length) {
+      await Promise.all(pending.map(function(entry) {
+        return fetch(SB_URL + '/rest/v1/pit_scout', {
+          method: 'POST',
+          headers: { ...HDRS, 'Content-Type': 'application/json',
+                     'Prefer': 'resolution=merge-duplicates,return=minimal' },
+          body: JSON.stringify(_pitEntryToPayload(entry))
+        }).catch(function(){});
+      }));
+    }
+
+    // Rebuild _pitEntries from DB (canonical) — pending rows now in DB too
+    _pitEntries = rows.map(_pitRowToEntry);
+    // Clear write-buffer — everything is now in Supabase
+    try { lsSet(PIT_LS_KEY, JSON.stringify([])); } catch(e) {}
+    renderPitLog();
+  } catch(e) {
+    console.warn('Pit scout load failed (showing local cache):', e.message);
+  }
+}
+
+/* ── Write one entry to Supabase (fire-and-forget, returns promise) ── */
+async function pitSyncToSupabase(entry) {
+  try {
+    const resp = await fetch(SB_URL + '/rest/v1/pit_scout', {
+      method: 'POST',
+      headers: { ...HDRS, 'Content-Type': 'application/json',
+                 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify(_pitEntryToPayload(entry)),
+    });
+    return resp.ok || resp.status === 409;
+  } catch(e) {
+    console.warn('Pit scout Supabase sync failed (local save still succeeded):', e);
+    return false;
+  }
+}
 
 function savePitEntry() {
   const team = (document.getElementById('pit-team').value || '').trim().toUpperCase();
@@ -13340,34 +14689,51 @@ function savePitEntry() {
     lang:       document.getElementById('pit-lang').value,
     notes:      document.getElementById('pit-notes').value.trim(),
   };
+
   // Overwrite existing entry for same team+event if exists
-  const existIdx = _pitEntries.findIndex(e => e.team === team && e.event === entry.event);
+  const existIdx = _pitEntries.findIndex(function(e){ return e.team === team && e.event === entry.event; });
   if (existIdx >= 0) _pitEntries[existIdx] = entry;
   else _pitEntries.unshift(entry);
+
+  // Write-buffer: save locally immediately so data survives if DB push fails
   try { lsSet(PIT_LS_KEY, JSON.stringify(_pitEntries)); } catch(e) {}
-  document.getElementById('pit-msg').innerHTML = '<span style="color:var(--green);font-size:12px;margin-top:8px;display:block"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic1"/></svg> Pit entry saved for ' + esc(team) + '.</span>';
+
+  document.getElementById('pit-msg').innerHTML = '<span style="color:var(--green);font-size:12px;margin-top:8px;display:block"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic1"/></svg> Pit entry saved for ' + esc(team) + '…</span>';
   renderPitLog();
-  setTimeout(() => { const m = document.getElementById('pit-msg'); if (m) m.innerHTML = ''; }, 3000);
+
+  // Async push to Supabase — clears write-buffer on success
+  pitSyncToSupabase(entry).then(function(synced) {
+    if (synced) {
+      // Entry confirmed in DB — remove from write-buffer
+      const confirmed = new Set(_pitEntries.map(function(e){ return String(e.id); }));
+      // (Buffer is already cleared by pitLoadFromSupabase on next pull; just clear now)
+      try { lsSet(PIT_LS_KEY, JSON.stringify([])); } catch(e) {}
+    }
+    const label = synced ? ' <span style="color:var(--ink3);font-size:10px">(synced ✓)</span>' : ' <span style="color:var(--amber);font-size:10px">(offline — will sync)</span>';
+    const msgEl = document.getElementById('pit-msg');
+    if (msgEl) msgEl.innerHTML = '<span style="color:var(--green);font-size:12px;margin-top:8px;display:block"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic1"/></svg> Pit entry saved for ' + esc(team) + '.' + label + '</span>';
+    setTimeout(function(){ const m = document.getElementById('pit-msg'); if (m) m.innerHTML = ''; }, 4000);
+  });
 }
 
 function clearPitForm() {
   ['pit-team','pit-name','pit-event','pit-ratio','pit-lift','pit-weight','pit-routes','pit-best-auton','pit-notes']
-    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    .forEach(function(id){ const el = document.getElementById(id); if (el) el.value = ''; });
   ['pit-drive','pit-motors','pit-type','pit-sawp','pit-lang']
-    .forEach(id => { const el = document.getElementById(id); if (el) el.selectedIndex = 0; });
+    .forEach(function(id){ const el = document.getElementById(id); if (el) el.selectedIndex = 0; });
   const m = document.getElementById('pit-msg'); if (m) m.innerHTML = '';
 }
 
 function renderPitLog() {
   const q = (document.getElementById('pit-log-q')?.value || '').trim().toUpperCase();
-  const rows = q ? _pitEntries.filter(e => (e.team||'').includes(q) || (e.name||'').toUpperCase().includes(q)) : _pitEntries;
+  const rows = q ? _pitEntries.filter(function(e){ return (e.team||'').includes(q) || (e.name||'').toUpperCase().includes(q); }) : _pitEntries;
   const body = document.getElementById('pit-log-body');
   if (!body) return;
   if (!rows.length) {
     body.innerHTML = '<div class="empty" style="padding:24px 0">' + (_pitEntries.length ? 'No matching entries.' : 'No pit entries yet. Fill out the form above.') + '</div>';
     return;
   }
-  body.innerHTML = rows.map(e => `
+  body.innerHTML = rows.map(function(e){ return `
     <div class="pit-row">
       <div style="font-family:var(--mono);font-weight:700;font-size:13px">${esc(e.team)}</div>
       <div>
@@ -13386,27 +14752,34 @@ function renderPitLog() {
         <button class="btn btn-sm" onclick="pitPrefill(${JSON.stringify(e.id)})" title="Load into form"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic15"/></svg></button>
         <button class="btn btn-sm btn-d" onclick="deletePitEntry(${JSON.stringify(e.id)})" title="Delete">&#10005;</button>
       </div>
-    </div>`).join('');
+    </div>`;}).join('');
 }
 
 function pitPrefill(id) {
-  const e = _pitEntries.find(en => String(en.id) === String(id));
+  const e = _pitEntries.find(function(en){ return String(en.id) === String(id); });
   if (!e) return;
-  const set = (i, v) => { const el = document.getElementById(i); if (el) el.value = v || ''; };
+  const set = function(i, v) { const el = document.getElementById(i); if (el) el.value = v || ''; };
   set('pit-team', e.team); set('pit-name', e.name); set('pit-event', e.event);
   set('pit-drive', e.drive); set('pit-motors', e.motors); set('pit-ratio', e.ratio);
   set('pit-type', e.type); set('pit-lift', e.lift); set('pit-weight', e.weight);
   set('pit-routes', e.routes); set('pit-best-auton', e.best_auton);
   set('pit-sawp', e.sawp); set('pit-lang', e.lang); set('pit-notes', e.notes);
   switchTab('calendar', document.querySelector('[data-tab="calendar"]'));
-  setTimeout(() => openPitForEvent(null), 150);
+  setTimeout(function(){ openPitForEvent(null); }, 150);
 }
 
-function deletePitEntry(id) {
+async function deletePitEntry(id) {
   if (!confirm('Delete this pit entry?')) return;
-  _pitEntries = _pitEntries.filter(e => String(e.id) !== String(id));
+  _pitEntries = _pitEntries.filter(function(e){ return String(e.id) !== String(id); });
   try { lsSet(PIT_LS_KEY, JSON.stringify(_pitEntries)); } catch(err) {}
   renderPitLog();
+  // Delete from Supabase (best-effort; needs auth write policy)
+  try {
+    await fetch(SB_URL + '/rest/v1/pit_scout?id=eq.' + encodeURIComponent(id), {
+      method: 'DELETE',
+      headers: { ...HDRS, 'Content-Type': 'application/json' }
+    });
+  } catch(e) { console.warn('Pit delete sync failed:', e.message); }
 }
 
 function exportPitCSV() {
@@ -13447,13 +14820,13 @@ function alResetPicked() {
 }
 
 function alScore(team) {
-  // Composite score: 60% avg_pins, 20% awp_pct, 10% success_pct, 10% TrueSkill (if available)
+  // Composite score: 65% event performance (avg_pins 43%, awp_pct 14%, success_pct 8%), 35% TrueSkill
   const avg = parseFloat(team.avg_pins) || 0;
   const awp = parseFloat(team.awp_pct)  || 0;
   const suc = parseFloat(team.success_pct) || 0;
   const ts  = tsGet ? (tsGet(team.team)?.ts || 25) : 25;
   const tsNorm = Math.max(0, Math.min(100, (ts / 50) * 100)); // normalise ts ~0-50 → 0-100
-  return avg * 0.6 + awp * 0.2 + suc * 0.1 + tsNorm * 0.1;
+  return avg * 0.43 + awp * 0.14 + suc * 0.08 + tsNorm * 0.35;
 }
 
 function runAlliance() {
@@ -13648,11 +15021,11 @@ async function qsFetchMatches() {
   const token = getREToken();
   const statusEl = document.getElementById('qs-status');
 
-  if (!evId)  { statusEl.textContent = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic4"/></svg> Pick an event first.'; statusEl.style.color = 'var(--red-text)'; return; }
-  if (!token) { statusEl.textContent = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic4"/></svg> Paste your RobotEvents API token.'; statusEl.style.color = 'var(--red-text)'; return; }
+  if (!evId)  { statusEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic4"/></svg> Pick an event first.'; statusEl.style.color = 'var(--red-text)'; return; }
+  if (!token) { statusEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic4"/></svg> Paste your RobotEvents API token.'; statusEl.style.color = 'var(--red-text)'; return; }
 
   const ev = (typeof calEventsMap !== 'undefined' ? calEventsMap : new Map()).get(String(evId));
-  if (!ev?.re_event_id) { statusEl.textContent = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic4"/></svg> Event has no RobotEvents ID — re-sync from RobotEvents.'; statusEl.style.color = 'var(--red-text)'; return; }
+  if (!ev?.re_event_id) { statusEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.125em;flex-shrink:0"><use href="#ic4"/></svg> Event has no RobotEvents ID — re-sync from RobotEvents.'; statusEl.style.color = 'var(--red-text)'; return; }
 
   _qsEventId = ev.re_event_id;
   statusEl.textContent = 'Fetching schedule…';
@@ -13704,7 +15077,7 @@ async function qsFetchMatches() {
     });
     matchSel.disabled = false;
     document.getElementById('qs-match-count').textContent = `(${allMatches.length} matches)`;
-    statusEl.textContent = `&#10003; Loaded ${allMatches.length} matches`;
+    statusEl.innerHTML = `&#10003; Loaded ${allMatches.length} matches`;
     statusEl.style.color = 'var(--green)';
   } catch (e) {
     statusEl.textContent = 'Error: ' + e.message;
@@ -13810,7 +15183,7 @@ async function qsSaveEntry(side) {
       allEntries.unshift(entry);
       setAllTeams(buildStats(allEntries));
       msgEl.style.color = 'var(--green)';
-      msgEl.textContent = '&#10003; Saved ' + team;
+      msgEl.innerHTML = '&#10003; Saved ' + team;
       showToast('&#10003; Saved ' + team, 'ok', 2000);
     } else {
       msgEl.style.color = 'var(--red-text)';
@@ -13918,7 +15291,7 @@ function adsAdvance() {
   const myTeam = document.getElementById('ads-my-team')?.value.trim().toUpperCase();
   const isMe = currentSeed === myTeam;
 
-  document.getElementById('ads-current-picker').textContent = currentSeed + (isMe ? ' <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;flex-shrink:0" ><path d="M15 15s1.5-3 1.5-6-1.5-6-1.5-6"/><path d="M9 18c.85.63 1.885 1 3 1 1.115 0 2.15-.37 3-1"/><path d="m6 12-3-1.5A2 2 0 0 1 2 8.5V7a1 1 0 0 1 1-1h3V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-1z"/></svg> YOU' : '');
+  document.getElementById('ads-current-picker').innerHTML = currentSeed + (isMe ? ' <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em;flex-shrink:0" ><path d="M15 15s1.5-3 1.5-6-1.5-6-1.5-6"/><path d="M9 18c.85.63 1.885 1 3 1 1.115 0 2.15-.37 3-1"/><path d="m6 12-3-1.5A2 2 0 0 1 2 8.5V7a1 1 0 0 1 1-1h3V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-1z"/></svg> YOU' : '');
   document.getElementById('ads-current-picker').style.color = isMe ? 'var(--amber)' : 'var(--ink)';
   document.getElementById('ads-pick-description').textContent = `Seed #${info.seedIdx + 1} · ${info.label}`;
   const pickNumber = _adsPicked.filter(p => p.action === 'accept').length + 1;
@@ -14589,6 +15962,512 @@ function unlockTabs() {
       </div>
     </div>
   </div>
+</div><!-- /.pit-modal-bg -->
+
+
+  <!-- ── ROUTES (admin only) ── -->
+  <div id="tab-routes" class="panel">
+    <div class="page">
+
+      <!-- ── FIELD OVERVIEW ── -->
+      <div style="background:var(--paper2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.25rem">
+        <div style="font-family:var(--barlow);font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-bottom:1rem;display:flex;align-items:center;gap:8px">
+          <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.1em;color:var(--amber)"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+          Field Overview — Push Back
+        </div>
+
+        <!-- Field image — referenced externally, not embedded -->
+        <div style="text-align:center;margin-bottom:.75rem">
+          <img src="field.png" alt="VEX V5RC Push Back field — top-down view"
+               style="max-width:100%;border-radius:var(--radius);border:1px solid var(--border2);display:inline-block"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+          <div style="display:none;font-size:11px;font-family:var(--mono);color:var(--ink3);padding:16px 0">
+            [field.png not found — place field.png alongside index.html]
+          </div>
+          <div style="font-size:10px;font-family:var(--mono);color:var(--ink3);margin-top:6px">VEX V5RC Push Back field — top-down view</div>
+        </div>
+
+        <p style="font-size:11px;font-family:var(--mono);color:var(--ink3);line-height:1.6">
+          Top-down field view — VEX V5RC Push Back. Diagonal lines divide the field into quadrants. Mobile goals start near each alliance corner and the centre.
+        </p>
+      </div>
+
+      <!-- ── ELEMENT NOTATION + AWP CRITERIA ── -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem">
+
+        <!-- Element Notation -->
+        <div style="background:var(--paper2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem 1.5rem">
+        <div style="font-family:var(--barlow);font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-bottom:1rem">Element Notation</div>
+        <table style="width:100%;border-collapse:collapse">
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0;width:68px"><code style="background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,192,48,.25);border-radius:3px;font-family:var(--mono);font-size:11px;padding:2px 7px;font-weight:700">g1</code></td><td style="padding:7px 0;font-size:13px;color:var(--ink2);font-family:var(--sans)">Goal1 (Alliance) (1)</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0"><code style="background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,192,48,.25);border-radius:3px;font-family:var(--mono);font-size:11px;padding:2px 7px;font-weight:700">g2</code></td><td style="padding:7px 0;font-size:13px;color:var(--ink2);font-family:var(--sans)">Goal2 (2)</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0"><code style="background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,192,48,.25);border-radius:3px;font-family:var(--mono);font-size:11px;padding:2px 7px;font-weight:700">mc</code></td><td style="padding:7px 0;font-size:13px;color:var(--ink2);font-family:var(--sans)">Middle Cup (3)</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0"><code style="background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,192,48,.25);border-radius:3px;font-family:var(--mono);font-size:11px;padding:2px 7px;font-weight:700">uu</code></td><td style="padding:7px 0;font-size:13px;color:var(--ink2);font-family:var(--sans)">Upper Pin (1) (4)</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0"><code style="background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,192,48,.25);border-radius:3px;font-family:var(--mono);font-size:11px;padding:2px 7px;font-weight:700">ul</code></td><td style="padding:7px 0;font-size:13px;color:var(--ink2);font-family:var(--sans)">Lower Pin (1) (5)</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0"><code style="background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,192,48,.25);border-radius:3px;font-family:var(--mono);font-size:11px;padding:2px 7px;font-weight:700">lu</code></td><td style="padding:7px 0;font-size:13px;color:var(--ink2);font-family:var(--sans)">Lower Pin (2) (6)</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0"><code style="background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,192,48,.25);border-radius:3px;font-family:var(--mono);font-size:11px;padding:2px 7px;font-weight:700">ll</code></td><td style="padding:7px 0;font-size:13px;color:var(--ink2);font-family:var(--sans)">Lower Pin (2) (7)</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0"><code style="background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,192,48,.25);border-radius:3px;font-family:var(--mono);font-size:11px;padding:2px 7px;font-weight:700">uc</code></td><td style="padding:7px 0;font-size:13px;color:var(--ink2);font-family:var(--sans)">Upper Cup (8)</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0"><code style="background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,192,48,.25);border-radius:3px;font-family:var(--mono);font-size:11px;padding:2px 7px;font-weight:700">lc</code></td><td style="padding:7px 0;font-size:13px;color:var(--ink2);font-family:var(--sans)">Lower Cup (9)</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0"><code style="background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,192,48,.25);border-radius:3px;font-family:var(--mono);font-size:11px;padding:2px 7px;font-weight:700">llwc</code></td><td style="padding:7px 0;font-size:13px;color:var(--ink2);font-family:var(--sans)">Left Wall Cup (10)</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0"><code style="background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,192,48,.25);border-radius:3px;font-family:var(--mono);font-size:11px;padding:2px 7px;font-weight:700">lmwc</code></td><td style="padding:7px 0;font-size:13px;color:var(--ink2);font-family:var(--sans)">Middle Wall Cup (11)</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0"><code style="background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,192,48,.25);border-radius:3px;font-family:var(--mono);font-size:11px;padding:2px 7px;font-weight:700">lrwc</code></td><td style="padding:7px 0;font-size:13px;color:var(--ink2);font-family:var(--sans)">Right Wall Cup (12)</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0"><code style="background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,192,48,.25);border-radius:3px;font-family:var(--mono);font-size:11px;padding:2px 7px;font-weight:700">rlwc</code></td><td style="padding:7px 0;font-size:13px;color:var(--ink2);font-family:var(--sans)">Left Wall Cup (13)</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0"><code style="background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,192,48,.25);border-radius:3px;font-family:var(--mono);font-size:11px;padding:2px 7px;font-weight:700">rmwc</code></td><td style="padding:7px 0;font-size:13px;color:var(--ink2);font-family:var(--sans)">Middle Wall Cup (14)</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0"><code style="background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,192,48,.25);border-radius:3px;font-family:var(--mono);font-size:11px;padding:2px 7px;font-weight:700">rrwc</code></td><td style="padding:7px 0;font-size:13px;color:var(--ink2);font-family:var(--sans)">Right Wall Cup (15)</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 0"><code style="background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,192,48,.25);border-radius:3px;font-family:var(--mono);font-size:11px;padding:2px 7px;font-weight:700">r</code></td><td style="padding:7px 0;font-size:13px;color:var(--ink2);font-family:var(--sans)">Roller (16)</td></tr>
+            <tr><td style="padding:7px 0"><code style="background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,192,48,.25);border-radius:3px;font-family:var(--mono);font-size:11px;padding:2px 7px;font-weight:700">&gt;</code></td><td style="padding:7px 0;font-size:13px;color:var(--ink2);font-family:var(--sans)">Sequence</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <!-- AWP Criteria -->
+        <div style="background:var(--paper2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem 1.5rem">
+          <div style="font-family:var(--barlow);font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-bottom:1rem">AWP Criteria</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:1rem">
+            <div style="display:flex;align-items:flex-start;gap:8px">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--green);margin-top:2px"><polyline points="20 6 9 17 4 12"/></svg>
+              <span style="font-size:13px;color:var(--ink);font-family:var(--sans)">7+ alliance pins (own side)</span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:8px">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--green);margin-top:2px"><polyline points="20 6 9 17 4 12"/></svg>
+              <span style="font-size:13px;color:var(--ink);font-family:var(--sans)">3+ goals with 2+ pins each</span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:8px">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--green);margin-top:2px"><polyline points="20 6 9 17 4 12"/></svg>
+              <span style="font-size:13px;color:var(--ink);font-family:var(--sans)">Neither robot touching perimeter</span>
+            </div>
+          </div>
+          <p style="font-size:11px;font-family:var(--mono);color:var(--ink3);line-height:1.6">
+            Auto bonus: 12 pts to higher-scoring alliance (SC7). Sig criteria tightens Sep 3 2026.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- ── NAMED ROUTES ── -->
+      <div style="background:var(--paper2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.25rem">
+        <div style="font-family:var(--barlow);font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-bottom:1rem">Named Routes</div>
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border2)">
+              <th style="text-align:left;font-size:10px;font-family:var(--mono);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);padding-bottom:8px;width:35%">Route</th>
+              <th style="text-align:left;font-size:10px;font-family:var(--mono);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);padding-bottom:8px;width:25%">Name</th>
+              <th style="text-align:left;font-size:10px;font-family:var(--mono);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);padding-bottom:8px">Notes</th>
+            </tr>
+          </thead>
+          <tbody id="named-routes-body">
+            <tr>
+              <td colspan="3" style="padding:24px 0;text-align:center;font-size:12px;font-family:var(--mono);color:var(--ink3)">No named routes yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── SAVE ROUTE ── -->
+      <div class="card">
+        <p class="sec">Saved Routes</p>
+        <p class="hint" style="margin-bottom:12px">Routes saved here are shared across your admin sessions.</p>
+        <div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap">
+          <input id="route-name" placeholder="Route name (e.g. Left AWP v2)" style="flex:1;min-width:160px">
+          <input id="route-desc" placeholder="Description / notes" style="flex:2;min-width:200px">
+          <button class="btn btn-p" onclick="routesSave()">+ Save Route</button>
+        </div>
+        <div id="routes-log">
+          <div class="empty" style="padding:24px 0">No routes saved yet.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── FORMULAS (admin only) ── -->
+  <div id="tab-formulas" class="panel">
+    <div class="page">
+
+      <!-- Hero -->
+      <div style="background:linear-gradient(160deg,var(--paper2) 0%,var(--paper) 60%);border-bottom:1px solid var(--border);padding:2rem 1.5rem 1.75rem;position:relative;overflow:hidden;margin:-1.5rem -1.5rem 1.5rem">
+        <div style="position:absolute;top:-40px;right:-40px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(61,142,240,.12) 0%,transparent 70%);pointer-events:none"></div>
+        <div style="position:absolute;bottom:-60px;left:-30px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(244,2,25,.07) 0%,transparent 70%);pointer-events:none"></div>
+        <div style="font-family:var(--barlow);font-size:clamp(22px,4vw,36px);font-weight:800;letter-spacing:1px;text-transform:uppercase;line-height:1.1;color:var(--ink);position:relative;z-index:1">
+          <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.1em"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+          Scoring <span style="color:var(--blue)">Formulas</span>
+        </div>
+        <div style="font-size:11px;font-family:var(--mono);color:var(--ink3);margin-top:6px;position:relative;z-index:1">Complete reference for every formula used across the scouting database — scoring, probability models, skill ratings, and rankings.</div>
+        <!-- Section jump pills -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:1rem;position:relative;z-index:1">
+          <a href="#fml-scoring"   style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.6px;padding:3px 10px;border-radius:99px;background:var(--red-bg);color:var(--red);border:1px solid rgba(244,2,25,.25);text-decoration:none">Scoring</a>
+          <a href="#fml-winprob"   style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.6px;padding:3px 10px;border-radius:99px;background:var(--blue-bg);color:var(--blue);border:1px solid rgba(61,142,240,.25);text-decoration:none">Win Prob</a>
+          <a href="#fml-awp"       style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.6px;padding:3px 10px;border-radius:99px;background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,192,48,.25);text-decoration:none">AWP</a>
+          <a href="#fml-trueskill" style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.6px;padding:3px 10px;border-radius:99px;background:var(--green-bg);color:var(--green);border:1px solid rgba(61,189,110,.25);text-decoration:none">TrueSkill</a>
+          <a href="#fml-rforce"    style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.6px;padding:3px 10px;border-radius:99px;background:var(--volt-bg);color:var(--volt);border:1px solid rgba(200,255,0,.2);text-decoration:none">RFORCE</a>
+          <a href="#fml-opr"       style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.6px;padding:3px 10px;border-radius:99px;background:var(--surface2);color:var(--ink2);border:1px solid var(--border2);text-decoration:none">OPR/DPR</a>
+          <a href="#fml-openskill" style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.6px;padding:3px 10px;border-radius:99px;background:var(--surface2);color:var(--ink2);border:1px solid var(--border2);text-decoration:none">OpenSkill</a>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           SECTION 1 — SCORING
+      ═══════════════════════════════════════ -->
+      <div id="fml-scoring" style="display:flex;align-items:center;gap:10px;margin:1.75rem 0 .75rem">
+        <div style="width:3px;height:20px;border-radius:2px;background:var(--red);flex-shrink:0"></div>
+        <div style="font-family:var(--barlow);font-size:16px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--ink)">Scoring</div>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+
+      <div class="g2">
+        <!-- Pin Score -->
+        <div class="card" style="border-left:3px solid var(--red)">
+          <p class="sec" style="color:var(--red)">Pin Score</p>
+          <div class="formula-box">pins = goal1_pins + goal2_pins
+
+SAWP mode (combined alliance):
+  pins = own_g1 + own_g2 + team_g1 + team_g2</div>
+          <p class="hint">Raw pin count per match entry. Primary leaderboard metric. In SAWP mode all four goal slots across both robots are summed for the alliance total.</p>
+        </div>
+
+        <!-- Match Score -->
+        <div class="card" style="border-left:3px solid var(--red)">
+          <p class="sec" style="color:var(--red)">Match Score</p>
+          <div class="formula-box">RawScore  = (R1_G1 + R1_G2 + R2_G1 + R2_G2) × 5
+
+AutoBonus = +12 pts → higher-scoring alliance  (SC7)
+           = +6 pts  → each alliance if raw scores tied
+
+FinalScore = RawScore + AutoBonus</div>
+          <p class="hint">Each pin is worth 5 match points. The <code>AutoBonus</code> is awarded to the higher-scoring alliance; on a tie both alliances receive +6 instead of +12.</p>
+        </div>
+      </div>
+
+      <!-- Worked Example -->
+      <div class="card" style="border:1px solid var(--border2);background:var(--paper2)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem">
+          <span style="font-size:14px">📐</span>
+          <p class="sec" style="margin:0">Worked Example</p>
+        </div>
+        <div class="g2">
+          <div>
+            <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--red);margin-bottom:4px">Red Alliance</div>
+            <div class="formula-box" style="margin:0">R1 → 4 pins total, 0% fail
+R2 → 3 pins total, 0% fail
+RawScore = 7 × 5 = 35 pts</div>
+          </div>
+          <div>
+            <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--blue);margin-bottom:4px">Blue Alliance</div>
+            <div class="formula-box" style="margin:0">R1 → 5 pins total, 0% fail
+R2 → 5 pins total, 0% fail
+RawScore = 10 × 5 = 50 pts</div>
+          </div>
+        </div>
+        <div class="formula-box" style="margin-top:8px">Blue wins raw (50 &gt; 35) → Blue gets +12 AutoBonus
+Final: Red = 35 pts    Blue = 62 pts
+
+With 0% fail rates → P(both succeed) = 100%
+→ Blue win probability = 100%</div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           SECTION 2 — WIN PROBABILITY
+      ═══════════════════════════════════════ -->
+      <div id="fml-winprob" style="display:flex;align-items:center;gap:10px;margin:1.75rem 0 .75rem">
+        <div style="width:3px;height:20px;border-radius:2px;background:var(--blue);flex-shrink:0"></div>
+        <div style="font-family:var(--barlow);font-size:16px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--ink)">Win Probability</div>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+
+      <div class="g2">
+        <!-- 16-outcome model -->
+        <div class="card" style="border-left:3px solid var(--blue)">
+          <p class="sec" style="color:var(--blue)">16-Outcome Model</p>
+          <div class="formula-box">Each robot independently succeeds or fails.
+All 2⁴ = 16 combinations are enumerated.
+
+For each outcome:
+  P(outcome) = ∏ P(robotᵢ branch)
+  P(succeed) = 1 − FailRate
+  P(fail)    = FailRate
+
+Scores computed per outcome; bar segments
+sized proportionally to P(outcome).
+
+Red win % = Σ P(outcomes: redScore &gt; blueScore)
+Blue win% = Σ P(outcomes: blueScore &gt; redScore)
+Tie %     = Σ P(outcomes: scores equal)</div>
+          <p class="hint">Base model. Each robot has a single fail rate that collapses the outcome to 0 pins on failure.</p>
+        </div>
+
+        <!-- Distribution-aware model -->
+        <div class="card" style="border-left:3px solid var(--blue);position:relative;overflow:hidden">
+          <div style="position:absolute;top:8px;right:10px;font-size:9px;font-family:var(--mono);font-weight:700;color:var(--blue);background:var(--blue-bg);border:1px solid rgba(61,142,240,.3);border-radius:99px;padding:1px 8px;letter-spacing:.3px;text-transform:uppercase">New</div>
+          <p class="sec" style="color:var(--blue)">Distribution-Aware Model</p>
+          <div class="formula-box">Extension of the 16-outcome model.
+Uses each robot's Fail Pin Distribution
+instead of a single fail → 0-pins outcome.
+
+On success: robot scores entered G1 + G2 pins.
+On fail:    robot scores according to its
+            empirical Fail Pin Distribution.
+
+All outcome combinations enumerated
+(cartesian product across all branches).
+
+Each branch weight:
+  P(succeed)         = 1 − FailRate
+  P(fail, k pins)    = FailRate × dist_weight(k)
+                       [weights normalised to sum = 1]
+
+Red win % = Σ P(outcomes: redScore &gt; blueScore)
+Blue win% = Σ P(outcomes: blueScore &gt; redScore)
+Tie %     = Σ P(outcomes: scores equal)</div>
+          <p class="hint">Richer model that captures partial scoring on failure. Each partial-pins scenario becomes a separate weighted branch in the outcome tree.</p>
+        </div>
+      </div>
+
+      <!-- Fail Pin Distribution -->
+      <div class="card" style="border-left:3px solid var(--blue);position:relative;overflow:hidden">
+        <div style="position:absolute;top:12px;right:14px;font-size:9px;font-family:var(--mono);font-weight:700;color:var(--blue);background:var(--blue-bg);border:1px solid rgba(61,142,240,.3);border-radius:99px;padding:1px 8px;letter-spacing:.3px;text-transform:uppercase">New</div>
+        <p class="sec" style="color:var(--blue)">Fail Pin Distribution</p>
+        <div class="g2">
+          <div>
+            <div class="formula-box">Input: % weight for each pin count
+  (0 pins, 1 pin, 2 pins, …)
+  Weights normalised to sum = 100%.
+
+Example:
+  0 pins → 60%,  1 pin → 30%,  2 pins → 10%
+
+  P(fail, 0 pins) = 0.60 × FailRate
+  P(fail, 1 pin)  = 0.30 × FailRate
+  P(fail, 2 pins) = 0.10 × FailRate</div>
+          </div>
+          <div style="display:flex;flex-direction:column;justify-content:center;gap:8px">
+            <p class="hint">Discrete empirical distribution entered manually per robot. Models partial scoring when the robot fails its primary objective but still scores some pins.</p>
+            <p class="hint">If no distribution is entered, fail defaults to <strong style="color:var(--ink)">0 pins (100%)</strong> — the standard 16-outcome model behaviour. Each pin count becomes a separate branch in the outcome tree.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           SECTION 3 — AWP
+      ═══════════════════════════════════════ -->
+      <div id="fml-awp" style="display:flex;align-items:center;gap:10px;margin:1.75rem 0 .75rem">
+        <div style="width:3px;height:20px;border-radius:2px;background:var(--amber);flex-shrink:0"></div>
+        <div style="font-family:var(--barlow);font-size:16px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--ink)">AWP Probability</div>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+
+      <div class="card" style="border-left:3px solid var(--amber)">
+        <p class="sec" style="color:var(--amber)">Autonomous Win Point (AWP)</p>
+        <div class="g2">
+          <div>
+            <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:6px">Earn Conditions (both required)</div>
+            <div class="formula-box">1.  Total alliance pins scored ≥ 7
+2.  At least 3 goals have ≥ 2 pins each
+
+AWP % = Σ P(scenarios where both
+            conditions are met)</div>
+          </div>
+          <div style="display:flex;flex-direction:column;justify-content:center;gap:8px">
+            <p class="hint">AWP is a <strong style="color:var(--ink)">deterministic rule</strong>, not a per-robot probability. For each outcome scenario the calculator checks whether the alliance's combined pin counts satisfy both conditions.</p>
+            <p class="hint">AWP earns <strong style="color:var(--amber)">Ranking Points (WP)</strong> — not autonomous match score. The AWP% shown in the probability legend is the sum of probabilities across all scenarios where the rule is met.</p>
+            <div class="formula-box" style="margin:0">Boolean per entry.
+AWP Rate = (AWP entries / total entries) × 100%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           SECTION 4 — TRUESKILL
+      ═══════════════════════════════════════ -->
+      <div id="fml-trueskill" style="display:flex;align-items:center;gap:10px;margin:1.75rem 0 .75rem">
+        <div style="width:3px;height:20px;border-radius:2px;background:var(--green);flex-shrink:0"></div>
+        <div style="font-family:var(--barlow);font-size:16px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--ink)">TrueSkill</div>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+
+      <div class="g2">
+        <div class="card" style="border-left:3px solid var(--green);position:relative;overflow:hidden">
+          <div style="position:absolute;top:8px;right:10px;font-size:9px;font-family:var(--mono);font-weight:700;color:var(--green);background:var(--green-bg);border:1px solid rgba(61,189,110,.3);border-radius:99px;padding:1px 8px;letter-spacing:.3px;text-transform:uppercase">New</div>
+          <p class="sec" style="color:var(--green)">TrueSkill Win Probability</p>
+          <div class="formula-box">P(A beats B) = Φ( (μA − μB) / √(2β² + σA² + σB²) )
+
+  β = 25/6 ≈ 4.167   (standard TrueSkill β)
+  μ = skill mean
+  σ = uncertainty (standard deviation)
+
+Alliance σ pooled:
+  σ_alliance = √((σ₁² + σ₂²) / 2)
+
+Φ(x) = standard normal CDF
+        (Abramowitz &amp; Stegun approx.)
+        max error &lt; 1.5 × 10⁻⁷</div>
+          <p class="hint">Source: Microsoft TrueSkill (Herbrich et al., 2006). Data: vrc-data-analysis.com — VRC Worlds 2026 (1,362 teams).</p>
+        </div>
+        <div class="card" style="border-left:3px solid var(--green)">
+          <p class="sec" style="color:var(--green)">TrueSkill Display Score</p>
+          <div class="formula-box">ts_score = μ − 3σ
+
+  μ = skill mean
+  σ = uncertainty
+
+Conservative lower-bound estimate.
+Penalises teams with few matches (high σ).
+σ shrinks as more matches are recorded.</div>
+          <p class="hint">Also called the <strong style="color:var(--ink)">ordinal</strong> — the 99.7% lower bound on true skill. Loaded from the <code>ts_rankings</code> Supabase table. Higher is better.</p>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           SECTION 5 — RFORCE
+      ═══════════════════════════════════════ -->
+      <div id="fml-rforce" style="display:flex;align-items:center;gap:10px;margin:1.75rem 0 .75rem">
+        <div style="width:3px;height:20px;border-radius:2px;background:var(--volt);flex-shrink:0"></div>
+        <div style="font-family:var(--barlow);font-size:16px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--ink)">RFORCE Rankings</div>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+
+      <div class="card" style="border-left:3px solid var(--volt)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem;flex-wrap:wrap">
+          <p class="sec" style="margin:0;color:var(--volt)">RFORCE Index</p>
+          <span style="font-size:9px;font-family:var(--mono);color:var(--ink3);font-weight:400;text-transform:none;letter-spacing:0">Local scouting approximation — not official; no judge awards or full RobotEvents data.</span>
+        </div>
+        <div class="g2">
+          <div>
+            <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:6px">Event Points (EP)</div>
+            <div class="formula-box">RANK_EP(rank, total) =
+  ((1 + total − rank) / total) × 10
+
+EP = Avg Pins RANK
+   + AWP Rate RANK
+   + Success Rate RANK</div>
+            <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin:10px 0 6px">Event Rating Factor (RFER)</div>
+            <div class="formula-box">EventCaliber = avg pins across all teams
+               at that event
+
+RFER = 1 + log₁₀(EventCaliber + 1)
+           × EventLevel × EventBonus
+
+EventLevel:
+  Local      = 1.0
+  Sig/Reg    = 1.25
+  National   = 1.5
+  World      = 2.0
+
+EventBonus = 1 + (n² − 1) / max(1, N²)
+  n = events this team attended
+  N = max events by any team</div>
+          </div>
+          <div>
+            <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:6px">Final RFORCE Score</div>
+            <div class="formula-box">EventScore = EP × RFER
+RFORCE     = Σ(EventScores) ÷ events attended</div>
+            <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin:10px 0 6px">Combined Score</div>
+            <div class="formula-box">Combined = 60% × normalised(RFORCE)
+         + 40% × normalised(TrueSkill)
+
+Both components normalised 0 → 100
+before weighting.</div>
+            <p class="hint" style="margin-top:8px">Event-weighted performance index. Better performance at higher-caliber events earns a larger RFER multiplier, rewarding teams that compete and win at tough events.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           SECTION 6 — OPR / DPR / CCWM
+      ═══════════════════════════════════════ -->
+      <div id="fml-opr" style="display:flex;align-items:center;gap:10px;margin:1.75rem 0 .75rem">
+        <div style="width:3px;height:20px;border-radius:2px;background:var(--ink3);flex-shrink:0"></div>
+        <div style="font-family:var(--barlow);font-size:16px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--ink)">OPR · DPR · CCWM</div>
+        <span style="font-size:9px;font-family:var(--mono);color:var(--green);background:var(--green-bg);border:1px solid rgba(61,189,110,.2);border-radius:99px;padding:2px 8px;letter-spacing:.3px;text-transform:uppercase;font-weight:700">Experimental</span>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+
+      <div class="g3">
+        <div class="card" style="border-left:3px solid var(--ink3)">
+          <p class="sec">OPR</p>
+          <div class="formula-box" style="line-height:1.7">OPR =
+avg pins scored per entry
+
+Measures raw offensive output
+per appearance.</div>
+          <p class="hint" style="margin-top:8px">Offensive Power Rating. Higher is better.</p>
+        </div>
+        <div class="card" style="border-left:3px solid var(--ink3)">
+          <p class="sec">DPR</p>
+          <div class="formula-box" style="line-height:1.7">DPR =
+avg of max(0, EventAvg − pins_scored)
+         per entry
+
+EventAvg = mean pins across all
+           entries at that event.</div>
+          <p class="hint" style="margin-top:8px">Defensive Power Rating. Proxy for how much defensive pressure opponents imposed. <strong style="color:var(--ink)">Lower DPR = better</strong> relative performance under pressure.</p>
+        </div>
+        <div class="card" style="border-left:3px solid var(--ink3)">
+          <p class="sec">CCWM</p>
+          <div class="formula-box" style="line-height:1.7">CCWM = OPR − DPR
+
+Positive = adds more than it concedes.
+Net contribution to winning margin.</div>
+          <p class="hint" style="margin-top:8px">Calculated Contribution to Winning Margin. Computed from scouted match entries — each entry is one robot in one match.</p>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           SECTION 7 — OPENSKILL
+      ═══════════════════════════════════════ -->
+      <div id="fml-openskill" style="display:flex;align-items:center;gap:10px;margin:1.75rem 0 .75rem">
+        <div style="width:3px;height:20px;border-radius:2px;background:var(--ink2);flex-shrink:0"></div>
+        <div style="font-family:var(--barlow);font-size:16px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--ink)">OpenSkill</div>
+        <span style="font-size:9px;font-family:var(--mono);color:var(--green);background:var(--green-bg);border:1px solid rgba(61,189,110,.2);border-radius:99px;padding:2px 8px;letter-spacing:.3px;text-transform:uppercase;font-weight:700">Experimental</span>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+
+      <div class="card" style="border-left:3px solid var(--ink2)">
+        <p class="sec">Weng-Lin Bradley-Terry Full</p>
+        <p class="hint" style="margin-bottom:.75rem">Source: Weng &amp; Lin, JMLR 2011 §3.1 — same model as openskill.js v4. Each scouted entry is treated as a 1-v-1 match vs a fixed "field" opponent.</p>
+        <div class="g2">
+          <div>
+            <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:6px">Parameters (openskill.js defaults)</div>
+            <div class="formula-box">μ₀  = 25          (initial mean)
+σ₀  = 25/3  ≈ 8.333  (initial uncertainty)
+β   = 25/6  ≈ 4.167  (performance noise)
+τ   = 25/300 ≈ 0.083 (dynamic factor)
+κ   = 0.0001          (σ floor multiplier)
+
+Field opponent: μ = 25, σ = σ₀ / 2
+Win condition:  team pins ≥ event average</div>
+          </div>
+          <div>
+            <div style="font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:6px">Update Equations (Bradley-Terry Full, §3.1)</div>
+            <div class="formula-box">c    = √(σᵢ² + σq² + 2β²)
+p_iq = Φ((μᵢ − μq) / c)    — win probability
+
+s    = 1 (win)  or  0 (loss)
+
+Ω    = (σᵢ²/c) × (s − p_iq)          — mean Δ
+Δ    = (σᵢ²/c²) × p_iq × (1 − p_iq) — var Δ
+
+μᵢ'  = μᵢ + Ω
+σᵢ'  = √( max(σᵢ²(1−Δ) + τ², (κσ₀)²) )
+
+Ordinal = μ − 3σ  (99.7% lower bound)
+
+Entries processed: chronological (created_at ↑)
+Φ(x): Abramowitz &amp; Stegun polynomial
+       max error &lt; 1.5 × 10⁻⁷</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer note -->
+      <div style="margin:1.5rem 0 .5rem;padding:12px 16px;background:var(--paper2);border:1px solid var(--border);border-radius:var(--radius);display:flex;align-items:center;gap:10px">
+        <span style="font-size:14px;flex-shrink:0">⚠️</span>
+        <span style="font-size:10px;font-family:var(--mono);color:var(--ink3);line-height:1.6">RFORCE, OPR/DPR/CCWM, and OpenSkill are <strong style="color:var(--ink)">local scouting approximations</strong> computed from manually-entered data and are not official VEX metrics. Accuracy improves with more scouted entries. OPR/CCWM are experimental on sparse datasets.</span>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
 <!-- ── ALLIANCE MODAL ── -->
@@ -14617,6 +16496,175 @@ function unlockTabs() {
   </div>
 </div>
 
+
+<script>
+
+/* ══════════════════════════════════════════════════════════
+   ROUTES — Supabase table: user_routes
+   Primary: Supabase, keyed by auth user_id (each signed-in
+   user owns their own rows).  Falls back to localStorage
+   write-buffer (os_routes_v1) when not signed in or offline,
+   and migrates that buffer to Supabase on next sign-in.
+══════════════════════════════════════════════════════════ */
+const _routesLS = 'os_routes_v1';
+let _savedRoutes = [];
+
+/* ── Helper: current user's JWT (admin or team user) ── */
+function _routesToken() {
+  return (typeof adminToken !== 'undefined' && adminToken) ||
+         (typeof teamUserToken !== 'undefined' && teamUserToken) ||
+         null;
+}
+function _routesHdrs() {
+  const tok = _routesToken();
+  if (!tok) return null;
+  return { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + tok,
+           'Content-Type': 'application/json', 'Accept': 'application/json' };
+}
+/* Extract user UUID from the current JWT */
+function _routesUserId() {
+  const tok = _routesToken();
+  if (!tok) return null;
+  try {
+    const p = JSON.parse(atob(tok.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    return p.sub || null;
+  } catch(e) { return null; }
+}
+
+/* ── Boot: show localStorage data immediately, then load from DB ── */
+(function() {
+  try { _savedRoutes = JSON.parse(lsGet(_routesLS) || '[]'); } catch(e) { _savedRoutes = []; }
+  renderRoutesLog();
+  // If signed in, pull from Supabase (replaces local state) and migrate any offline saves
+  if (_routesToken()) routesLoad();
+})();
+
+/* ── Load all routes for the current user from Supabase ── */
+async function routesLoad() {
+  const hdrs = _routesHdrs();
+  if (!hdrs) return; // not signed in — localStorage fallback already shown
+  try {
+    const r = await fetch(
+      SB_URL + '/rest/v1/user_routes?select=*&order=created_at.desc',
+      { headers: hdrs }
+    );
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const rows = await r.json();
+    // Migrate any offline saves that aren't in the DB yet
+    const remoteIds = new Set(rows.map(function(x){ return x.id; }));
+    const pending = _savedRoutes.filter(function(x){ return !remoteIds.has(String(x.id)); });
+    if (pending.length) {
+      const uid = _routesUserId();
+      if (uid) {
+        await Promise.all(pending.map(function(rt) {
+          return fetch(SB_URL + '/rest/v1/user_routes', {
+            method: 'POST',
+            headers: Object.assign({}, hdrs, { 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
+            body: JSON.stringify({ id: String(rt.id), user_id: uid, name: rt.name, description: rt.desc || '' })
+          }).catch(function(){});
+        }));
+      }
+    }
+    // Merge: start from DB rows, keeping shape consistent
+    _savedRoutes = rows.map(function(row) {
+      return { id: row.id, name: row.name, desc: row.description || '', ts: row.created_at };
+    });
+    // Clear the now-migrated local buffer
+    try { lsSet(_routesLS, JSON.stringify([])); } catch(e) {}
+    renderRoutesLog();
+  } catch(e) {
+    console.warn('Routes load failed (showing local data):', e.message);
+  }
+}
+
+/* ── Save a new route ── */
+async function routesSave() {
+  const name = (document.getElementById('route-name')?.value || '').trim();
+  const desc = (document.getElementById('route-desc')?.value || '').trim();
+  if (!name) { showToast('Route name required.', 'err'); return; }
+
+  const id = 'rt_' + Date.now();
+  const route = { id, name, desc, ts: new Date().toISOString() };
+  _savedRoutes.unshift(route);
+
+  const nameEl = document.getElementById('route-name');
+  const descEl = document.getElementById('route-desc');
+  if (nameEl) nameEl.value = '';
+  if (descEl) descEl.value = '';
+  renderRoutesLog();
+
+  const hdrs = _routesHdrs();
+  const uid  = _routesUserId();
+  if (hdrs && uid) {
+    // Signed in — write to Supabase, no localStorage needed
+    try {
+      const r = await fetch(SB_URL + '/rest/v1/user_routes', {
+        method: 'POST',
+        headers: Object.assign({}, hdrs, { 'Prefer': 'return=minimal' }),
+        body: JSON.stringify({ id, user_id: uid, name, description: desc })
+      });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      showToast('Route saved.', 'ok');
+    } catch(e) {
+      // DB write failed — fall back to localStorage buffer
+      try { lsSet(_routesLS, JSON.stringify(_savedRoutes)); } catch(_) {}
+      showToast('Route saved locally (sync failed).', 'err', 4000);
+    }
+  } else {
+    // Not signed in — write to localStorage as offline buffer
+    try { lsSet(_routesLS, JSON.stringify(_savedRoutes)); } catch(e) {}
+    showToast('Route saved locally. Sign in to sync across devices.', 'ok');
+  }
+}
+
+/* ── Delete a route by id ── */
+async function routesDelete(id) {
+  _savedRoutes = _savedRoutes.filter(function(r){ return String(r.id) !== String(id); });
+  try { lsSet(_routesLS, JSON.stringify(_savedRoutes)); } catch(e) {}
+  renderRoutesLog();
+
+  const hdrs = _routesHdrs();
+  if (hdrs) {
+    try {
+      await fetch(SB_URL + '/rest/v1/user_routes?id=eq.' + encodeURIComponent(id), {
+        method: 'DELETE', headers: hdrs
+      });
+    } catch(e) { console.warn('Route delete sync failed:', e.message); }
+  }
+}
+
+function renderRoutesLog() {
+  const el = document.getElementById('routes-log');
+  if (!el) return;
+  if (!_savedRoutes.length) {
+    el.innerHTML = '<div class="empty" style="padding:24px 0">No routes saved yet.</div>';
+    return;
+  }
+  el.innerHTML = _savedRoutes.map(function(r) {
+    const safeId = esc(String(r.id));
+    return `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px">${esc(r.name)}</div>
+        <div style="font-size:11px;font-family:var(--mono);color:var(--ink3)">${esc(r.desc||'')}</div>
+      </div>
+      <button onclick="routesDelete('${safeId}')" style="padding:2px 8px;border:1px solid rgba(244,2,25,.3);background:transparent;color:var(--red-text);border-radius:3px;cursor:pointer;font-size:10px;flex-shrink:0">✕</button>
+    </div>`;
+  }).join('');
+}
+
+/* Re-load routes from Supabase whenever the user signs in */
+(function() {
+  var _origTryLogin = window.tryLogin;
+  if (typeof _origTryLogin === 'function') {
+    window.tryLogin = async function() {
+      await _origTryLogin.apply(this, arguments);
+      // tryLogin sets adminToken/teamUserToken — give it a tick to settle
+      setTimeout(function() { if (_routesToken()) routesLoad(); }, 100);
+    };
+  }
+})();
+
+</script>
 
 <script>
 /* ── HERO ANIMATION INTERSECTION OBSERVER ──────────────
